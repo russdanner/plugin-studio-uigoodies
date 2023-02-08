@@ -1,0 +1,53 @@
+# This file describes a plugin for use in CrafterCMS
+
+# The version of the format for this file
+descriptorVersion: 2
+
+# Describe the plugin
+plugin:
+  type: site
+  id: org.rd.plugin.uigoodies
+  name: Studio UI Goodies
+  tags:
+    - studio
+  version:
+    major: 1
+    minor: 0
+    patch: 0
+  description: A plugin to adds some UI goodies to your studio
+  documentation: "https://raw.githubusercontent.com/russdanner/plugin-craftercms-uigoodies/master/README.md"
+  website:
+    name: Studio UI Goodies
+    url: https://github.com/russdanner/plugin-craftercms-uigoodies
+  media:
+    screenshots:
+      - title: CrafterCMS
+        description: CrafterCMS Plugin for Crafter Studio that adds UI helpers and extensions
+        url: "https://raw.githubusercontent.com/russdanner/plugin-craftercms-Studio UI Goodies/master/.crafter/logo.png"
+  developer:
+    company:
+      name: Russ Danner
+      email: russdanner@craftercms.com
+      url: https://github.com/russdanner
+  build:
+    id: cafebabe31300070207481d6ba87901d0b02716c9
+    date: 2023-02-07T00:00:00Z
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  crafterCmsVersions:
+    - major: 4
+      minor: 0
+      patch: 0
+    - major: 4
+      minor: 0
+      patch: 1
+    - major: 4
+      minor: 0
+      patch: 2
+    - major: 4
+      minor: 0
+      patch: 3
+  crafterCmsEditions:
+    - community
+    - enterprise
