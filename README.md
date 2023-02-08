@@ -1,7 +1,9 @@
 # Studio UI Goodies
 This is a plugin that contains a number of UI "Goodies."
 
-What is a goodie? Nothing specific. This plugin is a collection of UI tweaks and alternatives to help you customize the editing experience for your content authors to make them as efficient as possible. If you see a widget that helps you here, install it and be happy. If not, make the world a better place by doing a bit of programming and send us pull request :)
+What is a goodie? Nothing specific. This plugin is a collection of UI tweaks and alternatives to help you customize the editing experience for your content authors to make them as efficient as possible. 
+
+If you see a widget that helps you here, install it and be happy. If not, make the world a better place by doing a bit of programming and send us pull request :)
 
 ## Widgets
 - Toolbar Edit button
