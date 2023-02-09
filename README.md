@@ -6,8 +6,12 @@ What is a goodie? Nothing specific. This plugin is a collection of UI tweaks and
 If you see a widget that helps you here, install it and be happy. If not, make the world a better place by doing a bit of programming and send us pull request :)
 
 ## Widgets
+### Top Navigation Toolbar
 - Toolbar Edit button
 - Toolbar Publish button
+
+## Sidebar
+- Sidebar Tool Panel Accordian
 
 # Installation
 
@@ -57,3 +61,28 @@ curl --location --request POST 'http://SERVER_AND_PORT/studio/api/2/marketplace/
    </configuration>
 </widget>
 ```
+## Sidebar Tool Panel Accordian
+```
+<widget id="org.rd.plugin.uigoodies.ToolPanelAccordian">
+  <plugin id="org.rd.plugin.uigoodies"
+  site="{site}"
+  type="apps"
+  name="uigoodies"
+  file="index.js"/>
+  <configuration>
+    <title>A Title Goes Here</title>
+    <widgets>
+      <widget id="craftercms.components.PathNavigator">
+        <configuration>
+          <id>Pages</id>
+          <label>Pages</label>
+          <icon id="@mui/icons-material/DescriptionOutlined"/>
+          <rootPath>/site/website/index.xml</rootPath>
+          <locale>en</locale>
+        </configuration>
+      </widget>
+    </widgets>
+  </configuration>
+</widget>
+```
+
