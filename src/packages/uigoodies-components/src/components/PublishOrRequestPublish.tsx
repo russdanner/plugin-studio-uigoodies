@@ -14,9 +14,9 @@ export function PublishOrRequestPublish(props) {
   let forceRequest = false;
 
   if (item) {
-    if (item.stateMap.modified === true || item.stateMap.new === true) {
+    if (item.stateMap.modified || item.stateMap.new) {
       showButton = true;
-      if (item.availableActionsMap.publish === false) {
+      if (!item.availableActionsMap.publish) {
         forceRequest = true;
       }
     }
