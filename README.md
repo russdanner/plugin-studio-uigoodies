@@ -13,12 +13,12 @@ place by doing a bit of programming and send us pull request :)
 
 ### Top Navigation Toolbar
 
-- Toolbar Edit button
+- Toolbar Edit button 
 - Toolbar Publish button
 
 ## Sidebar
 
-- Sidebar Tool Panel Accordian
+- Sidebar Tool Panel Accordion
 
 # Installation
 
