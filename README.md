@@ -92,6 +92,11 @@ curl --location --request POST 'http://SERVER_AND_PORT/studio/api/2/marketplace/
 	<configuration>
 		<title>Shortcuts</title>
 		<icon id="@mui/icons-material/SentimentSatisfiedOutlined"/>
+        <sxs>
+            <accordionDetails>
+                <paddingLeft>15px</paddingLeft>
+            </accordionDetails>
+        </sxs>
 		<widgets>
 			<widget id="craftercms.components.ToolsPanelEmbeddedAppViewButton">
 				<configuration>
