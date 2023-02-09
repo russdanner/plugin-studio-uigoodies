@@ -1,59 +1,53 @@
 import * as React from 'react';
 import { useDispatch } from 'react-redux';
-import IconButton, { IconButtonProps } from '@mui/material/IconButton';
+import IconButton from '@mui/material/IconButton';
 import { Tooltip } from '@mui/material';
-
 import Button from '@mui/material/Button';
 import SystemIcon from '@craftercms/studio-ui/components/SystemIcon';
-
-import useActiveSiteId from '@craftercms/studio-ui/hooks/useActiveSiteId';
-import useCurrentPreviewItem from '@craftercms/studio-ui/hooks/useCurrentPreviewItem';
-import useEnv from '@craftercms/studio-ui/hooks/useEnv';
-
-import { showPublishDialog, closePublishDialog } from '@craftercms/studio-ui/state/actions/dialogs';
-import { batchActions } from '@craftercms/studio-ui/state/actions/misc';
+import { closePublishDialog, showPublishDialog } from '@craftercms/studio-ui/state/actions/dialogs';
 
 export function PublishOrRequestPublish(props) {
+  // Note: All toolbar child components receive the current preview item as a prop automatically. If this component will be used elsewhere, use useCurrentPreviewItem() hook.
+  const { item, useIcon } = props;
   const dispatch = useDispatch();
-  const useIcon = props.useIcon != 'undefined' ? props.useIcon : true;
-  const siteId = useActiveSiteId();
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const env = useEnv();
-  const item = useCurrentPreviewItem();
-
   let showButton = false;
   let forceRequest = false;
 
-  if (item?.stateMap.modified === true || item?.stateMap.new === true) {
-    showButton = true;
-
-    if (item.availableActionsMap.publish === false) {
-      forceRequest = true;
+  if (item) {
+    if (item.stateMap.modified === true || item.stateMap.new === true) {
+      showButton = true;
+      if (item.availableActionsMap.publish === false) {
+        forceRequest = true;
+      }
     }
   }
 
+  let label = forceRequest ? 'Request Publish' : 'Publish';
+  let iconId = item
+    ? forceRequest
+      ? '@mui/icons-material/CloudDoneOutlined'
+      : '@mui/icons-material/BackupOutlined'
+    : '@mui/icons-material/HourglassEmptyOutlined';
+
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    dispatch(showPublishDialog({ items: [item], onSuccess: batchActions([closePublishDialog()]) }));
+    dispatch(showPublishDialog({ items: [item], onSuccess: closePublishDialog() }));
   };
 
-  let label = forceRequest ? 'Request Publish' : 'Publish';
-  let iconId = forceRequest ? '@mui/icons-material/CloudDoneRounded' : '@mui/icons-material/BackupRounded';
-
-  if (showButton === true) {
-    return useIcon ? (
-      <Tooltip title={label}>
-        <IconButton size="medium" style={{ padding: 4 }} onClick={handleClick}>
-          <SystemIcon icon={{ id: iconId }} fontIconProps={{ fontSize: 'small' }} />
+  return showButton === true ? (
+    useIcon ? (
+      <Tooltip title={item ? label : ''}>
+        <IconButton size="small" onClick={handleClick} disabled={!item}>
+          <SystemIcon icon={{ id: iconId }} />
         </IconButton>
       </Tooltip>
     ) : (
-      <Button size="small" variant="text" onClick={handleClick}>
+      <Button size="small" variant="text" onClick={handleClick} disabled={!item}>
         {label}
       </Button>
-    );
-  } else {
-    return <></>;
-  }
+    )
+  ) : (
+    <></>
+  );
 }
 
 export default PublishOrRequestPublish;

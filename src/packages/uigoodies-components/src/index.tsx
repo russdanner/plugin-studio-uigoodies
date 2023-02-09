@@ -1,7 +1,7 @@
 import { PluginDescriptor } from '@craftercms/studio-ui';
 import EditOrViewCurrent from './components/EditOrViewCurrent';
 import PublishOrRequestPublish from './components/PublishOrRequestPublish';
-import ToolPanelAccordian from './components/ToolPanelAccordian';
+import ToolPanelAccordion from './components/ToolPanelAccordion';
 
 const plugin: PluginDescriptor = {
   locales: undefined,
@@ -11,10 +11,10 @@ const plugin: PluginDescriptor = {
   widgets: {
     'org.rd.plugin.uigoodies.EditOrViewCurrent': EditOrViewCurrent,
     'org.rd.plugin.uigoodies.PublishOrRequestPublish': PublishOrRequestPublish,
-    'org.rd.plugin.uigoodies.ToolPanelAccordian': ToolPanelAccordian
+    'org.rd.plugin.uigoodies.ToolPanelAccordion': ToolPanelAccordion
   }
 };
 
-export { EditOrViewCurrent, PublishOrRequestPublish };
+export { EditOrViewCurrent, PublishOrRequestPublish, ToolPanelAccordion };
 
 export default plugin;
