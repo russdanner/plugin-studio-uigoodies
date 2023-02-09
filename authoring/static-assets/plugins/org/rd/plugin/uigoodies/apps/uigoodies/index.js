@@ -101,16 +101,8 @@ function PublishOrRequestPublish(props) {
     // Note: All toolbar child components receive the current preview item as a prop automatically. If this component will be used elsewhere, use useCurrentPreviewItem() hook.
     var item = props.item, useIcon = props.useIcon;
     var dispatch = useDispatch();
-    var showButton = false;
-    var forceRequest = false;
-    if (item) {
-        if (item.stateMap.modified === true || item.stateMap.new === true) {
-            showButton = true;
-            if (item.availableActionsMap.publish === false) {
-                forceRequest = true;
-            }
-        }
-    }
+    var showButton = Boolean(item) && (item.stateMap.modified || item.stateMap.new);
+    var forceRequest = !(item === null || item === void 0 ? void 0 : item.availableActionsMap.publish);
     var label = forceRequest ? 'Request Publish' : 'Publish';
     var iconId = item
         ? forceRequest
