@@ -4,17 +4,29 @@ import { Tooltip } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
 import SystemIcon from '@craftercms/studio-ui/components/SystemIcon';
+import useActiveUser from '@craftercms/studio-ui/hooks/useActiveUser';
 import useActiveSiteId from '@craftercms/studio-ui/hooks/useActiveSiteId';
 import useEnv from '@craftercms/studio-ui/hooks/useEnv';
 import { showEditDialog } from '@craftercms/studio-ui/state/actions/dialogs';
+import { isItemLockedForMe } from '@craftercms/studio-ui/utils/content';
+
 
 export function EditOrViewCurrent(props) {
   // Note: All toolbar child components receive the current preview item as a prop automatically. If this component will be used elsewhere, use useCurrentPreviewItem() hook.
   const { item, useIcon } = props;
   const dispatch = useDispatch();
+  const currentUser = useActiveUser()
   const siteId = useActiveSiteId();
   const env = useEnv();
-  let readonly = item?.availableActionsMap.edit !== true;
+  let readonly = true;
+  
+  // make sure the user has access to the item, 
+  if(item?.availableActionsMap.edit === true
+  && isItemLockedForMe(item, currentUser.username) === false) {
+    readonly = false
+  }
+
+
   let label = readonly ? 'View' : 'Edit';
   let iconId = item
     ? readonly
@@ -23,14 +35,16 @@ export function EditOrViewCurrent(props) {
     : '@mui/icons-material/HourglassEmptyOutlined';
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    dispatch(
-      showEditDialog({
-        site: siteId,
-        path: item.path,
-        authoringBase: env.authoringBase,
-        readonly
-      })
-    );
+    if(!item.stateMap.systemProcessing) {        
+      dispatch(
+        showEditDialog({
+          site: siteId,
+          path: item.path,
+          authoringBase: env.authoringBase,
+          readonly
+        })
+      );
+    }
   };
 
   return useIcon ? (
@@ -47,3 +61,4 @@ export function EditOrViewCurrent(props) {
 }
 
 export default EditOrViewCurrent;
+

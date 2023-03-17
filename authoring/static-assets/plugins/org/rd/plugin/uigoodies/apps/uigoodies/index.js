@@ -6,8 +6,28 @@ const IconButton = craftercms.libs.MaterialUI.IconButton && Object.prototype.has
 const Button = craftercms.libs.MaterialUI.Button && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Button, 'default') ? craftercms.libs.MaterialUI.Button['default'] : craftercms.libs.MaterialUI.Button;
 const SystemIcon = craftercms.components.SystemIcon && Object.prototype.hasOwnProperty.call(craftercms.components.SystemIcon, 'default') ? craftercms.components.SystemIcon['default'] : craftercms.components.SystemIcon;
 const { createAction } = craftercms.libs.ReduxToolkit;
+const { isItemLockedForMe } = craftercms.utils.content;
 const { SystemIcon: SystemIcon$1, WidgetsGrid } = craftercms.components;
 const ExpandMore = craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreOutlined') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreOutlined'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreOutlined')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreOutlined');
+
+/*
+ * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License version 3 as published by
+ * the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+function useActiveUser() {
+  return useSelector((state) => state.user);
+}
 
 /*
  * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
@@ -75,9 +95,15 @@ function EditOrViewCurrent(props) {
     // Note: All toolbar child components receive the current preview item as a prop automatically. If this component will be used elsewhere, use useCurrentPreviewItem() hook.
     var item = props.item, useIcon = props.useIcon;
     var dispatch = useDispatch();
+    var currentUser = useActiveUser();
     var siteId = useActiveSiteId();
     var env = useEnv();
-    var readonly = (item === null || item === void 0 ? void 0 : item.availableActionsMap.edit) !== true;
+    var readonly = true;
+    // make sure the user has access to the item, 
+    if ((item === null || item === void 0 ? void 0 : item.availableActionsMap.edit) === true
+        && isItemLockedForMe(item, currentUser.username) === false) {
+        readonly = false;
+    }
     var label = readonly ? 'View' : 'Edit';
     var iconId = item
         ? readonly
@@ -85,12 +111,14 @@ function EditOrViewCurrent(props) {
             : '@mui/icons-material/EditOutlined'
         : '@mui/icons-material/HourglassEmptyOutlined';
     var handleClick = function (event) {
-        dispatch(showEditDialog({
-            site: siteId,
-            path: item.path,
-            authoringBase: env.authoringBase,
-            readonly: readonly
-        }));
+        if (!item.stateMap.systemProcessing) {
+            dispatch(showEditDialog({
+                site: siteId,
+                path: item.path,
+                authoringBase: env.authoringBase,
+                readonly: readonly
+            }));
+        }
     };
     return useIcon ? (React.createElement(Tooltip, { title: item ? "".concat(label, " (shift+e)") : '' },
         React.createElement(IconButton, { size: "small", onClick: handleClick, disabled: !item },
