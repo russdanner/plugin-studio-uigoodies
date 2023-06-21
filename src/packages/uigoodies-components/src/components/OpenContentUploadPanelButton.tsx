@@ -16,33 +16,16 @@
 
 import * as React from 'react';
 import ToolsPanelListItemButton from '@craftercms/studio-ui/components/ToolsPanelListItemButton';
-import { showWidgetDialog } from '@craftercms/studio-ui/state/actions/dialogs';
-import { useDispatch } from 'react-redux';
+import { CONTENT_UPLOAD_DEFAULTS, useOpenContentUpload } from '../utils';
 
 export function OpenContentUploadPanelButton(props) {
-  console.log(props)
-  const dispatch = useDispatch();
-  const { title = 'Content Upload', icon = { id: '@mui/icons-material/FileUploadOutlined' } } = props;
+  const { title = CONTENT_UPLOAD_DEFAULTS.title, icon = CONTENT_UPLOAD_DEFAULTS.icon, dialogTitle = title } = props;
+  const handleClick = useOpenContentUpload({ ...props, title: dialogTitle });
   return (
     <ToolsPanelListItemButton
       icon={icon}
       title={title}
-      onClick={() =>
-        dispatch(
-          showWidgetDialog({
-            title,
-            extraProps: props,
-            fullHeight: false,
-            fullWidth: false,
-            widget: {
-              id: 'org.rd.plugin.uigoodies.ContentUpload',
-              configuration: {
-                defaultPath: props.defaultPath
-              }
-            }
-          })
-        )
-      }
+      onClick={handleClick}
     />
   );
 }

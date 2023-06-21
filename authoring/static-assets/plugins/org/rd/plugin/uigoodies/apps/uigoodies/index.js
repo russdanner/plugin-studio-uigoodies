@@ -2,7 +2,7 @@ const React = craftercms.libs.React;
 const { useState, useRef } = craftercms.libs.React;
 const React__default = craftercms.libs.React && Object.prototype.hasOwnProperty.call(craftercms.libs.React, 'default') ? craftercms.libs.React['default'] : craftercms.libs.React;
 const { useSelector, useDispatch } = craftercms.libs.ReactRedux;
-const { Tooltip, useTheme, accordionClasses, accordionSummaryClasses, Accordion, AccordionSummary, Typography, AccordionDetails, Button: Button$1, buttonClasses } = craftercms.libs.MaterialUI;
+const { Tooltip, useTheme, accordionClasses, accordionSummaryClasses, Accordion, AccordionSummary, Typography, AccordionDetails, alpha, Button: Button$1, buttonClasses } = craftercms.libs.MaterialUI;
 const IconButton = craftercms.libs.MaterialUI.IconButton && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.IconButton, 'default') ? craftercms.libs.MaterialUI.IconButton['default'] : craftercms.libs.MaterialUI.IconButton;
 const Button = craftercms.libs.MaterialUI.Button && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Button, 'default') ? craftercms.libs.MaterialUI.Button['default'] : craftercms.libs.MaterialUI.Button;
 const SystemIcon = craftercms.components.SystemIcon && Object.prototype.hasOwnProperty.call(craftercms.components.SystemIcon, 'default') ? craftercms.components.SystemIcon['default'] : craftercms.components.SystemIcon;
@@ -14,8 +14,8 @@ const { createCustomDocumentEventListener } = craftercms.utils.dom;
 const TextField = craftercms.libs.MaterialUI.TextField && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.TextField, 'default') ? craftercms.libs.MaterialUI.TextField['default'] : craftercms.libs.MaterialUI.TextField;
 const Container = craftercms.libs.MaterialUI.Container && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Container, 'default') ? craftercms.libs.MaterialUI.Container['default'] : craftercms.libs.MaterialUI.Container;
 const Box = craftercms.libs.MaterialUI.Box && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Box, 'default') ? craftercms.libs.MaterialUI.Box['default'] : craftercms.libs.MaterialUI.Box;
-const Grid = craftercms.libs.MaterialUI.Grid && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Grid, 'default') ? craftercms.libs.MaterialUI.Grid['default'] : craftercms.libs.MaterialUI.Grid;
 const { writeContent } = craftercms.services.content;
+const { DialogFooter } = craftercms.components;
 const { capitalize, unstable_useId } = craftercms.libs.MaterialUI;
 const { styled, useThemeProps } = craftercms.libs.MaterialUI;
 const CircularProgress = craftercms.libs.MaterialUI.CircularProgress && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.CircularProgress, 'default') ? craftercms.libs.MaterialUI.CircularProgress['default'] : craftercms.libs.MaterialUI.CircularProgress;
@@ -202,7 +202,7 @@ function ToolPanelAccordion(props) {
     var contentClass = accordionSummaryClasses.content;
     return (React.createElement(Accordion, { expanded: open, onChange: function (e, isExpanded) { return setOpen(isExpanded); }, sx: __assign((_a = { boxShadow: 0 }, _a["&.".concat(expandedClass)] = { margin: 0 }, _a), sxs === null || sxs === void 0 ? void 0 : sxs.accordion) },
         React.createElement(AccordionSummary, { expandIcon: React.createElement(ExpandMore, null), sx: __assign((_b = { alignItems: 'center' }, _b["&, &.".concat(expandedClass)] = { minHeight: '48px' }, _b[".".concat(contentClass, ", .").concat(contentClass, ".").concat(expandedClass)] = { margin: 0 }, _b), sxs === null || sxs === void 0 ? void 0 : sxs.accordionSummary) },
-            icon && React.createElement(SystemIcon$1, { icon: icon, style: { marginRight: 10, color: theme.palette.action.active } }),
+            icon && React.createElement(SystemIcon$1, { icon: icon, style: { marginRight: '10px', color: theme.palette.action.active } }),
             React.createElement(Typography, null, title)),
         React.createElement(AccordionDetails, { sx: __assign({ padding: 0 }, sxs === null || sxs === void 0 ? void 0 : sxs.accordionDetails) },
             React.createElement(WidgetsGrid, { container: true, spacing: 0, direction: "column", widgets: props.widgets, sx: sxs === null || sxs === void 0 ? void 0 : sxs.widgetsGrid }))));
@@ -493,7 +493,6 @@ var LoadingButton$1 = LoadingButton;
  */
 function ContentUpload(props) {
     var _a;
-    console.log(props);
     var _b = useState((_a = props.defaultPath) !== null && _a !== void 0 ? _a : ''), path = _b[0], setPath = _b[1];
     var _c = useState(''), content = _c[0], setContent = _c[1];
     var _d = useState(false), processing = _d[0], setProcessing = _d[1];
@@ -573,55 +572,85 @@ function ContentUpload(props) {
             }
         });
     };
-    return (React__default.createElement(Container, null,
-        React__default.createElement(Box, { sx: { flexGrow: 1, padding: '50px' } },
-            React__default.createElement(Grid, { container: true, spacing: 4 },
-                React__default.createElement(Grid, { xs: 12, sx: { display: 'inline-flex', marginTop: '30px', alignItems: 'center' } },
-                    React__default.createElement(Grid, { xs: 8 },
-                        React__default.createElement(TextField, { id: "path-read-only-input", label: "Path to upload", value: path, InputProps: { readOnly: true }, fullWidth: true })),
-                    React__default.createElement(Grid, { xs: 4, sx: { textAlign: 'center' } },
-                        React__default.createElement(Button, { variant: "contained", onClick: handleSelectPath, disabled: processing, sx: {
-                                minWidth: '130px'
-                            } }, "Select Path"))),
-                React__default.createElement(Grid, { xs: 12, sx: { display: 'inline-flex', marginTop: '30px', alignItems: 'center' } },
-                    React__default.createElement(Grid, { xs: 8, sx: {
-                            '& input::file-selector-button': {
-                                'display': 'inline-flex',
-                                '-webkit-box-align': 'center',
-                                'align-items': 'center',
-                                '-webkit-box-pack': 'center',
-                                'justify-content': 'center',
-                                'position': 'relative',
-                                'box-sizing': 'border-box',
-                                '-webkit-tap-highlight-color': 'transparent',
-                                'outline': '0px',
-                                'border': '0px',
-                                'margin': '0px',
-                                'cursor': 'pointer',
-                                'user-select': 'none',
-                                'vertical-align': 'middle',
-                                'appearance': 'none',
-                                'text-decoration': 'none',
-                                'text-transform': 'none',
-                                'font-weight': '600',
-                                'font-size': '0.875rem',
-                                'line-height': '1.75',
-                                'padding': '6px 16px',
-                                'border-radius': '4px',
-                                'transition': 'background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
-                                'color': 'rgb(255, 255, 255)',
-                                'background-color': 'rgb(0, 122, 255)',
-                                'box-shadow': 'rgba(0, 0, 0, 0.2) 0px 3px 1px -2px, rgba(0, 0, 0, 0.14) 0px 2px 2px 0px, rgba(0, 0, 0, 0.12) 0px 1px 5px 0px',
-                                'min-width': '130px',
-                                'marginRight': '10px',
-                                'font-family': '"Source Sans Pro", "Open Sans", sans-serif'
-                            }
-                        } },
-                        React__default.createElement("input", { ref: inputRef, type: "file", accept: ".xml", onChange: onFileChange, onClick: function () {
-                                inputRef.current.value = null;
-                            } })),
-                    React__default.createElement(Grid, { xs: 4, sx: { textAlign: 'center' } },
-                        React__default.createElement(LoadingButton$1, { variant: "contained", onClick: handleUploadXMLFile, loading: processing, disabled: !content, loadingPosition: "start", sx: { minWidth: '130px' } }, "Upload Content")))))));
+    return (React__default.createElement(React__default.Fragment, null,
+        React__default.createElement(Container, { sx: {
+                'padding-top': '40px',
+                'padding-bottom': '40px'
+            } },
+            React__default.createElement(Box, { sx: {
+                    'display': 'flex',
+                    'marginBottom': '20px',
+                    'alignItems': 'center'
+                } },
+                React__default.createElement(TextField, { id: "path-read-only-input", label: "Path to upload", value: path, InputProps: { readOnly: true }, sx: { minWidth: '450px' } }),
+                props.allowPathSelection && (React__default.createElement(Button, { variant: "outlined", onClick: handleSelectPath, disabled: processing, sx: { minWidth: '130px', marginLeft: '20px' } }, "Select Path"))),
+            React__default.createElement(Box, { sx: function (theme) { return ({
+                    'font-family': '"Source Sans Pro", "Open Sans", sans-serif',
+                    '& input::file-selector-button': {
+                        'display': 'inline-flex',
+                        '-webkit-box-align': 'center',
+                        'align-items': 'center',
+                        '-webkit-box-pack': 'center',
+                        'justify-content': 'center',
+                        'position': 'relative',
+                        'box-sizing': 'border-box',
+                        '-webkit-tap-highlight-color': 'transparent',
+                        'backgroundColor': 'transparent',
+                        'outline': '0px',
+                        'margin': '0px',
+                        'cursor': 'pointer',
+                        'user-select': 'none',
+                        'vertical-align': 'middle',
+                        'appearance': 'none',
+                        'text-decoration': 'none',
+                        'text-transform': 'none',
+                        'font-family': '"Source Sans Pro", "Open Sans", sans-serif',
+                        'font-weight': '600',
+                        'font-size': '0.875rem',
+                        'line-height': '1.75',
+                        'padding': '5px 15px',
+                        'border-radius': '4px',
+                        'transition': 'background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
+                        'border': "1px solid ".concat(alpha(theme.palette.primary.main, 0.5)),
+                        'color': theme.palette.primary.main,
+                        'min-width': '130px',
+                        'marginRight': '10px',
+                        '&:hover': {
+                            'backgroundColor': alpha(theme.palette.primary.main, 0.04),
+                            'border': "1px solid ".concat(theme.palette.primary.main)
+                        }
+                    }
+                }); } },
+                React__default.createElement("input", { ref: inputRef, type: "file", accept: ".xml", onChange: onFileChange, onClick: function () {
+                        inputRef.current.value = null;
+                    } }))),
+        React__default.createElement(DialogFooter, null,
+            React__default.createElement(LoadingButton$1, { variant: "contained", onClick: handleUploadXMLFile, loading: processing, disabled: !content, loadingPosition: "start", sx: { minWidth: '130px' } }, "Upload Content"))));
+}
+
+var CONTENT_UPLOAD_DEFAULTS = {
+    title: 'Content Upload',
+    defaultPath: '/site',
+    icon: { id: '@mui/icons-material/FileUploadOutlined' },
+    allowPathSelection: true
+};
+function useOpenContentUpload(props) {
+    var dispatch = useDispatch();
+    return function () {
+        var _a, _b, _c;
+        return dispatch(showWidgetDialog({
+            title: (_a = props.title) !== null && _a !== void 0 ? _a : CONTENT_UPLOAD_DEFAULTS.title,
+            fullHeight: false,
+            fullWidth: false,
+            widget: {
+                id: 'org.rd.plugin.uigoodies.ContentUpload',
+                configuration: {
+                    defaultPath: (_b = props.defaultPath) !== null && _b !== void 0 ? _b : CONTENT_UPLOAD_DEFAULTS.defaultPath,
+                    allowPathSelection: (_c = props.allowPathSelection) !== null && _c !== void 0 ? _c : CONTENT_UPLOAD_DEFAULTS.allowPathSelection
+                }
+            }
+        }));
+    };
 }
 
 /*
@@ -640,23 +669,9 @@ function ContentUpload(props) {
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 function OpenContentUploadPanelButton(props) {
-    console.log(props);
-    var dispatch = useDispatch();
-    var _a = props.title, title = _a === void 0 ? 'Content Upload' : _a, _b = props.icon, icon = _b === void 0 ? { id: '@mui/icons-material/FileUploadOutlined' } : _b;
-    return (React.createElement(ToolsPanelListItemButton, { icon: icon, title: title, onClick: function () {
-            return dispatch(showWidgetDialog({
-                title: title,
-                extraProps: props,
-                fullHeight: false,
-                fullWidth: false,
-                widget: {
-                    id: 'org.rd.plugin.uigoodies.ContentUpload',
-                    configuration: {
-                        defaultPath: props.defaultPath
-                    }
-                }
-            }));
-        } }));
+    var _a = props.title, title = _a === void 0 ? CONTENT_UPLOAD_DEFAULTS.title : _a, _b = props.icon, icon = _b === void 0 ? CONTENT_UPLOAD_DEFAULTS.icon : _b, _c = props.dialogTitle, dialogTitle = _c === void 0 ? title : _c;
+    var handleClick = useOpenContentUpload(__assign(__assign({}, props), { title: dialogTitle }));
+    return (React.createElement(ToolsPanelListItemButton, { icon: icon, title: title, onClick: handleClick }));
 }
 
 /*
@@ -676,26 +691,12 @@ function OpenContentUploadPanelButton(props) {
  */
 function OpenContentUploadToolbarButton(props) {
     var _a;
-    var dispatch = useDispatch();
-    var _b = props.title, title = _b === void 0 ? 'Content Upload' : _b, _c = props.tooltip, tooltip = _c === void 0 ? title : _c, _d = props.useIcon, useIcon = _d === void 0 ? true : _d, _e = props.useIconWithText, useIconWithText = _e === void 0 ? false : _e, _f = props.buttonSize, buttonSize = _f === void 0 ? 'small' : _f, _g = props.dialogTitle, dialogTitle = _g === void 0 ? title : _g, _h = props.icon, icon = _h === void 0 ? { id: '@mui/icons-material/FileUploadOutlined' } : _h;
+    var _b = props.title, title = _b === void 0 ? CONTENT_UPLOAD_DEFAULTS.title : _b, _c = props.tooltip, tooltip = _c === void 0 ? title : _c, _d = props.useIcon, useIcon = _d === void 0 ? true : _d, _e = props.useIconWithText, useIconWithText = _e === void 0 ? false : _e, _f = props.buttonSize, buttonSize = _f === void 0 ? 'small' : _f, _g = props.dialogTitle, dialogTitle = _g === void 0 ? title : _g, _h = props.icon, icon = _h === void 0 ? CONTENT_UPLOAD_DEFAULTS.icon : _h;
     // Protection against confusion of using the two props combined (i.e. useIcon, useIconWithText)...
     if (useIconWithText) {
         useIcon = false;
     }
-    var handleClick = function () {
-        return dispatch(showWidgetDialog({
-            title: dialogTitle,
-            extraProps: props,
-            fullHeight: false,
-            fullWidth: false,
-            widget: {
-                id: 'org.rd.plugin.uigoodies.ContentUpload',
-                configuration: {
-                    defaultPath: props.defaultPath
-                }
-            }
-        }));
-    };
+    var handleClick = useOpenContentUpload(__assign(__assign({}, props), { title: dialogTitle }));
     var applyTooltip = function (children) {
         return useIcon || props.tooltip ? React.createElement(Tooltip$1, { title: tooltip }, children) : children;
     };

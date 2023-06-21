@@ -145,5 +145,47 @@ curl --location --request POST 'http://SERVER_AND_PORT/studio/api/2/marketplace/
 		</widgets>
 	</configuration>
 </widget>
+```
 
+## Sidebar Content Upload Button
+
+```xml
+<widget id="org.rd.plugin.uigoodies.openContentUploadPanelButton">
+    <plugin
+      id="org.rd.plugin.uigoodies"
+      site="{site}"
+      type="apps"
+      name="uigoodies"
+      file="index.js"
+    />
+    <!-- optional parameters -->
+    <configuration>
+        <title>Upload Content</title>
+        <icon id="@mui/icons-material/FileUploadRounded"/>
+        <defaultPath>/site/components/headers</defaultPath>
+        <allowPathSelection>true</allowPathSelection>
+    </configuration>
+</widget>
+```
+
+## Toolbar Content Upload Button
+
+```xml
+<widget id="org.rd.plugin.uigoodies.openContentUploadToolbarButton">
+    <plugin
+      id="org.rd.plugin.uigoodies"
+      site="{site}"
+      type="apps"
+      name="uigoodies"
+      file="index.js"
+    />
+    <!-- optional parameters -->
+    <configuration>
+        <title>Upload Content</title>
+        <dialogTitle>Upload Content</dialogTitle>
+        <icon id="@mui/icons-material/FileUploadRounded"/>
+        <defaultPath>/site/components/headers</defaultPath>
+        <allowPathSelection>true</allowPathSelection>
+    </configuration>
+</widget>
 ```

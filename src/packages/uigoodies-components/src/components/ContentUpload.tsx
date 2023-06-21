@@ -18,30 +18,29 @@ import React, { useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 import {
-  showPathSelectionDialog,
   closePathSelectionDialog,
-  pathSelectionDialogClosed
+  pathSelectionDialogClosed,
+  showPathSelectionDialog
 } from '@craftercms/studio-ui/state/actions/dialogs';
 import { showSystemNotification } from '@craftercms/studio-ui/state/actions/system';
-import { dispatchDOMEvent, batchActions } from '@craftercms/studio-ui/state/actions/misc';
+import { batchActions, dispatchDOMEvent } from '@craftercms/studio-ui/state/actions/misc';
 import { createCustomDocumentEventListener } from '@craftercms/studio-ui/utils/dom';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
-import CssBaseline from '@mui/material/CssBaseline';
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
 import LoadingButton from '@mui/lab/LoadingButton';
-import Typography from '@mui/material/Typography';
 import { writeContent } from '@craftercms/studio-ui/services/content';
 import useActiveSiteId from '@craftercms/studio-ui/hooks/useActiveSiteId';
+import { DialogFooter } from '@craftercms/studio-ui/components';
+import { alpha } from '@mui/material';
 
 export interface ContentUploadProps {
   defaultPath: string;
+  allowPathSelection?: boolean;
 }
 
 export function ContentUpload(props: ContentUploadProps) {
-  console.log(props);
   const [path, setPath] = useState(props.defaultPath ?? '');
   const [content, setContent] = useState('');
   const [processing, setProcessing] = useState(false);
@@ -86,13 +85,11 @@ export function ContentUpload(props: ContentUploadProps) {
     if (!file) {
       return;
     }
-
     const reader = new FileReader();
     reader.readAsText(event.target.files[0], 'UTF-8');
     reader.onload = (e) => {
       setContent(e.target.result as string);
     };
-
     reader.onerror = (e) => {
       dispatch(showSystemNotification({
         message: `Error while reading file. Please try again.`,
@@ -136,95 +133,99 @@ export function ContentUpload(props: ContentUploadProps) {
   };
 
   return (
-    <Container>
-      <Box sx={{ flexGrow: 1, padding: '50px' }}>
-        <Grid container spacing={4}>
-          <Grid xs={12} sx={{ display: 'inline-flex', marginTop: '30px', alignItems: 'center' }}>
-            <Grid xs={8}>
-              <TextField
-                id="path-read-only-input"
-                label="Path to upload"
-                value={path}
-                InputProps={{ readOnly: true }}
-                fullWidth
-              />
-            </Grid>
-            <Grid xs={4} sx={{ textAlign: 'center' }}>
-              <Button
-                variant="contained"
-                onClick={handleSelectPath}
-                disabled={processing}
-                sx={{
-                  minWidth: '130px'
-                }}
-              >
-                Select Path
-              </Button>
-            </Grid>
-          </Grid>
-          <Grid xs={12} sx={{ display: 'inline-flex', marginTop: '30px', alignItems: 'center' }}>
-            <Grid
-              xs={8}
-              sx={{
-                '& input::file-selector-button': {
-                  'display': 'inline-flex',
-                  '-webkit-box-align': 'center',
-                  'align-items': 'center',
-                  '-webkit-box-pack': 'center',
-                  'justify-content': 'center',
-                  'position': 'relative',
-                  'box-sizing': 'border-box',
-                  '-webkit-tap-highlight-color': 'transparent',
-                  'outline': '0px',
-                  'border': '0px',
-                  'margin': '0px',
-                  'cursor': 'pointer',
-                  'user-select': 'none',
-                  'vertical-align': 'middle',
-                  'appearance': 'none',
-                  'text-decoration': 'none',
-                  'text-transform': 'none',
-                  'font-weight': '600',
-                  'font-size': '0.875rem',
-                  'line-height': '1.75',
-                  'padding': '6px 16px',
-                  'border-radius': '4px',
-                  'transition': 'background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
-                  'color': 'rgb(255, 255, 255)',
-                  'background-color': 'rgb(0, 122, 255)',
-                  'box-shadow': 'rgba(0, 0, 0, 0.2) 0px 3px 1px -2px, rgba(0, 0, 0, 0.14) 0px 2px 2px 0px, rgba(0, 0, 0, 0.12) 0px 1px 5px 0px',
-                  'min-width': '130px',
-                  'marginRight': '10px',
-                  'font-family': '"Source Sans Pro", "Open Sans", sans-serif'
-                }
-              }}
+    <>
+      <Container
+        sx={{
+          'padding-top': '40px',
+          'padding-bottom': '40px'
+        }}
+      >
+        <Box sx={{
+          'display': 'flex',
+          'marginBottom': '20px',
+          'alignItems': 'center'
+        }}>
+          <TextField
+            id="path-read-only-input"
+            label="Path to upload"
+            value={path}
+            InputProps={{ readOnly: true }}
+            sx={{ minWidth: '450px' }}
+          />
+          {props.allowPathSelection && (
+            <Button
+              variant="outlined"
+              onClick={handleSelectPath}
+              disabled={processing}
+              sx={{ minWidth: '130px', marginLeft: '20px' }}
             >
-              <input
-                ref={inputRef}
-                type="file"
-                accept=".xml"
-                onChange={onFileChange}
-                onClick={() => {
-                  inputRef.current.value = null;
-                }}
-              />
-            </Grid>
-            <Grid xs={4} sx={{ textAlign: 'center' }}>
-              <LoadingButton
-                variant="contained"
-                onClick={handleUploadXMLFile}
-                loading={processing}
-                disabled={!content}
-                loadingPosition="start"
-                sx={{ minWidth: '130px' }}
-              >
-                Upload Content
-              </LoadingButton>
-            </Grid>
-          </Grid>
-        </Grid>
-      </Box>
-    </Container>
+              Select Path
+            </Button>
+          )}
+        </Box>
+        <Box
+          sx={(theme) => ({
+            'font-family': '"Source Sans Pro", "Open Sans", sans-serif',
+            '& input::file-selector-button': {
+              'display': 'inline-flex',
+              '-webkit-box-align': 'center',
+              'align-items': 'center',
+              '-webkit-box-pack': 'center',
+              'justify-content': 'center',
+              'position': 'relative',
+              'box-sizing': 'border-box',
+              '-webkit-tap-highlight-color': 'transparent',
+              'backgroundColor': 'transparent',
+              'outline': '0px',
+              'margin': '0px',
+              'cursor': 'pointer',
+              'user-select': 'none',
+              'vertical-align': 'middle',
+              'appearance': 'none',
+              'text-decoration': 'none',
+              'text-transform': 'none',
+              'font-family': '"Source Sans Pro", "Open Sans", sans-serif',
+              'font-weight': '600',
+              'font-size': '0.875rem',
+              'line-height': '1.75',
+              'padding': '5px 15px',
+              'border-radius': '4px',
+              'transition': 'background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
+              'border': `1px solid ${alpha(theme.palette.primary.main, 0.5)}`,
+              'color': theme.palette.primary.main,
+              'min-width': '130px',
+              'marginRight': '10px',
+              '&:hover': {
+                'backgroundColor': alpha(theme.palette.primary.main, 0.04),
+                'border': `1px solid ${theme.palette.primary.main}`
+              }
+            }
+          })}
+        >
+          <input
+            ref={inputRef}
+            type="file"
+            accept=".xml"
+            onChange={onFileChange}
+            onClick={() => {
+              inputRef.current.value = null;
+            }}
+          />
+        </Box>
+      </Container>
+      <DialogFooter>
+        <LoadingButton
+          variant="contained"
+          onClick={handleUploadXMLFile}
+          loading={processing}
+          disabled={!content}
+          loadingPosition="start"
+          sx={{ minWidth: '130px' }}
+        >
+          Upload Content
+        </LoadingButton>
+      </DialogFooter>
+    </>
   );
 }
 

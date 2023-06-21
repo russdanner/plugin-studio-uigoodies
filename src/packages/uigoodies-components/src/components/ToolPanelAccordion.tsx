@@ -51,7 +51,7 @@ export function ToolPanelAccordion(props: ToolPanelAccordion) {
           ...sxs?.accordionSummary
         }}
       >
-        {icon && <SystemIcon icon={icon} style={{ marginRight: 10, color: theme.palette.action.active }} />}
+        {icon && <SystemIcon icon={icon} style={{ marginRight: '10px', color: theme.palette.action.active }} />}
         <Typography>{title}</Typography>
       </AccordionSummary>
       <AccordionDetails sx={{ padding: 0, ...sxs?.accordionDetails }}>

@@ -18,40 +18,24 @@ import * as React from 'react';
 import Tooltip from '@mui/material/Tooltip';
 import IconButton from '@mui/material/IconButton';
 import SystemIcon from '@craftercms/studio-ui/components/SystemIcon';
-import { showWidgetDialog } from '@craftercms/studio-ui/state/actions/dialogs';
-import { useDispatch } from 'react-redux';
 import { Button, buttonClasses } from '@mui/material';
+import { CONTENT_UPLOAD_DEFAULTS, useOpenContentUpload } from '../utils';
 
 export function OpenContentUploadToolbarButton(props) {
-  const dispatch = useDispatch();
   let {
-    title = 'Content Upload',
+    title = CONTENT_UPLOAD_DEFAULTS.title,
     tooltip = title,
     useIcon = true,
     useIconWithText = false,
     buttonSize = 'small',
     dialogTitle = title,
-    icon = { id: '@mui/icons-material/FileUploadOutlined' }
+    icon = CONTENT_UPLOAD_DEFAULTS.icon
   } = props;
   // Protection against confusion of using the two props combined (i.e. useIcon, useIconWithText)...
   if (useIconWithText) {
     useIcon = false;
   }
-  const handleClick = () =>
-    dispatch(
-      showWidgetDialog({
-        title: dialogTitle,
-        extraProps: props,
-        fullHeight: false,
-        fullWidth: false,
-        widget: {
-          id: 'org.rd.plugin.uigoodies.ContentUpload',
-          configuration: {
-            defaultPath: props.defaultPath
-          }
-        }
-      })
-    );
+  const handleClick = useOpenContentUpload({ ...props, title: dialogTitle });
   const applyTooltip = (children) => {
     return useIcon || props.tooltip ? <Tooltip title={tooltip}>{children}</Tooltip> : children;
   };
