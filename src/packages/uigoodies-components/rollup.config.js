@@ -1,11 +1,11 @@
 const typescript = require('rollup-plugin-typescript2');
-// const commonjs = require('@rollup/plugin-commonjs');
+const commonjs = require('@rollup/plugin-commonjs');
 const resolve = require('@rollup/plugin-node-resolve');
 const replaceImportsWithVars = require('rollup-plugin-replace-imports-with-vars');
 const json = require('@rollup/plugin-json');
 const pkg = require('./package.json');
 const copy = require('rollup-plugin-copy');
-const { terser } = require('rollup-plugin-terser');
+// const { terser } = require('rollup-plugin-terser');
 const replace = require('@rollup/plugin-replace');
 
 const extensions = ['.js', '.jsx', '.ts', '.tsx'];
@@ -28,6 +28,7 @@ const globals = {
 const replacementRegExps = {
   '@craftercms/studio-ui/(components|icons|utils|services)/(.+)': (exec) =>
     `craftercms.${exec[1]}.${exec[2].split('/').pop()}`,
+  '@mui/material/styles': (exec) => 'craftercms.libs.MaterialUI',
   '@mui/material/(.+)': (exec) => `craftercms.libs.MaterialUI.${exec[1]}`,
   '@mui/icons-material/(.+(Rounded|Outlined))$': (exec) => `craftercms.utils.constants.components.get('${exec[0]}')`
 };
@@ -59,7 +60,7 @@ module.exports = {
     // !!: If used, terser should be after `replaceImportsWithVars`
     //terser(),
     resolve({ extensions }),
-    // commonjs(),
+    commonjs(),
     copy({
       hook: 'closeBundle',
       targets: [

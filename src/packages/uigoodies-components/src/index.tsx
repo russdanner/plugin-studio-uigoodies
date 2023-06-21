@@ -2,6 +2,9 @@ import { PluginDescriptor } from '@craftercms/studio-ui';
 import EditOrViewCurrent from './components/EditOrViewCurrent';
 import PublishOrRequestPublish from './components/PublishOrRequestPublish';
 import ToolPanelAccordion from './components/ToolPanelAccordion';
+import ContentUpload from './components/ContentUpload';
+import OpenContentUploadPanelButton from './components/OpenContentUploadPanelButton';
+import OpenContentUploadToolbarButton from './components/OpenContentUploadToolbarButton';
 
 const plugin: PluginDescriptor = {
   locales: undefined,
@@ -11,7 +14,10 @@ const plugin: PluginDescriptor = {
   widgets: {
     'org.rd.plugin.uigoodies.EditOrViewCurrent': EditOrViewCurrent,
     'org.rd.plugin.uigoodies.PublishOrRequestPublish': PublishOrRequestPublish,
-    'org.rd.plugin.uigoodies.ToolPanelAccordion': ToolPanelAccordion
+    'org.rd.plugin.uigoodies.ToolPanelAccordion': ToolPanelAccordion,
+    'org.rd.plugin.uigoodies.ContentUpload': ContentUpload,
+    'org.rd.plugin.uigoodies.openContentUploadPanelButton': OpenContentUploadPanelButton,
+    'org.rd.plugin.uigoodies.openContentUploadToolbarButton': OpenContentUploadToolbarButton
   }
 };
 
