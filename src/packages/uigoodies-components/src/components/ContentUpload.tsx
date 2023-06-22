@@ -37,11 +37,12 @@ import { alpha } from '@mui/material';
 
 export interface ContentUploadProps {
   defaultPath: string;
+  allowPathInput: boolean;
   allowPathSelection?: boolean;
 }
 
 export function ContentUpload(props: ContentUploadProps) {
-  const [path, setPath] = useState(props.defaultPath ?? '');
+  const [path, setPath] = useState(props.defaultPath ?? '/site');
   const [content, setContent] = useState('');
   const [processing, setProcessing] = useState(false);
 
@@ -51,7 +52,7 @@ export function ContentUpload(props: ContentUploadProps) {
 
   const handleSelectPath = () => {
     const rootPath = '/site';
-    const callbackId = 'pathSelectionDialogCallback';
+    const callbackId = 'ContentUploadPathSelectionDialogCallback';
     const callbackAccept = 'accept';
 
     dispatch(
@@ -61,14 +62,20 @@ export function ContentUpload(props: ContentUploadProps) {
         showCreateFolderOption: false,
         allowSwitchingRootPath: !rootPath,
         stripXmlIndex: true,
-        onClosed: batchActions([dispatchDOMEvent({
+        onClosed: batchActions([
+          dispatchDOMEvent({
           id: callbackId,
           action: 'close'
-        }), pathSelectionDialogClosed()]),
-        onOk: batchActions([dispatchDOMEvent({
+        }),
+          pathSelectionDialogClosed()
+        ]),
+        onOk: batchActions([
+          dispatchDOMEvent({
           id: callbackId,
           action: callbackAccept
-        }), closePathSelectionDialog()])
+        }),
+          closePathSelectionDialog()
+        ])
       })
     );
 
@@ -91,10 +98,12 @@ export function ContentUpload(props: ContentUploadProps) {
       setContent(e.target.result as string);
     };
     reader.onerror = (e) => {
-      dispatch(showSystemNotification({
-        message: `Error while reading file. Please try again.`,
-        options: { variant: 'error' }
-      }));
+      dispatch(
+        showSystemNotification({
+          message: `Error while reading file. Please try again.`,
+          options: { variant: 'error' }
+        })
+      );
     };
   };
 
@@ -134,23 +143,24 @@ export function ContentUpload(props: ContentUploadProps) {
 
   return (
     <>
-      <Container
-        sx={{
-          'padding-top': '40px',
-          'padding-bottom': '40px'
-        }}
-      >
+      <Container sx={{
+        'padding-top': '40px',
+        'padding-bottom': '40px'
+      }}>
         <Box sx={{
           'display': 'flex',
           'marginBottom': '20px',
           'alignItems': 'center'
         }}>
           <TextField
-            id="path-read-only-input"
             label="Path to upload"
-            value={path}
-            InputProps={{ readOnly: true }}
+            id="path-read-only-input"
             sx={{ minWidth: '450px' }}
+            InputProps={{ readOnly: !props.allowPathInput }}
+            value={path}
+            onChange={props.allowPathInput ? (e) => {
+              setPath(e.target.value);
+            } : undefined}
           />
           {props.allowPathSelection && (
             <Button
@@ -163,45 +173,43 @@ export function ContentUpload(props: ContentUploadProps) {
             </Button>
           )}
         </Box>
-        <Box
-          sx={(theme) => ({
+        <Box sx={(theme) => ({
+          'font-family': '"Source Sans Pro", "Open Sans", sans-serif',
+          '& input::file-selector-button': {
+            'display': 'inline-flex',
+            '-webkit-box-align': 'center',
+            'align-items': 'center',
+            '-webkit-box-pack': 'center',
+            'justify-content': 'center',
+            'position': 'relative',
+            'box-sizing': 'border-box',
+            '-webkit-tap-highlight-color': 'transparent',
+            'backgroundColor': 'transparent',
+            'outline': '0px',
+            'margin': '0px',
+            'cursor': 'pointer',
+            'user-select': 'none',
+            'vertical-align': 'middle',
+            'appearance': 'none',
+            'text-decoration': 'none',
+            'text-transform': 'none',
             'font-family': '"Source Sans Pro", "Open Sans", sans-serif',
-            '& input::file-selector-button': {
-              'display': 'inline-flex',
-              '-webkit-box-align': 'center',
-              'align-items': 'center',
-              '-webkit-box-pack': 'center',
-              'justify-content': 'center',
-              'position': 'relative',
-              'box-sizing': 'border-box',
-              '-webkit-tap-highlight-color': 'transparent',
-              'backgroundColor': 'transparent',
-              'outline': '0px',
-              'margin': '0px',
-              'cursor': 'pointer',
-              'user-select': 'none',
-              'vertical-align': 'middle',
-              'appearance': 'none',
-              'text-decoration': 'none',
-              'text-transform': 'none',
-              'font-family': '"Source Sans Pro", "Open Sans", sans-serif',
-              'font-weight': '600',
-              'font-size': '0.875rem',
-              'line-height': '1.75',
-              'padding': '5px 15px',
-              'border-radius': '4px',
-              'transition': 'background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
-              'border': `1px solid ${alpha(theme.palette.primary.main, 0.5)}`,
-              'color': theme.palette.primary.main,
-              'min-width': '130px',
-              'marginRight': '10px',
-              '&:hover': {
-                'backgroundColor': alpha(theme.palette.primary.main, 0.04),
-                'border': `1px solid ${theme.palette.primary.main}`
-              }
+            'font-weight': '600',
+            'font-size': '0.875rem',
+            'line-height': '1.75',
+            'padding': '5px 15px',
+            'border-radius': '4px',
+            'transition': 'background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
+            'border': `1px solid ${alpha(theme.palette.primary.main, 0.5)}`,
+            'color': theme.palette.primary.main,
+            'min-width': '130px',
+            'marginRight': '10px',
+            '&:hover': {
+              'backgroundColor': alpha(theme.palette.primary.main, 0.04),
+              'border': `1px solid ${theme.palette.primary.main}`
             }
-          })}
-        >
+          }
+        })}>
           <input
             ref={inputRef}
             type="file"

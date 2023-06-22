@@ -493,7 +493,7 @@ var LoadingButton$1 = LoadingButton;
  */
 function ContentUpload(props) {
     var _a;
-    var _b = useState((_a = props.defaultPath) !== null && _a !== void 0 ? _a : ''), path = _b[0], setPath = _b[1];
+    var _b = useState((_a = props.defaultPath) !== null && _a !== void 0 ? _a : '/site'), path = _b[0], setPath = _b[1];
     var _c = useState(''), content = _c[0], setContent = _c[1];
     var _d = useState(false), processing = _d[0], setProcessing = _d[1];
     var dispatch = useDispatch();
@@ -501,7 +501,7 @@ function ContentUpload(props) {
     var siteId = useActiveSiteId();
     var handleSelectPath = function () {
         var rootPath = '/site';
-        var callbackId = 'pathSelectionDialogCallback';
+        var callbackId = 'ContentUploadPathSelectionDialogCallback';
         var callbackAccept = 'accept';
         dispatch(showPathSelectionDialog({
             rootPath: rootPath ,
@@ -509,14 +509,20 @@ function ContentUpload(props) {
             showCreateFolderOption: false,
             allowSwitchingRootPath: !rootPath,
             stripXmlIndex: true,
-            onClosed: batchActions([dispatchDOMEvent({
+            onClosed: batchActions([
+                dispatchDOMEvent({
                     id: callbackId,
                     action: 'close'
-                }), pathSelectionDialogClosed()]),
-            onOk: batchActions([dispatchDOMEvent({
+                }),
+                pathSelectionDialogClosed()
+            ]),
+            onOk: batchActions([
+                dispatchDOMEvent({
                     id: callbackId,
                     action: callbackAccept
-                }), closePathSelectionDialog()])
+                }),
+                closePathSelectionDialog()
+            ])
         }));
         createCustomDocumentEventListener(callbackId, function (detail) {
             if (detail.action === callbackAccept) {
@@ -582,7 +588,9 @@ function ContentUpload(props) {
                     'marginBottom': '20px',
                     'alignItems': 'center'
                 } },
-                React__default.createElement(TextField, { id: "path-read-only-input", label: "Path to upload", value: path, InputProps: { readOnly: true }, sx: { minWidth: '450px' } }),
+                React__default.createElement(TextField, { label: "Path to upload", id: "path-read-only-input", sx: { minWidth: '450px' }, InputProps: { readOnly: !props.allowPathInput }, value: path, onChange: props.allowPathInput ? function (e) {
+                        setPath(e.target.value);
+                    } : undefined }),
                 props.allowPathSelection && (React__default.createElement(Button, { variant: "outlined", onClick: handleSelectPath, disabled: processing, sx: { minWidth: '130px', marginLeft: '20px' } }, "Select Path"))),
             React__default.createElement(Box, { sx: function (theme) { return ({
                     'font-family': '"Source Sans Pro", "Open Sans", sans-serif',
@@ -632,12 +640,13 @@ var CONTENT_UPLOAD_DEFAULTS = {
     title: 'Content Upload',
     defaultPath: '/site',
     icon: { id: '@mui/icons-material/FileUploadOutlined' },
-    allowPathSelection: true
+    allowPathSelection: true,
+    allowPathInput: false
 };
 function useOpenContentUpload(props) {
     var dispatch = useDispatch();
     return function () {
-        var _a, _b, _c;
+        var _a, _b, _c, _d;
         return dispatch(showWidgetDialog({
             title: (_a = props.title) !== null && _a !== void 0 ? _a : CONTENT_UPLOAD_DEFAULTS.title,
             fullHeight: false,
@@ -646,7 +655,8 @@ function useOpenContentUpload(props) {
                 id: 'org.rd.plugin.uigoodies.ContentUpload',
                 configuration: {
                     defaultPath: (_b = props.defaultPath) !== null && _b !== void 0 ? _b : CONTENT_UPLOAD_DEFAULTS.defaultPath,
-                    allowPathSelection: (_c = props.allowPathSelection) !== null && _c !== void 0 ? _c : CONTENT_UPLOAD_DEFAULTS.allowPathSelection
+                    allowPathSelection: (_c = props.allowPathSelection) !== null && _c !== void 0 ? _c : CONTENT_UPLOAD_DEFAULTS.allowPathSelection,
+                    allowPathInput: (_d = props.allowPathInput) !== null && _d !== void 0 ? _d : CONTENT_UPLOAD_DEFAULTS.allowPathInput
                 }
             }
         }));
