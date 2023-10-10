@@ -2,7 +2,7 @@ const React = craftercms.libs.React;
 const { useState, useRef } = craftercms.libs.React;
 const React__default = craftercms.libs.React && Object.prototype.hasOwnProperty.call(craftercms.libs.React, 'default') ? craftercms.libs.React['default'] : craftercms.libs.React;
 const { useSelector, useDispatch } = craftercms.libs.ReactRedux;
-const { Tooltip, useTheme, accordionClasses, accordionSummaryClasses, Accordion, AccordionSummary, Typography, AccordionDetails, alpha, Button: Button$1, buttonClasses } = craftercms.libs.MaterialUI;
+const { Tooltip, useTheme, accordionClasses, accordionSummaryClasses, Accordion, AccordionSummary, Typography, AccordionDetails, alpha, Button: Button$1, buttonClasses, Backdrop, CircularProgress: CircularProgress$1, Alert } = craftercms.libs.MaterialUI;
 const IconButton = craftercms.libs.MaterialUI.IconButton && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.IconButton, 'default') ? craftercms.libs.MaterialUI.IconButton['default'] : craftercms.libs.MaterialUI.IconButton;
 const Button = craftercms.libs.MaterialUI.Button && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Button, 'default') ? craftercms.libs.MaterialUI.Button['default'] : craftercms.libs.MaterialUI.Button;
 const SystemIcon = craftercms.components.SystemIcon && Object.prototype.hasOwnProperty.call(craftercms.components.SystemIcon, 'default') ? craftercms.components.SystemIcon['default'] : craftercms.components.SystemIcon;
@@ -23,6 +23,10 @@ const generateUtilityClass = craftercms.libs.MaterialUI.generateUtilityClass && 
 const generateUtilityClasses = craftercms.libs.MaterialUI.generateUtilityClasses && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.generateUtilityClasses, 'default') ? craftercms.libs.MaterialUI.generateUtilityClasses['default'] : craftercms.libs.MaterialUI.generateUtilityClasses;
 const ToolsPanelListItemButton = craftercms.components.ToolsPanelListItemButton && Object.prototype.hasOwnProperty.call(craftercms.components.ToolsPanelListItemButton, 'default') ? craftercms.components.ToolsPanelListItemButton['default'] : craftercms.components.ToolsPanelListItemButton;
 const Tooltip$1 = craftercms.libs.MaterialUI.Tooltip && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Tooltip, 'default') ? craftercms.libs.MaterialUI.Tooltip['default'] : craftercms.libs.MaterialUI.Tooltip;
+const { pull, push } = craftercms.services.repositories;
+const DownloadRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/DownloadRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/DownloadRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/DownloadRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/DownloadRounded');
+const PublishRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/PublishRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/PublishRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/PublishRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/PublishRounded');
+const Snackbar = craftercms.libs.MaterialUI.Snackbar && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Snackbar, 'default') ? craftercms.libs.MaterialUI.Snackbar['default'] : craftercms.libs.MaterialUI.Snackbar;
 
 /*
  * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
@@ -714,6 +718,86 @@ function OpenContentUploadToolbarButton(props) {
         React.createElement(SystemIcon, { icon: icon }))) : (React.createElement(Button$1, { size: buttonSize, onClick: handleClick, startIcon: useIconWithText ? React.createElement(SystemIcon, { icon: icon }) : void 0, sx: (_a = {}, _a[".".concat(buttonClasses.startIcon)] = { mr: 0.5 }, _a) }, title)));
 }
 
+function PullPushRemoteButtons(props) {
+    var useIcon = props.useIcon, remoteName = props.remoteName, mergeStrategy = props.mergeStrategy, pullBranch = props.pullBranch, pushBranch = props.pushBranch, pullLabel = props.pullLabel, pushLabel = props.pushLabel;
+    var siteId = useActiveSiteId();
+    useEnv();
+    var _a = React.useState(''), snackMessage = _a[0], setSnackMessage = _a[1];
+    var _b = React.useState(true), snackSuccess = _b[0], setSnackSuccess = _b[1];
+    var _c = React.useState(false), snackShow = _c[0], setSnackShow = _c[1];
+    var _d = React.useState(false), progressShow = _d[0], setProgressShow = _d[1];
+    var onPullSuccess = function (result) {
+        setSnackMessage("".concat(pullLabel ? pullLabel : 'Pull', " completed successfully."));
+        setSnackSuccess(true);
+        setSnackShow(true);
+    };
+    var onPullError = function (result) {
+        setSnackMessage("".concat(pullLabel ? pullLabel : 'Pull', " failed."));
+        setSnackSuccess(false);
+        setSnackShow(true);
+    };
+    var onPushSuccess = function () {
+        setSnackMessage("".concat(pushLabel ? pushLabel : 'Push', " completed successfully."));
+        setSnackSuccess(true);
+        setSnackShow(true);
+    };
+    var onPushError = function (result) {
+        setSnackMessage("".concat(pushLabel ? pushLabel : 'Push', " failed."));
+        setSnackSuccess(false);
+        setSnackShow(true);
+    };
+    var handlePullClick = function (event) {
+        setProgressShow(true);
+        pull({
+            siteId: siteId,
+            remoteName: remoteName,
+            remoteBranch: pullBranch,
+            mergeStrategy: mergeStrategy
+        }).subscribe({
+            next: function (result) {
+                onPullSuccess();
+            },
+            error: function (_a) {
+                var response = _a.response;
+                onPullError(response.response);
+            }
+        });
+    };
+    var handlePushClick = function (event) {
+        setProgressShow(true);
+        push(siteId, remoteName, pushBranch, false).subscribe({
+            next: function () {
+                onPushSuccess();
+            },
+            error: function (_a) {
+                var response = _a.response;
+                onPushError(response.response);
+            }
+        });
+    };
+    function handleSnackClose(event, reason) {
+        setProgressShow(false);
+        setSnackShow(false);
+    }
+    return useIcon ? (React.createElement(React.Fragment, null,
+        React.createElement(Tooltip, { title: pullLabel ? pullLabel : "Pull" },
+            React.createElement(IconButton, { size: "small", onClick: handlePullClick },
+                React.createElement(DownloadRoundedIcon, null))),
+        React.createElement(Tooltip, { title: pushLabel ? pushLabel : "Push" },
+            React.createElement(IconButton, { size: "small", onClick: handlePushClick },
+                React.createElement(PublishRoundedIcon, null))),
+        React.createElement(Backdrop, { sx: { color: '#fff', zIndex: function (theme) { return theme.zIndex.drawer + 1; } }, open: progressShow },
+            React.createElement(CircularProgress$1, { color: "inherit" }),
+            React.createElement(Snackbar, { anchorOrigin: { vertical: 'top', horizontal: 'center' }, open: snackShow, autoHideDuration: 5000, onClose: handleSnackClose },
+                React.createElement(Alert, { severity: snackSuccess ? "success" : "error", sx: { width: '100%' } }, snackMessage))))) : (React.createElement(React.Fragment, null,
+        React.createElement(Button, { size: "small", variant: "text", onClick: handlePullClick }, pullLabel ? pullLabel : "Pull"),
+        React.createElement(Button, { size: "small", variant: "text", onClick: handlePushClick }, pushLabel ? pushLabel : "Push"),
+        React.createElement(Backdrop, { sx: { color: '#fff', zIndex: function (theme) { return theme.zIndex.drawer + 1; } }, open: progressShow },
+            React.createElement(CircularProgress$1, { color: "inherit" }),
+            React.createElement(Snackbar, { anchorOrigin: { vertical: 'top', horizontal: 'center' }, open: snackShow, autoHideDuration: 5000, onClose: handleSnackClose },
+                React.createElement(Alert, { severity: snackSuccess ? "success" : "error", sx: { width: '100%' } }, snackMessage)))));
+}
+
 var plugin = {
     locales: undefined,
     scripts: undefined,
@@ -725,8 +809,9 @@ var plugin = {
         'org.rd.plugin.uigoodies.ToolPanelAccordion': ToolPanelAccordion,
         'org.rd.plugin.uigoodies.ContentUpload': ContentUpload,
         'org.rd.plugin.uigoodies.openContentUploadPanelButton': OpenContentUploadPanelButton,
-        'org.rd.plugin.uigoodies.openContentUploadToolbarButton': OpenContentUploadToolbarButton
+        'org.rd.plugin.uigoodies.openContentUploadToolbarButton': OpenContentUploadToolbarButton,
+        'org.rd.plugin.uigoodies.PullPushRemoteButtons': PullPushRemoteButtons,
     }
 };
 
-export { EditOrViewCurrent, PublishOrRequestPublish, ToolPanelAccordion, plugin as default };
+export { EditOrViewCurrent, PublishOrRequestPublish, PullPushRemoteButtons, ToolPanelAccordion, plugin as default };

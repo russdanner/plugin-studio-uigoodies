@@ -5,6 +5,7 @@ import ToolPanelAccordion from './components/ToolPanelAccordion';
 import ContentUpload from './components/ContentUpload';
 import OpenContentUploadPanelButton from './components/OpenContentUploadPanelButton';
 import OpenContentUploadToolbarButton from './components/OpenContentUploadToolbarButton';
+import PullPushRemoteButtons from './components/PullPushRemoteButtons';
 
 const plugin: PluginDescriptor = {
   locales: undefined,
@@ -17,10 +18,11 @@ const plugin: PluginDescriptor = {
     'org.rd.plugin.uigoodies.ToolPanelAccordion': ToolPanelAccordion,
     'org.rd.plugin.uigoodies.ContentUpload': ContentUpload,
     'org.rd.plugin.uigoodies.openContentUploadPanelButton': OpenContentUploadPanelButton,
-    'org.rd.plugin.uigoodies.openContentUploadToolbarButton': OpenContentUploadToolbarButton
+    'org.rd.plugin.uigoodies.openContentUploadToolbarButton': OpenContentUploadToolbarButton,
+    'org.rd.plugin.uigoodies.PullPushRemoteButtons': PullPushRemoteButtons,
   }
 };
 
-export { EditOrViewCurrent, PublishOrRequestPublish, ToolPanelAccordion };
+export { EditOrViewCurrent, PublishOrRequestPublish, ToolPanelAccordion, PullPushRemoteButtons };
 
 export default plugin;
