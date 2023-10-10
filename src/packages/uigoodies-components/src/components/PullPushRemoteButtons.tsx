@@ -79,45 +79,33 @@ export function PullPushRemoteButtons(props) {
     setSnackShow(false);
   }
 
-  return useIcon ? (
+  return (
     <>
-      <Tooltip title={pullLabel ? pullLabel : `Pull`}>
-        <IconButton size="small" onClick={handlePullClick}>
-          <DownloadRoundedIcon />
-        </IconButton>
-      </Tooltip>
+      {useIcon ? (
+        <>
+          <Tooltip title={pullLabel ? pullLabel : `Pull`}>
+            <IconButton size="small" onClick={handlePullClick}>
+              <DownloadRoundedIcon />
+            </IconButton>
+          </Tooltip>
 
-      <Tooltip title={pushLabel ? pushLabel : `Push`}>
-        <IconButton size="small" onClick={handlePushClick}>
-          <PublishRoundedIcon />
-        </IconButton>
-      </Tooltip>
+          <Tooltip title={pushLabel ? pushLabel : `Push`}>
+            <IconButton size="small" onClick={handlePushClick}>
+              <PublishRoundedIcon />
+            </IconButton>
+          </Tooltip>
+        </>
+      ) : (
+        <>
+          <Button size="small" variant="text" onClick={handlePullClick}>
+            {pullLabel ? pullLabel : `Pull`}
+          </Button>
 
-      <Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={progressShow}>
-        <CircularProgress color="inherit" />
-
-        <Snackbar
-          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-          open={snackShow}
-          autoHideDuration={5000}
-          onClose={handleSnackClose}
-        >
-          <Alert severity={snackSuccess ? `success` : `error`} sx={{ width: '100%' }}>
-            {snackMessage}
-          </Alert>
-        </Snackbar>
-      </Backdrop>
-    </>
-  ) : (
-    <>
-      <Button size="small" variant="text" onClick={handlePullClick}>
-        {pullLabel ? pullLabel : `Pull`}
-      </Button>
-
-      <Button size="small" variant="text" onClick={handlePushClick}>
-        {pushLabel ? pushLabel : `Push`}
-      </Button>
-
+          <Button size="small" variant="text" onClick={handlePushClick}>
+            {pushLabel ? pushLabel : `Push`}
+          </Button>
+        </>
+      )}
       <Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={progressShow}>
         <CircularProgress color="inherit" />
 
