@@ -8,7 +8,6 @@ import { pull, push } from '@craftercms/studio-ui/services/repositories';
 import DownloadRoundedIcon from '@mui/icons-material/DownloadRounded';
 import PublishRoundedIcon from '@mui/icons-material/PublishRounded';
 import Snackbar, { SnackbarCloseReason } from '@mui/material/Snackbar';
-import SnackbarContent from '@mui/material/SnackbarContent';
 
 export function PullPushRemoteButtons(props) {
   const { useIcon, remoteName, mergeStrategy, pullBranch, pushBranch, pullLabel, pushLabel } = props;
