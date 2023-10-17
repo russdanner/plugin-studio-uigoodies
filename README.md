@@ -192,24 +192,24 @@ curl --location --request POST 'http://SERVER_AND_PORT/studio/api/2/marketplace/
 
 ## Toolbar Git Pull and Push support
 This widget is useful if you have a DevContentOps process that requires business users to pull and push from a specific remote and branches
-```
+```xml
 <widget id="org.rd.plugin.uigoodies.PullPushRemoteButtons">
-<plugin id="org.rd.plugin.uigoodies" site="{site}" type="apps" name="uigoodies" file="index.js"/>
-<configuration>
-    <useIcon>false</useIcon>
-    
-    <remoteName>origin</remoteName>
-    <mergeStrategy>none</mergeStrategy>
-    
-    <pullBranch>master</pullBranch>
-    <pullLabel>Pull from Env X</pullLabel>
-
-    <pushBranch>master</pushBranch> 
-    <pushLabel>Push to Env X</pushLabel>
-
-    <enablePull>true</enablePull>
-    <enablePush>true</enablePush>
-
-</configuration>
+	<plugin id="org.rd.plugin.uigoodies" site="{site}" type="apps" name="uigoodies" file="index.js"/>
+	<configuration>
+	    <useIcon>false</useIcon>
+	    
+	    <remoteName>origin</remoteName>
+	    <mergeStrategy>none</mergeStrategy>
+	    
+	    <pullBranch>master</pullBranch>
+	    <pullLabel>Pull from Env X</pullLabel>
+	
+	    <pushBranch>master</pushBranch> 
+	    <pushLabel>Push to Env X</pushLabel>
+	
+	    <enablePull>true</enablePull>
+	    <enablePush>true</enablePush>
+	
+	</configuration>
 </widget>
 ```
