@@ -10,7 +10,17 @@ import PublishRoundedIcon from '@mui/icons-material/PublishRounded';
 import Snackbar, { SnackbarCloseReason } from '@mui/material/Snackbar';
 
 export function PullPushRemoteButtons(props) {
-  const { useIcon, remoteName, mergeStrategy, pullBranch, pushBranch, pullLabel, pushLabel } = props;
+  const {
+    useIcon,
+    remoteName,
+    mergeStrategy,
+    pullBranch,
+    pushBranch,
+    pullLabel,
+    pushLabel,
+    enablePull = true,
+    enablePush = true
+  } = props;
   const siteId = useActiveSiteId();
   const env = useEnv();
   const [snackMessage, setSnackMessage] = React.useState('');
@@ -82,27 +92,41 @@ export function PullPushRemoteButtons(props) {
     <>
       {useIcon ? (
         <>
-          <Tooltip title={pullLabel ? pullLabel : `Pull`}>
-            <IconButton size="small" onClick={handlePullClick}>
-              <DownloadRoundedIcon />
-            </IconButton>
-          </Tooltip>
-
-          <Tooltip title={pushLabel ? pushLabel : `Push`}>
-            <IconButton size="small" onClick={handlePushClick}>
-              <PublishRoundedIcon />
-            </IconButton>
-          </Tooltip>
+          {enablePull ? (
+            <Tooltip title={pullLabel ? pullLabel : `Pull`}>
+              <IconButton size="small" onClick={handlePullClick}>
+                <DownloadRoundedIcon />
+              </IconButton>
+            </Tooltip>
+          ) : (
+            <></>
+          )}
+          {enablePush ? (
+            <Tooltip title={pushLabel ? pushLabel : `Push`}>
+              <IconButton size="small" onClick={handlePushClick}>
+                <PublishRoundedIcon />
+              </IconButton>
+            </Tooltip>
+          ) : (
+            <></>
+          )}
         </>
       ) : (
         <>
-          <Button size="small" variant="text" onClick={handlePullClick}>
-            {pullLabel ? pullLabel : `Pull`}
-          </Button>
-
-          <Button size="small" variant="text" onClick={handlePushClick}>
-            {pushLabel ? pushLabel : `Push`}
-          </Button>
+          {enablePull ? (
+            <Button size="small" variant="text" onClick={handlePullClick}>
+              {pullLabel ? pullLabel : `Pull`}
+            </Button>
+          ) : (
+            <></>
+          )}
+          {enablePush ? (
+            <Button size="small" variant="text" onClick={handlePushClick}>
+              {pushLabel ? pushLabel : `Push`}
+            </Button>
+          ) : (
+            <></>
+          )}
         </>
       )}
       <Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={progressShow}>
