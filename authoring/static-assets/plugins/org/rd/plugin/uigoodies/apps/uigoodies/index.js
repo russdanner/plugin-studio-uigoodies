@@ -24,8 +24,8 @@ const generateUtilityClasses = craftercms.libs.MaterialUI.generateUtilityClasses
 const ToolsPanelListItemButton = craftercms.components.ToolsPanelListItemButton && Object.prototype.hasOwnProperty.call(craftercms.components.ToolsPanelListItemButton, 'default') ? craftercms.components.ToolsPanelListItemButton['default'] : craftercms.components.ToolsPanelListItemButton;
 const Tooltip$1 = craftercms.libs.MaterialUI.Tooltip && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Tooltip, 'default') ? craftercms.libs.MaterialUI.Tooltip['default'] : craftercms.libs.MaterialUI.Tooltip;
 const { pull, push } = craftercms.services.repositories;
-const DownloadRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/DownloadRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/DownloadRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/DownloadRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/DownloadRounded');
-const PublishRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/PublishRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/PublishRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/PublishRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/PublishRounded');
+const DownloadIcon = craftercms.utils.constants.components.get('@mui/icons-material/DownloadOutlined') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/DownloadOutlined'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/DownloadOutlined')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/DownloadOutlined');
+const PublishIcon = craftercms.utils.constants.components.get('@mui/icons-material/PublishOutlined') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/PublishOutlined'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/PublishOutlined')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/PublishOutlined');
 const Snackbar = craftercms.libs.MaterialUI.Snackbar && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Snackbar, 'default') ? craftercms.libs.MaterialUI.Snackbar['default'] : craftercms.libs.MaterialUI.Snackbar;
 
 /*
@@ -718,14 +718,52 @@ function OpenContentUploadToolbarButton(props) {
         React.createElement(SystemIcon, { icon: icon }))) : (React.createElement(Button$1, { size: buttonSize, onClick: handleClick, startIcon: useIconWithText ? React.createElement(SystemIcon, { icon: icon }) : void 0, sx: (_a = {}, _a[".".concat(buttonClasses.startIcon)] = { mr: 0.5 }, _a) }, title)));
 }
 
+/*
+ * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License version 3 as published by
+ * the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+const useSelection =
+  useSelector ;
+
+/*
+ * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License version 3 as published by
+ * the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+function useRoles() {
+  return useSelection((state) => state.user.rolesBySite);
+}
+
 function PullPushRemoteButtons(props) {
-    var useIcon = props.useIcon, remoteName = props.remoteName, mergeStrategy = props.mergeStrategy, pullBranch = props.pullBranch, pushBranch = props.pushBranch, pullLabel = props.pullLabel, pushLabel = props.pushLabel, _a = props.enablePull, enablePull = _a === void 0 ? true : _a, _b = props.enablePush, enablePush = _b === void 0 ? true : _b;
+    var useIcon = props.useIcon, remoteName = props.remoteName, mergeStrategy = props.mergeStrategy, pullBranch = props.pullBranch, pushBranch = props.pushBranch, pullLabel = props.pullLabel, pushLabel = props.pushLabel, enablePull = props.enablePull, enablePush = props.enablePush;
     var siteId = useActiveSiteId();
     useEnv();
-    var _c = React.useState(''), snackMessage = _c[0], setSnackMessage = _c[1];
-    var _d = React.useState(true), snackSuccess = _d[0], setSnackSuccess = _d[1];
-    var _e = React.useState(false), snackShow = _e[0], setSnackShow = _e[1];
-    var _f = React.useState(false), progressShow = _f[0], setProgressShow = _f[1];
+    var roles = useRoles();
+    var _a = React.useState(''), snackMessage = _a[0], setSnackMessage = _a[1];
+    var _b = React.useState(true), snackSuccess = _b[0], setSnackSuccess = _b[1];
+    var _c = React.useState(false), snackShow = _c[0], setSnackShow = _c[1];
+    var _d = React.useState(false), progressShow = _d[0], setProgressShow = _d[1];
     var onPullSuccess = function (result) {
         setSnackMessage("".concat(pullLabel ? pullLabel : 'Pull', " completed successfully."));
         setSnackSuccess(true);
@@ -775,20 +813,38 @@ function PullPushRemoteButtons(props) {
             }
         });
     };
+    var shouldShowButton = function (enabled) {
+        var allowed = false;
+        if (props.permittedRoles) {
+            var allowedRoles = props.permittedRoles;
+            var userRoles = roles[siteId];
+            for (var i = 0; i < allowedRoles.length; i++) {
+                //@ts-ignore
+                if (userRoles.indexOf(allowedRoles[i]) != -1) {
+                    allowed = true;
+                    break;
+                }
+            }
+        }
+        else {
+            allowed = true;
+        }
+        return enabled && allowed;
+    };
     function handleSnackClose(event, reason) {
         setProgressShow(false);
         setSnackShow(false);
     }
     return (React.createElement(React.Fragment, null,
         useIcon ? (React.createElement(React.Fragment, null,
-            enablePull ? (React.createElement(Tooltip, { title: pullLabel ? pullLabel : "Pull" },
+            shouldShowButton(enablePull) ? (React.createElement(Tooltip, { title: pullLabel ? pullLabel : "Pull" },
                 React.createElement(IconButton, { size: "small", onClick: handlePullClick },
-                    React.createElement(DownloadRoundedIcon, null)))) : (React.createElement(React.Fragment, null)),
-            enablePush ? (React.createElement(Tooltip, { title: pushLabel ? pushLabel : "Push" },
+                    React.createElement(DownloadIcon, null)))) : (React.createElement(React.Fragment, null)),
+            shouldShowButton(enablePush) ? (React.createElement(Tooltip, { title: pushLabel ? pushLabel : "Push" },
                 React.createElement(IconButton, { size: "small", onClick: handlePushClick },
-                    React.createElement(PublishRoundedIcon, null)))) : (React.createElement(React.Fragment, null)))) : (React.createElement(React.Fragment, null,
-            enablePull ? (React.createElement(Button, { size: "small", variant: "text", onClick: handlePullClick }, pullLabel ? pullLabel : "Pull")) : (React.createElement(React.Fragment, null)),
-            enablePush ? (React.createElement(Button, { size: "small", variant: "text", onClick: handlePushClick }, pushLabel ? pushLabel : "Push")) : (React.createElement(React.Fragment, null)))),
+                    React.createElement(PublishIcon, null)))) : (React.createElement(React.Fragment, null)))) : (React.createElement(React.Fragment, null,
+            shouldShowButton(enablePull) ? (React.createElement(Button, { size: "small", variant: "text", onClick: handlePullClick }, pullLabel ? pullLabel : "Pull")) : (React.createElement(React.Fragment, null)),
+            shouldShowButton(enablePush) ? (React.createElement(Button, { size: "small", variant: "text", onClick: handlePushClick }, pushLabel ? pushLabel : "Push")) : (React.createElement(React.Fragment, null)))),
         React.createElement(Backdrop, { sx: { color: '#fff', zIndex: function (theme) { return theme.zIndex.drawer + 1; } }, open: progressShow },
             React.createElement(CircularProgress$1, { color: "inherit" }),
             React.createElement(Snackbar, { anchorOrigin: { vertical: 'top', horizontal: 'center' }, open: snackShow, autoHideDuration: 5000, onClose: handleSnackClose },

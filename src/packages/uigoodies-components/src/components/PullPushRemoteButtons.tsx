@@ -3,26 +3,19 @@ import { Alert, Backdrop, CircularProgress, Tooltip } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
 import useActiveSiteId from '@craftercms/studio-ui/hooks/useActiveSiteId';
+import useRoles from '@craftercms/studio-ui/hooks/useRoles';
 import useEnv from '@craftercms/studio-ui/hooks/useEnv';
 import { pull, push } from '@craftercms/studio-ui/services/repositories';
-import DownloadRoundedIcon from '@mui/icons-material/DownloadRounded';
-import PublishRoundedIcon from '@mui/icons-material/PublishRounded';
+import DownloadIcon from '@mui/icons-material/DownloadOutlined';
+import PublishIcon from '@mui/icons-material/PublishOutlined';
 import Snackbar, { SnackbarCloseReason } from '@mui/material/Snackbar';
 
 export function PullPushRemoteButtons(props) {
-  const {
-    useIcon,
-    remoteName,
-    mergeStrategy,
-    pullBranch,
-    pushBranch,
-    pullLabel,
-    pushLabel,
-    enablePull = true,
-    enablePush = true
-  } = props;
+  const { useIcon, remoteName, mergeStrategy, pullBranch, pushBranch, pullLabel, pushLabel, enablePull, enablePush } =
+    props;
   const siteId = useActiveSiteId();
   const env = useEnv();
+  const roles = useRoles();
   const [snackMessage, setSnackMessage] = React.useState('');
   const [snackSuccess, setSnackSuccess] = React.useState(true);
   const [snackShow, setSnackShow] = React.useState(false);
@@ -83,6 +76,27 @@ export function PullPushRemoteButtons(props) {
     });
   };
 
+  const shouldShowButton = (enabled: Boolean) => {
+    let allowed = false;
+
+    if (props.permittedRoles) {
+      let allowedRoles = props.permittedRoles
+      let userRoles = roles[siteId];
+
+      for (var i = 0; i < allowedRoles.length; i++) {
+        //@ts-ignore
+        if (userRoles.indexOf(allowedRoles[i]) != -1) {
+          allowed = true;
+          break;
+        }
+      }
+    } else {
+      allowed = true;
+    }
+
+    return enabled && allowed;
+  };
+
   function handleSnackClose(event: Event | React.SyntheticEvent<any, Event>, reason: SnackbarCloseReason): void {
     setProgressShow(false);
     setSnackShow(false);
@@ -92,19 +106,19 @@ export function PullPushRemoteButtons(props) {
     <>
       {useIcon ? (
         <>
-          {enablePull ? (
+          {shouldShowButton(enablePull) ? (
             <Tooltip title={pullLabel ? pullLabel : `Pull`}>
               <IconButton size="small" onClick={handlePullClick}>
-                <DownloadRoundedIcon />
+                <DownloadIcon />
               </IconButton>
             </Tooltip>
           ) : (
             <></>
           )}
-          {enablePush ? (
+          {shouldShowButton(enablePush) ? (
             <Tooltip title={pushLabel ? pushLabel : `Push`}>
               <IconButton size="small" onClick={handlePushClick}>
-                <PublishRoundedIcon />
+                <PublishIcon />
               </IconButton>
             </Tooltip>
           ) : (
@@ -113,14 +127,14 @@ export function PullPushRemoteButtons(props) {
         </>
       ) : (
         <>
-          {enablePull ? (
+          {shouldShowButton(enablePull) ? (
             <Button size="small" variant="text" onClick={handlePullClick}>
               {pullLabel ? pullLabel : `Pull`}
             </Button>
           ) : (
             <></>
           )}
-          {enablePush ? (
+          {shouldShowButton(enablePush) ? (
             <Button size="small" variant="text" onClick={handlePushClick}>
               {pushLabel ? pushLabel : `Push`}
             </Button>
