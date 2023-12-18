@@ -80,14 +80,26 @@ export function PullPushRemoteButtons(props) {
     let allowed = false;
 
     if (props.permittedRoles) {
-      let allowedRoles = props.permittedRoles
+      let allowedRoles = props.permittedRoles;
       let userRoles = roles[siteId];
 
-      for (var i = 0; i < allowedRoles.length; i++) {
-        //@ts-ignore
-        if (userRoles.indexOf(allowedRoles[i]) != -1) {
-          allowed = true;
-          break;
+      if (allowedRoles.role) {
+        var aRoles = Object.values(allowedRoles.role);
+
+        for (var i = 0; i < aRoles.length; i++) {
+          //@ts-ignore
+          if (userRoles.indexOf(aRoles[i]) != -1) {
+            allowed = true;
+            break;
+          }
+        }
+      } else {
+        for (var i = 0; i < allowedRoles.length; i++) {
+          //@ts-ignore
+          if (userRoles.indexOf(allowedRoles[i]) != -1) {
+            allowed = true;
+            break;
+          }
         }
       }
     } else {
