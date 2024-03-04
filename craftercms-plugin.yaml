@@ -13,7 +13,7 @@ plugin:
   version:
     major: 1
     minor: 0
-    patch: 0
+    patch: 1
   description: A plugin to adds some UI goodies to your studio
   documentation: "https://raw.githubusercontent.com/russdanner/plugin-craftercms-uigoodies/master/README.md"
   website:
@@ -47,6 +47,12 @@ plugin:
       patch: 2
     - major: 4
       minor: 0
+      patch: 3
+    - major: 4
+      minor: 0
+      patch: 8
+    - major: 4
+      minor: 1
       patch: 3
   crafterCmsEditions:
     - community

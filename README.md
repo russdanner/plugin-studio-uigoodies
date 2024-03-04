@@ -13,7 +13,7 @@ place by doing a bit of programming and send us pull request :)
 
 ### Top Navigation Toolbar
 
-- Toolbar Edit button 
+- Toolbar Edit button
 - Toolbar Publish button
 
 ## Sidebar
@@ -190,6 +190,47 @@ curl --location --request POST 'http://SERVER_AND_PORT/studio/api/2/marketplace/
 </widget>
 ```
 
+## Sidebar Bulk Publish Assets Button
+
+```xml
+<widget id="org.rd.plugin.uigoodies.openBulkPublishPanelButton">
+    <plugin
+        id="org.rd.plugin.uigoodies"
+        site="{site}"
+        type="apps"
+        name="uigoodies"
+        file="index.js"
+    />
+    <!-- optional parameters -->
+    <configuration>
+        <title>Bulk Publish Assets</title>
+        <icon id="@mui/icons-material/AutoAwesomeMotionOutlined"/>
+        <defaultPath>/static-assets</defaultPath>
+    </configuration>
+</widget>
+```
+
+## Toolbar Bulk Publish Assets Button
+
+```xml
+<widget id="org.rd.plugin.uigoodies.openBulkPublishToolbarButton">
+    <plugin
+      id="org.rd.plugin.uigoodies"
+      site="{site}"
+      type="apps"
+      name="uigoodies"
+      file="index.js"
+    />
+    <!-- optional parameters -->
+    <configuration>
+        <title>Bulk Publish Assets</title>
+        <dialogTitle>Bulk Publish Assets</dialogTitle>
+        <icon id="@mui/icons-material/AutoAwesomeMotionOutlined"/>
+        <defaultPath>/static-assets</defaultPath>
+    </configuration>
+</widget>
+```
+
 ## Toolbar Git Pull and Push support
 This widget is useful if you have a DevContentOps process that requires business users to pull and push from a specific remote and branches
 ```xml
@@ -197,19 +238,19 @@ This widget is useful if you have a DevContentOps process that requires business
 	<plugin id="org.rd.plugin.uigoodies" site="{site}" type="apps" name="uigoodies" file="index.js"/>
 	<configuration>
 	    <useIcon>false</useIcon>
-	    
+
 	    <remoteName>origin</remoteName>
 	    <mergeStrategy>none</mergeStrategy>
-	    
+
 	    <pullBranch>master</pullBranch>
 	    <pullLabel>Pull from Env X</pullLabel>
-	
-	    <pushBranch>master</pushBranch> 
+
+	    <pushBranch>master</pushBranch>
 	    <pushLabel>Push to Env X</pushLabel>
-	
+
 	    <enablePull>true</enablePull>
 	    <enablePush>true</enablePush>
-	
+
 	</configuration>
 </widget>
 ```
