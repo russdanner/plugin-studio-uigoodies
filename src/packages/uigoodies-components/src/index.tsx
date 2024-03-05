@@ -6,6 +6,9 @@ import ContentUpload from './components/ContentUpload';
 import OpenContentUploadPanelButton from './components/OpenContentUploadPanelButton';
 import OpenContentUploadToolbarButton from './components/OpenContentUploadToolbarButton';
 import PullPushRemoteButtons from './components/PullPushRemoteButtons';
+import BulkPublishView from './components/BulkPublishView';
+import OpenBulkPublishPanelButton from './components/OpenBulkPublishPanelButton';
+import OpenBulkPublishToolbarButton from './components/OpenBulkPublishToolbarButton';
 
 const plugin: PluginDescriptor = {
   locales: undefined,
@@ -20,6 +23,9 @@ const plugin: PluginDescriptor = {
     'org.rd.plugin.uigoodies.openContentUploadPanelButton': OpenContentUploadPanelButton,
     'org.rd.plugin.uigoodies.openContentUploadToolbarButton': OpenContentUploadToolbarButton,
     'org.rd.plugin.uigoodies.PullPushRemoteButtons': PullPushRemoteButtons,
+    'org.rd.plugin.uigoodies.bulkPublishView': BulkPublishView,
+    'org.rd.plugin.uigoodies.openBulkPublishPanelButton': OpenBulkPublishPanelButton,
+    'org.rd.plugin.uigoodies.openBulkPublishToolbarButton': OpenBulkPublishToolbarButton
   }
 };
 
