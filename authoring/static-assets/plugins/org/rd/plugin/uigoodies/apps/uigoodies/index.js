@@ -1,5 +1,5 @@
 const React = craftercms.libs.React;
-const { useState, useRef, useReducer, useEffect } = craftercms.libs.React;
+const { useState, useRef, useEffect } = craftercms.libs.React;
 const React__default = craftercms.libs.React && Object.prototype.hasOwnProperty.call(craftercms.libs.React, 'default') ? craftercms.libs.React['default'] : craftercms.libs.React;
 const { useSelector, useDispatch } = craftercms.libs.ReactRedux;
 const { Tooltip, useTheme, accordionClasses, accordionSummaryClasses, Accordion, AccordionSummary, Typography, AccordionDetails, alpha, Button: Button$1, buttonClasses, Backdrop, CircularProgress: CircularProgress$1, Alert, Paper, Box: Box$1 } = craftercms.libs.MaterialUI;
@@ -7,7 +7,7 @@ const IconButton = craftercms.libs.MaterialUI.IconButton && Object.prototype.has
 const Button = craftercms.libs.MaterialUI.Button && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Button, 'default') ? craftercms.libs.MaterialUI.Button['default'] : craftercms.libs.MaterialUI.Button;
 const SystemIcon = craftercms.components.SystemIcon && Object.prototype.hasOwnProperty.call(craftercms.components.SystemIcon, 'default') ? craftercms.components.SystemIcon['default'] : craftercms.components.SystemIcon;
 const { isItemLockedForMe } = craftercms.utils.content;
-const { SystemIcon: SystemIcon$1, WidgetsGrid, PublishOnDemandForm, DialogFooter: DialogFooter$1 } = craftercms.components;
+const { SystemIcon: SystemIcon$1, WidgetsGrid, DialogBody, DialogFooter: DialogFooter$1 } = craftercms.components;
 const ExpandMore = craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreOutlined') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreOutlined'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreOutlined')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreOutlined');
 const { createCustomDocumentEventListener } = craftercms.utils.dom;
 const TextField = craftercms.libs.MaterialUI.TextField && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.TextField, 'default') ? craftercms.libs.MaterialUI.TextField['default'] : craftercms.libs.MaterialUI.TextField;
@@ -26,12 +26,13 @@ const { pull, push } = craftercms.services.repositories;
 const DownloadIcon = craftercms.utils.constants.components.get('@mui/icons-material/DownloadOutlined') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/DownloadOutlined'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/DownloadOutlined')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/DownloadOutlined');
 const PublishIcon = craftercms.utils.constants.components.get('@mui/icons-material/PublishOutlined') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/PublishOutlined'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/PublishOutlined')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/PublishOutlined');
 const Snackbar = craftercms.libs.MaterialUI.Snackbar && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Snackbar, 'default') ? craftercms.libs.MaterialUI.Snackbar['default'] : craftercms.libs.MaterialUI.Snackbar;
-const { defineMessages, useIntl, FormattedMessage } = craftercms.libs.ReactIntl;
+const { FormattedMessage } = craftercms.libs.ReactIntl;
+const { of } = craftercms.libs.rxjs;
+const { concatMap, expand, toArray } = craftercms.libs.rxjs;
+const { fetchUnpublished } = craftercms.services.dashboard;
 const { nou } = craftercms.utils.object;
 const { lookupItemByPath } = craftercms.utils.content;
 const { hasInitialPublish } = craftercms.services.sites;
-const { fetchPublishingTargets, bulkGoLive } = craftercms.services.publishing;
-const { isBlank } = craftercms.utils.string;
 const InfoOutlinedIcon = craftercms.utils.constants.components.get('@mui/icons-material/InfoOutlined') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/InfoOutlined'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/InfoOutlined')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/InfoOutlined');
 
 var jsxRuntime = {exports: {}};
@@ -632,10 +633,6 @@ F();
  */
 
 // endregion
-// region Confirm
-const showConfirmDialog = /*#__PURE__*/ createAction('SHOW_CONFIRM_DIALOG');
-const closeConfirmDialog = /*#__PURE__*/ createAction('CLOSE_CONFIRM_DIALOG');
-// endregion
 // region Publish
 const showPublishDialog = /*#__PURE__*/ createAction('SHOW_PUBLISH_DIALOG');
 const closePublishDialog = /*#__PURE__*/ createAction('CLOSE_PUBLISH_DIALOG');
@@ -756,6 +753,7 @@ function ToolPanelAccordion(props) {
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+const showPublishItemSuccessNotification = /*#__PURE__*/ createAction('SHOW_PUBLISH_ITEM_SUCCESS_NOTIFICATION');
 const showSystemNotification = /*#__PURE__*/ createAction('SHOW_SYSTEM_NOTIFICATION');
 // endregion
 
@@ -1132,8 +1130,8 @@ var CONTENT_UPLOAD_DEFAULTS = {
     allowPathSelection: true,
     allowPathInput: false
 };
-var BULK_PUBLISH_ASSETS_DEFAULTS = {
-    title: 'Bulk Publish Assets',
+var BULK_PUBLISH_DEFAULTS = {
+    title: 'Bulk Publish',
     defaultPath: '/static-assets',
     icon: { id: '@mui/icons-material/AutoAwesomeMotionOutlined' }
 };
@@ -1156,18 +1154,18 @@ function useOpenContentUpload(props) {
         }));
     };
 }
-function useOpenBulkPublishAssets(props) {
+function useOpenBulkPublish(props) {
     var dispatch = useDispatch();
     return function () {
         var _a, _b;
         return dispatch(showWidgetDialog({
-            title: (_a = props.title) !== null && _a !== void 0 ? _a : BULK_PUBLISH_ASSETS_DEFAULTS.title,
+            title: (_a = props.title) !== null && _a !== void 0 ? _a : BULK_PUBLISH_DEFAULTS.title,
             fullHeight: false,
             fullWidth: false,
             widget: {
                 id: 'org.rd.plugin.uigoodies.bulkPublishView',
                 configuration: {
-                    defaultPath: (_b = props.defaultPath) !== null && _b !== void 0 ? _b : BULK_PUBLISH_ASSETS_DEFAULTS.defaultPath
+                    defaultPath: (_b = props.defaultPath) !== null && _b !== void 0 ? _b : BULK_PUBLISH_DEFAULTS.defaultPath
                 }
             }
         }));
@@ -1364,31 +1362,6 @@ function usePermissionsBySite() {
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function useSpreadState(initialState, init) {
-  return useReducer(
-    (state, nextState) =>
-      nextState === '$RESET$' ? Object.assign({}, initialState) : Object.assign(Object.assign({}, state), nextState),
-    initialState,
-    init
-  );
-}
-
-/*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License version 3 as published by
- * the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 const completeDetailedItem = /*#__PURE__*/ createAction('COMPLETE_DETAILED_ITEM');
 // endregion
 
@@ -1460,64 +1433,18 @@ createReducer(initialState, {
 // for 4.1.x since `@craftercms/studio-ui/PathSelector` is not a valid component
 // @ts-ignore
 var PathSelector = craftercms.components.SiteSearchPathSelector;
-var messages = defineMessages({
-    publishStudioWarning: {
-        id: 'publishingDashboard.warning',
-        defaultMessage: "This will force publish all items that match the pattern requested including their dependencies, and it may take a long time depending on the number of items. Please make sure that all modified items (including potentially someone's work in progress) are ready to be published before continuing."
-    },
-    warningLabel: {
-        id: 'words.warning',
-        defaultMessage: 'Warning'
-    },
-    publishStudioNote: {
-        id: 'publishingDashboard.studioNote',
-        defaultMessage: 'Publishing by path should be used to publish changes made in Studio via the UI. For changes made via direct git actions, please <a>publish by commit or tag</a>.'
-    },
-    publishSuccess: {
-        id: 'publishingDashboard.publishSuccess',
-        defaultMessage: 'Published successfully.'
-    },
-    bulkPublishStarted: {
-        id: 'publishingDashboard.bulkPublishStarted',
-        defaultMessage: 'Bulk Publish process has been started.'
-    },
-    invalidForm: {
-        id: 'publishingDashboard.invalidForm',
-        defaultMessage: 'You cannot publish until form requirements are satisfied.'
-    }
-});
+var FETCH_UNPUBLISHED_ITEMS_LIMIT = 100;
 function BulkPublishView(props) {
-    var _a, _b, _c;
-    var formatMessage = useIntl().formatMessage;
+    var _a, _b;
     var dispatch = useDispatch();
     var siteId = useActiveSiteId();
     var theme = useTheme$1();
     var permissionsBySite = usePermissionsBySite();
     var hasPublishPermission = (_a = permissionsBySite[siteId]) === null || _a === void 0 ? void 0 : _a.includes('publish');
     var initialPublishItem = useDetailedItem('/site/website/index.xml');
-    var _d = useState((_b = props.defaultPath) !== null && _b !== void 0 ? _b : BULK_PUBLISH_ASSETS_DEFAULTS.defaultPath), path = _d[0], setPath = _d[1];
-    var _e = useState(false), isSubmitting = _e[0], setIsSubmitting = _e[1];
-    var _f = useSelection(function (state) { return state.uiConfig.publishing; }), bulkPublishCommentRequired = _f.bulkPublishCommentRequired, publishByCommitCommentRequired = _f.publishByCommitCommentRequired;
-    var initialPublishStudioFormData = {
-        path: (_c = props.defaultPath) !== null && _c !== void 0 ? _c : BULK_PUBLISH_ASSETS_DEFAULTS.defaultPath,
-        publishingTarget: '',
-        comment: ''
-    };
-    var _g = useSpreadState(initialPublishStudioFormData), publishStudioFormData = _g[0], setPublishStudioFormData = _g[1];
-    var _h = useState(null), hasInitialPublish$1 = _h[0], setHasInitialPublish = _h[1];
-    var _j = useState(null), publishingTargets = _j[0], setPublishingTargets = _j[1];
-    var _k = useState(null), publishingTargetsError = _k[0], setPublishingTargetsError = _k[1];
-    var publishStudioFormValid = !isBlank(publishStudioFormData.publishingTarget) &&
-        (!bulkPublishCommentRequired || !isBlank(publishStudioFormData.comment)) &&
-        publishStudioFormData.path.replace(/\s/g, '') !== '';
-    var setDefaultPublishingTarget = function (targets, clearData) {
-        var _a;
-        if (targets.length) {
-            var stagingEnv = targets.find(function (target) { return target.name === 'staging'; });
-            var publishingTarget = (_a = stagingEnv === null || stagingEnv === void 0 ? void 0 : stagingEnv.name) !== null && _a !== void 0 ? _a : targets[0].name;
-            setPublishStudioFormData(__assign(__assign({}, (clearData && initialPublishStudioFormData)), { publishingTarget: publishingTarget }));
-        }
-    };
+    var _c = useState((_b = props.defaultPath) !== null && _b !== void 0 ? _b : BULK_PUBLISH_DEFAULTS.defaultPath), selectedPath = _c[0], setSelectedPath = _c[1];
+    var _d = useState(false), isSubmitting = _d[0], setIsSubmitting = _d[1];
+    var _e = useState(null), hasInitialPublish$1 = _e[0], setHasInitialPublish = _e[1];
     useEffect(function () {
         hasInitialPublish(siteId).subscribe({
             next: function (response) {
@@ -1527,54 +1454,37 @@ function BulkPublishView(props) {
                 dispatch(showErrorDialog(error));
             }
         });
-        fetchPublishingTargets(siteId).subscribe({
-            next: function (_a) {
-                var targets = _a.publishingTargets;
-                setPublishingTargets(targets);
-                // Set pre-selected environment.
-                setDefaultPublishingTarget(targets);
-            },
-            error: function (error) {
-                setPublishingTargetsError(error);
-            }
-        });
-        // We only want to re-fetch the publishingTargets when the site changes.
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [siteId]);
+    var customEventId = 'dialogDismissConfirm';
     var onSubmitBulkPublish = function () {
-        var eventId = 'bulkPublishWidgetSubmit';
-        var studioNote = formatMessage(messages.publishStudioNote, { a: function (msg) { return msg[0]; } });
-        dispatch(showConfirmDialog({
-            body: "".concat(formatMessage(messages.publishStudioWarning), " ").concat(studioNote),
-            onCancel: batchActions([closeConfirmDialog(), dispatchDOMEvent({ id: eventId, button: 'cancel' })]),
-            onOk: batchActions([closeConfirmDialog(), dispatchDOMEvent({ id: eventId, button: 'ok' })])
-        }));
-        createCustomDocumentEventListener(eventId, function (_a) {
-            var button = _a.button;
-            if (button === 'ok') {
-                setIsSubmitting(true);
-                var path_1 = publishStudioFormData.path, publishingTarget_1 = publishStudioFormData.publishingTarget, comment = publishStudioFormData.comment;
-                bulkGoLive(siteId, path_1, publishingTarget_1, comment).subscribe({
-                    next: function () {
-                        setIsSubmitting(false);
-                        setPublishStudioFormData(__assign(__assign({}, initialPublishStudioFormData), { publishingTarget: publishingTarget_1 }));
-                        dispatch(showSystemNotification({
-                            message: formatMessage(messages.bulkPublishStarted)
-                        }));
-                    },
-                    error: function (_a) {
-                        var response = _a.response;
-                        setIsSubmitting(false);
-                        showSystemNotification({
-                            message: response.message,
-                            options: { variant: 'error' }
-                        });
-                    }
-                });
+        setIsSubmitting(true);
+        var fetchItems = function (offset) { return fetchUnpublished(siteId, { limit: FETCH_UNPUBLISHED_ITEMS_LIMIT, offset: offset }); };
+        var itemsByPath = [];
+        of(0).pipe(concatMap(function (offset) { return fetchItems(offset); }), expand(function (data) {
+            itemsByPath.push.apply(itemsByPath, data.filter(function (item) { return item.path.startsWith(selectedPath); }));
+            return data.total > data.limit + data.offset ? fetchItems(data.limit + data.offset) : of();
+        }), toArray()).subscribe({
+            complete: function () {
+                if (itemsByPath.length === 0) {
+                    dispatch(showSystemNotification({
+                        message: 'No items to publish at provided path'
+                    }));
+                    setIsSubmitting(false);
+                    return;
+                }
+                dispatch(showPublishDialog({
+                    items: itemsByPath,
+                    onSuccess: batchActions([
+                        showPublishItemSuccessNotification(),
+                        closePublishDialog(),
+                        dispatchDOMEvent({ id: customEventId, type: 'publish' })
+                    ]),
+                    onClosed: dispatchDOMEvent({ id: customEventId, type: 'cancel' })
+                }));
+                setIsSubmitting(false);
             }
         });
     };
-    var customEventId = 'dialogDismissConfirm';
     var onInitialPublish = function () {
         dispatch(showPublishDialog({
             items: [initialPublishItem],
@@ -1587,13 +1497,15 @@ function BulkPublishView(props) {
         });
     };
     var onPathSelected = function (value) {
-        setPath(value);
-        setPublishStudioFormData(__assign(__assign({}, publishStudioFormData), { path: value }));
+        setSelectedPath(value.replace('/index.xml', ''));
     };
     if (hasInitialPublish$1 === null) {
-        return (jsxRuntimeExports.jsx(Paper, { elevation: 2, sx: { height: '100%' }, children: jsxRuntimeExports.jsx(Typography, { children: "Loading..." }) }));
+        return (jsxRuntimeExports.jsx(Paper, { elevation: 2, sx: { height: '100%' } }));
     }
-    return (jsxRuntimeExports.jsx(Paper, { elevation: 2, sx: { height: '100%' }, children: jsxRuntimeExports.jsx(Box$1, { sx: { p: 1 }, children: hasInitialPublish$1 ? (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsx(Box$1, { sx: { paddingBottom: 1 }, children: jsxRuntimeExports.jsx(PathSelector, { value: path, disabled: false, onPathSelected: onPathSelected, stripXmlIndex: false }) }), jsxRuntimeExports.jsx(PublishOnDemandForm, { disabled: isSubmitting, formData: publishStudioFormData, setFormData: setPublishStudioFormData, mode: 'studio', publishingTargets: publishingTargets, publishingTargetsError: publishingTargetsError, bulkPublishCommentRequired: bulkPublishCommentRequired, publishByCommitCommentRequired: publishByCommitCommentRequired }), jsxRuntimeExports.jsx(DialogFooter$1, { children: jsxRuntimeExports.jsx(LoadingButton$1, { sx: { float: 'right' }, variant: "contained", color: "primary", disabled: !publishStudioFormValid, loading: isSubmitting, onClick: onSubmitBulkPublish, children: "Bulk Publish" }) })] })) : (jsxRuntimeExports.jsxs(Box$1, { sx: {
+    return (jsxRuntimeExports.jsx(Paper, { elevation: 2, sx: { height: '100%' }, children: jsxRuntimeExports.jsx(Box$1, { sx: { p: 1 }, children: hasInitialPublish$1 ? (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsxs(DialogBody, { sx: { minHeight: '24vh', minWidth: '48vh' }, children: [jsxRuntimeExports.jsx(Typography, { variant: "body1", sx: {
+                                    paddingBottom: 2,
+                                    float: 'left',
+                                }, children: "Select a path to calculate publish packages." }), jsxRuntimeExports.jsx(Box$1, { sx: { paddingBottom: 1 }, children: jsxRuntimeExports.jsx(PathSelector, { value: selectedPath, disabled: false, onPathSelected: onPathSelected, stripXmlIndex: false }) })] }), jsxRuntimeExports.jsx(DialogFooter$1, { children: jsxRuntimeExports.jsx(Button$1, { sx: { float: 'right' }, variant: "contained", color: "primary", disabled: isSubmitting, onClick: onSubmitBulkPublish, children: "Bulk Publish" }) })] })) : (jsxRuntimeExports.jsxs(Box$1, { sx: {
                     display: 'flex',
                     alignItems: 'center',
                     flexDirection: 'column',
@@ -1609,19 +1521,19 @@ function BulkPublishView(props) {
 }
 
 function OpenBulkPublishPanelButton(props) {
-    var _a = props.title, title = _a === void 0 ? BULK_PUBLISH_ASSETS_DEFAULTS.title : _a, _b = props.icon, icon = _b === void 0 ? BULK_PUBLISH_ASSETS_DEFAULTS.icon : _b, _c = props.dialogTitle, dialogTitle = _c === void 0 ? title : _c;
-    var handleClick = useOpenBulkPublishAssets(__assign(__assign({}, props), { title: dialogTitle }));
+    var _a = props.title, title = _a === void 0 ? BULK_PUBLISH_DEFAULTS.title : _a, _b = props.icon, icon = _b === void 0 ? BULK_PUBLISH_DEFAULTS.icon : _b, _c = props.dialogTitle, dialogTitle = _c === void 0 ? title : _c;
+    var handleClick = useOpenBulkPublish(__assign(__assign({}, props), { title: dialogTitle }));
     return (jsxRuntimeExports.jsx(ToolsPanelListItemButton, { icon: icon, title: title, onClick: handleClick }));
 }
 
 function OpenBulkPublishToolbarButton(props) {
     var _a;
-    var _b = props.title, title = _b === void 0 ? BULK_PUBLISH_ASSETS_DEFAULTS.title : _b, _c = props.tooltip, tooltip = _c === void 0 ? title : _c, _d = props.useIcon, useIcon = _d === void 0 ? true : _d, _e = props.useIconWithText, useIconWithText = _e === void 0 ? false : _e, _f = props.buttonSize, buttonSize = _f === void 0 ? 'small' : _f, _g = props.dialogTitle, dialogTitle = _g === void 0 ? title : _g, _h = props.icon, icon = _h === void 0 ? BULK_PUBLISH_ASSETS_DEFAULTS.icon : _h;
+    var _b = props.title, title = _b === void 0 ? BULK_PUBLISH_DEFAULTS.title : _b, _c = props.tooltip, tooltip = _c === void 0 ? title : _c, _d = props.useIcon, useIcon = _d === void 0 ? true : _d, _e = props.useIconWithText, useIconWithText = _e === void 0 ? false : _e, _f = props.buttonSize, buttonSize = _f === void 0 ? 'small' : _f, _g = props.dialogTitle, dialogTitle = _g === void 0 ? title : _g, _h = props.icon, icon = _h === void 0 ? BULK_PUBLISH_DEFAULTS.icon : _h;
     // Protection against confusion of using the two props combined (i.e. useIcon, useIconWithText)...
     if (useIconWithText) {
         useIcon = false;
     }
-    var handleClick = useOpenBulkPublishAssets(__assign(__assign({}, props), { title: dialogTitle }));
+    var handleClick = useOpenBulkPublish(__assign(__assign({}, props), { title: dialogTitle }));
     var applyTooltip = function (children) {
         return useIcon || props.tooltip ? jsxRuntimeExports.jsx(Tooltip$1, { title: tooltip, children: children }) : children;
     };
