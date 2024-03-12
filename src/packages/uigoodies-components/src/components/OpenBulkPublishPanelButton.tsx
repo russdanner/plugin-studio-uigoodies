@@ -16,11 +16,11 @@
 
 import * as React from 'react';
 import ToolsPanelListItemButton from '@craftercms/studio-ui/components/ToolsPanelListItemButton';
-import { BULK_PUBLISH_ASSETS_DEFAULTS, useOpenBulkPublishAssets } from '../utils';
+import { BULK_PUBLISH_DEFAULTS, useOpenBulkPublish } from '../utils';
 
 export function OpenBulkPublishPanelButton(props) {
-  const { title = BULK_PUBLISH_ASSETS_DEFAULTS.title, icon = BULK_PUBLISH_ASSETS_DEFAULTS.icon, dialogTitle = title } = props;
-  const handleClick = useOpenBulkPublishAssets({ ...props, title: dialogTitle });
+  const { title = BULK_PUBLISH_DEFAULTS.title, icon = BULK_PUBLISH_DEFAULTS.icon, dialogTitle = title } = props;
+  const handleClick = useOpenBulkPublish({ ...props, title: dialogTitle });
   return (
     <ToolsPanelListItemButton
       icon={icon}
