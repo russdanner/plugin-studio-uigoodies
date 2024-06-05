@@ -19,23 +19,23 @@ import Tooltip from '@mui/material/Tooltip';
 import IconButton from '@mui/material/IconButton';
 import SystemIcon from '@craftercms/studio-ui/components/SystemIcon';
 import { Button, buttonClasses } from '@mui/material';
-import { BULK_PUBLISH_ASSETS_DEFAULTS, useOpenBulkPublishAssets } from '../utils';
+import { BULK_PUBLISH_DEFAULTS, useOpenBulkPublish } from '../utils';
 
 export function OpenBulkPublishToolbarButton(props) {
   let {
-    title = BULK_PUBLISH_ASSETS_DEFAULTS.title,
+    title = BULK_PUBLISH_DEFAULTS.title,
     tooltip = title,
     useIcon = true,
     useIconWithText = false,
     buttonSize = 'small',
     dialogTitle = title,
-    icon = BULK_PUBLISH_ASSETS_DEFAULTS.icon
+    icon = BULK_PUBLISH_DEFAULTS.icon
   } = props;
   // Protection against confusion of using the two props combined (i.e. useIcon, useIconWithText)...
   if (useIconWithText) {
     useIcon = false;
   }
-  const handleClick = useOpenBulkPublishAssets({ ...props, title: dialogTitle });
+  const handleClick = useOpenBulkPublish({ ...props, title: dialogTitle });
   const applyTooltip = (children) => {
     return useIcon || props.tooltip ? <Tooltip title={tooltip}>{children}</Tooltip> : children;
   };

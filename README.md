@@ -190,7 +190,7 @@ curl --location --request POST 'http://SERVER_AND_PORT/studio/api/2/marketplace/
 </widget>
 ```
 
-## Sidebar Bulk Publish Assets Button
+## Sidebar Bulk Publish Button
 
 ```xml
 <widget id="org.rd.plugin.uigoodies.openBulkPublishPanelButton">
@@ -203,14 +203,14 @@ curl --location --request POST 'http://SERVER_AND_PORT/studio/api/2/marketplace/
     />
     <!-- optional parameters -->
     <configuration>
-        <title>Bulk Publish Assets</title>
+        <title>Bulk Publish</title>
         <icon id="@mui/icons-material/AutoAwesomeMotionOutlined"/>
         <defaultPath>/static-assets</defaultPath>
     </configuration>
 </widget>
 ```
 
-## Toolbar Bulk Publish Assets Button
+## Toolbar Bulk Publish Button
 
 ```xml
 <widget id="org.rd.plugin.uigoodies.openBulkPublishToolbarButton">
@@ -223,8 +223,8 @@ curl --location --request POST 'http://SERVER_AND_PORT/studio/api/2/marketplace/
     />
     <!-- optional parameters -->
     <configuration>
-        <title>Bulk Publish Assets</title>
-        <dialogTitle>Bulk Publish Assets</dialogTitle>
+        <title>Bulk Publish</title>
+        <dialogTitle>Bulk Publish</dialogTitle>
         <icon id="@mui/icons-material/AutoAwesomeMotionOutlined"/>
         <defaultPath>/static-assets</defaultPath>
     </configuration>
