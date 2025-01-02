@@ -34,6 +34,9 @@ const { nou } = craftercms.utils.object;
 const { lookupItemByPath } = craftercms.utils.content;
 const { hasInitialPublish } = craftercms.services.sites;
 const InfoOutlinedIcon = craftercms.utils.constants.components.get('@mui/icons-material/InfoOutlined') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/InfoOutlined'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/InfoOutlined')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/InfoOutlined');
+const Menu = craftercms.libs.MaterialUI.Menu && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Menu, 'default') ? craftercms.libs.MaterialUI.Menu['default'] : craftercms.libs.MaterialUI.Menu;
+const MenuItem = craftercms.libs.MaterialUI.MenuItem && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.MenuItem, 'default') ? craftercms.libs.MaterialUI.MenuItem['default'] : craftercms.libs.MaterialUI.MenuItem;
+const ExpandMoreRounded = craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreRounded');
 
 var jsxRuntime = {exports: {}};
 
@@ -1540,6 +1543,55 @@ function OpenBulkPublishToolbarButton(props) {
     return applyTooltip(useIcon ? (jsxRuntimeExports.jsx(IconButton, { size: buttonSize, onClick: handleClick, children: jsxRuntimeExports.jsx(SystemIcon, { icon: icon }) })) : (jsxRuntimeExports.jsx(Button$1, { size: buttonSize, onClick: handleClick, startIcon: useIconWithText ? jsxRuntimeExports.jsx(SystemIcon, { icon: icon }) : void 0, sx: (_a = {}, _a[".".concat(buttonClasses.startIcon)] = { mr: 0.5 }, _a), children: title })));
 }
 
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text)
+        .catch(function (err) {
+        console.error('Failed to copy text: ', err);
+    });
+}
+function CopyCurrentPageUrl(props) {
+    var item = props.item, useIcon = props.useIcon, environments = props.environments;
+    var _a = React.useState(null), optionMenuAnchorEl = _a[0], setOptionMenuAnchorEl = _a[1];
+    var iconId = '@mui/icons-material/FileCopyOutlined';
+    var siteId = useActiveSiteId();
+    var dispatch = useDispatch();
+    var options = (environments === null || environments === void 0 ? void 0 : environments.label) && (environments === null || environments === void 0 ? void 0 : environments.pattern) ? Object.keys(environments.label).map(function (key) { return ({
+        label: environments.label[key],
+        pattern: environments.pattern[key]
+    }); }) : [];
+    var handleClick = function (event) {
+        copyToClipboard(item.previewUrl);
+        dispatch(showSystemNotification({
+            message: 'URL copied to clipboard'
+        }));
+    };
+    var handleOptionMenuClick = function (event) {
+        setOptionMenuAnchorEl(optionMenuAnchorEl ? null : event.currentTarget);
+    };
+    var handleOptionSelect = function (label, pattern) {
+        var url = pattern.replace('[URL]', item.previewUrl).replace('[SITEID]', siteId);
+        copyToClipboard(url);
+        dispatch(showSystemNotification({
+            message: 'URL copied to clipboard'
+        }));
+        setTimeout(function () {
+            setOptionMenuAnchorEl(null);
+        }, 50);
+    };
+    return (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [useIcon ? (jsxRuntimeExports.jsx(Tooltip, { title: 'Copy Page Relative URL', children: jsxRuntimeExports.jsx(IconButton, { size: "small", onClick: handleClick, children: jsxRuntimeExports.jsx(SystemIcon, { icon: { id: iconId } }) }) })) : (jsxRuntimeExports.jsx(Button, { size: "small", variant: "text", onClick: handleClick, children: "Copy Page URL" })), options && options.length > 0 && (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsx(Button, { id: "urls-select-button", variant: "text", color: "inherit", onClick: handleOptionMenuClick, "aria-controls": optionMenuAnchorEl ? 'urls-select-menu' : undefined, "aria-haspopup": "true", "aria-expanded": Boolean(optionMenuAnchorEl), sx: {
+                            typography: 'subtitle1',
+                            textTransform: 'none',
+                            borderRadius: 1,
+                            minWidth: 0
+                        }, endIcon: jsxRuntimeExports.jsx(ExpandMoreRounded, {}), children: "Copy URLs" }), jsxRuntimeExports.jsx(Menu, { id: "urls-select-menu", anchorEl: optionMenuAnchorEl, open: Boolean(optionMenuAnchorEl), onClose: function () { return setOptionMenuAnchorEl(null); }, MenuListProps: {
+                            'aria-labelledby': 'urls-select-button'
+                        }, slotProps: {
+                            paper: {
+                                style: { minWidth: 132 }
+                            }
+                        }, children: options.map(function (option) { return (jsxRuntimeExports.jsx(MenuItem, { onClick: function () { return handleOptionSelect(option.label, option.pattern); }, children: option.label }, option.label)); }) })] }))] }));
+}
+
 var plugin = {
     locales: undefined,
     scripts: undefined,
@@ -1555,8 +1607,9 @@ var plugin = {
         'org.rd.plugin.uigoodies.PullPushRemoteButtons': PullPushRemoteButtons,
         'org.rd.plugin.uigoodies.bulkPublishView': BulkPublishView,
         'org.rd.plugin.uigoodies.openBulkPublishPanelButton': OpenBulkPublishPanelButton,
-        'org.rd.plugin.uigoodies.openBulkPublishToolbarButton': OpenBulkPublishToolbarButton
+        'org.rd.plugin.uigoodies.openBulkPublishToolbarButton': OpenBulkPublishToolbarButton,
+        'org.rd.plugin.uigoodies.CopyCurrentPageUrl': CopyCurrentPageUrl
     }
 };
 
-export { EditOrViewCurrent, PublishOrRequestPublish, PullPushRemoteButtons, ToolPanelAccordion, plugin as default };
+export { CopyCurrentPageUrl, EditOrViewCurrent, PublishOrRequestPublish, PullPushRemoteButtons, ToolPanelAccordion, plugin as default };
