@@ -1578,18 +1578,18 @@ function CopyCurrentPageUrl(props) {
             setOptionMenuAnchorEl(null);
         }, 50);
     };
-    return (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [useIcon ? (jsxRuntimeExports.jsx(Tooltip, { title: 'Copy Page Relative URL', children: jsxRuntimeExports.jsx(IconButton, { size: "small", onClick: handleClick, children: jsxRuntimeExports.jsx(SystemIcon, { icon: { id: iconId } }) }) })) : (jsxRuntimeExports.jsx(Button, { size: "small", variant: "text", onClick: handleClick, children: "Copy Page URL" })), options && options.length > 0 && (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsx(Button, { id: "urls-select-button", variant: "text", color: "inherit", onClick: handleOptionMenuClick, "aria-controls": optionMenuAnchorEl ? 'urls-select-menu' : undefined, "aria-haspopup": "true", "aria-expanded": Boolean(optionMenuAnchorEl), sx: {
+    return (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [useIcon ? (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsx(Tooltip, { title: 'Copy Page URL', children: jsxRuntimeExports.jsx(IconButton, { size: "small", onClick: handleClick, children: jsxRuntimeExports.jsx(SystemIcon, { icon: { id: iconId } }) }) }), options && options.length > 0 && (jsxRuntimeExports.jsx(Button, { id: "urls-select-button", variant: "text", color: "inherit", onClick: handleOptionMenuClick, "aria-controls": optionMenuAnchorEl ? 'urls-select-menu' : undefined, "aria-haspopup": "true", "aria-expanded": Boolean(optionMenuAnchorEl), sx: {
                             typography: 'subtitle1',
                             textTransform: 'none',
                             borderRadius: 1,
                             minWidth: 0
-                        }, endIcon: jsxRuntimeExports.jsx(ExpandMoreRounded, {}), children: "Copy URLs" }), jsxRuntimeExports.jsx(Menu, { id: "urls-select-menu", anchorEl: optionMenuAnchorEl, open: Boolean(optionMenuAnchorEl), onClose: function () { return setOptionMenuAnchorEl(null); }, MenuListProps: {
-                            'aria-labelledby': 'urls-select-button'
-                        }, slotProps: {
-                            paper: {
-                                style: { minWidth: 132 }
-                            }
-                        }, children: options.map(function (option) { return (jsxRuntimeExports.jsx(MenuItem, { onClick: function () { return handleOptionSelect(option.label, option.pattern); }, children: option.label }, option.label)); }) })] }))] }));
+                        }, endIcon: jsxRuntimeExports.jsx(ExpandMoreRounded, {}), children: "Copy URLs" }))] })) : (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsx(Button, { size: "small", variant: "text", onClick: handleClick, children: "Copy Page URL" }), options && options.length > 0 && (jsxRuntimeExports.jsx(Tooltip, { title: 'Copy more URLs', children: jsxRuntimeExports.jsx(IconButton, { id: "urls-select-button", color: "inherit", size: "small", "aria-controls": optionMenuAnchorEl ? 'urls-select-menu' : undefined, "aria-haspopup": "true", onClick: handleOptionMenuClick, children: jsxRuntimeExports.jsx(ExpandMoreRounded, {}) }) }))] })), options && options.length > 0 && (jsxRuntimeExports.jsx(Menu, { id: "urls-select-menu", anchorEl: optionMenuAnchorEl, open: Boolean(optionMenuAnchorEl), onClose: function () { return setOptionMenuAnchorEl(null); }, MenuListProps: {
+                    'aria-labelledby': 'urls-select-button'
+                }, slotProps: {
+                    paper: {
+                        style: { minWidth: 132 }
+                    }
+                }, children: options.map(function (option) { return (jsxRuntimeExports.jsx(MenuItem, { onClick: function () { return handleOptionSelect(option.label, option.pattern); }, children: option.label }, option.label)); }) }))] }));
 }
 
 var plugin = {
