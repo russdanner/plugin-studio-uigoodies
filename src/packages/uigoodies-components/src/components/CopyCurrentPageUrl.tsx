@@ -58,59 +58,77 @@ export function CopyCurrentPageUrl(props) {
   return (
     <>
       {useIcon ? (
-        <Tooltip title='Copy Page Relative URL'>
-          <IconButton size="small" onClick={handleClick}>
-            <SystemIcon icon={{ id: iconId }} />
-          </IconButton>
-        </Tooltip>
+        <>
+          <Tooltip title='Copy Page URL'>
+            <IconButton size="small" onClick={handleClick}>
+              <SystemIcon icon={{ id: iconId }} />
+            </IconButton>
+          </Tooltip>
+          {options && options.length > 0 && (
+            <Button
+              id="urls-select-button"
+              variant="text"
+              color="inherit"
+              onClick={handleOptionMenuClick}
+              aria-controls={optionMenuAnchorEl ? 'urls-select-menu' : undefined}
+              aria-haspopup="true"
+              aria-expanded={Boolean(optionMenuAnchorEl)}
+              sx={{
+                typography: 'subtitle1',
+                textTransform: 'none',
+                borderRadius: 1,
+                minWidth: 0
+              }}
+              endIcon={<ExpandMoreRounded />}
+            >
+              Copy URLs
+            </Button>
+          )}
+        </>
       ) : (
-        <Button size="small" variant="text" onClick={handleClick}>
-          Copy Page URL
-        </Button>
+        <>
+          <Button size="small" variant="text" onClick={handleClick}>
+            Copy Page URL
+          </Button>
+          {options && options.length > 0 && (
+            <Tooltip title='Copy more URLs'>
+              <IconButton
+                id="urls-select-button"
+                color="inherit"
+                size="small"
+                aria-controls={optionMenuAnchorEl ? 'urls-select-menu' : undefined}
+                aria-haspopup="true"
+                onClick={handleOptionMenuClick}
+              >
+                <ExpandMoreRounded />
+              </IconButton>
+            </Tooltip>
+          )}
+        </>
       )}
       {options && options.length > 0 && (
-        <>
-          <Button
-            id="urls-select-button"
-            variant="text"
-            color="inherit"
-            onClick={handleOptionMenuClick}
-            aria-controls={optionMenuAnchorEl ? 'urls-select-menu' : undefined}
-            aria-haspopup="true"
-            aria-expanded={Boolean(optionMenuAnchorEl)}
-            sx={{
-              typography: 'subtitle1',
-              textTransform: 'none',
-              borderRadius: 1,
-              minWidth: 0
-            }}
-            endIcon={<ExpandMoreRounded />}
-          >
-            Copy URLs
-          </Button>
-          <Menu
-              id="urls-select-menu"
-              anchorEl={optionMenuAnchorEl}
-              open={Boolean(optionMenuAnchorEl)}
-              onClose={() => setOptionMenuAnchorEl(null)}
-              MenuListProps={{
-                'aria-labelledby': 'urls-select-button'
-              }}
-              slotProps={{
-                paper: {
-                  style: { minWidth: 132 }
-                }
-              }}
-            >
-              {
-                options.map((option) => (
-                  <MenuItem key={option.label} onClick={() => handleOptionSelect(option.label, option.pattern)}>
-                    {option.label}
-                  </MenuItem>
-                ))
-              }
-            </Menu>
-        </>
+        <Menu
+          id="urls-select-menu"
+          anchorEl={optionMenuAnchorEl}
+          open={Boolean(optionMenuAnchorEl)}
+          onClose={() => setOptionMenuAnchorEl(null)}
+          MenuListProps={{
+            'aria-labelledby': 'urls-select-button'
+          }}
+          slotProps={{
+            paper: {
+              style: { minWidth: 132 }
+            }
+          }}
+        >
+          {
+            options.map((option) => (
+              <MenuItem key={option.label} onClick={() => handleOptionSelect(option.label, option.pattern)}>
+                {option.label}
+              </MenuItem>
+            ))
+          }
+        </Menu>
       )}
     </>
   )
