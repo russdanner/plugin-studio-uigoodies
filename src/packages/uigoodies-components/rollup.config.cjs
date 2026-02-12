@@ -1,10 +1,10 @@
+const { cpSync, rmSync } = require('fs');
 const typescript = require('@rollup/plugin-typescript');
 const commonjs = require('@rollup/plugin-commonjs');
 const resolve = require('@rollup/plugin-node-resolve');
 const replaceImportsWithVars = require('rollup-plugin-replace-imports-with-vars');
 const json = require('@rollup/plugin-json');
 const pkg = require('./package.json');
-const copy = require('rollup-plugin-copy');
 const replace = require('@rollup/plugin-replace');
 
 const extensions = ['.js', '.jsx', '.ts', '.tsx'];
@@ -58,14 +58,13 @@ module.exports = {
     }),
     resolve({ extensions }),
     commonjs(),
-    copy({
-      hook: 'closeBundle',
-      targets: [
-        {
-          src: './dist/index.js',
-          dest: '../../../authoring/static-assets/plugins/org/rd/plugin/uigoodies/apps/uigoodies'
-        }
-      ]
-    })
+    {
+      name: 'copy-and-clean',
+      closeBundle() {
+        cpSync('./dist/index.js', '../../../authoring/static-assets/plugins/org/rd/plugin/uigoodies/apps/uigoodies/index.js');
+        rmSync('./build', { recursive: true, force: true });
+        rmSync('./dist', { recursive: true, force: true });
+      }
+    }
   ]
 };
