@@ -21,13 +21,7 @@ import { BULK_PUBLISH_DEFAULTS, useOpenBulkPublish } from '../utils';
 export function OpenBulkPublishPanelButton(props) {
   const { title = BULK_PUBLISH_DEFAULTS.title, icon = BULK_PUBLISH_DEFAULTS.icon, dialogTitle = title } = props;
   const handleClick = useOpenBulkPublish({ ...props, title: dialogTitle });
-  return (
-    <ToolsPanelListItemButton
-      icon={icon}
-      title={title}
-      onClick={handleClick}
-    />
-  );
+  return <ToolsPanelListItemButton icon={icon} title={title} onClick={handleClick} />;
 }
 
 export default OpenBulkPublishPanelButton;

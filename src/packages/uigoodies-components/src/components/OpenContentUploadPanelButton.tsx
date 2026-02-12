@@ -21,13 +21,7 @@ import { CONTENT_UPLOAD_DEFAULTS, useOpenContentUpload } from '../utils';
 export function OpenContentUploadPanelButton(props) {
   const { title = CONTENT_UPLOAD_DEFAULTS.title, icon = CONTENT_UPLOAD_DEFAULTS.icon, dialogTitle = title } = props;
   const handleClick = useOpenContentUpload({ ...props, title: dialogTitle });
-  return (
-    <ToolsPanelListItemButton
-      icon={icon}
-      title={title}
-      onClick={handleClick}
-    />
-  );
+  return <ToolsPanelListItemButton icon={icon} title={title} onClick={handleClick} />;
 }
 
 export default OpenContentUploadPanelButton;

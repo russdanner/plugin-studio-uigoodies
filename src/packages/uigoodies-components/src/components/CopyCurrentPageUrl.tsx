@@ -11,10 +11,9 @@ import useActiveSiteId from '@craftercms/studio-ui/hooks/useActiveSiteId';
 import { showSystemNotification } from '@craftercms/studio-ui/state/actions/system';
 
 function copyToClipboard(text) {
-  navigator.clipboard.writeText(text)
-    .catch(err => {
-      console.error('Failed to copy text: ', err);
-    });
+  navigator.clipboard.writeText(text).catch((err) => {
+    console.error('Failed to copy text: ', err);
+  });
 }
 
 export function CopyCurrentPageUrl(props) {
@@ -24,10 +23,13 @@ export function CopyCurrentPageUrl(props) {
   const siteId = useActiveSiteId();
   const dispatch = useDispatch();
 
-  const options = environments?.label && environments?.pattern ? Object.keys(environments.label).map(key => ({
-    label: environments.label[key],
-    pattern: environments.pattern[key]
-  })) : [];
+  const options =
+    environments?.label && environments?.pattern
+      ? Object.keys(environments.label).map((key) => ({
+          label: environments.label[key],
+          pattern: environments.pattern[key]
+        }))
+      : [];
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     copyToClipboard(item.previewUrl);
@@ -59,7 +61,7 @@ export function CopyCurrentPageUrl(props) {
     <>
       {useIcon ? (
         <>
-          <Tooltip title='Copy Page URL'>
+          <Tooltip title="Copy Page URL">
             <IconButton size="small" onClick={handleClick}>
               <SystemIcon icon={{ id: iconId }} />
             </IconButton>
@@ -91,7 +93,7 @@ export function CopyCurrentPageUrl(props) {
             Copy Page URL
           </Button>
           {options && options.length > 0 && (
-            <Tooltip title='Copy more URLs'>
+            <Tooltip title="Copy more URLs">
               <IconButton
                 id="urls-select-button"
                 color="inherit"
@@ -121,17 +123,15 @@ export function CopyCurrentPageUrl(props) {
             }
           }}
         >
-          {
-            options.map((option) => (
-              <MenuItem key={option.label} onClick={() => handleOptionSelect(option.label, option.pattern)}>
-                {option.label}
-              </MenuItem>
-            ))
-          }
+          {options.map((option) => (
+            <MenuItem key={option.label} onClick={() => handleOptionSelect(option.label, option.pattern)}>
+              {option.label}
+            </MenuItem>
+          ))}
         </Menu>
       )}
     </>
-  )
+  );
 }
 
 export default CopyCurrentPageUrl;

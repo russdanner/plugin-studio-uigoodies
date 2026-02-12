@@ -64,16 +64,16 @@ export function ContentUpload(props: ContentUploadProps) {
         stripXmlIndex: true,
         onClosed: batchActions([
           dispatchDOMEvent({
-          id: callbackId,
-          action: 'close'
-        }),
+            id: callbackId,
+            action: 'close'
+          }),
           pathSelectionDialogClosed()
         ]),
         onOk: batchActions([
           dispatchDOMEvent({
-          id: callbackId,
-          action: callbackAccept
-        }),
+            id: callbackId,
+            action: callbackAccept
+          }),
           closePathSelectionDialog()
         ])
       })
@@ -143,24 +143,32 @@ export function ContentUpload(props: ContentUploadProps) {
 
   return (
     <>
-      <Container sx={{
-        'padding-top': '40px',
-        'padding-bottom': '40px'
-      }}>
-        <Box sx={{
-          'display': 'flex',
-          'marginBottom': '20px',
-          'alignItems': 'center'
-        }}>
+      <Container
+        sx={{
+          'padding-top': '40px',
+          'padding-bottom': '40px'
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            marginBottom: '20px',
+            alignItems: 'center'
+          }}
+        >
           <TextField
             label="Path to upload"
             id="path-read-only-input"
             sx={{ minWidth: '450px' }}
             InputProps={{ readOnly: !props.allowPathInput }}
             value={path}
-            onChange={props.allowPathInput ? (e) => {
-              setPath(e.target.value);
-            } : undefined}
+            onChange={
+              props.allowPathInput
+                ? (e) => {
+                    setPath(e.target.value);
+                  }
+                : undefined
+            }
           />
           {props.allowPathSelection && (
             <Button
@@ -173,43 +181,46 @@ export function ContentUpload(props: ContentUploadProps) {
             </Button>
           )}
         </Box>
-        <Box sx={(theme) => ({
-          'font-family': '"Source Sans Pro", "Open Sans", sans-serif',
-          '& input::file-selector-button': {
-            'display': 'inline-flex',
-            '-webkit-box-align': 'center',
-            'align-items': 'center',
-            '-webkit-box-pack': 'center',
-            'justify-content': 'center',
-            'position': 'relative',
-            'box-sizing': 'border-box',
-            '-webkit-tap-highlight-color': 'transparent',
-            'backgroundColor': 'transparent',
-            'outline': '0px',
-            'margin': '0px',
-            'cursor': 'pointer',
-            'user-select': 'none',
-            'vertical-align': 'middle',
-            'appearance': 'none',
-            'text-decoration': 'none',
-            'text-transform': 'none',
+        <Box
+          sx={(theme) => ({
             'font-family': '"Source Sans Pro", "Open Sans", sans-serif',
-            'font-weight': '600',
-            'font-size': '0.875rem',
-            'line-height': '1.75',
-            'padding': '5px 15px',
-            'border-radius': '4px',
-            'transition': 'background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
-            'border': `1px solid ${alpha(theme.palette.primary.main, 0.5)}`,
-            'color': theme.palette.primary.main,
-            'min-width': '130px',
-            'marginRight': '10px',
-            '&:hover': {
-              'backgroundColor': alpha(theme.palette.primary.main, 0.04),
-              'border': `1px solid ${theme.palette.primary.main}`
+            '& input::file-selector-button': {
+              display: 'inline-flex',
+              '-webkit-box-align': 'center',
+              'align-items': 'center',
+              '-webkit-box-pack': 'center',
+              'justify-content': 'center',
+              position: 'relative',
+              'box-sizing': 'border-box',
+              '-webkit-tap-highlight-color': 'transparent',
+              backgroundColor: 'transparent',
+              outline: '0px',
+              margin: '0px',
+              cursor: 'pointer',
+              'user-select': 'none',
+              'vertical-align': 'middle',
+              appearance: 'none',
+              'text-decoration': 'none',
+              'text-transform': 'none',
+              'font-family': '"Source Sans Pro", "Open Sans", sans-serif',
+              'font-weight': '600',
+              'font-size': '0.875rem',
+              'line-height': '1.75',
+              padding: '5px 15px',
+              'border-radius': '4px',
+              transition:
+                'background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
+              border: `1px solid ${alpha(theme.palette.primary.main, 0.5)}`,
+              color: theme.palette.primary.main,
+              'min-width': '130px',
+              marginRight: '10px',
+              '&:hover': {
+                backgroundColor: alpha(theme.palette.primary.main, 0.04),
+                border: `1px solid ${theme.palette.primary.main}`
+              }
             }
-          }
-        })}>
+          })}
+        >
           <input
             ref={inputRef}
             type="file"
