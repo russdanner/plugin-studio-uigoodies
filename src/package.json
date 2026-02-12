@@ -8,13 +8,12 @@
   "private": true,
   "packageManager": "yarn@3.2.2",
   "workspaces": [
-    "packages/uigoodies-components",
-    "packages/cra"
+    "packages/uigoodies-components"
   ],
   "scripts": {
     "w:prettier": "yarn prettier --write './packages/**/*.{ts,tsx}'"
   },
   "dependencies": {
-    "prettier": "^2.5.1"
+    "prettier": "^3.5.3"
   }
 }

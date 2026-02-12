@@ -7,10 +7,8 @@ project id is something different.
 
 Instructions:
 - Run `yarn` on the root
-- Use the `example-cra` to test & develop your plugins agilely
-  - Run `yarn build` to build the files you can use to test on the test app.
 - When ready to deploy run `yarn dist` and create a plugin using the `dist/*` files with CATEGORY set to `apps`
-  and NAME set to `library`. 
+  and NAME set to `library`.
   - `apps` & `library` can be what ever naming you wish to use, update your plugin descriptor file and directories accordingly
   - `apps` represents the type — or category — of plugin
   - `library` represents the plugin name
@@ -46,4 +44,4 @@ installation:
 
 - Finally, install your newly created plugin via the `crafter-cli` command `copy-plugin`.
 
-To learn more on creating plugins in CrafterCMS, see [CrafterCMS plugins documentation](https://docs.craftercms.org/en/4.0/developers/extensions/plugins.html) 
+To learn more on creating plugins in CrafterCMS, see [CrafterCMS plugins documentation](https://docs.craftercms.org/en/4.0/developers/extensions/plugins.html)

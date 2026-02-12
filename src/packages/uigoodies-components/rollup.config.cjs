@@ -5,7 +5,6 @@ const replaceImportsWithVars = require('rollup-plugin-replace-imports-with-vars'
 const json = require('@rollup/plugin-json');
 const pkg = require('./package.json');
 const copy = require('rollup-plugin-copy');
-// const { terser } = require('rollup-plugin-terser');
 const replace = require('@rollup/plugin-replace');
 
 const extensions = ['.js', '.jsx', '.ts', '.tsx'];
@@ -15,8 +14,6 @@ const globals = {
   rxjs: 'craftercms.libs.rxjs',
   'rxjs/operators': 'craftercms.libs.rxjs',
   // jsx runtime part of Studio's runtime starting 4.1.2
-  // comment this line to support 4.0.x
-  // 'react/jsx-runtime': 'craftercms.libs?.reactJsxRuntime',
   '@emotion/css/create-instance': 'craftercms.libs.createEmotion',
   'react-dom': 'craftercms.libs.ReactDOM',
   'react-intl': 'craftercms.libs.ReactIntl',
@@ -26,7 +23,6 @@ const globals = {
   '@craftercms/studio-ui': 'craftercms.components',
   '@craftercms/studio-ui/components': 'craftercms.components',
   '@mui/material/utils': 'craftercms.libs.MaterialUI'
-  // '@reduxjs/toolkit': 'craftercms.libs.ReduxToolkit'
 };
 
 const replacementRegExps = {
@@ -55,22 +51,16 @@ module.exports = {
       'process.env.NODE_ENV': JSON.stringify('production'),
       'import.meta.env.MODE': JSON.stringify('production')
     }),
-    typescript({ tsconfig: './tsconfig.json', compilerOptions: { noEmit: false } }),
+    typescript({ tsconfig: './tsconfig.json', compilerOptions: { noEmit: false, outDir: 'dist' } }),
     replaceImportsWithVars({
       replacementLookup: globals,
       replacementRegExps
     }),
-    // !!: If used, terser should be after `replaceImportsWithVars`
-    //terser(),
     resolve({ extensions }),
     commonjs(),
     copy({
       hook: 'closeBundle',
       targets: [
-        // {
-        //   src: './dist/*',
-        //   dest: '/path/to/where/you/want/to/copy'
-        // },
         {
           src: './dist/index.js',
           dest: '../../../authoring/static-assets/plugins/org/rd/plugin/uigoodies/apps/uigoodies'

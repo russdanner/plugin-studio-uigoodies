@@ -15,15 +15,10 @@ plugin:
     minor: 0
     patch: 1
   description: A plugin to adds some UI goodies to your studio
-  documentation: "https://raw.githubusercontent.com/russdanner/plugin-craftercms-uigoodies/master/README.md"
+  documentation: "https://raw.githubusercontent.com/russdanner/plugin-studio-uigoodies/master/README.md"
   website:
     name: Studio UI Goodies
     url: https://github.com/russdanner/plugin-craftercms-uigoodies
-  media:
-    screenshots:
-      - title: CrafterCMS
-        description: CrafterCMS Plugin for Crafter Studio that adds UI helpers and extensions
-        url: "https://raw.githubusercontent.com/russdanner/plugin-craftercms-Studio UI Goodies/master/.crafter/logo.png"
   developer:
     company:
       name: Russ Danner

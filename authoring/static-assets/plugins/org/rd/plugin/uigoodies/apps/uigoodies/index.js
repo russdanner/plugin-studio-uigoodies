@@ -15,11 +15,11 @@ const Container = craftercms.libs.MaterialUI.Container && Object.prototype.hasOw
 const Box = craftercms.libs.MaterialUI.Box && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Box, 'default') ? craftercms.libs.MaterialUI.Box['default'] : craftercms.libs.MaterialUI.Box;
 const { writeContent } = craftercms.services.content;
 const { DialogFooter } = craftercms.components;
-const { capitalize, unstable_useId } = craftercms.libs.MaterialUI;
-const { styled, useThemeProps, useTheme: useTheme$1 } = craftercms.libs.MaterialUI;
+const { unstable_useId, capitalize } = craftercms.libs.MaterialUI;
+const { styled, useTheme: useTheme$1 } = craftercms.libs.MaterialUI;
+const { useDefaultProps } = craftercms.libs.MaterialUI.DefaultPropsProvider;
+const { ButtonGroupContext } = craftercms.libs.MaterialUI.ButtonGroup;
 const CircularProgress = craftercms.libs.MaterialUI.CircularProgress && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.CircularProgress, 'default') ? craftercms.libs.MaterialUI.CircularProgress['default'] : craftercms.libs.MaterialUI.CircularProgress;
-const generateUtilityClass = craftercms.libs.MaterialUI.generateUtilityClass && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.generateUtilityClass, 'default') ? craftercms.libs.MaterialUI.generateUtilityClass['default'] : craftercms.libs.MaterialUI.generateUtilityClass;
-const generateUtilityClasses = craftercms.libs.MaterialUI.generateUtilityClasses && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.generateUtilityClasses, 'default') ? craftercms.libs.MaterialUI.generateUtilityClasses['default'] : craftercms.libs.MaterialUI.generateUtilityClasses;
 const ToolsPanelListItemButton = craftercms.components.ToolsPanelListItemButton && Object.prototype.hasOwnProperty.call(craftercms.components.ToolsPanelListItemButton, 'default') ? craftercms.components.ToolsPanelListItemButton['default'] : craftercms.components.ToolsPanelListItemButton;
 const Tooltip$1 = craftercms.libs.MaterialUI.Tooltip && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Tooltip, 'default') ? craftercms.libs.MaterialUI.Tooltip['default'] : craftercms.libs.MaterialUI.Tooltip;
 const { pull, push } = craftercms.services.repositories;
@@ -51,14 +51,30 @@ var reactJsxRuntime_production_min = {};
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-var f$1=React__default,k$1=Symbol.for("react.element"),l$1=Symbol.for("react.fragment"),m$1=Object.prototype.hasOwnProperty,n$1=f$1.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentOwner,p$1={key:!0,ref:!0,__self:!0,__source:!0};
-function q$1(c,a,g){var b,d={},e=null,h=null;void 0!==g&&(e=""+g);void 0!==a.key&&(e=""+a.key);void 0!==a.ref&&(h=a.ref);for(b in a)m$1.call(a,b)&&!p$1.hasOwnProperty(b)&&(d[b]=a[b]);if(c&&c.defaultProps)for(b in a=c.defaultProps,a)void 0===d[b]&&(d[b]=a[b]);return {$$typeof:k$1,type:c,key:e,ref:h,props:d,_owner:n$1.current}}reactJsxRuntime_production_min.Fragment=l$1;reactJsxRuntime_production_min.jsx=q$1;reactJsxRuntime_production_min.jsxs=q$1;
 
-{
-  jsxRuntime.exports = reactJsxRuntime_production_min;
+var hasRequiredReactJsxRuntime_production_min;
+
+function requireReactJsxRuntime_production_min () {
+	if (hasRequiredReactJsxRuntime_production_min) return reactJsxRuntime_production_min;
+	hasRequiredReactJsxRuntime_production_min = 1;
+var f=React__default,k=Symbol.for("react.element"),l=Symbol.for("react.fragment"),m=Object.prototype.hasOwnProperty,n=f.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentOwner,p={key:true,ref:true,__self:true,__source:true};
+	function q(c,a,g){var b,d={},e=null,h=null;void 0!==g&&(e=""+g);void 0!==a.key&&(e=""+a.key);void 0!==a.ref&&(h=a.ref);for(b in a)m.call(a,b)&&!p.hasOwnProperty(b)&&(d[b]=a[b]);if(c&&c.defaultProps)for(b in a=c.defaultProps,a) void 0===d[b]&&(d[b]=a[b]);return {$$typeof:k,type:c,key:e,ref:h,props:d,_owner:n.current}}reactJsxRuntime_production_min.Fragment=l;reactJsxRuntime_production_min.jsx=q;reactJsxRuntime_production_min.jsxs=q;
+	return reactJsxRuntime_production_min;
 }
 
-var jsxRuntimeExports = jsxRuntime.exports;
+var hasRequiredJsxRuntime;
+
+function requireJsxRuntime () {
+	if (hasRequiredJsxRuntime) return jsxRuntime.exports;
+	hasRequiredJsxRuntime = 1;
+
+	{
+	  jsxRuntime.exports = requireReactJsxRuntime_production_min();
+	}
+	return jsxRuntime.exports;
+}
+
+var jsxRuntimeExports = requireJsxRuntime();
 
 /*
  * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
@@ -120,504 +136,960 @@ function useEnv() {
   return useSelector((state) => state.env);
 }
 
-function n(n){for(var r=arguments.length,t=Array(r>1?r-1:0),e=1;e<r;e++)t[e-1]=arguments[e];throw Error("[Immer] minified error nr: "+n+(t.length?" "+t.map((function(n){return "'"+n+"'"})).join(","):"")+". Find the full error at: https://bit.ly/3cXEKWf")}function r(n){return !!n&&!!n[Q]}function t(n){var r;return !!n&&(function(n){if(!n||"object"!=typeof n)return !1;var r=Object.getPrototypeOf(n);if(null===r)return !0;var t=Object.hasOwnProperty.call(r,"constructor")&&r.constructor;return t===Object||"function"==typeof t&&Function.toString.call(t)===Z}(n)||Array.isArray(n)||!!n[L]||!!(null===(r=n.constructor)||void 0===r?void 0:r[L])||s(n)||v(n))}function i(n,r,t){void 0===t&&(t=!1),0===o(n)?(t?Object.keys:nn)(n).forEach((function(e){t&&"symbol"==typeof e||r(e,n[e],n);})):n.forEach((function(t,e){return r(e,t,n)}));}function o(n){var r=n[Q];return r?r.i>3?r.i-4:r.i:Array.isArray(n)?1:s(n)?2:v(n)?3:0}function u(n,r){return 2===o(n)?n.has(r):Object.prototype.hasOwnProperty.call(n,r)}function a(n,r){return 2===o(n)?n.get(r):n[r]}function f(n,r,t){var e=o(n);2===e?n.set(r,t):3===e?n.add(t):n[r]=t;}function c(n,r){return n===r?0!==n||1/n==1/r:n!=n&&r!=r}function s(n){return X&&n instanceof Map}function v(n){return q&&n instanceof Set}function p(n){return n.o||n.t}function l(n){if(Array.isArray(n))return Array.prototype.slice.call(n);var r=rn(n);delete r[Q];for(var t=nn(r),e=0;e<t.length;e++){var i=t[e],o=r[i];!1===o.writable&&(o.writable=!0,o.configurable=!0),(o.get||o.set)&&(r[i]={configurable:!0,writable:!0,enumerable:o.enumerable,value:n[i]});}return Object.create(Object.getPrototypeOf(n),r)}function d(n,e){return void 0===e&&(e=!1),y(n)||r(n)||!t(n)||(o(n)>1&&(n.set=n.add=n.clear=n.delete=h),Object.freeze(n),e&&i(n,(function(n,r){return d(r,!0)}),!0)),n}function h(){n(2);}function y(n){return null==n||"object"!=typeof n||Object.isFrozen(n)}function b(r){var t=tn[r];return t||n(18,r),t}function m(n,r){tn[n]||(tn[n]=r);}function _(){return U}function j(n,r){r&&(b("Patches"),n.u=[],n.s=[],n.v=r);}function g(n){O(n),n.p.forEach(S),n.p=null;}function O(n){n===U&&(U=n.l);}function w(n){return U={p:[],l:U,h:n,m:!0,_:0}}function S(n){var r=n[Q];0===r.i||1===r.i?r.j():r.g=!0;}function P(r,e){e._=e.p.length;var i=e.p[0],o=void 0!==r&&r!==i;return e.h.O||b("ES5").S(e,r,o),o?(i[Q].P&&(g(e),n(4)),t(r)&&(r=M(e,r),e.l||x(e,r)),e.u&&b("Patches").M(i[Q].t,r,e.u,e.s)):r=M(e,i,[]),g(e),e.u&&e.v(e.u,e.s),r!==H?r:void 0}function M(n,r,t){if(y(r))return r;var e=r[Q];if(!e)return i(r,(function(i,o){return A(n,e,r,i,o,t)}),!0),r;if(e.A!==n)return r;if(!e.P)return x(n,e.t,!0),e.t;if(!e.I){e.I=!0,e.A._--;var o=4===e.i||5===e.i?e.o=l(e.k):e.o,u=o,a=!1;3===e.i&&(u=new Set(o),o.clear(),a=!0),i(u,(function(r,i){return A(n,e,o,r,i,t,a)})),x(n,o,!1),t&&n.u&&b("Patches").N(e,t,n.u,n.s);}return e.o}function A(e,i,o,a,c,s,v){if(r(c)){var p=M(e,c,s&&i&&3!==i.i&&!u(i.R,a)?s.concat(a):void 0);if(f(o,a,p),!r(p))return;e.m=!1;}else v&&o.add(c);if(t(c)&&!y(c)){if(!e.h.D&&e._<1)return;M(e,c),i&&i.A.l||x(e,c);}}function x(n,r,t){void 0===t&&(t=!1),!n.l&&n.h.D&&n.m&&d(r,t);}function z(n,r){var t=n[Q];return (t?p(t):n)[r]}function I(n,r){if(r in n)for(var t=Object.getPrototypeOf(n);t;){var e=Object.getOwnPropertyDescriptor(t,r);if(e)return e;t=Object.getPrototypeOf(t);}}function k(n){n.P||(n.P=!0,n.l&&k(n.l));}function E(n){n.o||(n.o=l(n.t));}function N(n,r,t){var e=s(r)?b("MapSet").F(r,t):v(r)?b("MapSet").T(r,t):n.O?function(n,r){var t=Array.isArray(n),e={i:t?1:0,A:r?r.A:_(),P:!1,I:!1,R:{},l:r,t:n,k:null,o:null,j:null,C:!1},i=e,o=en;t&&(i=[e],o=on);var u=Proxy.revocable(i,o),a=u.revoke,f=u.proxy;return e.k=f,e.j=a,f}(r,t):b("ES5").J(r,t);return (t?t.A:_()).p.push(e),e}function R(e){return r(e)||n(22,e),function n(r){if(!t(r))return r;var e,u=r[Q],c=o(r);if(u){if(!u.P&&(u.i<4||!b("ES5").K(u)))return u.t;u.I=!0,e=D(r,c),u.I=!1;}else e=D(r,c);return i(e,(function(r,t){u&&a(u.t,r)===t||f(e,r,n(t));})),3===c?new Set(e):e}(e)}function D(n,r){switch(r){case 2:return new Map(n);case 3:return Array.from(n)}return l(n)}function F(){function t(n,r){var t=s[n];return t?t.enumerable=r:s[n]=t={configurable:!0,enumerable:r,get:function(){var r=this[Q];return en.get(r,n)},set:function(r){var t=this[Q];en.set(t,n,r);}},t}function e(n){for(var r=n.length-1;r>=0;r--){var t=n[r][Q];if(!t.P)switch(t.i){case 5:a(t)&&k(t);break;case 4:o(t)&&k(t);}}}function o(n){for(var r=n.t,t=n.k,e=nn(t),i=e.length-1;i>=0;i--){var o=e[i];if(o!==Q){var a=r[o];if(void 0===a&&!u(r,o))return !0;var f=t[o],s=f&&f[Q];if(s?s.t!==a:!c(f,a))return !0}}var v=!!r[Q];return e.length!==nn(r).length+(v?0:1)}function a(n){var r=n.k;if(r.length!==n.t.length)return !0;var t=Object.getOwnPropertyDescriptor(r,r.length-1);if(t&&!t.get)return !0;for(var e=0;e<r.length;e++)if(!r.hasOwnProperty(e))return !0;return !1}var s={};m("ES5",{J:function(n,r){var e=Array.isArray(n),i=function(n,r){if(n){for(var e=Array(r.length),i=0;i<r.length;i++)Object.defineProperty(e,""+i,t(i,!0));return e}var o=rn(r);delete o[Q];for(var u=nn(o),a=0;a<u.length;a++){var f=u[a];o[f]=t(f,n||!!o[f].enumerable);}return Object.create(Object.getPrototypeOf(r),o)}(e,n),o={i:e?5:4,A:r?r.A:_(),P:!1,I:!1,R:{},l:r,t:n,k:i,o:null,g:!1,C:!1};return Object.defineProperty(i,Q,{value:o,writable:!0}),i},S:function(n,t,o){o?r(t)&&t[Q].A===n&&e(n.p):(n.u&&function n(r){if(r&&"object"==typeof r){var t=r[Q];if(t){var e=t.t,o=t.k,f=t.R,c=t.i;if(4===c)i(o,(function(r){r!==Q&&(void 0!==e[r]||u(e,r)?f[r]||n(o[r]):(f[r]=!0,k(t)));})),i(e,(function(n){void 0!==o[n]||u(o,n)||(f[n]=!1,k(t));}));else if(5===c){if(a(t)&&(k(t),f.length=!0),o.length<e.length)for(var s=o.length;s<e.length;s++)f[s]=!1;else for(var v=e.length;v<o.length;v++)f[v]=!0;for(var p=Math.min(o.length,e.length),l=0;l<p;l++)o.hasOwnProperty(l)||(f[l]=!0),void 0===f[l]&&n(o[l]);}}}}(n.p[0]),e(n.p));},K:function(n){return 4===n.i?o(n):a(n)}});}var G,U,W="undefined"!=typeof Symbol&&"symbol"==typeof Symbol("x"),X="undefined"!=typeof Map,q="undefined"!=typeof Set,B="undefined"!=typeof Proxy&&void 0!==Proxy.revocable&&"undefined"!=typeof Reflect,H=W?Symbol.for("immer-nothing"):((G={})["immer-nothing"]=!0,G),L=W?Symbol.for("immer-draftable"):"__$immer_draftable",Q=W?Symbol.for("immer-state"):"__$immer_state",Z=""+Object.prototype.constructor,nn="undefined"!=typeof Reflect&&Reflect.ownKeys?Reflect.ownKeys:void 0!==Object.getOwnPropertySymbols?function(n){return Object.getOwnPropertyNames(n).concat(Object.getOwnPropertySymbols(n))}:Object.getOwnPropertyNames,rn=Object.getOwnPropertyDescriptors||function(n){var r={};return nn(n).forEach((function(t){r[t]=Object.getOwnPropertyDescriptor(n,t);})),r},tn={},en={get:function(n,r){if(r===Q)return n;var e=p(n);if(!u(e,r))return function(n,r,t){var e,i=I(r,t);return i?"value"in i?i.value:null===(e=i.get)||void 0===e?void 0:e.call(n.k):void 0}(n,e,r);var i=e[r];return n.I||!t(i)?i:i===z(n.t,r)?(E(n),n.o[r]=N(n.A.h,i,n)):i},has:function(n,r){return r in p(n)},ownKeys:function(n){return Reflect.ownKeys(p(n))},set:function(n,r,t){var e=I(p(n),r);if(null==e?void 0:e.set)return e.set.call(n.k,t),!0;if(!n.P){var i=z(p(n),r),o=null==i?void 0:i[Q];if(o&&o.t===t)return n.o[r]=t,n.R[r]=!1,!0;if(c(t,i)&&(void 0!==t||u(n.t,r)))return !0;E(n),k(n);}return n.o[r]===t&&(void 0!==t||r in n.o)||Number.isNaN(t)&&Number.isNaN(n.o[r])||(n.o[r]=t,n.R[r]=!0),!0},deleteProperty:function(n,r){return void 0!==z(n.t,r)||r in n.t?(n.R[r]=!1,E(n),k(n)):delete n.R[r],n.o&&delete n.o[r],!0},getOwnPropertyDescriptor:function(n,r){var t=p(n),e=Reflect.getOwnPropertyDescriptor(t,r);return e?{writable:!0,configurable:1!==n.i||"length"!==r,enumerable:e.enumerable,value:t[r]}:e},defineProperty:function(){n(11);},getPrototypeOf:function(n){return Object.getPrototypeOf(n.t)},setPrototypeOf:function(){n(12);}},on={};i(en,(function(n,r){on[n]=function(){return arguments[0]=arguments[0][0],r.apply(this,arguments)};})),on.deleteProperty=function(r,t){return on.set.call(this,r,t,void 0)},on.set=function(r,t,e){return en.set.call(this,r[0],t,e,r[0])};var un=function(){function e(r){var e=this;this.O=B,this.D=!0,this.produce=function(r,i,o){if("function"==typeof r&&"function"!=typeof i){var u=i;i=r;var a=e;return function(n){var r=this;void 0===n&&(n=u);for(var t=arguments.length,e=Array(t>1?t-1:0),o=1;o<t;o++)e[o-1]=arguments[o];return a.produce(n,(function(n){var t;return (t=i).call.apply(t,[r,n].concat(e))}))}}var f;if("function"!=typeof i&&n(6),void 0!==o&&"function"!=typeof o&&n(7),t(r)){var c=w(e),s=N(e,r,void 0),v=!0;try{f=i(s),v=!1;}finally{v?g(c):O(c);}return "undefined"!=typeof Promise&&f instanceof Promise?f.then((function(n){return j(c,o),P(n,c)}),(function(n){throw g(c),n})):(j(c,o),P(f,c))}if(!r||"object"!=typeof r){if(void 0===(f=i(r))&&(f=r),f===H&&(f=void 0),e.D&&d(f,!0),o){var p=[],l=[];b("Patches").M(r,f,p,l),o(p,l);}return f}n(21,r);},this.produceWithPatches=function(n,r){if("function"==typeof n)return function(r){for(var t=arguments.length,i=Array(t>1?t-1:0),o=1;o<t;o++)i[o-1]=arguments[o];return e.produceWithPatches(r,(function(r){return n.apply(void 0,[r].concat(i))}))};var t,i,o=e.produce(n,r,(function(n,r){t=n,i=r;}));return "undefined"!=typeof Promise&&o instanceof Promise?o.then((function(n){return [n,t,i]})):[o,t,i]},"boolean"==typeof(null==r?void 0:r.useProxies)&&this.setUseProxies(r.useProxies),"boolean"==typeof(null==r?void 0:r.autoFreeze)&&this.setAutoFreeze(r.autoFreeze);}var i=e.prototype;return i.createDraft=function(e){t(e)||n(8),r(e)&&(e=R(e));var i=w(this),o=N(this,e,void 0);return o[Q].C=!0,O(i),o},i.finishDraft=function(r,t){var e=r&&r[Q];var i=e.A;return j(i,t),P(void 0,i)},i.setAutoFreeze=function(n){this.D=n;},i.setUseProxies=function(r){r&&!B&&n(20),this.O=r;},i.applyPatches=function(n,t){var e;for(e=t.length-1;e>=0;e--){var i=t[e];if(0===i.path.length&&"replace"===i.op){n=i.value;break}}e>-1&&(t=t.slice(e+1));var o=b("Patches").$;return r(n)?o(n,t):this.produce(n,(function(n){return o(n,t)}))},e}(),an=new un,fn=an.produce;an.produceWithPatches.bind(an);an.setAutoFreeze.bind(an);an.setUseProxies.bind(an);an.applyPatches.bind(an);an.createDraft.bind(an);an.finishDraft.bind(an);
+// src/utils/formatProdErrorMessage.ts
 
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-var __spreadArray = (this && this.__spreadArray) || function (to, from) {
-    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
-        to[j] = from[i];
-    return to;
-};
-var __defProp = Object.defineProperty;
-var __defProps = Object.defineProperties;
-var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
-var __getOwnPropSymbols = Object.getOwnPropertySymbols;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __propIsEnum = Object.prototype.propertyIsEnumerable;
-var __defNormalProp = function (obj, key, value) { return key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value: value }) : obj[key] = value; };
-var __spreadValues = function (a, b) {
-    for (var prop in b || (b = {}))
-        if (__hasOwnProp.call(b, prop))
-            __defNormalProp(a, prop, b[prop]);
-    if (__getOwnPropSymbols)
-        for (var _i = 0, _c = __getOwnPropSymbols(b); _i < _c.length; _i++) {
-            var prop = _c[_i];
-            if (__propIsEnum.call(b, prop))
-                __defNormalProp(a, prop, b[prop]);
-        }
-    return a;
-};
-var __spreadProps = function (a, b) { return __defProps(a, __getOwnPropDescs(b)); };
-var __async = function (__this, __arguments, generator) {
-    return new Promise(function (resolve, reject) {
-        var fulfilled = function (value) {
-            try {
-                step(generator.next(value));
-            }
-            catch (e) {
-                reject(e);
-            }
-        };
-        var rejected = function (value) {
-            try {
-                step(generator.throw(value));
-            }
-            catch (e) {
-                reject(e);
-            }
-        };
-        var step = function (x) { return x.done ? resolve(x.value) : Promise.resolve(x.value).then(fulfilled, rejected); };
-        step((generator = generator.apply(__this, __arguments)).next());
+// src/utils/isPlainObject.ts
+function isPlainObject$1(obj) {
+  if (typeof obj !== "object" || obj === null)
+    return false;
+  let proto = obj;
+  while (Object.getPrototypeOf(proto) !== null) {
+    proto = Object.getPrototypeOf(proto);
+  }
+  return Object.getPrototypeOf(obj) === proto || Object.getPrototypeOf(obj) === null;
+}
+
+// src/utils/isAction.ts
+function isAction(action) {
+  return isPlainObject$1(action) && "type" in action && typeof action.type === "string";
+}
+
+// src/utils/env.ts
+var NOTHING = Symbol.for("immer-nothing");
+var DRAFTABLE = Symbol.for("immer-draftable");
+var DRAFT_STATE = Symbol.for("immer-state");
+function die(error, ...args) {
+  throw new Error(
+    `[Immer] minified error nr: ${error}. Full error at: https://bit.ly/3cXEKWf`
+  );
+}
+
+// src/utils/common.ts
+var O = Object;
+var getPrototypeOf = O.getPrototypeOf;
+var CONSTRUCTOR = "constructor";
+var PROTOTYPE = "prototype";
+var CONFIGURABLE = "configurable";
+var ENUMERABLE = "enumerable";
+var WRITABLE = "writable";
+var VALUE = "value";
+var isDraft = (value) => !!value && !!value[DRAFT_STATE];
+function isDraftable(value) {
+  if (!value)
+    return false;
+  return isPlainObject(value) || isArray(value) || !!value[DRAFTABLE] || !!value[CONSTRUCTOR]?.[DRAFTABLE] || isMap(value) || isSet(value);
+}
+var objectCtorString = O[PROTOTYPE][CONSTRUCTOR].toString();
+var cachedCtorStrings = /* @__PURE__ */ new WeakMap();
+function isPlainObject(value) {
+  if (!value || !isObjectish(value))
+    return false;
+  const proto = getPrototypeOf(value);
+  if (proto === null || proto === O[PROTOTYPE])
+    return true;
+  const Ctor = O.hasOwnProperty.call(proto, CONSTRUCTOR) && proto[CONSTRUCTOR];
+  if (Ctor === Object)
+    return true;
+  if (!isFunction(Ctor))
+    return false;
+  let ctorString = cachedCtorStrings.get(Ctor);
+  if (ctorString === void 0) {
+    ctorString = Function.toString.call(Ctor);
+    cachedCtorStrings.set(Ctor, ctorString);
+  }
+  return ctorString === objectCtorString;
+}
+function each(obj, iter, strict = true) {
+  if (getArchtype(obj) === 0 /* Object */) {
+    const keys = strict ? Reflect.ownKeys(obj) : O.keys(obj);
+    keys.forEach((key) => {
+      iter(key, obj[key], obj);
     });
+  } else {
+    obj.forEach((entry, index) => iter(index, entry, obj));
+  }
+}
+function getArchtype(thing) {
+  const state = thing[DRAFT_STATE];
+  return state ? state.type_ : isArray(thing) ? 1 /* Array */ : isMap(thing) ? 2 /* Map */ : isSet(thing) ? 3 /* Set */ : 0 /* Object */;
+}
+var has = (thing, prop, type = getArchtype(thing)) => type === 2 /* Map */ ? thing.has(prop) : O[PROTOTYPE].hasOwnProperty.call(thing, prop);
+var get = (thing, prop, type = getArchtype(thing)) => (
+  // @ts-ignore
+  type === 2 /* Map */ ? thing.get(prop) : thing[prop]
+);
+var set = (thing, propOrOldValue, value, type = getArchtype(thing)) => {
+  if (type === 2 /* Map */)
+    thing.set(propOrOldValue, value);
+  else if (type === 3 /* Set */) {
+    thing.add(value);
+  } else
+    thing[propOrOldValue] = value;
 };
+function is(x, y) {
+  if (x === y) {
+    return x !== 0 || 1 / x === 1 / y;
+  } else {
+    return x !== x && y !== y;
+  }
+}
+var isArray = Array.isArray;
+var isMap = (target) => target instanceof Map;
+var isSet = (target) => target instanceof Set;
+var isObjectish = (target) => typeof target === "object";
+var isFunction = (target) => typeof target === "function";
+var isBoolean = (target) => typeof target === "boolean";
+function isArrayIndex(value) {
+  const n = +value;
+  return Number.isInteger(n) && String(n) === value;
+}
+var latest = (state) => state.copy_ || state.base_;
+var getFinalValue = (state) => state.modified_ ? state.copy_ : state.base_;
+function shallowCopy(base, strict) {
+  if (isMap(base)) {
+    return new Map(base);
+  }
+  if (isSet(base)) {
+    return new Set(base);
+  }
+  if (isArray(base))
+    return Array[PROTOTYPE].slice.call(base);
+  const isPlain = isPlainObject(base);
+  if (strict === true || strict === "class_only" && !isPlain) {
+    const descriptors = O.getOwnPropertyDescriptors(base);
+    delete descriptors[DRAFT_STATE];
+    let keys = Reflect.ownKeys(descriptors);
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      const desc = descriptors[key];
+      if (desc[WRITABLE] === false) {
+        desc[WRITABLE] = true;
+        desc[CONFIGURABLE] = true;
+      }
+      if (desc.get || desc.set)
+        descriptors[key] = {
+          [CONFIGURABLE]: true,
+          [WRITABLE]: true,
+          // could live with !!desc.set as well here...
+          [ENUMERABLE]: desc[ENUMERABLE],
+          [VALUE]: base[key]
+        };
+    }
+    return O.create(getPrototypeOf(base), descriptors);
+  } else {
+    const proto = getPrototypeOf(base);
+    if (proto !== null && isPlain) {
+      return { ...base };
+    }
+    const obj = O.create(proto);
+    return O.assign(obj, base);
+  }
+}
+function freeze(obj, deep = false) {
+  if (isFrozen(obj) || isDraft(obj) || !isDraftable(obj))
+    return obj;
+  if (getArchtype(obj) > 1) {
+    O.defineProperties(obj, {
+      set: dontMutateMethodOverride,
+      add: dontMutateMethodOverride,
+      clear: dontMutateMethodOverride,
+      delete: dontMutateMethodOverride
+    });
+  }
+  O.freeze(obj);
+  if (deep)
+    each(
+      obj,
+      (_key, value) => {
+        freeze(value, true);
+      },
+      false
+    );
+  return obj;
+}
+function dontMutateFrozenCollections() {
+  die(2);
+}
+var dontMutateMethodOverride = {
+  [VALUE]: dontMutateFrozenCollections
+};
+function isFrozen(obj) {
+  if (obj === null || !isObjectish(obj))
+    return true;
+  return O.isFrozen(obj);
+}
+
+// src/utils/plugins.ts
+var PluginMapSet = "MapSet";
+var PluginPatches = "Patches";
+var PluginArrayMethods = "ArrayMethods";
+var plugins = {};
+function getPlugin(pluginKey) {
+  const plugin = plugins[pluginKey];
+  if (!plugin) {
+    die(0, pluginKey);
+  }
+  return plugin;
+}
+var isPluginLoaded = (pluginKey) => !!plugins[pluginKey];
+
+// src/core/scope.ts
+var currentScope;
+var getCurrentScope = () => currentScope;
+var createScope = (parent_, immer_) => ({
+  drafts_: [],
+  parent_,
+  immer_,
+  // Whenever the modified draft contains a draft from another scope, we
+  // need to prevent auto-freezing so the unowned draft can be finalized.
+  canAutoFreeze_: true,
+  unfinalizedDrafts_: 0,
+  handledSet_: /* @__PURE__ */ new Set(),
+  processedForPatches_: /* @__PURE__ */ new Set(),
+  mapSetPlugin_: isPluginLoaded(PluginMapSet) ? getPlugin(PluginMapSet) : void 0,
+  arrayMethodsPlugin_: isPluginLoaded(PluginArrayMethods) ? getPlugin(PluginArrayMethods) : void 0
+});
+function usePatchesInScope(scope, patchListener) {
+  if (patchListener) {
+    scope.patchPlugin_ = getPlugin(PluginPatches);
+    scope.patches_ = [];
+    scope.inversePatches_ = [];
+    scope.patchListener_ = patchListener;
+  }
+}
+function revokeScope(scope) {
+  leaveScope(scope);
+  scope.drafts_.forEach(revokeDraft);
+  scope.drafts_ = null;
+}
+function leaveScope(scope) {
+  if (scope === currentScope) {
+    currentScope = scope.parent_;
+  }
+}
+var enterScope = (immer2) => currentScope = createScope(currentScope, immer2);
+function revokeDraft(draft) {
+  const state = draft[DRAFT_STATE];
+  if (state.type_ === 0 /* Object */ || state.type_ === 1 /* Array */)
+    state.revoke_();
+  else
+    state.revoked_ = true;
+}
+
+// src/core/finalize.ts
+function processResult(result, scope) {
+  scope.unfinalizedDrafts_ = scope.drafts_.length;
+  const baseDraft = scope.drafts_[0];
+  const isReplaced = result !== void 0 && result !== baseDraft;
+  if (isReplaced) {
+    if (baseDraft[DRAFT_STATE].modified_) {
+      revokeScope(scope);
+      die(4);
+    }
+    if (isDraftable(result)) {
+      result = finalize(scope, result);
+    }
+    const { patchPlugin_ } = scope;
+    if (patchPlugin_) {
+      patchPlugin_.generateReplacementPatches_(
+        baseDraft[DRAFT_STATE].base_,
+        result,
+        scope
+      );
+    }
+  } else {
+    result = finalize(scope, baseDraft);
+  }
+  maybeFreeze(scope, result, true);
+  revokeScope(scope);
+  if (scope.patches_) {
+    scope.patchListener_(scope.patches_, scope.inversePatches_);
+  }
+  return result !== NOTHING ? result : void 0;
+}
+function finalize(rootScope, value) {
+  if (isFrozen(value))
+    return value;
+  const state = value[DRAFT_STATE];
+  if (!state) {
+    const finalValue = handleValue(value, rootScope.handledSet_, rootScope);
+    return finalValue;
+  }
+  if (!isSameScope(state, rootScope)) {
+    return value;
+  }
+  if (!state.modified_) {
+    return state.base_;
+  }
+  if (!state.finalized_) {
+    const { callbacks_ } = state;
+    if (callbacks_) {
+      while (callbacks_.length > 0) {
+        const callback = callbacks_.pop();
+        callback(rootScope);
+      }
+    }
+    generatePatchesAndFinalize(state, rootScope);
+  }
+  return state.copy_;
+}
+function maybeFreeze(scope, value, deep = false) {
+  if (!scope.parent_ && scope.immer_.autoFreeze_ && scope.canAutoFreeze_) {
+    freeze(value, deep);
+  }
+}
+function markStateFinalized(state) {
+  state.finalized_ = true;
+  state.scope_.unfinalizedDrafts_--;
+}
+var isSameScope = (state, rootScope) => state.scope_ === rootScope;
+var EMPTY_LOCATIONS_RESULT = [];
+function updateDraftInParent(parent, draftValue, finalizedValue, originalKey) {
+  const parentCopy = latest(parent);
+  const parentType = parent.type_;
+  if (originalKey !== void 0) {
+    const currentValue = get(parentCopy, originalKey, parentType);
+    if (currentValue === draftValue) {
+      set(parentCopy, originalKey, finalizedValue, parentType);
+      return;
+    }
+  }
+  if (!parent.draftLocations_) {
+    const draftLocations = parent.draftLocations_ = /* @__PURE__ */ new Map();
+    each(parentCopy, (key, value) => {
+      if (isDraft(value)) {
+        const keys = draftLocations.get(value) || [];
+        keys.push(key);
+        draftLocations.set(value, keys);
+      }
+    });
+  }
+  const locations = parent.draftLocations_.get(draftValue) ?? EMPTY_LOCATIONS_RESULT;
+  for (const location of locations) {
+    set(parentCopy, location, finalizedValue, parentType);
+  }
+}
+function registerChildFinalizationCallback(parent, child, key) {
+  parent.callbacks_.push(function childCleanup(rootScope) {
+    const state = child;
+    if (!state || !isSameScope(state, rootScope)) {
+      return;
+    }
+    rootScope.mapSetPlugin_?.fixSetContents(state);
+    const finalizedValue = getFinalValue(state);
+    updateDraftInParent(parent, state.draft_ ?? state, finalizedValue, key);
+    generatePatchesAndFinalize(state, rootScope);
+  });
+}
+function generatePatchesAndFinalize(state, rootScope) {
+  const shouldFinalize = state.modified_ && !state.finalized_ && (state.type_ === 3 /* Set */ || state.type_ === 1 /* Array */ && state.allIndicesReassigned_ || (state.assigned_?.size ?? 0) > 0);
+  if (shouldFinalize) {
+    const { patchPlugin_ } = rootScope;
+    if (patchPlugin_) {
+      const basePath = patchPlugin_.getPath(state);
+      if (basePath) {
+        patchPlugin_.generatePatches_(state, basePath, rootScope);
+      }
+    }
+    markStateFinalized(state);
+  }
+}
+function handleCrossReference(target, key, value) {
+  const { scope_ } = target;
+  if (isDraft(value)) {
+    const state = value[DRAFT_STATE];
+    if (isSameScope(state, scope_)) {
+      state.callbacks_.push(function crossReferenceCleanup() {
+        prepareCopy(target);
+        const finalizedValue = getFinalValue(state);
+        updateDraftInParent(target, value, finalizedValue, key);
+      });
+    }
+  } else if (isDraftable(value)) {
+    target.callbacks_.push(function nestedDraftCleanup() {
+      const targetCopy = latest(target);
+      if (target.type_ === 3 /* Set */) {
+        if (targetCopy.has(value)) {
+          handleValue(value, scope_.handledSet_, scope_);
+        }
+      } else {
+        if (get(targetCopy, key, target.type_) === value) {
+          if (scope_.drafts_.length > 1 && (target.assigned_.get(key) ?? false) === true && target.copy_) {
+            handleValue(
+              get(target.copy_, key, target.type_),
+              scope_.handledSet_,
+              scope_
+            );
+          }
+        }
+      }
+    });
+  }
+}
+function handleValue(target, handledSet, rootScope) {
+  if (!rootScope.immer_.autoFreeze_ && rootScope.unfinalizedDrafts_ < 1) {
+    return target;
+  }
+  if (isDraft(target) || handledSet.has(target) || !isDraftable(target) || isFrozen(target)) {
+    return target;
+  }
+  handledSet.add(target);
+  each(target, (key, value) => {
+    if (isDraft(value)) {
+      const state = value[DRAFT_STATE];
+      if (isSameScope(state, rootScope)) {
+        const updatedValue = getFinalValue(state);
+        set(target, key, updatedValue, target.type_);
+        markStateFinalized(state);
+      }
+    } else if (isDraftable(value)) {
+      handleValue(value, handledSet, rootScope);
+    }
+  });
+  return target;
+}
+
+// src/core/proxy.ts
+function createProxyProxy(base, parent) {
+  const baseIsArray = isArray(base);
+  const state = {
+    type_: baseIsArray ? 1 /* Array */ : 0 /* Object */,
+    // Track which produce call this is associated with.
+    scope_: parent ? parent.scope_ : getCurrentScope(),
+    // True for both shallow and deep changes.
+    modified_: false,
+    // Used during finalization.
+    finalized_: false,
+    // Track which properties have been assigned (true) or deleted (false).
+    // actually instantiated in `prepareCopy()`
+    assigned_: void 0,
+    // The parent draft state.
+    parent_: parent,
+    // The base state.
+    base_: base,
+    // The base proxy.
+    draft_: null,
+    // set below
+    // The base copy with any updated values.
+    copy_: null,
+    // Called by the `produce` function.
+    revoke_: null,
+    isManual_: false,
+    // `callbacks` actually gets assigned in `createProxy`
+    callbacks_: void 0
+  };
+  let target = state;
+  let traps = objectTraps;
+  if (baseIsArray) {
+    target = [state];
+    traps = arrayTraps;
+  }
+  const { revoke, proxy } = Proxy.revocable(target, traps);
+  state.draft_ = proxy;
+  state.revoke_ = revoke;
+  return [proxy, state];
+}
+var objectTraps = {
+  get(state, prop) {
+    if (prop === DRAFT_STATE)
+      return state;
+    let arrayPlugin = state.scope_.arrayMethodsPlugin_;
+    const isArrayWithStringProp = state.type_ === 1 /* Array */ && typeof prop === "string";
+    if (isArrayWithStringProp) {
+      if (arrayPlugin?.isArrayOperationMethod(prop)) {
+        return arrayPlugin.createMethodInterceptor(state, prop);
+      }
+    }
+    const source = latest(state);
+    if (!has(source, prop, state.type_)) {
+      return readPropFromProto(state, source, prop);
+    }
+    const value = source[prop];
+    if (state.finalized_ || !isDraftable(value)) {
+      return value;
+    }
+    if (isArrayWithStringProp && state.operationMethod && arrayPlugin?.isMutatingArrayMethod(
+      state.operationMethod
+    ) && isArrayIndex(prop)) {
+      return value;
+    }
+    if (value === peek(state.base_, prop)) {
+      prepareCopy(state);
+      const childKey = state.type_ === 1 /* Array */ ? +prop : prop;
+      const childDraft = createProxy(state.scope_, value, state, childKey);
+      return state.copy_[childKey] = childDraft;
+    }
+    return value;
+  },
+  has(state, prop) {
+    return prop in latest(state);
+  },
+  ownKeys(state) {
+    return Reflect.ownKeys(latest(state));
+  },
+  set(state, prop, value) {
+    const desc = getDescriptorFromProto(latest(state), prop);
+    if (desc?.set) {
+      desc.set.call(state.draft_, value);
+      return true;
+    }
+    if (!state.modified_) {
+      const current2 = peek(latest(state), prop);
+      const currentState = current2?.[DRAFT_STATE];
+      if (currentState && currentState.base_ === value) {
+        state.copy_[prop] = value;
+        state.assigned_.set(prop, false);
+        return true;
+      }
+      if (is(value, current2) && (value !== void 0 || has(state.base_, prop, state.type_)))
+        return true;
+      prepareCopy(state);
+      markChanged(state);
+    }
+    if (state.copy_[prop] === value && // special case: handle new props with value 'undefined'
+    (value !== void 0 || prop in state.copy_) || // special case: NaN
+    Number.isNaN(value) && Number.isNaN(state.copy_[prop]))
+      return true;
+    state.copy_[prop] = value;
+    state.assigned_.set(prop, true);
+    handleCrossReference(state, prop, value);
+    return true;
+  },
+  deleteProperty(state, prop) {
+    prepareCopy(state);
+    if (peek(state.base_, prop) !== void 0 || prop in state.base_) {
+      state.assigned_.set(prop, false);
+      markChanged(state);
+    } else {
+      state.assigned_.delete(prop);
+    }
+    if (state.copy_) {
+      delete state.copy_[prop];
+    }
+    return true;
+  },
+  // Note: We never coerce `desc.value` into an Immer draft, because we can't make
+  // the same guarantee in ES5 mode.
+  getOwnPropertyDescriptor(state, prop) {
+    const owner = latest(state);
+    const desc = Reflect.getOwnPropertyDescriptor(owner, prop);
+    if (!desc)
+      return desc;
+    return {
+      [WRITABLE]: true,
+      [CONFIGURABLE]: state.type_ !== 1 /* Array */ || prop !== "length",
+      [ENUMERABLE]: desc[ENUMERABLE],
+      [VALUE]: owner[prop]
+    };
+  },
+  defineProperty() {
+    die(11);
+  },
+  getPrototypeOf(state) {
+    return getPrototypeOf(state.base_);
+  },
+  setPrototypeOf() {
+    die(12);
+  }
+};
+var arrayTraps = {};
+for (let key in objectTraps) {
+  let fn = objectTraps[key];
+  arrayTraps[key] = function() {
+    const args = arguments;
+    args[0] = args[0][0];
+    return fn.apply(this, args);
+  };
+}
+arrayTraps.deleteProperty = function(state, prop) {
+  return arrayTraps.set.call(this, state, prop, void 0);
+};
+arrayTraps.set = function(state, prop, value) {
+  return objectTraps.set.call(this, state[0], prop, value, state[0]);
+};
+function peek(draft, prop) {
+  const state = draft[DRAFT_STATE];
+  const source = state ? latest(state) : draft;
+  return source[prop];
+}
+function readPropFromProto(state, source, prop) {
+  const desc = getDescriptorFromProto(source, prop);
+  return desc ? VALUE in desc ? desc[VALUE] : (
+    // This is a very special case, if the prop is a getter defined by the
+    // prototype, we should invoke it with the draft as context!
+    desc.get?.call(state.draft_)
+  ) : void 0;
+}
+function getDescriptorFromProto(source, prop) {
+  if (!(prop in source))
+    return void 0;
+  let proto = getPrototypeOf(source);
+  while (proto) {
+    const desc = Object.getOwnPropertyDescriptor(proto, prop);
+    if (desc)
+      return desc;
+    proto = getPrototypeOf(proto);
+  }
+  return void 0;
+}
+function markChanged(state) {
+  if (!state.modified_) {
+    state.modified_ = true;
+    if (state.parent_) {
+      markChanged(state.parent_);
+    }
+  }
+}
+function prepareCopy(state) {
+  if (!state.copy_) {
+    state.assigned_ = /* @__PURE__ */ new Map();
+    state.copy_ = shallowCopy(
+      state.base_,
+      state.scope_.immer_.useStrictShallowCopy_
+    );
+  }
+}
+
+// src/core/immerClass.ts
+var Immer2 = class {
+  constructor(config) {
+    this.autoFreeze_ = true;
+    this.useStrictShallowCopy_ = false;
+    this.useStrictIteration_ = false;
+    /**
+     * The `produce` function takes a value and a "recipe function" (whose
+     * return value often depends on the base state). The recipe function is
+     * free to mutate its first argument however it wants. All mutations are
+     * only ever applied to a __copy__ of the base state.
+     *
+     * Pass only a function to create a "curried producer" which relieves you
+     * from passing the recipe function every time.
+     *
+     * Only plain objects and arrays are made mutable. All other objects are
+     * considered uncopyable.
+     *
+     * Note: This function is __bound__ to its `Immer` instance.
+     *
+     * @param {any} base - the initial state
+     * @param {Function} recipe - function that receives a proxy of the base state as first argument and which can be freely modified
+     * @param {Function} patchListener - optional function that will be called with all the patches produced here
+     * @returns {any} a new state, or the initial state if nothing was modified
+     */
+    this.produce = (base, recipe, patchListener) => {
+      if (isFunction(base) && !isFunction(recipe)) {
+        const defaultBase = recipe;
+        recipe = base;
+        const self = this;
+        return function curriedProduce(base2 = defaultBase, ...args) {
+          return self.produce(base2, (draft) => recipe.call(this, draft, ...args));
+        };
+      }
+      if (!isFunction(recipe))
+        die(6);
+      if (patchListener !== void 0 && !isFunction(patchListener))
+        die(7);
+      let result;
+      if (isDraftable(base)) {
+        const scope = enterScope(this);
+        const proxy = createProxy(scope, base, void 0);
+        let hasError = true;
+        try {
+          result = recipe(proxy);
+          hasError = false;
+        } finally {
+          if (hasError)
+            revokeScope(scope);
+          else
+            leaveScope(scope);
+        }
+        usePatchesInScope(scope, patchListener);
+        return processResult(result, scope);
+      } else if (!base || !isObjectish(base)) {
+        result = recipe(base);
+        if (result === void 0)
+          result = base;
+        if (result === NOTHING)
+          result = void 0;
+        if (this.autoFreeze_)
+          freeze(result, true);
+        if (patchListener) {
+          const p = [];
+          const ip = [];
+          getPlugin(PluginPatches).generateReplacementPatches_(base, result, {
+            patches_: p,
+            inversePatches_: ip
+          });
+          patchListener(p, ip);
+        }
+        return result;
+      } else
+        die(1, base);
+    };
+    this.produceWithPatches = (base, recipe) => {
+      if (isFunction(base)) {
+        return (state, ...args) => this.produceWithPatches(state, (draft) => base(draft, ...args));
+      }
+      let patches, inversePatches;
+      const result = this.produce(base, recipe, (p, ip) => {
+        patches = p;
+        inversePatches = ip;
+      });
+      return [result, patches, inversePatches];
+    };
+    if (isBoolean(config?.autoFreeze))
+      this.setAutoFreeze(config.autoFreeze);
+    if (isBoolean(config?.useStrictShallowCopy))
+      this.setUseStrictShallowCopy(config.useStrictShallowCopy);
+    if (isBoolean(config?.useStrictIteration))
+      this.setUseStrictIteration(config.useStrictIteration);
+  }
+  createDraft(base) {
+    if (!isDraftable(base))
+      die(8);
+    if (isDraft(base))
+      base = current(base);
+    const scope = enterScope(this);
+    const proxy = createProxy(scope, base, void 0);
+    proxy[DRAFT_STATE].isManual_ = true;
+    leaveScope(scope);
+    return proxy;
+  }
+  finishDraft(draft, patchListener) {
+    const state = draft && draft[DRAFT_STATE];
+    if (!state || !state.isManual_)
+      die(9);
+    const { scope_: scope } = state;
+    usePatchesInScope(scope, patchListener);
+    return processResult(void 0, scope);
+  }
+  /**
+   * Pass true to automatically freeze all copies created by Immer.
+   *
+   * By default, auto-freezing is enabled.
+   */
+  setAutoFreeze(value) {
+    this.autoFreeze_ = value;
+  }
+  /**
+   * Pass true to enable strict shallow copy.
+   *
+   * By default, immer does not copy the object descriptors such as getter, setter and non-enumrable properties.
+   */
+  setUseStrictShallowCopy(value) {
+    this.useStrictShallowCopy_ = value;
+  }
+  /**
+   * Pass false to use faster iteration that skips non-enumerable properties
+   * but still handles symbols for compatibility.
+   *
+   * By default, strict iteration is enabled (includes all own properties).
+   */
+  setUseStrictIteration(value) {
+    this.useStrictIteration_ = value;
+  }
+  shouldUseStrictIteration() {
+    return this.useStrictIteration_;
+  }
+  applyPatches(base, patches) {
+    let i;
+    for (i = patches.length - 1; i >= 0; i--) {
+      const patch = patches[i];
+      if (patch.path.length === 0 && patch.op === "replace") {
+        base = patch.value;
+        break;
+      }
+    }
+    if (i > -1) {
+      patches = patches.slice(i + 1);
+    }
+    const applyPatchesImpl = getPlugin(PluginPatches).applyPatches_;
+    if (isDraft(base)) {
+      return applyPatchesImpl(base, patches);
+    }
+    return this.produce(
+      base,
+      (draft) => applyPatchesImpl(draft, patches)
+    );
+  }
+};
+function createProxy(rootScope, value, parent, key) {
+  const [draft, state] = isMap(value) ? getPlugin(PluginMapSet).proxyMap_(value, parent) : isSet(value) ? getPlugin(PluginMapSet).proxySet_(value, parent) : createProxyProxy(value, parent);
+  const scope = parent?.scope_ ?? getCurrentScope();
+  scope.drafts_.push(draft);
+  state.callbacks_ = parent?.callbacks_ ?? [];
+  state.key_ = key;
+  if (parent && key !== void 0) {
+    registerChildFinalizationCallback(parent, state, key);
+  } else {
+    state.callbacks_.push(function rootDraftCleanup(rootScope2) {
+      rootScope2.mapSetPlugin_?.fixSetContents(state);
+      const { patchPlugin_ } = rootScope2;
+      if (state.modified_ && patchPlugin_) {
+        patchPlugin_.generatePatches_(state, [], rootScope2);
+      }
+    });
+  }
+  return draft;
+}
+
+// src/core/current.ts
+function current(value) {
+  if (!isDraft(value))
+    die(10, value);
+  return currentImpl(value);
+}
+function currentImpl(value) {
+  if (!isDraftable(value) || isFrozen(value))
+    return value;
+  const state = value[DRAFT_STATE];
+  let copy;
+  let strict = true;
+  if (state) {
+    if (!state.modified_)
+      return state.base_;
+    state.finalized_ = true;
+    copy = shallowCopy(value, state.scope_.immer_.useStrictShallowCopy_);
+    strict = state.scope_.immer_.shouldUseStrictIteration();
+  } else {
+    copy = shallowCopy(value, true);
+  }
+  each(
+    copy,
+    (key, childValue) => {
+      set(copy, key, currentImpl(childValue));
+    },
+    strict
+  );
+  if (state) {
+    state.finalized_ = false;
+  }
+  return copy;
+}
+
+// src/immer.ts
+var immer = new Immer2();
+var produce = immer.produce;
+
+// src/index.ts
+
 // src/createAction.ts
 function createAction(type, prepareAction) {
-    function actionCreator() {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
-        }
-        if (prepareAction) {
-            var prepared = prepareAction.apply(void 0, args);
-            if (!prepared) {
-                throw new Error("prepareAction did not return an object");
-            }
-            return __spreadValues(__spreadValues({
-                type: type,
-                payload: prepared.payload
-            }, "meta" in prepared && { meta: prepared.meta }), "error" in prepared && { error: prepared.error });
-        }
-        return { type: type, payload: args[0] };
-    }
-    actionCreator.toString = function () { return "" + type; };
-    actionCreator.type = type;
-    actionCreator.match = function (action) { return action.type === type; };
-    return actionCreator;
+  function actionCreator(...args) {
+    return {
+      type,
+      payload: args[0]
+    };
+  }
+  actionCreator.toString = () => `${type}`;
+  actionCreator.type = type;
+  actionCreator.match = (action) => isAction(action) && action.type === type;
+  return actionCreator;
 }
-/** @class */ ((function (_super) {
-    __extends(MiddlewareArray, _super);
-    function MiddlewareArray() {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
-        }
-        var _this = _super.apply(this, args) || this;
-        Object.setPrototypeOf(_this, MiddlewareArray.prototype);
-        return _this;
-    }
-    Object.defineProperty(MiddlewareArray, Symbol.species, {
-        get: function () {
-            return MiddlewareArray;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    MiddlewareArray.prototype.concat = function () {
-        var arr = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            arr[_i] = arguments[_i];
-        }
-        return _super.prototype.concat.apply(this, arr);
-    };
-    MiddlewareArray.prototype.prepend = function () {
-        var arr = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            arr[_i] = arguments[_i];
-        }
-        if (arr.length === 1 && Array.isArray(arr[0])) {
-            return new (MiddlewareArray.bind.apply(MiddlewareArray, __spreadArray([void 0], arr[0].concat(this))))();
-        }
-        return new (MiddlewareArray.bind.apply(MiddlewareArray, __spreadArray([void 0], arr.concat(this))))();
-    };
-    return MiddlewareArray;
-})(Array));
-/** @class */ ((function (_super) {
-    __extends(EnhancerArray, _super);
-    function EnhancerArray() {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
-        }
-        var _this = _super.apply(this, args) || this;
-        Object.setPrototypeOf(_this, EnhancerArray.prototype);
-        return _this;
-    }
-    Object.defineProperty(EnhancerArray, Symbol.species, {
-        get: function () {
-            return EnhancerArray;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    EnhancerArray.prototype.concat = function () {
-        var arr = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            arr[_i] = arguments[_i];
-        }
-        return _super.prototype.concat.apply(this, arr);
-    };
-    EnhancerArray.prototype.prepend = function () {
-        var arr = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            arr[_i] = arguments[_i];
-        }
-        if (arr.length === 1 && Array.isArray(arr[0])) {
-            return new (EnhancerArray.bind.apply(EnhancerArray, __spreadArray([void 0], arr[0].concat(this))))();
-        }
-        return new (EnhancerArray.bind.apply(EnhancerArray, __spreadArray([void 0], arr.concat(this))))();
-    };
-    return EnhancerArray;
-})(Array));
 function freezeDraftable(val) {
-    return t(val) ? fn(val, function () {
-    }) : val;
+  return isDraftable(val) ? produce(val, () => {
+  }) : val;
 }
+
 // src/mapBuilders.ts
 function executeReducerBuilderCallback(builderCallback) {
-    var actionsMap = {};
-    var actionMatchers = [];
-    var defaultCaseReducer;
-    var builder = {
-        addCase: function (typeOrActionCreator, reducer) {
-            var type = typeof typeOrActionCreator === "string" ? typeOrActionCreator : typeOrActionCreator.type;
-            if (!type) {
-                throw new Error("`builder.addCase` cannot be called with an empty action type");
-            }
-            if (type in actionsMap) {
-                throw new Error("`builder.addCase` cannot be called with two reducers for the same action type");
-            }
-            actionsMap[type] = reducer;
-            return builder;
-        },
-        addMatcher: function (matcher, reducer) {
-            actionMatchers.push({ matcher: matcher, reducer: reducer });
-            return builder;
-        },
-        addDefaultCase: function (reducer) {
-            defaultCaseReducer = reducer;
-            return builder;
-        }
-    };
-    builderCallback(builder);
-    return [actionsMap, actionMatchers, defaultCaseReducer];
+  const actionsMap = {};
+  const actionMatchers = [];
+  let defaultCaseReducer;
+  const builder = {
+    addCase(typeOrActionCreator, reducer) {
+      const type = typeof typeOrActionCreator === "string" ? typeOrActionCreator : typeOrActionCreator.type;
+      if (!type) {
+        throw new Error(formatProdErrorMessage(28) );
+      }
+      if (type in actionsMap) {
+        throw new Error(formatProdErrorMessage(29) );
+      }
+      actionsMap[type] = reducer;
+      return builder;
+    },
+    addAsyncThunk(asyncThunk, reducers) {
+      if (reducers.pending) actionsMap[asyncThunk.pending.type] = reducers.pending;
+      if (reducers.rejected) actionsMap[asyncThunk.rejected.type] = reducers.rejected;
+      if (reducers.fulfilled) actionsMap[asyncThunk.fulfilled.type] = reducers.fulfilled;
+      if (reducers.settled) actionMatchers.push({
+        matcher: asyncThunk.settled,
+        reducer: reducers.settled
+      });
+      return builder;
+    },
+    addMatcher(matcher, reducer) {
+      actionMatchers.push({
+        matcher,
+        reducer
+      });
+      return builder;
+    },
+    addDefaultCase(reducer) {
+      defaultCaseReducer = reducer;
+      return builder;
+    }
+  };
+  builderCallback(builder);
+  return [actionsMap, actionMatchers, defaultCaseReducer];
 }
+
 // src/createReducer.ts
 function isStateFunction(x) {
-    return typeof x === "function";
+  return typeof x === "function";
 }
-function createReducer(initialState, mapOrBuilderCallback, actionMatchers, defaultCaseReducer) {
-    if (actionMatchers === void 0) { actionMatchers = []; }
-    var _c = typeof mapOrBuilderCallback === "function" ? executeReducerBuilderCallback(mapOrBuilderCallback) : [mapOrBuilderCallback, actionMatchers, defaultCaseReducer], actionsMap = _c[0], finalActionMatchers = _c[1], finalDefaultCaseReducer = _c[2];
-    var getInitialState;
-    if (isStateFunction(initialState)) {
-        getInitialState = function () { return freezeDraftable(initialState()); };
+function createReducer(initialState, mapOrBuilderCallback) {
+  let [actionsMap, finalActionMatchers, finalDefaultCaseReducer] = executeReducerBuilderCallback(mapOrBuilderCallback);
+  let getInitialState;
+  if (isStateFunction(initialState)) {
+    getInitialState = () => freezeDraftable(initialState());
+  } else {
+    const frozenInitialState = freezeDraftable(initialState);
+    getInitialState = () => frozenInitialState;
+  }
+  function reducer(state = getInitialState(), action) {
+    let caseReducers = [actionsMap[action.type], ...finalActionMatchers.filter(({
+      matcher
+    }) => matcher(action)).map(({
+      reducer: reducer2
+    }) => reducer2)];
+    if (caseReducers.filter((cr) => !!cr).length === 0) {
+      caseReducers = [finalDefaultCaseReducer];
     }
-    else {
-        var frozenInitialState_1 = freezeDraftable(initialState);
-        getInitialState = function () { return frozenInitialState_1; };
-    }
-    function reducer(state, action) {
-        if (state === void 0) { state = getInitialState(); }
-        var caseReducers = __spreadArray([
-            actionsMap[action.type]
-        ], finalActionMatchers.filter(function (_c) {
-            var matcher = _c.matcher;
-            return matcher(action);
-        }).map(function (_c) {
-            var reducer2 = _c.reducer;
-            return reducer2;
-        }));
-        if (caseReducers.filter(function (cr) { return !!cr; }).length === 0) {
-            caseReducers = [finalDefaultCaseReducer];
-        }
-        return caseReducers.reduce(function (previousState, caseReducer) {
-            if (caseReducer) {
-                if (r(previousState)) {
-                    var draft = previousState;
-                    var result = caseReducer(draft, action);
-                    if (result === void 0) {
-                        return previousState;
-                    }
-                    return result;
-                }
-                else if (!t(previousState)) {
-                    var result = caseReducer(previousState, action);
-                    if (result === void 0) {
-                        if (previousState === null) {
-                            return previousState;
-                        }
-                        throw Error("A case reducer on a non-draftable value must not return undefined");
-                    }
-                    return result;
-                }
-                else {
-                    return fn(previousState, function (draft) {
-                        return caseReducer(draft, action);
-                    });
-                }
-            }
+    return caseReducers.reduce((previousState, caseReducer) => {
+      if (caseReducer) {
+        if (isDraft(previousState)) {
+          const draft = previousState;
+          const result = caseReducer(draft, action);
+          if (result === void 0) {
             return previousState;
-        }, state);
-    }
-    reducer.getInitialState = getInitialState;
-    return reducer;
-}
-// src/nanoid.ts
-var urlAlphabet = "ModuleSymbhasOwnPr-0123456789ABCDEFGHNRVfgctiUvz_KqYTJkLxpZXIjQW";
-var nanoid = function (size) {
-    if (size === void 0) { size = 21; }
-    var id = "";
-    var i = size;
-    while (i--) {
-        id += urlAlphabet[Math.random() * 64 | 0];
-    }
-    return id;
-};
-// src/createAsyncThunk.ts
-var commonProperties = [
-    "name",
-    "message",
-    "stack",
-    "code"
-];
-var RejectWithValue = /** @class */ (function () {
-    function RejectWithValue(payload, meta) {
-        this.payload = payload;
-        this.meta = meta;
-    }
-    return RejectWithValue;
-}());
-var FulfillWithMeta = /** @class */ (function () {
-    function FulfillWithMeta(payload, meta) {
-        this.payload = payload;
-        this.meta = meta;
-    }
-    return FulfillWithMeta;
-}());
-var miniSerializeError = function (value) {
-    if (typeof value === "object" && value !== null) {
-        var simpleError = {};
-        for (var _i = 0, commonProperties_1 = commonProperties; _i < commonProperties_1.length; _i++) {
-            var property = commonProperties_1[_i];
-            if (typeof value[property] === "string") {
-                simpleError[property] = value[property];
+          }
+          return result;
+        } else if (!isDraftable(previousState)) {
+          const result = caseReducer(previousState, action);
+          if (result === void 0) {
+            if (previousState === null) {
+              return previousState;
             }
+            throw Error("A case reducer on a non-draftable value must not return undefined");
+          }
+          return result;
+        } else {
+          return produce(previousState, (draft) => {
+            return caseReducer(draft, action);
+          });
         }
-        return simpleError;
-    }
-    return { message: String(value) };
-};
-((function () {
-    function createAsyncThunk2(typePrefix, payloadCreator, options) {
-        var fulfilled = createAction(typePrefix + "/fulfilled", function (payload, requestId, arg, meta) { return ({
-            payload: payload,
-            meta: __spreadProps(__spreadValues({}, meta || {}), {
-                arg: arg,
-                requestId: requestId,
-                requestStatus: "fulfilled"
-            })
-        }); });
-        var pending = createAction(typePrefix + "/pending", function (requestId, arg, meta) { return ({
-            payload: void 0,
-            meta: __spreadProps(__spreadValues({}, meta || {}), {
-                arg: arg,
-                requestId: requestId,
-                requestStatus: "pending"
-            })
-        }); });
-        var rejected = createAction(typePrefix + "/rejected", function (error, requestId, arg, payload, meta) { return ({
-            payload: payload,
-            error: (options && options.serializeError || miniSerializeError)(error || "Rejected"),
-            meta: __spreadProps(__spreadValues({}, meta || {}), {
-                arg: arg,
-                requestId: requestId,
-                rejectedWithValue: !!payload,
-                requestStatus: "rejected",
-                aborted: (error == null ? void 0 : error.name) === "AbortError",
-                condition: (error == null ? void 0 : error.name) === "ConditionError"
-            })
-        }); });
-        var AC = typeof AbortController !== "undefined" ? AbortController : /** @class */ (function () {
-            function class_1() {
-                this.signal = {
-                    aborted: false,
-                    addEventListener: function () {
-                    },
-                    dispatchEvent: function () {
-                        return false;
-                    },
-                    onabort: function () {
-                    },
-                    removeEventListener: function () {
-                    },
-                    reason: void 0,
-                    throwIfAborted: function () {
-                    }
-                };
-            }
-            class_1.prototype.abort = function () {
-            };
-            return class_1;
-        }());
-        function actionCreator(arg) {
-            return function (dispatch, getState, extra) {
-                var requestId = (options == null ? void 0 : options.idGenerator) ? options.idGenerator(arg) : nanoid();
-                var abortController = new AC();
-                var abortReason;
-                function abort(reason) {
-                    abortReason = reason;
-                    abortController.abort();
-                }
-                var promise2 = function () {
-                    return __async(this, null, function () {
-                        var _a, _b, finalAction, conditionResult, abortedPromise, err_1, skipDispatch;
-                        return __generator(this, function (_c) {
-                            switch (_c.label) {
-                                case 0:
-                                    _c.trys.push([0, 4, , 5]);
-                                    conditionResult = (_a = options == null ? void 0 : options.condition) == null ? void 0 : _a.call(options, arg, { getState: getState, extra: extra });
-                                    if (!isThenable(conditionResult)) return [3 /*break*/, 2];
-                                    return [4 /*yield*/, conditionResult];
-                                case 1:
-                                    conditionResult = _c.sent();
-                                    _c.label = 2;
-                                case 2:
-                                    if (conditionResult === false || abortController.signal.aborted) {
-                                        throw {
-                                            name: "ConditionError",
-                                            message: "Aborted due to condition callback returning false."
-                                        };
-                                    }
-                                    abortedPromise = new Promise(function (_, reject) { return abortController.signal.addEventListener("abort", function () { return reject({
-                                        name: "AbortError",
-                                        message: abortReason || "Aborted"
-                                    }); }); });
-                                    dispatch(pending(requestId, arg, (_b = options == null ? void 0 : options.getPendingMeta) == null ? void 0 : _b.call(options, { requestId: requestId, arg: arg }, { getState: getState, extra: extra })));
-                                    return [4 /*yield*/, Promise.race([
-                                            abortedPromise,
-                                            Promise.resolve(payloadCreator(arg, {
-                                                dispatch: dispatch,
-                                                getState: getState,
-                                                extra: extra,
-                                                requestId: requestId,
-                                                signal: abortController.signal,
-                                                abort: abort,
-                                                rejectWithValue: function (value, meta) {
-                                                    return new RejectWithValue(value, meta);
-                                                },
-                                                fulfillWithValue: function (value, meta) {
-                                                    return new FulfillWithMeta(value, meta);
-                                                }
-                                            })).then(function (result) {
-                                                if (result instanceof RejectWithValue) {
-                                                    throw result;
-                                                }
-                                                if (result instanceof FulfillWithMeta) {
-                                                    return fulfilled(result.payload, requestId, arg, result.meta);
-                                                }
-                                                return fulfilled(result, requestId, arg);
-                                            })
-                                        ])];
-                                case 3:
-                                    finalAction = _c.sent();
-                                    return [3 /*break*/, 5];
-                                case 4:
-                                    err_1 = _c.sent();
-                                    finalAction = err_1 instanceof RejectWithValue ? rejected(null, requestId, arg, err_1.payload, err_1.meta) : rejected(err_1, requestId, arg);
-                                    return [3 /*break*/, 5];
-                                case 5:
-                                    skipDispatch = options && !options.dispatchConditionRejection && rejected.match(finalAction) && finalAction.meta.condition;
-                                    if (!skipDispatch) {
-                                        dispatch(finalAction);
-                                    }
-                                    return [2 /*return*/, finalAction];
-                            }
-                        });
-                    });
-                }();
-                return Object.assign(promise2, {
-                    abort: abort,
-                    requestId: requestId,
-                    arg: arg,
-                    unwrap: function () {
-                        return promise2.then(unwrapResult);
-                    }
-                });
-            };
-        }
-        return Object.assign(actionCreator, {
-            pending: pending,
-            rejected: rejected,
-            fulfilled: fulfilled,
-            typePrefix: typePrefix
-        });
-    }
-    createAsyncThunk2.withTypes = function () { return createAsyncThunk2; };
-    return createAsyncThunk2;
-}))();
-function unwrapResult(action) {
-    if (action.meta && action.meta.rejectedWithValue) {
-        throw action.payload;
-    }
-    if (action.error) {
-        throw action.error;
-    }
-    return action.payload;
+      }
+      return previousState;
+    }, state);
+  }
+  reducer.getInitialState = getInitialState;
+  return reducer;
 }
-function isThenable(value) {
-    return value !== null && typeof value === "object" && typeof value.then === "function";
+
+// src/formatProdErrorMessage.ts
+function formatProdErrorMessage(code) {
+  return `Minified Redux Toolkit error #${code}; visit https://redux-toolkit.js.org/Errors?code=${code} for the full message or use the non-minified dev environment for full errors. `;
 }
-var alm = "listenerMiddleware";
-createAction(alm + "/add");
-createAction(alm + "/removeAll");
-createAction(alm + "/remove");
-var promise;
-typeof queueMicrotask === "function" ? queueMicrotask.bind(typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : globalThis) : function (cb) { return (promise || (promise = Promise.resolve())).then(cb).catch(function (err) { return setTimeout(function () {
-    throw err;
-}, 0); }); };
-// src/index.ts
-F();
 
 /*
  * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
@@ -716,7 +1188,7 @@ LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
 OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 PERFORMANCE OF THIS SOFTWARE.
 ***************************************************************************** */
-/* global Reflect, Promise */
+/* global Reflect, Promise, SuppressedError, Symbol, Iterator */
 
 
 var __assign = function() {
@@ -728,6 +1200,11 @@ var __assign = function() {
         return t;
     };
     return __assign.apply(this, arguments);
+};
+
+typeof SuppressedError === "function" ? SuppressedError : function (error, suppressed, message) {
+    var e = new Error(message);
+    return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
 };
 
 function ToolPanelAccordion(props) {
@@ -811,34 +1288,112 @@ function _extends() {
   return _extends.apply(this, arguments);
 }
 
-function composeClasses(slots, getUtilityClass, classes) {
+/**
+ * Add keys, values of `defaultProps` that does not exist in `props`
+ * @param {object} defaultProps
+ * @param {object} props
+ * @returns {object} resolved props
+ */
+function resolveProps(defaultProps, props) {
+  const output = _extends({}, props);
+  Object.keys(defaultProps).forEach(propName => {
+    if (propName.toString().match(/^(components|slots)$/)) {
+      output[propName] = _extends({}, defaultProps[propName], output[propName]);
+    } else if (propName.toString().match(/^(componentsProps|slotProps)$/)) {
+      const defaultSlotProps = defaultProps[propName] || {};
+      const slotProps = props[propName];
+      output[propName] = {};
+      if (!slotProps || !Object.keys(slotProps)) {
+        // Reduce the iteration if the slot props is empty
+        output[propName] = defaultSlotProps;
+      } else if (!defaultSlotProps || !Object.keys(defaultSlotProps)) {
+        // Reduce the iteration if the default slot props is empty
+        output[propName] = slotProps;
+      } else {
+        output[propName] = _extends({}, slotProps);
+        Object.keys(defaultSlotProps).forEach(slotPropName => {
+          output[propName][slotPropName] = resolveProps(defaultSlotProps[slotPropName], slotProps[slotPropName]);
+        });
+      }
+    } else if (output[propName] === undefined) {
+      output[propName] = defaultProps[propName];
+    }
+  });
+  return output;
+}
+
+function composeClasses(slots, getUtilityClass, classes = undefined) {
   const output = {};
-  Object.keys(slots).forEach( // `Objet.keys(slots)` can't be wider than `T` because we infer `T` from `slots`.
+  Object.keys(slots).forEach(
+  // `Object.keys(slots)` can't be wider than `T` because we infer `T` from `slots`.
   // @ts-expect-error https://github.com/microsoft/TypeScript/pull/12253#issuecomment-263132208
   slot => {
     output[slot] = slots[slot].reduce((acc, key) => {
       if (key) {
-        acc.push(getUtilityClass(key));
-
+        const utilityClass = getUtilityClass(key);
+        if (utilityClass !== '') {
+          acc.push(utilityClass);
+        }
         if (classes && classes[key]) {
           acc.push(classes[key]);
         }
       }
-
       return acc;
     }, []).join(' ');
   });
   return output;
 }
 
+const defaultGenerator = componentName => componentName;
+const createClassNameGenerator = () => {
+  let generate = defaultGenerator;
+  return {
+    configure(generator) {
+      generate = generator;
+    },
+    generate(componentName) {
+      return generate(componentName);
+    },
+    reset() {
+      generate = defaultGenerator;
+    }
+  };
+};
+const ClassNameGenerator = createClassNameGenerator();
+
+const globalStateClasses = {
+  active: 'active',
+  checked: 'checked',
+  completed: 'completed',
+  disabled: 'disabled',
+  error: 'error',
+  expanded: 'expanded',
+  focused: 'focused',
+  focusVisible: 'focusVisible',
+  open: 'open',
+  readOnly: 'readOnly',
+  required: 'required',
+  selected: 'selected'
+};
+function generateUtilityClass(componentName, slot, globalStatePrefix = 'Mui') {
+  const globalStateClass = globalStateClasses[slot];
+  return globalStateClass ? `${globalStatePrefix}-${globalStateClass}` : `${ClassNameGenerator.generate(componentName)}-${slot}`;
+}
+
+function generateUtilityClasses(componentName, slots, globalStatePrefix = 'Mui') {
+  const result = {};
+  slots.forEach(slot => {
+    result[slot] = generateUtilityClass(componentName, slot, globalStatePrefix);
+  });
+  return result;
+}
+
 function getLoadingButtonUtilityClass(slot) {
   return generateUtilityClass('MuiLoadingButton', slot);
 }
 const loadingButtonClasses = generateUtilityClasses('MuiLoadingButton', ['root', 'loading', 'loadingIndicator', 'loadingIndicatorCenter', 'loadingIndicatorStart', 'loadingIndicatorEnd', 'endIconLoadingEnd', 'startIconLoadingStart']);
-var loadingButtonClasses$1 = loadingButtonClasses;
 
 const _excluded = ["children", "disabled", "id", "loading", "loadingIndicator", "loadingPosition", "variant"];
-
 const useUtilityClasses = ownerState => {
   const {
     loading,
@@ -853,27 +1408,26 @@ const useUtilityClasses = ownerState => {
   };
   const composedClasses = composeClasses(slots, getLoadingButtonUtilityClass, classes);
   return _extends({}, classes, composedClasses);
-}; // TODO use `import { rootShouldForwardProp } from '../styles/styled';` once move to core
+};
 
-
+// TODO use `import { rootShouldForwardProp } from '../styles/styled';` once move to core
 const rootShouldForwardProp = prop => prop !== 'ownerState' && prop !== 'theme' && prop !== 'sx' && prop !== 'as' && prop !== 'classes';
-
 const LoadingButtonRoot = styled(Button, {
   shouldForwardProp: prop => rootShouldForwardProp(prop) || prop === 'classes',
   name: 'MuiLoadingButton',
   slot: 'Root',
   overridesResolver: (props, styles) => {
     return [styles.root, styles.startIconLoadingStart && {
-      [`& .${loadingButtonClasses$1.startIconLoadingStart}`]: styles.startIconLoadingStart
+      [`& .${loadingButtonClasses.startIconLoadingStart}`]: styles.startIconLoadingStart
     }, styles.endIconLoadingEnd && {
-      [`& .${loadingButtonClasses$1.endIconLoadingEnd}`]: styles.endIconLoadingEnd
+      [`& .${loadingButtonClasses.endIconLoadingEnd}`]: styles.endIconLoadingEnd
     }];
   }
 })(({
   ownerState,
   theme
 }) => _extends({
-  [`& .${loadingButtonClasses$1.startIconLoadingStart}, & .${loadingButtonClasses$1.endIconLoadingEnd}`]: {
+  [`& .${loadingButtonClasses.startIconLoadingStart}, & .${loadingButtonClasses.endIconLoadingEnd}`]: {
     transition: theme.transitions.create(['opacity'], {
       duration: theme.transitions.duration.short
     }),
@@ -883,11 +1437,11 @@ const LoadingButtonRoot = styled(Button, {
   transition: theme.transitions.create(['background-color', 'box-shadow', 'border-color'], {
     duration: theme.transitions.duration.short
   }),
-  [`&.${loadingButtonClasses$1.loading}`]: {
+  [`&.${loadingButtonClasses.loading}`]: {
     color: 'transparent'
   }
 }, ownerState.loadingPosition === 'start' && ownerState.fullWidth && {
-  [`& .${loadingButtonClasses$1.startIconLoadingStart}, & .${loadingButtonClasses$1.endIconLoadingEnd}`]: {
+  [`& .${loadingButtonClasses.startIconLoadingStart}, & .${loadingButtonClasses.endIconLoadingEnd}`]: {
     transition: theme.transitions.create(['opacity'], {
       duration: theme.transitions.duration.short
     }),
@@ -895,7 +1449,7 @@ const LoadingButtonRoot = styled(Button, {
     marginRight: -8
   }
 }, ownerState.loadingPosition === 'end' && ownerState.fullWidth && {
-  [`& .${loadingButtonClasses$1.startIconLoadingStart}, & .${loadingButtonClasses$1.endIconLoadingEnd}`]: {
+  [`& .${loadingButtonClasses.startIconLoadingStart}, & .${loadingButtonClasses.endIconLoadingEnd}`]: {
     transition: theme.transitions.create(['opacity'], {
       duration: theme.transitions.duration.short
     }),
@@ -903,7 +1457,7 @@ const LoadingButtonRoot = styled(Button, {
     marginLeft: -8
   }
 }));
-const LoadingButtonLoadingIndicator = styled('div', {
+const LoadingButtonLoadingIndicator = styled('span', {
   name: 'MuiLoadingButton',
   slot: 'LoadingIndicator',
   overridesResolver: (props, styles) => {
@@ -939,29 +1493,28 @@ const LoadingButtonLoadingIndicator = styled('div', {
   right: -10
 }));
 const LoadingButton = /*#__PURE__*/React.forwardRef(function LoadingButton(inProps, ref) {
-  const props = useThemeProps({
-    props: inProps,
+  const contextProps = React.useContext(ButtonGroupContext);
+  const resolvedProps = resolveProps(contextProps, inProps);
+  const props = useDefaultProps({
+    props: resolvedProps,
     name: 'MuiLoadingButton'
   });
-
   const {
-    children,
-    disabled = false,
-    id: idProp,
-    loading = false,
-    loadingIndicator: loadingIndicatorProp,
-    loadingPosition = 'center',
-    variant = 'text'
-  } = props,
-        other = _objectWithoutPropertiesLoose(props, _excluded);
-
+      children,
+      disabled = false,
+      id: idProp,
+      loading = false,
+      loadingIndicator: loadingIndicatorProp,
+      loadingPosition = 'center',
+      variant = 'text'
+    } = props,
+    other = _objectWithoutPropertiesLoose(props, _excluded);
   const id = unstable_useId(idProp);
   const loadingIndicator = loadingIndicatorProp != null ? loadingIndicatorProp : /*#__PURE__*/jsxRuntimeExports.jsx(CircularProgress, {
     "aria-labelledby": id,
     color: "inherit",
     size: 16
   });
-
   const ownerState = _extends({}, props, {
     disabled,
     loading,
@@ -969,7 +1522,6 @@ const LoadingButton = /*#__PURE__*/React.forwardRef(function LoadingButton(inPro
     loadingPosition,
     variant
   });
-
   const classes = useUtilityClasses(ownerState);
   const loadingButtonLoadingIndicator = loading ? /*#__PURE__*/jsxRuntimeExports.jsx(LoadingButtonLoadingIndicator, {
     className: classes.loadingIndicator,
@@ -987,7 +1539,6 @@ const LoadingButton = /*#__PURE__*/React.forwardRef(function LoadingButton(inPro
     children: [ownerState.loadingPosition === 'end' ? children : loadingButtonLoadingIndicator, ownerState.loadingPosition === 'end' ? loadingButtonLoadingIndicator : children]
   }));
 });
-var LoadingButton$1 = LoadingButton;
 
 function ContentUpload(props) {
     var _a;
@@ -1123,7 +1674,7 @@ function ContentUpload(props) {
                             }
                         }); }, children: jsxRuntimeExports.jsx("input", { ref: inputRef, type: "file", accept: ".xml", onChange: onFileChange, onClick: function () {
                                 inputRef.current.value = null;
-                            } }) })] }), jsxRuntimeExports.jsx(DialogFooter, { children: jsxRuntimeExports.jsx(LoadingButton$1, { variant: "contained", onClick: handleUploadXMLFile, loading: processing, disabled: !content, loadingPosition: "start", sx: { minWidth: '130px' }, children: "Upload Content" }) })] }));
+                            } }) })] }), jsxRuntimeExports.jsx(DialogFooter, { children: jsxRuntimeExports.jsx(LoadingButton, { variant: "contained", onClick: handleUploadXMLFile, loading: processing, disabled: !content, loadingPosition: "start", sx: { minWidth: '130px' }, children: "Upload Content" }) })] }));
 }
 
 var CONTENT_UPLOAD_DEFAULTS = {
@@ -1212,7 +1763,7 @@ function OpenContentUploadToolbarButton(props) {
  */
 
 const useSelection =
-  useSelector ;
+  import.meta.env.NODE_ENV === 'production' ? useSelector : (selector, equalityFn) => useSelector(selector, equalityFn);
 
 /*
  * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
@@ -1387,7 +1938,7 @@ const completeDetailedItem = /*#__PURE__*/ createAction('COMPLETE_DETAILED_ITEM'
 function useDetailedItem(path) {
   const dispatch = useDispatch();
   const itemsByPath = useSelection((state) => state.content.itemsByPath);
-  const item = path ? lookupItemByPath(path, itemsByPath) : null;
+  const item = lookupItemByPath(path, itemsByPath) ;
   const beingFetching = useSelection((state) => state.content.itemsBeingFetchedByPath[path]);
   useEffect(() => {
     if (nou(item) && path && beingFetching === undefined) {
@@ -1420,17 +1971,18 @@ const initialState = {
   open: false,
   error: null
 };
-createReducer(initialState, {
-  [showErrorDialog.type]: (state, { payload }) =>
-    Object.assign(
-      Object.assign(
-        { onClose: closeErrorDialog(), onClosed: errorDialogClosed(), onDismiss: closeErrorDialog() },
-        payload
-      ),
-      { open: true }
-    ),
-  [closeErrorDialog.type]: (state) => Object.assign(Object.assign({}, state), { open: false }),
-  [errorDialogClosed.type]: () => initialState
+createReducer(initialState, (builder) => {
+  builder
+    .addCase(showErrorDialog, (state, { payload }) => ({
+      onClose: closeErrorDialog(),
+      onClosed: errorDialogClosed(),
+      onDismiss: closeErrorDialog(),
+      error: null,
+      ...payload,
+      open: true
+    }))
+    .addCase(closeErrorDialog, (state) => ({ ...state, open: false }))
+    .addCase(errorDialogClosed, (state) => initialState);
 });
 
 // for 4.1.x since `@craftercms/studio-ui/PathSelector` is not a valid component
@@ -1520,7 +2072,7 @@ function BulkPublishView(props) {
                         } }), jsxRuntimeExports.jsx(Typography, { variant: "body1", sx: {
                             maxWidth: '470px',
                             textAlign: 'center'
-                        }, children: jsxRuntimeExports.jsx(FormattedMessage, { id: "publishOnDemand.noInitialPublish", defaultMessage: "The project needs to undergo its initial publish before other publishing options become available" }) }), hasPublishPermission && (jsxRuntimeExports.jsx(LoadingButton$1, { variant: "contained", color: "primary", onClick: onInitialPublish, children: jsxRuntimeExports.jsx(FormattedMessage, { id: "publishOnDemand.publishEntireProject", defaultMessage: "Publish Entire Project" }) }))] })) }) }));
+                        }, children: jsxRuntimeExports.jsx(FormattedMessage, { id: "publishOnDemand.noInitialPublish", defaultMessage: "The project needs to undergo its initial publish before other publishing options become available" }) }), hasPublishPermission && (jsxRuntimeExports.jsx(LoadingButton, { variant: "contained", color: "primary", onClick: onInitialPublish, children: jsxRuntimeExports.jsx(FormattedMessage, { id: "publishOnDemand.publishEntireProject", defaultMessage: "Publish Entire Project" }) }))] })) }) }));
 }
 
 function OpenBulkPublishPanelButton(props) {
