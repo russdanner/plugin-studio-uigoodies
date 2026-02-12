@@ -19,10 +19,7 @@ import { FormattedMessage } from 'react-intl';
 import { useDispatch } from 'react-redux';
 import { of } from 'rxjs';
 import { expand, toArray, concatMap } from 'rxjs/operators';
-import {
-  closePublishDialog,
-  showPublishDialog
-} from '@craftercms/studio-ui/state/actions/dialogs';
+import { closePublishDialog, showPublishDialog } from '@craftercms/studio-ui/state/actions/dialogs';
 import { fetchUnpublished } from '@craftercms/studio-ui/services/dashboard';
 import { batchActions, dispatchDOMEvent } from '@craftercms/studio-ui/state/actions/misc';
 import { createCustomDocumentEventListener } from '@craftercms/studio-ui/utils/dom';
@@ -33,12 +30,7 @@ import { showSystemNotification, showPublishItemSuccessNotification } from '@cra
 import { showErrorDialog } from '@craftercms/studio-ui/state/reducers/dialogs/error';
 import useActiveSiteId from '@craftercms/studio-ui/hooks/useActiveSiteId';
 import { useTheme } from '@mui/material/styles';
-import {
-  Paper,
-  Box,
-  Typography,
-  Button
-} from '@mui/material';
+import { Paper, Box, Typography, Button } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { DialogBody, DialogFooter } from '@craftercms/studio-ui';
@@ -53,7 +45,7 @@ const FETCH_UNPUBLISHED_ITEMS_LIMIT = 100;
 
 export interface BulkPublishViewProps {
   defaultPath: string;
-};
+}
 
 export function BulkPublishView(props: Readonly<BulkPublishViewProps>) {
   const dispatch = useDispatch();
@@ -83,38 +75,41 @@ export function BulkPublishView(props: Readonly<BulkPublishViewProps>) {
 
     const fetchItems = (offset) => fetchUnpublished(siteId, { limit: FETCH_UNPUBLISHED_ITEMS_LIMIT, offset });
     const itemsByPath = [];
-    of(0).pipe(
-      concatMap(offset => fetchItems(offset)),
-      expand(data => {
-        itemsByPath.push(...data.filter(item => item.path.startsWith(selectedPath)));
-        return data.total > data.limit + data.offset ? fetchItems(data.limit + data.offset) : of()
-      }),
-      toArray()
-    ).subscribe({
-      complete: () => {
-        if (itemsByPath.length === 0) {
+    of(0)
+      .pipe(
+        concatMap((offset) => fetchItems(offset)),
+        expand((data) => {
+          itemsByPath.push(...data.filter((item) => item.path.startsWith(selectedPath)));
+          return data.total > data.limit + data.offset ? fetchItems(data.limit + data.offset) : of();
+        }),
+        toArray()
+      )
+      .subscribe({
+        complete: () => {
+          if (itemsByPath.length === 0) {
+            dispatch(
+              showSystemNotification({
+                message: 'No items to publish at provided path'
+              })
+            );
+            setIsSubmitting(false);
+            return;
+          }
+
           dispatch(
-            showSystemNotification({
-              message: 'No items to publish at provided path'
+            showPublishDialog({
+              items: itemsByPath,
+              onSuccess: batchActions([
+                showPublishItemSuccessNotification(),
+                closePublishDialog(),
+                dispatchDOMEvent({ id: customEventId, type: 'publish' })
+              ]),
+              onClosed: dispatchDOMEvent({ id: customEventId, type: 'cancel' })
             })
           );
           setIsSubmitting(false);
-          return;
         }
-
-        dispatch(
-          showPublishDialog({
-            items: itemsByPath,
-            onSuccess: batchActions([
-              showPublishItemSuccessNotification(),
-              closePublishDialog(),
-              dispatchDOMEvent({ id: customEventId, type: 'publish' })
-            ]),
-            onClosed: dispatchDOMEvent({ id: customEventId, type: 'cancel' })
-          })
-        );
-        setIsSubmitting(false);
-      }});
+      });
   };
 
   const onInitialPublish = () => {
@@ -136,79 +131,82 @@ export function BulkPublishView(props: Readonly<BulkPublishViewProps>) {
   };
 
   if (hasInitialPublish === null) {
-    return (
-      <Paper elevation={2} sx={{ height: '100%' }} />
-    )
+    return <Paper elevation={2} sx={{ height: '100%' }} />;
   }
 
   return (
     <Paper elevation={2} sx={{ height: '100%' }}>
-        <Box sx={{ p: 1 }}>
-          {hasInitialPublish ? (
-            <>
-              <DialogBody sx={{ minHeight: '24vh', minWidth: '48vh' }}>
-                <Typography
-                  variant="body1"
-                  sx={{
-                    paddingBottom: 2,
-                    float: 'left',
-                  }}
-                >
-                  Select a path to calculate publish packages.
-                </Typography>
-                <Box sx={{ paddingBottom: 1 }}>
-                  <PathSelector value={selectedPath} disabled={false} onPathSelected={onPathSelected} stripXmlIndex={false} />
-                </Box>
-              </DialogBody>
-              <DialogFooter>
-                <Button
-                  sx={{ float: 'right' }}
-                  variant="contained"
-                  color="primary"
-                  disabled={isSubmitting}
-                  onClick={onSubmitBulkPublish}
-                >
-                  Bulk Publish
-                </Button>
-              </DialogFooter>
-            </>
-          ) : (
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                flexDirection: 'column',
-                rowGap: theme.spacing(2),
-                padding: theme.spacing(5)
-              }}
-            >
-              <InfoOutlinedIcon
-                sx={{
-                  color: theme.palette.text.secondary,
-                  fontSize: '1.75rem'
-                }}
-              />
+      <Box sx={{ p: 1 }}>
+        {hasInitialPublish ? (
+          <>
+            <DialogBody sx={{ minHeight: '24vh', minWidth: '48vh' }}>
               <Typography
                 variant="body1"
                 sx={{
-                  maxWidth: '470px',
-                  textAlign: 'center'
+                  paddingBottom: 2,
+                  float: 'left'
                 }}
               >
-                <FormattedMessage
-                  id="publishOnDemand.noInitialPublish"
-                  defaultMessage="The project needs to undergo its initial publish before other publishing options become available"
-                />
+                Select a path to calculate publish packages.
               </Typography>
-              {hasPublishPermission && (
-                <LoadingButton variant="contained" color="primary" onClick={onInitialPublish}>
-                  <FormattedMessage id="publishOnDemand.publishEntireProject" defaultMessage="Publish Entire Project" />
-                </LoadingButton>
-              )}
-            </Box>
-          )}
-        </Box>
-      </Paper>
+              <Box sx={{ paddingBottom: 1 }}>
+                <PathSelector
+                  value={selectedPath}
+                  disabled={false}
+                  onPathSelected={onPathSelected}
+                  stripXmlIndex={false}
+                />
+              </Box>
+            </DialogBody>
+            <DialogFooter>
+              <Button
+                sx={{ float: 'right' }}
+                variant="contained"
+                color="primary"
+                disabled={isSubmitting}
+                onClick={onSubmitBulkPublish}
+              >
+                Bulk Publish
+              </Button>
+            </DialogFooter>
+          </>
+        ) : (
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              flexDirection: 'column',
+              rowGap: theme.spacing(2),
+              padding: theme.spacing(5)
+            }}
+          >
+            <InfoOutlinedIcon
+              sx={{
+                color: theme.palette.text.secondary,
+                fontSize: '1.75rem'
+              }}
+            />
+            <Typography
+              variant="body1"
+              sx={{
+                maxWidth: '470px',
+                textAlign: 'center'
+              }}
+            >
+              <FormattedMessage
+                id="publishOnDemand.noInitialPublish"
+                defaultMessage="The project needs to undergo its initial publish before other publishing options become available"
+              />
+            </Typography>
+            {hasPublishPermission && (
+              <LoadingButton variant="contained" color="primary" onClick={onInitialPublish}>
+                <FormattedMessage id="publishOnDemand.publishEntireProject" defaultMessage="Publish Entire Project" />
+              </LoadingButton>
+            )}
+          </Box>
+        )}
+      </Box>
+    </Paper>
   );
 }
 
