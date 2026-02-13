@@ -31,11 +31,11 @@ import { showErrorDialog } from '@craftercms/studio-ui/state/reducers/dialogs/er
 import useActiveSiteId from '@craftercms/studio-ui/hooks/useActiveSiteId';
 import { useTheme } from '@mui/material/styles';
 import { Paper, Box, Typography, Button } from '@mui/material';
-import LoadingButton from '@mui/lab/LoadingButton';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { DialogBody, DialogFooter } from '@craftercms/studio-ui';
 
 import { BULK_PUBLISH_DEFAULTS } from '../utils';
+import MyLoadingButton from './MyLoadingButton';
 
 // for 4.1.x since `@craftercms/studio-ui/PathSelector` is not a valid component
 // @ts-ignore
@@ -199,9 +199,9 @@ export function BulkPublishView(props: Readonly<BulkPublishViewProps>) {
               />
             </Typography>
             {hasPublishPermission && (
-              <LoadingButton variant="contained" color="primary" onClick={onInitialPublish}>
+              <MyLoadingButton loading={false} variant="contained" color="primary" onClick={onInitialPublish}>
                 <FormattedMessage id="publishOnDemand.publishEntireProject" defaultMessage="Publish Entire Project" />
-              </LoadingButton>
+              </MyLoadingButton>
             )}
           </Box>
         )}

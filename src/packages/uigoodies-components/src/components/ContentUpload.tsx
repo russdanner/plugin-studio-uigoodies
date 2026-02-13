@@ -29,11 +29,11 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
-import LoadingButton from '@mui/lab/LoadingButton';
 import { writeContent } from '@craftercms/studio-ui/services/content';
 import useActiveSiteId from '@craftercms/studio-ui/hooks/useActiveSiteId';
 import { DialogFooter } from '@craftercms/studio-ui/components';
 import { alpha } from '@mui/material';
+import MyLoadingButton from './MyLoadingButton';
 
 export interface ContentUploadProps {
   defaultPath: string;
@@ -233,16 +233,15 @@ export function ContentUpload(props: ContentUploadProps) {
         </Box>
       </Container>
       <DialogFooter>
-        <LoadingButton
+        <MyLoadingButton
           variant="contained"
           onClick={handleUploadXMLFile}
           loading={processing}
           disabled={!content}
-          loadingPosition="start"
           sx={{ minWidth: '130px' }}
         >
           Upload Content
-        </LoadingButton>
+        </MyLoadingButton>
       </DialogFooter>
     </>
   );
