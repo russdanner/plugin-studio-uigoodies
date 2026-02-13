@@ -49,6 +49,7 @@ module.exports = {
     replace({
       preventAssignment: true,
       'process.env.NODE_ENV': JSON.stringify('production'),
+      'import.meta.env.NODE_ENV': JSON.stringify('production'),
       'import.meta.env.MODE': JSON.stringify('production')
     }),
     typescript({ tsconfig: './tsconfig.json', compilerOptions: { noEmit: false, outDir: 'dist' } }),
@@ -61,7 +62,10 @@ module.exports = {
     {
       name: 'copy-and-clean',
       closeBundle() {
-        cpSync('./dist/index.js', '../../../authoring/static-assets/plugins/org/rd/plugin/uigoodies/apps/uigoodies/index.js');
+        cpSync(
+          './dist/index.js',
+          '../../../authoring/static-assets/plugins/org/rd/plugin/uigoodies/apps/uigoodies/index.js'
+        );
         rmSync('./build', { recursive: true, force: true });
         rmSync('./dist', { recursive: true, force: true });
       }
