@@ -2,7 +2,7 @@ const React = craftercms.libs.React;
 const { useState, useRef, useEffect } = craftercms.libs.React;
 const React__default = craftercms.libs.React && Object.prototype.hasOwnProperty.call(craftercms.libs.React, 'default') ? craftercms.libs.React['default'] : craftercms.libs.React;
 const { useSelector, useDispatch } = craftercms.libs.ReactRedux;
-const { Tooltip, useTheme, accordionClasses, accordionSummaryClasses, Accordion, AccordionSummary, Typography, AccordionDetails, alpha, Button: Button$1, buttonClasses, Backdrop, CircularProgress: CircularProgress$1, Alert, Paper, Box: Box$1, AlertTitle } = craftercms.libs.MaterialUI;
+const { Tooltip, useTheme, accordionClasses, accordionSummaryClasses, Accordion, AccordionSummary, Typography, AccordionDetails, Button: Button$1, CircularProgress, alpha, buttonClasses, Backdrop, Alert, Paper, Box: Box$1, AlertTitle } = craftercms.libs.MaterialUI;
 const IconButton = craftercms.libs.MaterialUI.IconButton && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.IconButton, 'default') ? craftercms.libs.MaterialUI.IconButton['default'] : craftercms.libs.MaterialUI.IconButton;
 const Button = craftercms.libs.MaterialUI.Button && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Button, 'default') ? craftercms.libs.MaterialUI.Button['default'] : craftercms.libs.MaterialUI.Button;
 const SystemIcon = craftercms.components.SystemIcon && Object.prototype.hasOwnProperty.call(craftercms.components.SystemIcon, 'default') ? craftercms.components.SystemIcon['default'] : craftercms.components.SystemIcon;
@@ -15,11 +15,6 @@ const Container = craftercms.libs.MaterialUI.Container && Object.prototype.hasOw
 const Box = craftercms.libs.MaterialUI.Box && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Box, 'default') ? craftercms.libs.MaterialUI.Box['default'] : craftercms.libs.MaterialUI.Box;
 const { writeContent } = craftercms.services.content;
 const { DialogFooter, PathNavigator } = craftercms.components;
-const { unstable_useId, capitalize } = craftercms.libs.MaterialUI;
-const { styled, useTheme: useTheme$1 } = craftercms.libs.MaterialUI;
-const { useDefaultProps } = craftercms.libs.MaterialUI.DefaultPropsProvider;
-const { ButtonGroupContext } = craftercms.libs.MaterialUI.ButtonGroup;
-const CircularProgress = craftercms.libs.MaterialUI.CircularProgress && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.CircularProgress, 'default') ? craftercms.libs.MaterialUI.CircularProgress['default'] : craftercms.libs.MaterialUI.CircularProgress;
 const ToolsPanelListItemButton = craftercms.components.ToolsPanelListItemButton && Object.prototype.hasOwnProperty.call(craftercms.components.ToolsPanelListItemButton, 'default') ? craftercms.components.ToolsPanelListItemButton['default'] : craftercms.components.ToolsPanelListItemButton;
 const Tooltip$1 = craftercms.libs.MaterialUI.Tooltip && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Tooltip, 'default') ? craftercms.libs.MaterialUI.Tooltip['default'] : craftercms.libs.MaterialUI.Tooltip;
 const { pull, push } = craftercms.services.repositories;
@@ -33,6 +28,7 @@ const { fetchUnpublished } = craftercms.services.dashboard;
 const { nou } = craftercms.utils.object;
 const { lookupItemByPath } = craftercms.utils.content;
 const { hasInitialPublish } = craftercms.services.sites;
+const { useTheme: useTheme$1 } = craftercms.libs.MaterialUI;
 const InfoOutlinedIcon = craftercms.utils.constants.components.get('@mui/icons-material/InfoOutlined') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/InfoOutlined'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/InfoOutlined')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/InfoOutlined');
 const Menu = craftercms.libs.MaterialUI.Menu && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Menu, 'default') ? craftercms.libs.MaterialUI.Menu['default'] : craftercms.libs.MaterialUI.Menu;
 const MenuItem = craftercms.libs.MaterialUI.MenuItem && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.MenuItem, 'default') ? craftercms.libs.MaterialUI.MenuItem['default'] : craftercms.libs.MaterialUI.MenuItem;
@@ -1201,6 +1197,18 @@ var __assign = function() {
     return __assign.apply(this, arguments);
 };
 
+function __rest(s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+}
+
 typeof SuppressedError === "function" ? SuppressedError : function (error, suppressed, message) {
     var e = new Error(message);
     return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
@@ -1259,285 +1267,10 @@ const batchActions = /*#__PURE__*/ createAction('BATCH_ACTIONS');
 const dispatchDOMEvent = /*#__PURE__*/ createAction('DISPATCH_DOM_EVENT');
 // endregion
 
-function _objectWithoutPropertiesLoose(source, excluded) {
-  if (source == null) return {};
-  var target = {};
-  var sourceKeys = Object.keys(source);
-  var key, i;
-  for (i = 0; i < sourceKeys.length; i++) {
-    key = sourceKeys[i];
-    if (excluded.indexOf(key) >= 0) continue;
-    target[key] = source[key];
-  }
-  return target;
-}
-
-function _extends() {
-  _extends = Object.assign ? Object.assign.bind() : function (target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i];
-      for (var key in source) {
-        if (Object.prototype.hasOwnProperty.call(source, key)) {
-          target[key] = source[key];
-        }
-      }
-    }
-    return target;
-  };
-  return _extends.apply(this, arguments);
-}
-
-/**
- * Add keys, values of `defaultProps` that does not exist in `props`
- * @param {object} defaultProps
- * @param {object} props
- * @returns {object} resolved props
- */
-function resolveProps(defaultProps, props) {
-  const output = _extends({}, props);
-  Object.keys(defaultProps).forEach(propName => {
-    if (propName.toString().match(/^(components|slots)$/)) {
-      output[propName] = _extends({}, defaultProps[propName], output[propName]);
-    } else if (propName.toString().match(/^(componentsProps|slotProps)$/)) {
-      const defaultSlotProps = defaultProps[propName] || {};
-      const slotProps = props[propName];
-      output[propName] = {};
-      if (!slotProps || !Object.keys(slotProps)) {
-        // Reduce the iteration if the slot props is empty
-        output[propName] = defaultSlotProps;
-      } else if (!defaultSlotProps || !Object.keys(defaultSlotProps)) {
-        // Reduce the iteration if the default slot props is empty
-        output[propName] = slotProps;
-      } else {
-        output[propName] = _extends({}, slotProps);
-        Object.keys(defaultSlotProps).forEach(slotPropName => {
-          output[propName][slotPropName] = resolveProps(defaultSlotProps[slotPropName], slotProps[slotPropName]);
-        });
-      }
-    } else if (output[propName] === undefined) {
-      output[propName] = defaultProps[propName];
-    }
-  });
-  return output;
-}
-
-function composeClasses(slots, getUtilityClass, classes = undefined) {
-  const output = {};
-  Object.keys(slots).forEach(
-  // `Object.keys(slots)` can't be wider than `T` because we infer `T` from `slots`.
-  // @ts-expect-error https://github.com/microsoft/TypeScript/pull/12253#issuecomment-263132208
-  slot => {
-    output[slot] = slots[slot].reduce((acc, key) => {
-      if (key) {
-        const utilityClass = getUtilityClass(key);
-        if (utilityClass !== '') {
-          acc.push(utilityClass);
-        }
-        if (classes && classes[key]) {
-          acc.push(classes[key]);
-        }
-      }
-      return acc;
-    }, []).join(' ');
-  });
-  return output;
-}
-
-const defaultGenerator = componentName => componentName;
-const createClassNameGenerator = () => {
-  let generate = defaultGenerator;
-  return {
-    configure(generator) {
-      generate = generator;
-    },
-    generate(componentName) {
-      return generate(componentName);
-    },
-    reset() {
-      generate = defaultGenerator;
-    }
-  };
+var MyLoadingButton = function (props) {
+    var loading = props.loading, children = props.children, rest = __rest(props, ["loading", "children"]);
+    return (jsxRuntimeExports.jsx(Button$1, __assign({ startIcon: loading ? jsxRuntimeExports.jsx(CircularProgress, { size: 16 }) : undefined }, rest, { children: children })));
 };
-const ClassNameGenerator = createClassNameGenerator();
-
-const globalStateClasses = {
-  active: 'active',
-  checked: 'checked',
-  completed: 'completed',
-  disabled: 'disabled',
-  error: 'error',
-  expanded: 'expanded',
-  focused: 'focused',
-  focusVisible: 'focusVisible',
-  open: 'open',
-  readOnly: 'readOnly',
-  required: 'required',
-  selected: 'selected'
-};
-function generateUtilityClass(componentName, slot, globalStatePrefix = 'Mui') {
-  const globalStateClass = globalStateClasses[slot];
-  return globalStateClass ? `${globalStatePrefix}-${globalStateClass}` : `${ClassNameGenerator.generate(componentName)}-${slot}`;
-}
-
-function generateUtilityClasses(componentName, slots, globalStatePrefix = 'Mui') {
-  const result = {};
-  slots.forEach(slot => {
-    result[slot] = generateUtilityClass(componentName, slot, globalStatePrefix);
-  });
-  return result;
-}
-
-function getLoadingButtonUtilityClass(slot) {
-  return generateUtilityClass('MuiLoadingButton', slot);
-}
-const loadingButtonClasses = generateUtilityClasses('MuiLoadingButton', ['root', 'loading', 'loadingIndicator', 'loadingIndicatorCenter', 'loadingIndicatorStart', 'loadingIndicatorEnd', 'endIconLoadingEnd', 'startIconLoadingStart']);
-
-const _excluded = ["children", "disabled", "id", "loading", "loadingIndicator", "loadingPosition", "variant"];
-const useUtilityClasses = ownerState => {
-  const {
-    loading,
-    loadingPosition,
-    classes
-  } = ownerState;
-  const slots = {
-    root: ['root', loading && 'loading'],
-    startIcon: [loading && `startIconLoading${capitalize(loadingPosition)}`],
-    endIcon: [loading && `endIconLoading${capitalize(loadingPosition)}`],
-    loadingIndicator: ['loadingIndicator', loading && `loadingIndicator${capitalize(loadingPosition)}`]
-  };
-  const composedClasses = composeClasses(slots, getLoadingButtonUtilityClass, classes);
-  return _extends({}, classes, composedClasses);
-};
-
-// TODO use `import { rootShouldForwardProp } from '../styles/styled';` once move to core
-const rootShouldForwardProp = prop => prop !== 'ownerState' && prop !== 'theme' && prop !== 'sx' && prop !== 'as' && prop !== 'classes';
-const LoadingButtonRoot = styled(Button, {
-  shouldForwardProp: prop => rootShouldForwardProp(prop) || prop === 'classes',
-  name: 'MuiLoadingButton',
-  slot: 'Root',
-  overridesResolver: (props, styles) => {
-    return [styles.root, styles.startIconLoadingStart && {
-      [`& .${loadingButtonClasses.startIconLoadingStart}`]: styles.startIconLoadingStart
-    }, styles.endIconLoadingEnd && {
-      [`& .${loadingButtonClasses.endIconLoadingEnd}`]: styles.endIconLoadingEnd
-    }];
-  }
-})(({
-  ownerState,
-  theme
-}) => _extends({
-  [`& .${loadingButtonClasses.startIconLoadingStart}, & .${loadingButtonClasses.endIconLoadingEnd}`]: {
-    transition: theme.transitions.create(['opacity'], {
-      duration: theme.transitions.duration.short
-    }),
-    opacity: 0
-  }
-}, ownerState.loadingPosition === 'center' && {
-  transition: theme.transitions.create(['background-color', 'box-shadow', 'border-color'], {
-    duration: theme.transitions.duration.short
-  }),
-  [`&.${loadingButtonClasses.loading}`]: {
-    color: 'transparent'
-  }
-}, ownerState.loadingPosition === 'start' && ownerState.fullWidth && {
-  [`& .${loadingButtonClasses.startIconLoadingStart}, & .${loadingButtonClasses.endIconLoadingEnd}`]: {
-    transition: theme.transitions.create(['opacity'], {
-      duration: theme.transitions.duration.short
-    }),
-    opacity: 0,
-    marginRight: -8
-  }
-}, ownerState.loadingPosition === 'end' && ownerState.fullWidth && {
-  [`& .${loadingButtonClasses.startIconLoadingStart}, & .${loadingButtonClasses.endIconLoadingEnd}`]: {
-    transition: theme.transitions.create(['opacity'], {
-      duration: theme.transitions.duration.short
-    }),
-    opacity: 0,
-    marginLeft: -8
-  }
-}));
-const LoadingButtonLoadingIndicator = styled('span', {
-  name: 'MuiLoadingButton',
-  slot: 'LoadingIndicator',
-  overridesResolver: (props, styles) => {
-    const {
-      ownerState
-    } = props;
-    return [styles.loadingIndicator, styles[`loadingIndicator${capitalize(ownerState.loadingPosition)}`]];
-  }
-})(({
-  theme,
-  ownerState
-}) => _extends({
-  position: 'absolute',
-  visibility: 'visible',
-  display: 'flex'
-}, ownerState.loadingPosition === 'start' && (ownerState.variant === 'outlined' || ownerState.variant === 'contained') && {
-  left: ownerState.size === 'small' ? 10 : 14
-}, ownerState.loadingPosition === 'start' && ownerState.variant === 'text' && {
-  left: 6
-}, ownerState.loadingPosition === 'center' && {
-  left: '50%',
-  transform: 'translate(-50%)',
-  color: (theme.vars || theme).palette.action.disabled
-}, ownerState.loadingPosition === 'end' && (ownerState.variant === 'outlined' || ownerState.variant === 'contained') && {
-  right: ownerState.size === 'small' ? 10 : 14
-}, ownerState.loadingPosition === 'end' && ownerState.variant === 'text' && {
-  right: 6
-}, ownerState.loadingPosition === 'start' && ownerState.fullWidth && {
-  position: 'relative',
-  left: -10
-}, ownerState.loadingPosition === 'end' && ownerState.fullWidth && {
-  position: 'relative',
-  right: -10
-}));
-const LoadingButton = /*#__PURE__*/React.forwardRef(function LoadingButton(inProps, ref) {
-  const contextProps = React.useContext(ButtonGroupContext);
-  const resolvedProps = resolveProps(contextProps, inProps);
-  const props = useDefaultProps({
-    props: resolvedProps,
-    name: 'MuiLoadingButton'
-  });
-  const {
-      children,
-      disabled = false,
-      id: idProp,
-      loading = false,
-      loadingIndicator: loadingIndicatorProp,
-      loadingPosition = 'center',
-      variant = 'text'
-    } = props,
-    other = _objectWithoutPropertiesLoose(props, _excluded);
-  const id = unstable_useId(idProp);
-  const loadingIndicator = loadingIndicatorProp != null ? loadingIndicatorProp : /*#__PURE__*/jsxRuntimeExports.jsx(CircularProgress, {
-    "aria-labelledby": id,
-    color: "inherit",
-    size: 16
-  });
-  const ownerState = _extends({}, props, {
-    disabled,
-    loading,
-    loadingIndicator,
-    loadingPosition,
-    variant
-  });
-  const classes = useUtilityClasses(ownerState);
-  const loadingButtonLoadingIndicator = loading ? /*#__PURE__*/jsxRuntimeExports.jsx(LoadingButtonLoadingIndicator, {
-    className: classes.loadingIndicator,
-    ownerState: ownerState,
-    children: loadingIndicator
-  }) : null;
-  return /*#__PURE__*/jsxRuntimeExports.jsxs(LoadingButtonRoot, _extends({
-    disabled: disabled || loading,
-    id: id,
-    ref: ref
-  }, other, {
-    variant: variant,
-    classes: classes,
-    ownerState: ownerState,
-    children: [ownerState.loadingPosition === 'end' ? children : loadingButtonLoadingIndicator, ownerState.loadingPosition === 'end' ? loadingButtonLoadingIndicator : children]
-  }));
-});
 
 function ContentUpload(props) {
     var _a;
@@ -1675,7 +1408,7 @@ function ContentUpload(props) {
                             }
                         }); }, children: jsxRuntimeExports.jsx("input", { ref: inputRef, type: "file", accept: ".xml", onChange: onFileChange, onClick: function () {
                                 inputRef.current.value = null;
-                            } }) })] }), jsxRuntimeExports.jsx(DialogFooter, { children: jsxRuntimeExports.jsx(LoadingButton, { variant: "contained", onClick: handleUploadXMLFile, loading: processing, disabled: !content, loadingPosition: "start", sx: { minWidth: '130px' }, children: "Upload Content" }) })] }));
+                            } }) })] }), jsxRuntimeExports.jsx(DialogFooter, { children: jsxRuntimeExports.jsx(MyLoadingButton, { variant: "contained", onClick: handleUploadXMLFile, loading: processing, disabled: !content, sx: { minWidth: '130px' }, children: "Upload Content" }) })] }));
 }
 
 var CONTENT_UPLOAD_DEFAULTS = {
@@ -1764,7 +1497,7 @@ function OpenContentUploadToolbarButton(props) {
  */
 
 const useSelection =
-  import.meta.env.NODE_ENV === 'production' ? useSelector : (selector, equalityFn) => useSelector(selector, equalityFn);
+  useSelector ;
 
 /*
  * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
@@ -1878,7 +1611,7 @@ function PullPushRemoteButtons(props) {
         setProgressShow(false);
         setSnackShow(false);
     }
-    return (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [useIcon ? (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [shouldShowButton(enablePull) ? (jsxRuntimeExports.jsx(Tooltip, { title: pullLabel ? pullLabel : "Pull", children: jsxRuntimeExports.jsx(IconButton, { size: "small", onClick: handlePullClick, children: jsxRuntimeExports.jsx(DownloadIcon, {}) }) })) : (jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, {})), shouldShowButton(enablePush) ? (jsxRuntimeExports.jsx(Tooltip, { title: pushLabel ? pushLabel : "Push", children: jsxRuntimeExports.jsx(IconButton, { size: "small", onClick: handlePushClick, children: jsxRuntimeExports.jsx(PublishIcon, {}) }) })) : (jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, {}))] })) : (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [shouldShowButton(enablePull) ? (jsxRuntimeExports.jsx(Button, { size: "small", variant: "text", onClick: handlePullClick, children: pullLabel ? pullLabel : "Pull" })) : (jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, {})), shouldShowButton(enablePush) ? (jsxRuntimeExports.jsx(Button, { size: "small", variant: "text", onClick: handlePushClick, children: pushLabel ? pushLabel : "Push" })) : (jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, {}))] })), jsxRuntimeExports.jsxs(Backdrop, { sx: { color: '#fff', zIndex: function (theme) { return theme.zIndex.drawer + 1; } }, open: progressShow, children: [jsxRuntimeExports.jsx(CircularProgress$1, { color: "inherit" }), jsxRuntimeExports.jsx(Snackbar, { anchorOrigin: { vertical: 'top', horizontal: 'center' }, open: snackShow, autoHideDuration: 5000, onClose: handleSnackClose, children: jsxRuntimeExports.jsx(Alert, { severity: snackSuccess ? "success" : "error", sx: { width: '100%' }, children: snackMessage }) })] })] }));
+    return (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [useIcon ? (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [shouldShowButton(enablePull) ? (jsxRuntimeExports.jsx(Tooltip, { title: pullLabel ? pullLabel : "Pull", children: jsxRuntimeExports.jsx(IconButton, { size: "small", onClick: handlePullClick, children: jsxRuntimeExports.jsx(DownloadIcon, {}) }) })) : (jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, {})), shouldShowButton(enablePush) ? (jsxRuntimeExports.jsx(Tooltip, { title: pushLabel ? pushLabel : "Push", children: jsxRuntimeExports.jsx(IconButton, { size: "small", onClick: handlePushClick, children: jsxRuntimeExports.jsx(PublishIcon, {}) }) })) : (jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, {}))] })) : (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [shouldShowButton(enablePull) ? (jsxRuntimeExports.jsx(Button, { size: "small", variant: "text", onClick: handlePullClick, children: pullLabel ? pullLabel : "Pull" })) : (jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, {})), shouldShowButton(enablePush) ? (jsxRuntimeExports.jsx(Button, { size: "small", variant: "text", onClick: handlePushClick, children: pushLabel ? pushLabel : "Push" })) : (jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, {}))] })), jsxRuntimeExports.jsxs(Backdrop, { sx: { color: '#fff', zIndex: function (theme) { return theme.zIndex.drawer + 1; } }, open: progressShow, children: [jsxRuntimeExports.jsx(CircularProgress, { color: "inherit" }), jsxRuntimeExports.jsx(Snackbar, { anchorOrigin: { vertical: 'top', horizontal: 'center' }, open: snackShow, autoHideDuration: 5000, onClose: handleSnackClose, children: jsxRuntimeExports.jsx(Alert, { severity: snackSuccess ? "success" : "error", sx: { width: '100%' }, children: snackMessage }) })] })] }));
 }
 
 /*
@@ -2075,7 +1808,7 @@ function BulkPublishView(props) {
                         } }), jsxRuntimeExports.jsx(Typography, { variant: "body1", sx: {
                             maxWidth: '470px',
                             textAlign: 'center'
-                        }, children: jsxRuntimeExports.jsx(FormattedMessage, { id: "publishOnDemand.noInitialPublish", defaultMessage: "The project needs to undergo its initial publish before other publishing options become available" }) }), hasPublishPermission && (jsxRuntimeExports.jsx(LoadingButton, { variant: "contained", color: "primary", onClick: onInitialPublish, children: jsxRuntimeExports.jsx(FormattedMessage, { id: "publishOnDemand.publishEntireProject", defaultMessage: "Publish Entire Project" }) }))] })) }) }));
+                        }, children: jsxRuntimeExports.jsx(FormattedMessage, { id: "publishOnDemand.noInitialPublish", defaultMessage: "The project needs to undergo its initial publish before other publishing options become available" }) }), hasPublishPermission && (jsxRuntimeExports.jsx(MyLoadingButton, { loading: false, variant: "contained", color: "primary", onClick: onInitialPublish, children: jsxRuntimeExports.jsx(FormattedMessage, { id: "publishOnDemand.publishEntireProject", defaultMessage: "Publish Entire Project" }) }))] })) }) }));
 }
 
 function OpenBulkPublishPanelButton(props) {
@@ -2298,7 +2031,7 @@ var plugin = {
     stylesheets: undefined,
     id: 'org.rd.plugin.uigoodies',
     widgets: {
-        'org.rd.plugin.uigoodies.component-preview-path-navigator': ComponentPreviewPathNavigator,
+        'org.rd.plugin.uigoodies.ComponentPreviewPathNavigator': ComponentPreviewPathNavigator,
         'org.rd.plugin.uigoodies.EditOrViewCurrent': EditOrViewCurrent,
         'org.rd.plugin.uigoodies.PublishOrRequestPublish': PublishOrRequestPublish,
         'org.rd.plugin.uigoodies.ToolPanelAccordion': ToolPanelAccordion,

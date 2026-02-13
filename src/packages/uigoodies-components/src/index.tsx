@@ -18,7 +18,7 @@ const plugin: PluginDescriptor = {
   stylesheets: undefined,
   id: 'org.rd.plugin.uigoodies',
   widgets: {
-    'org.rd.plugin.uigoodies.component-preview-path-navigator': ComponentPreviewPathNavigator,
+    'org.rd.plugin.uigoodies.ComponentPreviewPathNavigator': ComponentPreviewPathNavigator,
     'org.rd.plugin.uigoodies.EditOrViewCurrent': EditOrViewCurrent,
     'org.rd.plugin.uigoodies.PublishOrRequestPublish': PublishOrRequestPublish,
     'org.rd.plugin.uigoodies.ToolPanelAccordion': ToolPanelAccordion,

@@ -11,24 +11,39 @@ place by doing a bit of programming and send us pull request :)
 
 # Installation
 
-Install the plugin via Studio's Plugin Management UI under `Site Tools` > `Plugin Management`.
+[//]: # (## Install via CrafterCMS Marketplace)
+
+[//]: # (Install the plugin via Studio's Plugin Management UI under `Site Tools` > `Plugin Management`.)
 
 ## Install based on this repository
 
-You can also install this plugin by cloning this repository and using the Studio API.
+You can install this plugin by cloning this repository and using the Studio API.
 
-1. Create a Studio JWT Token.
+1. Create a Studio API token.
 2. Execute the following CURL command a terminal
 
 ```bash
 curl --location --request POST 'http://SERVER_AND_PORT/studio/api/2/marketplace/copy' \
---header 'Authorization: Bearer THE_JWT_TOKEN_FOR_STUDIO' \
+--header 'Authorization: Bearer YOUR_STUDIO_API_TOKEN' \
 --header 'Content-Type: application/json' \
 --data-raw '{
   "siteId": "YOUR-SITE-ID",
   "path": "THE_ABSOLUTEL_FILE_SYSTEM_PATH_TO_THIS_REPO",
   "parameters": { }
 }
+```
+
+Here is a real-life functioning example:
+
+```bash
+curl --location --request POST 'http://localhost:8080/studio/api/2/marketplace/copy' \
+--header 'Authorization: Bearer eyJhbGciOiJQQkVTMi1IUzUxMitBMjU2S1ciLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwiY3R5IjoiSldUIiwicDJjIjo2NTUzNiwicDJzIjoiQ0hmZDQ4SmlsT1I5bzVociJ9.Iq5RcXLbT85nTXKWFr054e0LZ-RaMpkVVdAo5UtqW17hgkJ_MNPIXPf_NcW9q-GuRsHpCjtwbhTjgHHLdLK8vbl8Kb3dKsS-.HdJcVASJ1_SnaafB5hiY2g.T0hOxNfhfDuhVPEF1lCgCCuuChpj_8tvpD48CXo8RoXOXqa-fgkyOV88dk0OaRDmKY2QLcPeiQAddGI_gsn_bJd0LM0lA_zVpDdiUkWvDYzO5tDefpG3z7tfC5DWIkHUtPQBlWLNkkIzNyv2xsSEQUGClPurP2Bue70Q8WG75YPZkhl6uw2FWKM_ida3kyCakOgt51TVKN3Fbn4MbtuzX6f5Rc0QPOs0i9E0ejejfL5U4sHu-0ULFTPmSrECxcSg_yjPRu2Z39IhPPJ44ehMClho4kWGtsLnMiP0380BkspNTEN1O8tUl1D3bZ5nznC_iat0EM651t-uFAGrVKrlsg.9P0gqUGEvr6XDFXm8Py_0hdfXKcdF7BR8T_2gqu7Jcw' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "siteId": "ed3",
+  "path": "/Volumes/Projects/repositories/plugin-studio-uigoodies",
+  "parameters": { }
+}'
 ```
 
 # Building
@@ -338,10 +353,9 @@ widget. Note that nonPreviewablePaths and `paths` require their own configuratio
 
 ```xml
 
-<widget id="org.rd.plugin.uigoodies.component-preview-path-navigator">
+<widget id="org.rd.plugin.uigoodies.ComponentPreviewPathNavigator">
     <plugin
             id="org.rd.plugin.uigoodies"
-            site="{site}"
             type="apps"
             name="uigoodies"
             file="index.js"
