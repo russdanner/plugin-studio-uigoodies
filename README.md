@@ -374,7 +374,7 @@ widget. Note that nonPreviewablePaths and `paths` require their own configuratio
                 <target>/video</target>
             </item>
         </paths>
-        <nonPreviewablePaths>.*\/crafter-level-descriptor.level.xml,(?!.*/my-configs/).*</nonPreviewablePaths>
+        <nonPreviewablePaths>.*\/crafter-level-descriptor.level.xml,.*/my-configs/.*</nonPreviewablePaths>
         <limit>50</limit>
     </configuration>
 </widget>
