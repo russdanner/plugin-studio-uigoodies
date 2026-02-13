@@ -2,7 +2,7 @@ const React = craftercms.libs.React;
 const { useState, useRef, useEffect } = craftercms.libs.React;
 const React__default = craftercms.libs.React && Object.prototype.hasOwnProperty.call(craftercms.libs.React, 'default') ? craftercms.libs.React['default'] : craftercms.libs.React;
 const { useSelector, useDispatch } = craftercms.libs.ReactRedux;
-const { Tooltip, useTheme, accordionClasses, accordionSummaryClasses, Accordion, AccordionSummary, Typography, AccordionDetails, alpha, Button: Button$1, buttonClasses, Backdrop, CircularProgress: CircularProgress$1, Alert, Paper, Box: Box$1 } = craftercms.libs.MaterialUI;
+const { Tooltip, useTheme, accordionClasses, accordionSummaryClasses, Accordion, AccordionSummary, Typography, AccordionDetails, Button: Button$1, CircularProgress, alpha, buttonClasses, Backdrop, Alert, Paper, Box: Box$1, AlertTitle } = craftercms.libs.MaterialUI;
 const IconButton = craftercms.libs.MaterialUI.IconButton && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.IconButton, 'default') ? craftercms.libs.MaterialUI.IconButton['default'] : craftercms.libs.MaterialUI.IconButton;
 const Button = craftercms.libs.MaterialUI.Button && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Button, 'default') ? craftercms.libs.MaterialUI.Button['default'] : craftercms.libs.MaterialUI.Button;
 const SystemIcon = craftercms.components.SystemIcon && Object.prototype.hasOwnProperty.call(craftercms.components.SystemIcon, 'default') ? craftercms.components.SystemIcon['default'] : craftercms.components.SystemIcon;
@@ -14,12 +14,7 @@ const TextField = craftercms.libs.MaterialUI.TextField && Object.prototype.hasOw
 const Container = craftercms.libs.MaterialUI.Container && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Container, 'default') ? craftercms.libs.MaterialUI.Container['default'] : craftercms.libs.MaterialUI.Container;
 const Box = craftercms.libs.MaterialUI.Box && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Box, 'default') ? craftercms.libs.MaterialUI.Box['default'] : craftercms.libs.MaterialUI.Box;
 const { writeContent } = craftercms.services.content;
-const { DialogFooter } = craftercms.components;
-const { unstable_useId, capitalize } = craftercms.libs.MaterialUI;
-const { styled, useTheme: useTheme$1 } = craftercms.libs.MaterialUI;
-const { useDefaultProps } = craftercms.libs.MaterialUI.DefaultPropsProvider;
-const { ButtonGroupContext } = craftercms.libs.MaterialUI.ButtonGroup;
-const CircularProgress = craftercms.libs.MaterialUI.CircularProgress && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.CircularProgress, 'default') ? craftercms.libs.MaterialUI.CircularProgress['default'] : craftercms.libs.MaterialUI.CircularProgress;
+const { DialogFooter, PathNavigator } = craftercms.components;
 const ToolsPanelListItemButton = craftercms.components.ToolsPanelListItemButton && Object.prototype.hasOwnProperty.call(craftercms.components.ToolsPanelListItemButton, 'default') ? craftercms.components.ToolsPanelListItemButton['default'] : craftercms.components.ToolsPanelListItemButton;
 const Tooltip$1 = craftercms.libs.MaterialUI.Tooltip && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Tooltip, 'default') ? craftercms.libs.MaterialUI.Tooltip['default'] : craftercms.libs.MaterialUI.Tooltip;
 const { pull, push } = craftercms.services.repositories;
@@ -33,6 +28,7 @@ const { fetchUnpublished } = craftercms.services.dashboard;
 const { nou } = craftercms.utils.object;
 const { lookupItemByPath } = craftercms.utils.content;
 const { hasInitialPublish } = craftercms.services.sites;
+const { useTheme: useTheme$1 } = craftercms.libs.MaterialUI;
 const InfoOutlinedIcon = craftercms.utils.constants.components.get('@mui/icons-material/InfoOutlined') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/InfoOutlined'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/InfoOutlined')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/InfoOutlined');
 const Menu = craftercms.libs.MaterialUI.Menu && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Menu, 'default') ? craftercms.libs.MaterialUI.Menu['default'] : craftercms.libs.MaterialUI.Menu;
 const MenuItem = craftercms.libs.MaterialUI.MenuItem && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.MenuItem, 'default') ? craftercms.libs.MaterialUI.MenuItem['default'] : craftercms.libs.MaterialUI.MenuItem;
@@ -1132,9 +1128,8 @@ function EditOrViewCurrent(props) {
     var siteId = useActiveSiteId();
     var env = useEnv();
     var readonly = true;
-    // make sure the user has access to the item, 
-    if ((item === null || item === void 0 ? void 0 : item.availableActionsMap.edit) === true
-        && isItemLockedForMe(item, currentUser.username) === false) {
+    // make sure the user has access to the item,
+    if ((item === null || item === void 0 ? void 0 : item.availableActionsMap.edit) === true && isItemLockedForMe(item, currentUser.username) === false) {
         readonly = false;
     }
     var label = readonly ? 'View' : 'Edit';
@@ -1202,6 +1197,18 @@ var __assign = function() {
     return __assign.apply(this, arguments);
 };
 
+function __rest(s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+}
+
 typeof SuppressedError === "function" ? SuppressedError : function (error, suppressed, message) {
     var e = new Error(message);
     return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
@@ -1260,285 +1267,10 @@ const batchActions = /*#__PURE__*/ createAction('BATCH_ACTIONS');
 const dispatchDOMEvent = /*#__PURE__*/ createAction('DISPATCH_DOM_EVENT');
 // endregion
 
-function _objectWithoutPropertiesLoose(source, excluded) {
-  if (source == null) return {};
-  var target = {};
-  var sourceKeys = Object.keys(source);
-  var key, i;
-  for (i = 0; i < sourceKeys.length; i++) {
-    key = sourceKeys[i];
-    if (excluded.indexOf(key) >= 0) continue;
-    target[key] = source[key];
-  }
-  return target;
-}
-
-function _extends() {
-  _extends = Object.assign ? Object.assign.bind() : function (target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i];
-      for (var key in source) {
-        if (Object.prototype.hasOwnProperty.call(source, key)) {
-          target[key] = source[key];
-        }
-      }
-    }
-    return target;
-  };
-  return _extends.apply(this, arguments);
-}
-
-/**
- * Add keys, values of `defaultProps` that does not exist in `props`
- * @param {object} defaultProps
- * @param {object} props
- * @returns {object} resolved props
- */
-function resolveProps(defaultProps, props) {
-  const output = _extends({}, props);
-  Object.keys(defaultProps).forEach(propName => {
-    if (propName.toString().match(/^(components|slots)$/)) {
-      output[propName] = _extends({}, defaultProps[propName], output[propName]);
-    } else if (propName.toString().match(/^(componentsProps|slotProps)$/)) {
-      const defaultSlotProps = defaultProps[propName] || {};
-      const slotProps = props[propName];
-      output[propName] = {};
-      if (!slotProps || !Object.keys(slotProps)) {
-        // Reduce the iteration if the slot props is empty
-        output[propName] = defaultSlotProps;
-      } else if (!defaultSlotProps || !Object.keys(defaultSlotProps)) {
-        // Reduce the iteration if the default slot props is empty
-        output[propName] = slotProps;
-      } else {
-        output[propName] = _extends({}, slotProps);
-        Object.keys(defaultSlotProps).forEach(slotPropName => {
-          output[propName][slotPropName] = resolveProps(defaultSlotProps[slotPropName], slotProps[slotPropName]);
-        });
-      }
-    } else if (output[propName] === undefined) {
-      output[propName] = defaultProps[propName];
-    }
-  });
-  return output;
-}
-
-function composeClasses(slots, getUtilityClass, classes = undefined) {
-  const output = {};
-  Object.keys(slots).forEach(
-  // `Object.keys(slots)` can't be wider than `T` because we infer `T` from `slots`.
-  // @ts-expect-error https://github.com/microsoft/TypeScript/pull/12253#issuecomment-263132208
-  slot => {
-    output[slot] = slots[slot].reduce((acc, key) => {
-      if (key) {
-        const utilityClass = getUtilityClass(key);
-        if (utilityClass !== '') {
-          acc.push(utilityClass);
-        }
-        if (classes && classes[key]) {
-          acc.push(classes[key]);
-        }
-      }
-      return acc;
-    }, []).join(' ');
-  });
-  return output;
-}
-
-const defaultGenerator = componentName => componentName;
-const createClassNameGenerator = () => {
-  let generate = defaultGenerator;
-  return {
-    configure(generator) {
-      generate = generator;
-    },
-    generate(componentName) {
-      return generate(componentName);
-    },
-    reset() {
-      generate = defaultGenerator;
-    }
-  };
+var MyLoadingButton = function (props) {
+    var loading = props.loading, children = props.children, rest = __rest(props, ["loading", "children"]);
+    return (jsxRuntimeExports.jsx(Button$1, __assign({ startIcon: loading ? jsxRuntimeExports.jsx(CircularProgress, { size: 16 }) : undefined }, rest, { children: children })));
 };
-const ClassNameGenerator = createClassNameGenerator();
-
-const globalStateClasses = {
-  active: 'active',
-  checked: 'checked',
-  completed: 'completed',
-  disabled: 'disabled',
-  error: 'error',
-  expanded: 'expanded',
-  focused: 'focused',
-  focusVisible: 'focusVisible',
-  open: 'open',
-  readOnly: 'readOnly',
-  required: 'required',
-  selected: 'selected'
-};
-function generateUtilityClass(componentName, slot, globalStatePrefix = 'Mui') {
-  const globalStateClass = globalStateClasses[slot];
-  return globalStateClass ? `${globalStatePrefix}-${globalStateClass}` : `${ClassNameGenerator.generate(componentName)}-${slot}`;
-}
-
-function generateUtilityClasses(componentName, slots, globalStatePrefix = 'Mui') {
-  const result = {};
-  slots.forEach(slot => {
-    result[slot] = generateUtilityClass(componentName, slot, globalStatePrefix);
-  });
-  return result;
-}
-
-function getLoadingButtonUtilityClass(slot) {
-  return generateUtilityClass('MuiLoadingButton', slot);
-}
-const loadingButtonClasses = generateUtilityClasses('MuiLoadingButton', ['root', 'loading', 'loadingIndicator', 'loadingIndicatorCenter', 'loadingIndicatorStart', 'loadingIndicatorEnd', 'endIconLoadingEnd', 'startIconLoadingStart']);
-
-const _excluded = ["children", "disabled", "id", "loading", "loadingIndicator", "loadingPosition", "variant"];
-const useUtilityClasses = ownerState => {
-  const {
-    loading,
-    loadingPosition,
-    classes
-  } = ownerState;
-  const slots = {
-    root: ['root', loading && 'loading'],
-    startIcon: [loading && `startIconLoading${capitalize(loadingPosition)}`],
-    endIcon: [loading && `endIconLoading${capitalize(loadingPosition)}`],
-    loadingIndicator: ['loadingIndicator', loading && `loadingIndicator${capitalize(loadingPosition)}`]
-  };
-  const composedClasses = composeClasses(slots, getLoadingButtonUtilityClass, classes);
-  return _extends({}, classes, composedClasses);
-};
-
-// TODO use `import { rootShouldForwardProp } from '../styles/styled';` once move to core
-const rootShouldForwardProp = prop => prop !== 'ownerState' && prop !== 'theme' && prop !== 'sx' && prop !== 'as' && prop !== 'classes';
-const LoadingButtonRoot = styled(Button, {
-  shouldForwardProp: prop => rootShouldForwardProp(prop) || prop === 'classes',
-  name: 'MuiLoadingButton',
-  slot: 'Root',
-  overridesResolver: (props, styles) => {
-    return [styles.root, styles.startIconLoadingStart && {
-      [`& .${loadingButtonClasses.startIconLoadingStart}`]: styles.startIconLoadingStart
-    }, styles.endIconLoadingEnd && {
-      [`& .${loadingButtonClasses.endIconLoadingEnd}`]: styles.endIconLoadingEnd
-    }];
-  }
-})(({
-  ownerState,
-  theme
-}) => _extends({
-  [`& .${loadingButtonClasses.startIconLoadingStart}, & .${loadingButtonClasses.endIconLoadingEnd}`]: {
-    transition: theme.transitions.create(['opacity'], {
-      duration: theme.transitions.duration.short
-    }),
-    opacity: 0
-  }
-}, ownerState.loadingPosition === 'center' && {
-  transition: theme.transitions.create(['background-color', 'box-shadow', 'border-color'], {
-    duration: theme.transitions.duration.short
-  }),
-  [`&.${loadingButtonClasses.loading}`]: {
-    color: 'transparent'
-  }
-}, ownerState.loadingPosition === 'start' && ownerState.fullWidth && {
-  [`& .${loadingButtonClasses.startIconLoadingStart}, & .${loadingButtonClasses.endIconLoadingEnd}`]: {
-    transition: theme.transitions.create(['opacity'], {
-      duration: theme.transitions.duration.short
-    }),
-    opacity: 0,
-    marginRight: -8
-  }
-}, ownerState.loadingPosition === 'end' && ownerState.fullWidth && {
-  [`& .${loadingButtonClasses.startIconLoadingStart}, & .${loadingButtonClasses.endIconLoadingEnd}`]: {
-    transition: theme.transitions.create(['opacity'], {
-      duration: theme.transitions.duration.short
-    }),
-    opacity: 0,
-    marginLeft: -8
-  }
-}));
-const LoadingButtonLoadingIndicator = styled('span', {
-  name: 'MuiLoadingButton',
-  slot: 'LoadingIndicator',
-  overridesResolver: (props, styles) => {
-    const {
-      ownerState
-    } = props;
-    return [styles.loadingIndicator, styles[`loadingIndicator${capitalize(ownerState.loadingPosition)}`]];
-  }
-})(({
-  theme,
-  ownerState
-}) => _extends({
-  position: 'absolute',
-  visibility: 'visible',
-  display: 'flex'
-}, ownerState.loadingPosition === 'start' && (ownerState.variant === 'outlined' || ownerState.variant === 'contained') && {
-  left: ownerState.size === 'small' ? 10 : 14
-}, ownerState.loadingPosition === 'start' && ownerState.variant === 'text' && {
-  left: 6
-}, ownerState.loadingPosition === 'center' && {
-  left: '50%',
-  transform: 'translate(-50%)',
-  color: (theme.vars || theme).palette.action.disabled
-}, ownerState.loadingPosition === 'end' && (ownerState.variant === 'outlined' || ownerState.variant === 'contained') && {
-  right: ownerState.size === 'small' ? 10 : 14
-}, ownerState.loadingPosition === 'end' && ownerState.variant === 'text' && {
-  right: 6
-}, ownerState.loadingPosition === 'start' && ownerState.fullWidth && {
-  position: 'relative',
-  left: -10
-}, ownerState.loadingPosition === 'end' && ownerState.fullWidth && {
-  position: 'relative',
-  right: -10
-}));
-const LoadingButton = /*#__PURE__*/React.forwardRef(function LoadingButton(inProps, ref) {
-  const contextProps = React.useContext(ButtonGroupContext);
-  const resolvedProps = resolveProps(contextProps, inProps);
-  const props = useDefaultProps({
-    props: resolvedProps,
-    name: 'MuiLoadingButton'
-  });
-  const {
-      children,
-      disabled = false,
-      id: idProp,
-      loading = false,
-      loadingIndicator: loadingIndicatorProp,
-      loadingPosition = 'center',
-      variant = 'text'
-    } = props,
-    other = _objectWithoutPropertiesLoose(props, _excluded);
-  const id = unstable_useId(idProp);
-  const loadingIndicator = loadingIndicatorProp != null ? loadingIndicatorProp : /*#__PURE__*/jsxRuntimeExports.jsx(CircularProgress, {
-    "aria-labelledby": id,
-    color: "inherit",
-    size: 16
-  });
-  const ownerState = _extends({}, props, {
-    disabled,
-    loading,
-    loadingIndicator,
-    loadingPosition,
-    variant
-  });
-  const classes = useUtilityClasses(ownerState);
-  const loadingButtonLoadingIndicator = loading ? /*#__PURE__*/jsxRuntimeExports.jsx(LoadingButtonLoadingIndicator, {
-    className: classes.loadingIndicator,
-    ownerState: ownerState,
-    children: loadingIndicator
-  }) : null;
-  return /*#__PURE__*/jsxRuntimeExports.jsxs(LoadingButtonRoot, _extends({
-    disabled: disabled || loading,
-    id: id,
-    ref: ref
-  }, other, {
-    variant: variant,
-    classes: classes,
-    ownerState: ownerState,
-    children: [ownerState.loadingPosition === 'end' ? children : loadingButtonLoadingIndicator, ownerState.loadingPosition === 'end' ? loadingButtonLoadingIndicator : children]
-  }));
-});
 
 function ContentUpload(props) {
     var _a;
@@ -1631,50 +1363,52 @@ function ContentUpload(props) {
                     'padding-top': '40px',
                     'padding-bottom': '40px'
                 }, children: [jsxRuntimeExports.jsxs(Box, { sx: {
-                            'display': 'flex',
-                            'marginBottom': '20px',
-                            'alignItems': 'center'
-                        }, children: [jsxRuntimeExports.jsx(TextField, { label: "Path to upload", id: "path-read-only-input", sx: { minWidth: '450px' }, InputProps: { readOnly: !props.allowPathInput }, value: path, onChange: props.allowPathInput ? function (e) {
-                                    setPath(e.target.value);
-                                } : undefined }), props.allowPathSelection && (jsxRuntimeExports.jsx(Button, { variant: "outlined", onClick: handleSelectPath, disabled: processing, sx: { minWidth: '130px', marginLeft: '20px' }, children: "Select Path" }))] }), jsxRuntimeExports.jsx(Box, { sx: function (theme) { return ({
+                            display: 'flex',
+                            marginBottom: '20px',
+                            alignItems: 'center'
+                        }, children: [jsxRuntimeExports.jsx(TextField, { label: "Path to upload", id: "path-read-only-input", sx: { minWidth: '450px' }, InputProps: { readOnly: !props.allowPathInput }, value: path, onChange: props.allowPathInput
+                                    ? function (e) {
+                                        setPath(e.target.value);
+                                    }
+                                    : undefined }), props.allowPathSelection && (jsxRuntimeExports.jsx(Button, { variant: "outlined", onClick: handleSelectPath, disabled: processing, sx: { minWidth: '130px', marginLeft: '20px' }, children: "Select Path" }))] }), jsxRuntimeExports.jsx(Box, { sx: function (theme) { return ({
                             'font-family': '"Source Sans Pro", "Open Sans", sans-serif',
                             '& input::file-selector-button': {
-                                'display': 'inline-flex',
+                                display: 'inline-flex',
                                 '-webkit-box-align': 'center',
                                 'align-items': 'center',
                                 '-webkit-box-pack': 'center',
                                 'justify-content': 'center',
-                                'position': 'relative',
+                                position: 'relative',
                                 'box-sizing': 'border-box',
                                 '-webkit-tap-highlight-color': 'transparent',
-                                'backgroundColor': 'transparent',
-                                'outline': '0px',
-                                'margin': '0px',
-                                'cursor': 'pointer',
+                                backgroundColor: 'transparent',
+                                outline: '0px',
+                                margin: '0px',
+                                cursor: 'pointer',
                                 'user-select': 'none',
                                 'vertical-align': 'middle',
-                                'appearance': 'none',
+                                appearance: 'none',
                                 'text-decoration': 'none',
                                 'text-transform': 'none',
                                 'font-family': '"Source Sans Pro", "Open Sans", sans-serif',
                                 'font-weight': '600',
                                 'font-size': '0.875rem',
                                 'line-height': '1.75',
-                                'padding': '5px 15px',
+                                padding: '5px 15px',
                                 'border-radius': '4px',
-                                'transition': 'background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
-                                'border': "1px solid ".concat(alpha(theme.palette.primary.main, 0.5)),
-                                'color': theme.palette.primary.main,
+                                transition: 'background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
+                                border: "1px solid ".concat(alpha(theme.palette.primary.main, 0.5)),
+                                color: theme.palette.primary.main,
                                 'min-width': '130px',
-                                'marginRight': '10px',
+                                marginRight: '10px',
                                 '&:hover': {
-                                    'backgroundColor': alpha(theme.palette.primary.main, 0.04),
-                                    'border': "1px solid ".concat(theme.palette.primary.main)
+                                    backgroundColor: alpha(theme.palette.primary.main, 0.04),
+                                    border: "1px solid ".concat(theme.palette.primary.main)
                                 }
                             }
                         }); }, children: jsxRuntimeExports.jsx("input", { ref: inputRef, type: "file", accept: ".xml", onChange: onFileChange, onClick: function () {
                                 inputRef.current.value = null;
-                            } }) })] }), jsxRuntimeExports.jsx(DialogFooter, { children: jsxRuntimeExports.jsx(LoadingButton, { variant: "contained", onClick: handleUploadXMLFile, loading: processing, disabled: !content, loadingPosition: "start", sx: { minWidth: '130px' }, children: "Upload Content" }) })] }));
+                            } }) })] }), jsxRuntimeExports.jsx(DialogFooter, { children: jsxRuntimeExports.jsx(MyLoadingButton, { variant: "contained", onClick: handleUploadXMLFile, loading: processing, disabled: !content, sx: { minWidth: '130px' }, children: "Upload Content" }) })] }));
 }
 
 var CONTENT_UPLOAD_DEFAULTS = {
@@ -1729,7 +1463,7 @@ function useOpenBulkPublish(props) {
 function OpenContentUploadPanelButton(props) {
     var _a = props.title, title = _a === void 0 ? CONTENT_UPLOAD_DEFAULTS.title : _a, _b = props.icon, icon = _b === void 0 ? CONTENT_UPLOAD_DEFAULTS.icon : _b, _c = props.dialogTitle, dialogTitle = _c === void 0 ? title : _c;
     var handleClick = useOpenContentUpload(__assign(__assign({}, props), { title: dialogTitle }));
-    return (jsxRuntimeExports.jsx(ToolsPanelListItemButton, { icon: icon, title: title, onClick: handleClick }));
+    return jsxRuntimeExports.jsx(ToolsPanelListItemButton, { icon: icon, title: title, onClick: handleClick });
 }
 
 function OpenContentUploadToolbarButton(props) {
@@ -1763,7 +1497,7 @@ function OpenContentUploadToolbarButton(props) {
  */
 
 const useSelection =
-  import.meta.env.NODE_ENV === 'production' ? useSelector : (selector, equalityFn) => useSelector(selector, equalityFn);
+  useSelector ;
 
 /*
  * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
@@ -1877,7 +1611,7 @@ function PullPushRemoteButtons(props) {
         setProgressShow(false);
         setSnackShow(false);
     }
-    return (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [useIcon ? (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [shouldShowButton(enablePull) ? (jsxRuntimeExports.jsx(Tooltip, { title: pullLabel ? pullLabel : "Pull", children: jsxRuntimeExports.jsx(IconButton, { size: "small", onClick: handlePullClick, children: jsxRuntimeExports.jsx(DownloadIcon, {}) }) })) : (jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, {})), shouldShowButton(enablePush) ? (jsxRuntimeExports.jsx(Tooltip, { title: pushLabel ? pushLabel : "Push", children: jsxRuntimeExports.jsx(IconButton, { size: "small", onClick: handlePushClick, children: jsxRuntimeExports.jsx(PublishIcon, {}) }) })) : (jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, {}))] })) : (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [shouldShowButton(enablePull) ? (jsxRuntimeExports.jsx(Button, { size: "small", variant: "text", onClick: handlePullClick, children: pullLabel ? pullLabel : "Pull" })) : (jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, {})), shouldShowButton(enablePush) ? (jsxRuntimeExports.jsx(Button, { size: "small", variant: "text", onClick: handlePushClick, children: pushLabel ? pushLabel : "Push" })) : (jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, {}))] })), jsxRuntimeExports.jsxs(Backdrop, { sx: { color: '#fff', zIndex: function (theme) { return theme.zIndex.drawer + 1; } }, open: progressShow, children: [jsxRuntimeExports.jsx(CircularProgress$1, { color: "inherit" }), jsxRuntimeExports.jsx(Snackbar, { anchorOrigin: { vertical: 'top', horizontal: 'center' }, open: snackShow, autoHideDuration: 5000, onClose: handleSnackClose, children: jsxRuntimeExports.jsx(Alert, { severity: snackSuccess ? "success" : "error", sx: { width: '100%' }, children: snackMessage }) })] })] }));
+    return (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [useIcon ? (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [shouldShowButton(enablePull) ? (jsxRuntimeExports.jsx(Tooltip, { title: pullLabel ? pullLabel : "Pull", children: jsxRuntimeExports.jsx(IconButton, { size: "small", onClick: handlePullClick, children: jsxRuntimeExports.jsx(DownloadIcon, {}) }) })) : (jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, {})), shouldShowButton(enablePush) ? (jsxRuntimeExports.jsx(Tooltip, { title: pushLabel ? pushLabel : "Push", children: jsxRuntimeExports.jsx(IconButton, { size: "small", onClick: handlePushClick, children: jsxRuntimeExports.jsx(PublishIcon, {}) }) })) : (jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, {}))] })) : (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [shouldShowButton(enablePull) ? (jsxRuntimeExports.jsx(Button, { size: "small", variant: "text", onClick: handlePullClick, children: pullLabel ? pullLabel : "Pull" })) : (jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, {})), shouldShowButton(enablePush) ? (jsxRuntimeExports.jsx(Button, { size: "small", variant: "text", onClick: handlePushClick, children: pushLabel ? pushLabel : "Push" })) : (jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, {}))] })), jsxRuntimeExports.jsxs(Backdrop, { sx: { color: '#fff', zIndex: function (theme) { return theme.zIndex.drawer + 1; } }, open: progressShow, children: [jsxRuntimeExports.jsx(CircularProgress, { color: "inherit" }), jsxRuntimeExports.jsx(Snackbar, { anchorOrigin: { vertical: 'top', horizontal: 'center' }, open: snackShow, autoHideDuration: 5000, onClose: handleSnackClose, children: jsxRuntimeExports.jsx(Alert, { severity: snackSuccess ? "success" : "error", sx: { width: '100%' }, children: snackMessage }) })] })] }));
 }
 
 /*
@@ -2015,10 +1749,12 @@ function BulkPublishView(props) {
         setIsSubmitting(true);
         var fetchItems = function (offset) { return fetchUnpublished(siteId, { limit: FETCH_UNPUBLISHED_ITEMS_LIMIT, offset: offset }); };
         var itemsByPath = [];
-        of(0).pipe(concatMap(function (offset) { return fetchItems(offset); }), expand(function (data) {
+        of(0)
+            .pipe(concatMap(function (offset) { return fetchItems(offset); }), expand(function (data) {
             itemsByPath.push.apply(itemsByPath, data.filter(function (item) { return item.path.startsWith(selectedPath); }));
             return data.total > data.limit + data.offset ? fetchItems(data.limit + data.offset) : of();
-        }), toArray()).subscribe({
+        }), toArray())
+            .subscribe({
             complete: function () {
                 if (itemsByPath.length === 0) {
                     dispatch(showSystemNotification({
@@ -2055,11 +1791,11 @@ function BulkPublishView(props) {
         setSelectedPath(value.replace('/index.xml', ''));
     };
     if (hasInitialPublish$1 === null) {
-        return (jsxRuntimeExports.jsx(Paper, { elevation: 2, sx: { height: '100%' } }));
+        return jsxRuntimeExports.jsx(Paper, { elevation: 2, sx: { height: '100%' } });
     }
     return (jsxRuntimeExports.jsx(Paper, { elevation: 2, sx: { height: '100%' }, children: jsxRuntimeExports.jsx(Box$1, { sx: { p: 1 }, children: hasInitialPublish$1 ? (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsxs(DialogBody, { sx: { minHeight: '24vh', minWidth: '48vh' }, children: [jsxRuntimeExports.jsx(Typography, { variant: "body1", sx: {
                                     paddingBottom: 2,
-                                    float: 'left',
+                                    float: 'left'
                                 }, children: "Select a path to calculate publish packages." }), jsxRuntimeExports.jsx(Box$1, { sx: { paddingBottom: 1 }, children: jsxRuntimeExports.jsx(PathSelector, { value: selectedPath, disabled: false, onPathSelected: onPathSelected, stripXmlIndex: false }) })] }), jsxRuntimeExports.jsx(DialogFooter$1, { children: jsxRuntimeExports.jsx(Button$1, { sx: { float: 'right' }, variant: "contained", color: "primary", disabled: isSubmitting, onClick: onSubmitBulkPublish, children: "Bulk Publish" }) })] })) : (jsxRuntimeExports.jsxs(Box$1, { sx: {
                     display: 'flex',
                     alignItems: 'center',
@@ -2072,13 +1808,13 @@ function BulkPublishView(props) {
                         } }), jsxRuntimeExports.jsx(Typography, { variant: "body1", sx: {
                             maxWidth: '470px',
                             textAlign: 'center'
-                        }, children: jsxRuntimeExports.jsx(FormattedMessage, { id: "publishOnDemand.noInitialPublish", defaultMessage: "The project needs to undergo its initial publish before other publishing options become available" }) }), hasPublishPermission && (jsxRuntimeExports.jsx(LoadingButton, { variant: "contained", color: "primary", onClick: onInitialPublish, children: jsxRuntimeExports.jsx(FormattedMessage, { id: "publishOnDemand.publishEntireProject", defaultMessage: "Publish Entire Project" }) }))] })) }) }));
+                        }, children: jsxRuntimeExports.jsx(FormattedMessage, { id: "publishOnDemand.noInitialPublish", defaultMessage: "The project needs to undergo its initial publish before other publishing options become available" }) }), hasPublishPermission && (jsxRuntimeExports.jsx(MyLoadingButton, { loading: false, variant: "contained", color: "primary", onClick: onInitialPublish, children: jsxRuntimeExports.jsx(FormattedMessage, { id: "publishOnDemand.publishEntireProject", defaultMessage: "Publish Entire Project" }) }))] })) }) }));
 }
 
 function OpenBulkPublishPanelButton(props) {
     var _a = props.title, title = _a === void 0 ? BULK_PUBLISH_DEFAULTS.title : _a, _b = props.icon, icon = _b === void 0 ? BULK_PUBLISH_DEFAULTS.icon : _b, _c = props.dialogTitle, dialogTitle = _c === void 0 ? title : _c;
     var handleClick = useOpenBulkPublish(__assign(__assign({}, props), { title: dialogTitle }));
-    return (jsxRuntimeExports.jsx(ToolsPanelListItemButton, { icon: icon, title: title, onClick: handleClick }));
+    return jsxRuntimeExports.jsx(ToolsPanelListItemButton, { icon: icon, title: title, onClick: handleClick });
 }
 
 function OpenBulkPublishToolbarButton(props) {
@@ -2096,8 +1832,7 @@ function OpenBulkPublishToolbarButton(props) {
 }
 
 function copyToClipboard(text) {
-    navigator.clipboard.writeText(text)
-        .catch(function (err) {
+    navigator.clipboard.writeText(text).catch(function (err) {
         console.error('Failed to copy text: ', err);
     });
 }
@@ -2107,10 +1842,12 @@ function CopyCurrentPageUrl(props) {
     var iconId = '@mui/icons-material/FileCopyOutlined';
     var siteId = useActiveSiteId();
     var dispatch = useDispatch();
-    var options = (environments === null || environments === void 0 ? void 0 : environments.label) && (environments === null || environments === void 0 ? void 0 : environments.pattern) ? Object.keys(environments.label).map(function (key) { return ({
-        label: environments.label[key],
-        pattern: environments.pattern[key]
-    }); }) : [];
+    var options = (environments === null || environments === void 0 ? void 0 : environments.label) && (environments === null || environments === void 0 ? void 0 : environments.pattern)
+        ? Object.keys(environments.label).map(function (key) { return ({
+            label: environments.label[key],
+            pattern: environments.pattern[key]
+        }); })
+        : [];
     var handleClick = function (event) {
         copyToClipboard(item.previewUrl);
         dispatch(showSystemNotification({
@@ -2130,12 +1867,12 @@ function CopyCurrentPageUrl(props) {
             setOptionMenuAnchorEl(null);
         }, 50);
     };
-    return (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [useIcon ? (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsx(Tooltip, { title: 'Copy Page URL', children: jsxRuntimeExports.jsx(IconButton, { size: "small", onClick: handleClick, children: jsxRuntimeExports.jsx(SystemIcon, { icon: { id: iconId } }) }) }), options && options.length > 0 && (jsxRuntimeExports.jsx(Button, { id: "urls-select-button", variant: "text", color: "inherit", onClick: handleOptionMenuClick, "aria-controls": optionMenuAnchorEl ? 'urls-select-menu' : undefined, "aria-haspopup": "true", "aria-expanded": Boolean(optionMenuAnchorEl), sx: {
+    return (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [useIcon ? (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsx(Tooltip, { title: "Copy Page URL", children: jsxRuntimeExports.jsx(IconButton, { size: "small", onClick: handleClick, children: jsxRuntimeExports.jsx(SystemIcon, { icon: { id: iconId } }) }) }), options && options.length > 0 && (jsxRuntimeExports.jsx(Button, { id: "urls-select-button", variant: "text", color: "inherit", onClick: handleOptionMenuClick, "aria-controls": optionMenuAnchorEl ? 'urls-select-menu' : undefined, "aria-haspopup": "true", "aria-expanded": Boolean(optionMenuAnchorEl), sx: {
                             typography: 'subtitle1',
                             textTransform: 'none',
                             borderRadius: 1,
                             minWidth: 0
-                        }, endIcon: jsxRuntimeExports.jsx(ExpandMoreRounded, {}), children: "Copy URLs" }))] })) : (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsx(Button, { size: "small", variant: "text", onClick: handleClick, children: "Copy Page URL" }), options && options.length > 0 && (jsxRuntimeExports.jsx(Tooltip, { title: 'Copy more URLs', children: jsxRuntimeExports.jsx(IconButton, { id: "urls-select-button", color: "inherit", size: "small", "aria-controls": optionMenuAnchorEl ? 'urls-select-menu' : undefined, "aria-haspopup": "true", onClick: handleOptionMenuClick, children: jsxRuntimeExports.jsx(ExpandMoreRounded, {}) }) }))] })), options && options.length > 0 && (jsxRuntimeExports.jsx(Menu, { id: "urls-select-menu", anchorEl: optionMenuAnchorEl, open: Boolean(optionMenuAnchorEl), onClose: function () { return setOptionMenuAnchorEl(null); }, MenuListProps: {
+                        }, endIcon: jsxRuntimeExports.jsx(ExpandMoreRounded, {}), children: "Copy URLs" }))] })) : (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsx(Button, { size: "small", variant: "text", onClick: handleClick, children: "Copy Page URL" }), options && options.length > 0 && (jsxRuntimeExports.jsx(Tooltip, { title: "Copy more URLs", children: jsxRuntimeExports.jsx(IconButton, { id: "urls-select-button", color: "inherit", size: "small", "aria-controls": optionMenuAnchorEl ? 'urls-select-menu' : undefined, "aria-haspopup": "true", onClick: handleOptionMenuClick, children: jsxRuntimeExports.jsx(ExpandMoreRounded, {}) }) }))] })), options && options.length > 0 && (jsxRuntimeExports.jsx(Menu, { id: "urls-select-menu", anchorEl: optionMenuAnchorEl, open: Boolean(optionMenuAnchorEl), onClose: function () { return setOptionMenuAnchorEl(null); }, MenuListProps: {
                     'aria-labelledby': 'urls-select-button'
                 }, slotProps: {
                     paper: {
@@ -2144,12 +1881,157 @@ function CopyCurrentPageUrl(props) {
                 }, children: options.map(function (option) { return (jsxRuntimeExports.jsx(MenuItem, { onClick: function () { return handleOptionSelect(option.label, option.pattern); }, children: option.label }, option.label)); }) }))] }));
 }
 
+/*
+ * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License version 3 as published by
+ * the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+function useActiveSite() {
+  const id = useActiveSiteId();
+  return useSelector((state) => state.sites.byId[id]);
+}
+
+/*
+ * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License version 3 as published by
+ * the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+const pathNavigatorFetchPath = /*#__PURE__*/ createAction('PATH_NAV_FETCH_PATH');
+
+// shim
+function isFolder(item) {
+    return (item === null || item === void 0 ? void 0 : item.systemType) === 'folder';
+}
+
+// shim
+var PREVIEW_URL_PATH = '/preview';
+function getSystemLink(_a) {
+    var systemLinkId = _a.systemLinkId, authoringBase = _a.authoringBase, site = _a.site, _b = _a.page, page = _b === void 0 ? '/' : _b;
+    return {
+        preview: "".concat(authoringBase).concat(PREVIEW_URL_PATH, "#/?page=").concat(page, "&site=").concat(site),
+        siteTools: "".concat(authoringBase, "/site-config"),
+        siteSearch: "".concat(authoringBase, "/search"),
+        siteDashboard: "".concat(authoringBase, "/site-dashboard")
+    }[systemLinkId];
+}
+
+var ComponentPreviewPathNavigator = function (props) {
+    var _a, _b;
+    var dispatch = useDispatch();
+    var siteId = useActiveSite().id;
+    var pathNavigatorId = 'componentPreviewPathNavigator';
+    var doesPathMatchRegex = function (inputPath) {
+        var regexList = props.nonPreviewablePaths.split(',');
+        for (var i = 0; i < regexList.length; i++) {
+            var regex = new RegExp("^".concat(regexList[i], "$"));
+            if (regex.test(inputPath)) {
+                return true;
+            }
+        }
+        return false;
+    };
+    var onItemClicked = function (item, e) {
+        if (isFolder(item)) {
+            onPathSelected(item);
+        }
+        else {
+            // show edit form
+            // const foundExactMatch = props.nonPreviewablePaths.includes(item.path);
+            // const itemFolderPath = item.path.substring(0, item.path.lastIndexOf('/'));
+            // const foundFolderMatch = props.nonPreviewablePaths.includes(itemFolderPath);
+            var isLevelDescriptor_1 = item.path
+                .substring(item.path.length, item.path.lastIndexOf('/'))
+                .includes('crafter-level-descriptor.level.xml');
+            var isNotPreviewable = doesPathMatchRegex(item.path);
+            if (isNotPreviewable) {
+                showEditForm(item);
+                return;
+            }
+            var path_1;
+            if (props.paths.item[0]) {
+                var paths = Object.values(props.paths.item);
+                paths.map(function (p) {
+                    var path_without_extension = item.path.substring(0, item.path.lastIndexOf('/'));
+                    if (isLevelDescriptor_1 && path_without_extension.includes(p.source) && p.isLevelDescriptor) {
+                        path_1 = p;
+                        return;
+                    }
+                    if (path_without_extension.includes(p.source) && !p.isLevelDescriptor) {
+                        path_1 = p;
+                        return;
+                    }
+                });
+            }
+            else {
+                path_1 = props.paths.item;
+            }
+            // show preview
+            var url = getSystemLink({
+                site: siteId,
+                systemLinkId: 'preview',
+                authoringBase: '/studio',
+                page: item.path
+                    .substring(0, item.path.length - 4) // remove .xml extension
+                    .replace(path_1.source, path_1.target)
+            });
+            if (e.ctrlKey || e.metaKey) {
+                window.open(url);
+            }
+            else {
+                window.location.href = url;
+            }
+        }
+    };
+    var onPathSelected = function (item) {
+        dispatch(pathNavigatorFetchPath({
+            id: pathNavigatorId,
+            path: item.path
+        }));
+    };
+    var validConfigurationExists = function () {
+        return props.icon && props.label && props.rootPath && props.limit;
+    };
+    var showEditForm = function (item) {
+        var authoringBase = '/studio';
+        dispatch(showEditDialog({
+            path: item.path,
+            authoringBase: authoringBase,
+            site: siteId,
+            readonly: true
+        }));
+    };
+    return (jsxRuntimeExports.jsx("div", { children: validConfigurationExists() ? (jsxRuntimeExports.jsx(PathNavigator, { id: pathNavigatorId, label: props.label, rootPath: props.rootPath, onItemClicked: onItemClicked, icon: { id: props.icon }, limit: props.limit, excludes: (_b = (_a = props.excludedPaths) === null || _a === void 0 ? void 0 : _a.split(',')) !== null && _b !== void 0 ? _b : [] })) : (jsxRuntimeExports.jsxs(Alert, { severity: "warning", children: [jsxRuntimeExports.jsx(AlertTitle, { children: "Component Preview Path Navigator plugin configuration not found" }), "Please edit the ui.xml file and configure the widget as described in the README.md."] })) }));
+};
+
 var plugin = {
     locales: undefined,
     scripts: undefined,
     stylesheets: undefined,
     id: 'org.rd.plugin.uigoodies',
     widgets: {
+        'org.rd.plugin.uigoodies.ComponentPreviewPathNavigator': ComponentPreviewPathNavigator,
         'org.rd.plugin.uigoodies.EditOrViewCurrent': EditOrViewCurrent,
         'org.rd.plugin.uigoodies.PublishOrRequestPublish': PublishOrRequestPublish,
         'org.rd.plugin.uigoodies.ToolPanelAccordion': ToolPanelAccordion,
@@ -2164,4 +2046,4 @@ var plugin = {
     }
 };
 
-export { CopyCurrentPageUrl, EditOrViewCurrent, PublishOrRequestPublish, PullPushRemoteButtons, ToolPanelAccordion, plugin as default };
+export { BulkPublishView, ComponentPreviewPathNavigator, ContentUpload, CopyCurrentPageUrl, EditOrViewCurrent, OpenBulkPublishPanelButton, OpenBulkPublishToolbarButton, OpenContentUploadPanelButton, OpenContentUploadToolbarButton, PublishOrRequestPublish, PullPushRemoteButtons, ToolPanelAccordion, plugin as default };
