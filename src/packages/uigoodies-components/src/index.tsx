@@ -10,6 +10,7 @@ import BulkPublishView from './components/BulkPublishView';
 import OpenBulkPublishPanelButton from './components/OpenBulkPublishPanelButton';
 import OpenBulkPublishToolbarButton from './components/OpenBulkPublishToolbarButton';
 import CopyCurrentPageUrl from './components/CopyCurrentPageUrl';
+import ComponentPreviewPathNavigator from './components/ComponentPreview/ComponentPreviewPathNavigator';
 
 const plugin: PluginDescriptor = {
   locales: undefined,
@@ -17,6 +18,7 @@ const plugin: PluginDescriptor = {
   stylesheets: undefined,
   id: 'org.rd.plugin.uigoodies',
   widgets: {
+    'org.rd.plugin.uigoodies.component-preview-path-navigator': ComponentPreviewPathNavigator,
     'org.rd.plugin.uigoodies.EditOrViewCurrent': EditOrViewCurrent,
     'org.rd.plugin.uigoodies.PublishOrRequestPublish': PublishOrRequestPublish,
     'org.rd.plugin.uigoodies.ToolPanelAccordion': ToolPanelAccordion,
@@ -31,6 +33,19 @@ const plugin: PluginDescriptor = {
   }
 };
 
-export { EditOrViewCurrent, PublishOrRequestPublish, ToolPanelAccordion, PullPushRemoteButtons, CopyCurrentPageUrl };
+export {
+  ComponentPreviewPathNavigator,
+  EditOrViewCurrent,
+  PublishOrRequestPublish,
+  ToolPanelAccordion,
+  ContentUpload,
+  OpenContentUploadPanelButton,
+  OpenContentUploadToolbarButton,
+  PullPushRemoteButtons,
+  BulkPublishView,
+  OpenBulkPublishPanelButton,
+  OpenBulkPublishToolbarButton,
+  CopyCurrentPageUrl
+};
 
 export default plugin;

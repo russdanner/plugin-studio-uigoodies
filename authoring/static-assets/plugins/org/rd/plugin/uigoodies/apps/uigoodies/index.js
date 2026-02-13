@@ -2,7 +2,7 @@ const React = craftercms.libs.React;
 const { useState, useRef, useEffect } = craftercms.libs.React;
 const React__default = craftercms.libs.React && Object.prototype.hasOwnProperty.call(craftercms.libs.React, 'default') ? craftercms.libs.React['default'] : craftercms.libs.React;
 const { useSelector, useDispatch } = craftercms.libs.ReactRedux;
-const { Tooltip, useTheme, accordionClasses, accordionSummaryClasses, Accordion, AccordionSummary, Typography, AccordionDetails, alpha, Button: Button$1, buttonClasses, Backdrop, CircularProgress: CircularProgress$1, Alert, Paper, Box: Box$1 } = craftercms.libs.MaterialUI;
+const { Tooltip, useTheme, accordionClasses, accordionSummaryClasses, Accordion, AccordionSummary, Typography, AccordionDetails, alpha, Button: Button$1, buttonClasses, Backdrop, CircularProgress: CircularProgress$1, Alert, Paper, Box: Box$1, AlertTitle } = craftercms.libs.MaterialUI;
 const IconButton = craftercms.libs.MaterialUI.IconButton && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.IconButton, 'default') ? craftercms.libs.MaterialUI.IconButton['default'] : craftercms.libs.MaterialUI.IconButton;
 const Button = craftercms.libs.MaterialUI.Button && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Button, 'default') ? craftercms.libs.MaterialUI.Button['default'] : craftercms.libs.MaterialUI.Button;
 const SystemIcon = craftercms.components.SystemIcon && Object.prototype.hasOwnProperty.call(craftercms.components.SystemIcon, 'default') ? craftercms.components.SystemIcon['default'] : craftercms.components.SystemIcon;
@@ -14,7 +14,7 @@ const TextField = craftercms.libs.MaterialUI.TextField && Object.prototype.hasOw
 const Container = craftercms.libs.MaterialUI.Container && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Container, 'default') ? craftercms.libs.MaterialUI.Container['default'] : craftercms.libs.MaterialUI.Container;
 const Box = craftercms.libs.MaterialUI.Box && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Box, 'default') ? craftercms.libs.MaterialUI.Box['default'] : craftercms.libs.MaterialUI.Box;
 const { writeContent } = craftercms.services.content;
-const { DialogFooter } = craftercms.components;
+const { DialogFooter, PathNavigator } = craftercms.components;
 const { unstable_useId, capitalize } = craftercms.libs.MaterialUI;
 const { styled, useTheme: useTheme$1 } = craftercms.libs.MaterialUI;
 const { useDefaultProps } = craftercms.libs.MaterialUI.DefaultPropsProvider;
@@ -1132,9 +1132,8 @@ function EditOrViewCurrent(props) {
     var siteId = useActiveSiteId();
     var env = useEnv();
     var readonly = true;
-    // make sure the user has access to the item, 
-    if ((item === null || item === void 0 ? void 0 : item.availableActionsMap.edit) === true
-        && isItemLockedForMe(item, currentUser.username) === false) {
+    // make sure the user has access to the item,
+    if ((item === null || item === void 0 ? void 0 : item.availableActionsMap.edit) === true && isItemLockedForMe(item, currentUser.username) === false) {
         readonly = false;
     }
     var label = readonly ? 'View' : 'Edit';
@@ -1631,45 +1630,47 @@ function ContentUpload(props) {
                     'padding-top': '40px',
                     'padding-bottom': '40px'
                 }, children: [jsxRuntimeExports.jsxs(Box, { sx: {
-                            'display': 'flex',
-                            'marginBottom': '20px',
-                            'alignItems': 'center'
-                        }, children: [jsxRuntimeExports.jsx(TextField, { label: "Path to upload", id: "path-read-only-input", sx: { minWidth: '450px' }, InputProps: { readOnly: !props.allowPathInput }, value: path, onChange: props.allowPathInput ? function (e) {
-                                    setPath(e.target.value);
-                                } : undefined }), props.allowPathSelection && (jsxRuntimeExports.jsx(Button, { variant: "outlined", onClick: handleSelectPath, disabled: processing, sx: { minWidth: '130px', marginLeft: '20px' }, children: "Select Path" }))] }), jsxRuntimeExports.jsx(Box, { sx: function (theme) { return ({
+                            display: 'flex',
+                            marginBottom: '20px',
+                            alignItems: 'center'
+                        }, children: [jsxRuntimeExports.jsx(TextField, { label: "Path to upload", id: "path-read-only-input", sx: { minWidth: '450px' }, InputProps: { readOnly: !props.allowPathInput }, value: path, onChange: props.allowPathInput
+                                    ? function (e) {
+                                        setPath(e.target.value);
+                                    }
+                                    : undefined }), props.allowPathSelection && (jsxRuntimeExports.jsx(Button, { variant: "outlined", onClick: handleSelectPath, disabled: processing, sx: { minWidth: '130px', marginLeft: '20px' }, children: "Select Path" }))] }), jsxRuntimeExports.jsx(Box, { sx: function (theme) { return ({
                             'font-family': '"Source Sans Pro", "Open Sans", sans-serif',
                             '& input::file-selector-button': {
-                                'display': 'inline-flex',
+                                display: 'inline-flex',
                                 '-webkit-box-align': 'center',
                                 'align-items': 'center',
                                 '-webkit-box-pack': 'center',
                                 'justify-content': 'center',
-                                'position': 'relative',
+                                position: 'relative',
                                 'box-sizing': 'border-box',
                                 '-webkit-tap-highlight-color': 'transparent',
-                                'backgroundColor': 'transparent',
-                                'outline': '0px',
-                                'margin': '0px',
-                                'cursor': 'pointer',
+                                backgroundColor: 'transparent',
+                                outline: '0px',
+                                margin: '0px',
+                                cursor: 'pointer',
                                 'user-select': 'none',
                                 'vertical-align': 'middle',
-                                'appearance': 'none',
+                                appearance: 'none',
                                 'text-decoration': 'none',
                                 'text-transform': 'none',
                                 'font-family': '"Source Sans Pro", "Open Sans", sans-serif',
                                 'font-weight': '600',
                                 'font-size': '0.875rem',
                                 'line-height': '1.75',
-                                'padding': '5px 15px',
+                                padding: '5px 15px',
                                 'border-radius': '4px',
-                                'transition': 'background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
-                                'border': "1px solid ".concat(alpha(theme.palette.primary.main, 0.5)),
-                                'color': theme.palette.primary.main,
+                                transition: 'background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
+                                border: "1px solid ".concat(alpha(theme.palette.primary.main, 0.5)),
+                                color: theme.palette.primary.main,
                                 'min-width': '130px',
-                                'marginRight': '10px',
+                                marginRight: '10px',
                                 '&:hover': {
-                                    'backgroundColor': alpha(theme.palette.primary.main, 0.04),
-                                    'border': "1px solid ".concat(theme.palette.primary.main)
+                                    backgroundColor: alpha(theme.palette.primary.main, 0.04),
+                                    border: "1px solid ".concat(theme.palette.primary.main)
                                 }
                             }
                         }); }, children: jsxRuntimeExports.jsx("input", { ref: inputRef, type: "file", accept: ".xml", onChange: onFileChange, onClick: function () {
@@ -1729,7 +1730,7 @@ function useOpenBulkPublish(props) {
 function OpenContentUploadPanelButton(props) {
     var _a = props.title, title = _a === void 0 ? CONTENT_UPLOAD_DEFAULTS.title : _a, _b = props.icon, icon = _b === void 0 ? CONTENT_UPLOAD_DEFAULTS.icon : _b, _c = props.dialogTitle, dialogTitle = _c === void 0 ? title : _c;
     var handleClick = useOpenContentUpload(__assign(__assign({}, props), { title: dialogTitle }));
-    return (jsxRuntimeExports.jsx(ToolsPanelListItemButton, { icon: icon, title: title, onClick: handleClick }));
+    return jsxRuntimeExports.jsx(ToolsPanelListItemButton, { icon: icon, title: title, onClick: handleClick });
 }
 
 function OpenContentUploadToolbarButton(props) {
@@ -2015,10 +2016,12 @@ function BulkPublishView(props) {
         setIsSubmitting(true);
         var fetchItems = function (offset) { return fetchUnpublished(siteId, { limit: FETCH_UNPUBLISHED_ITEMS_LIMIT, offset: offset }); };
         var itemsByPath = [];
-        of(0).pipe(concatMap(function (offset) { return fetchItems(offset); }), expand(function (data) {
+        of(0)
+            .pipe(concatMap(function (offset) { return fetchItems(offset); }), expand(function (data) {
             itemsByPath.push.apply(itemsByPath, data.filter(function (item) { return item.path.startsWith(selectedPath); }));
             return data.total > data.limit + data.offset ? fetchItems(data.limit + data.offset) : of();
-        }), toArray()).subscribe({
+        }), toArray())
+            .subscribe({
             complete: function () {
                 if (itemsByPath.length === 0) {
                     dispatch(showSystemNotification({
@@ -2055,11 +2058,11 @@ function BulkPublishView(props) {
         setSelectedPath(value.replace('/index.xml', ''));
     };
     if (hasInitialPublish$1 === null) {
-        return (jsxRuntimeExports.jsx(Paper, { elevation: 2, sx: { height: '100%' } }));
+        return jsxRuntimeExports.jsx(Paper, { elevation: 2, sx: { height: '100%' } });
     }
     return (jsxRuntimeExports.jsx(Paper, { elevation: 2, sx: { height: '100%' }, children: jsxRuntimeExports.jsx(Box$1, { sx: { p: 1 }, children: hasInitialPublish$1 ? (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsxs(DialogBody, { sx: { minHeight: '24vh', minWidth: '48vh' }, children: [jsxRuntimeExports.jsx(Typography, { variant: "body1", sx: {
                                     paddingBottom: 2,
-                                    float: 'left',
+                                    float: 'left'
                                 }, children: "Select a path to calculate publish packages." }), jsxRuntimeExports.jsx(Box$1, { sx: { paddingBottom: 1 }, children: jsxRuntimeExports.jsx(PathSelector, { value: selectedPath, disabled: false, onPathSelected: onPathSelected, stripXmlIndex: false }) })] }), jsxRuntimeExports.jsx(DialogFooter$1, { children: jsxRuntimeExports.jsx(Button$1, { sx: { float: 'right' }, variant: "contained", color: "primary", disabled: isSubmitting, onClick: onSubmitBulkPublish, children: "Bulk Publish" }) })] })) : (jsxRuntimeExports.jsxs(Box$1, { sx: {
                     display: 'flex',
                     alignItems: 'center',
@@ -2078,7 +2081,7 @@ function BulkPublishView(props) {
 function OpenBulkPublishPanelButton(props) {
     var _a = props.title, title = _a === void 0 ? BULK_PUBLISH_DEFAULTS.title : _a, _b = props.icon, icon = _b === void 0 ? BULK_PUBLISH_DEFAULTS.icon : _b, _c = props.dialogTitle, dialogTitle = _c === void 0 ? title : _c;
     var handleClick = useOpenBulkPublish(__assign(__assign({}, props), { title: dialogTitle }));
-    return (jsxRuntimeExports.jsx(ToolsPanelListItemButton, { icon: icon, title: title, onClick: handleClick }));
+    return jsxRuntimeExports.jsx(ToolsPanelListItemButton, { icon: icon, title: title, onClick: handleClick });
 }
 
 function OpenBulkPublishToolbarButton(props) {
@@ -2096,8 +2099,7 @@ function OpenBulkPublishToolbarButton(props) {
 }
 
 function copyToClipboard(text) {
-    navigator.clipboard.writeText(text)
-        .catch(function (err) {
+    navigator.clipboard.writeText(text).catch(function (err) {
         console.error('Failed to copy text: ', err);
     });
 }
@@ -2107,10 +2109,12 @@ function CopyCurrentPageUrl(props) {
     var iconId = '@mui/icons-material/FileCopyOutlined';
     var siteId = useActiveSiteId();
     var dispatch = useDispatch();
-    var options = (environments === null || environments === void 0 ? void 0 : environments.label) && (environments === null || environments === void 0 ? void 0 : environments.pattern) ? Object.keys(environments.label).map(function (key) { return ({
-        label: environments.label[key],
-        pattern: environments.pattern[key]
-    }); }) : [];
+    var options = (environments === null || environments === void 0 ? void 0 : environments.label) && (environments === null || environments === void 0 ? void 0 : environments.pattern)
+        ? Object.keys(environments.label).map(function (key) { return ({
+            label: environments.label[key],
+            pattern: environments.pattern[key]
+        }); })
+        : [];
     var handleClick = function (event) {
         copyToClipboard(item.previewUrl);
         dispatch(showSystemNotification({
@@ -2130,12 +2134,12 @@ function CopyCurrentPageUrl(props) {
             setOptionMenuAnchorEl(null);
         }, 50);
     };
-    return (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [useIcon ? (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsx(Tooltip, { title: 'Copy Page URL', children: jsxRuntimeExports.jsx(IconButton, { size: "small", onClick: handleClick, children: jsxRuntimeExports.jsx(SystemIcon, { icon: { id: iconId } }) }) }), options && options.length > 0 && (jsxRuntimeExports.jsx(Button, { id: "urls-select-button", variant: "text", color: "inherit", onClick: handleOptionMenuClick, "aria-controls": optionMenuAnchorEl ? 'urls-select-menu' : undefined, "aria-haspopup": "true", "aria-expanded": Boolean(optionMenuAnchorEl), sx: {
+    return (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [useIcon ? (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsx(Tooltip, { title: "Copy Page URL", children: jsxRuntimeExports.jsx(IconButton, { size: "small", onClick: handleClick, children: jsxRuntimeExports.jsx(SystemIcon, { icon: { id: iconId } }) }) }), options && options.length > 0 && (jsxRuntimeExports.jsx(Button, { id: "urls-select-button", variant: "text", color: "inherit", onClick: handleOptionMenuClick, "aria-controls": optionMenuAnchorEl ? 'urls-select-menu' : undefined, "aria-haspopup": "true", "aria-expanded": Boolean(optionMenuAnchorEl), sx: {
                             typography: 'subtitle1',
                             textTransform: 'none',
                             borderRadius: 1,
                             minWidth: 0
-                        }, endIcon: jsxRuntimeExports.jsx(ExpandMoreRounded, {}), children: "Copy URLs" }))] })) : (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsx(Button, { size: "small", variant: "text", onClick: handleClick, children: "Copy Page URL" }), options && options.length > 0 && (jsxRuntimeExports.jsx(Tooltip, { title: 'Copy more URLs', children: jsxRuntimeExports.jsx(IconButton, { id: "urls-select-button", color: "inherit", size: "small", "aria-controls": optionMenuAnchorEl ? 'urls-select-menu' : undefined, "aria-haspopup": "true", onClick: handleOptionMenuClick, children: jsxRuntimeExports.jsx(ExpandMoreRounded, {}) }) }))] })), options && options.length > 0 && (jsxRuntimeExports.jsx(Menu, { id: "urls-select-menu", anchorEl: optionMenuAnchorEl, open: Boolean(optionMenuAnchorEl), onClose: function () { return setOptionMenuAnchorEl(null); }, MenuListProps: {
+                        }, endIcon: jsxRuntimeExports.jsx(ExpandMoreRounded, {}), children: "Copy URLs" }))] })) : (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsx(Button, { size: "small", variant: "text", onClick: handleClick, children: "Copy Page URL" }), options && options.length > 0 && (jsxRuntimeExports.jsx(Tooltip, { title: "Copy more URLs", children: jsxRuntimeExports.jsx(IconButton, { id: "urls-select-button", color: "inherit", size: "small", "aria-controls": optionMenuAnchorEl ? 'urls-select-menu' : undefined, "aria-haspopup": "true", onClick: handleOptionMenuClick, children: jsxRuntimeExports.jsx(ExpandMoreRounded, {}) }) }))] })), options && options.length > 0 && (jsxRuntimeExports.jsx(Menu, { id: "urls-select-menu", anchorEl: optionMenuAnchorEl, open: Boolean(optionMenuAnchorEl), onClose: function () { return setOptionMenuAnchorEl(null); }, MenuListProps: {
                     'aria-labelledby': 'urls-select-button'
                 }, slotProps: {
                     paper: {
@@ -2144,12 +2148,157 @@ function CopyCurrentPageUrl(props) {
                 }, children: options.map(function (option) { return (jsxRuntimeExports.jsx(MenuItem, { onClick: function () { return handleOptionSelect(option.label, option.pattern); }, children: option.label }, option.label)); }) }))] }));
 }
 
+/*
+ * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License version 3 as published by
+ * the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+function useActiveSite() {
+  const id = useActiveSiteId();
+  return useSelector((state) => state.sites.byId[id]);
+}
+
+/*
+ * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License version 3 as published by
+ * the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+const pathNavigatorFetchPath = /*#__PURE__*/ createAction('PATH_NAV_FETCH_PATH');
+
+// shim
+function isFolder(item) {
+    return (item === null || item === void 0 ? void 0 : item.systemType) === 'folder';
+}
+
+// shim
+var PREVIEW_URL_PATH = '/preview';
+function getSystemLink(_a) {
+    var systemLinkId = _a.systemLinkId, authoringBase = _a.authoringBase, site = _a.site, _b = _a.page, page = _b === void 0 ? '/' : _b;
+    return {
+        preview: "".concat(authoringBase).concat(PREVIEW_URL_PATH, "#/?page=").concat(page, "&site=").concat(site),
+        siteTools: "".concat(authoringBase, "/site-config"),
+        siteSearch: "".concat(authoringBase, "/search"),
+        siteDashboard: "".concat(authoringBase, "/site-dashboard")
+    }[systemLinkId];
+}
+
+var ComponentPreviewPathNavigator = function (props) {
+    var _a, _b;
+    var dispatch = useDispatch();
+    var siteId = useActiveSite().id;
+    var pathNavigatorId = 'componentPreviewPathNavigator';
+    var doesPathMatchRegex = function (inputPath) {
+        var regexList = props.nonPreviewablePaths.split(',');
+        for (var i = 0; i < regexList.length; i++) {
+            var regex = new RegExp("^".concat(regexList[i], "$"));
+            if (regex.test(inputPath)) {
+                return true;
+            }
+        }
+        return false;
+    };
+    var onItemClicked = function (item, e) {
+        if (isFolder(item)) {
+            onPathSelected(item);
+        }
+        else {
+            // show edit form
+            // const foundExactMatch = props.nonPreviewablePaths.includes(item.path);
+            // const itemFolderPath = item.path.substring(0, item.path.lastIndexOf('/'));
+            // const foundFolderMatch = props.nonPreviewablePaths.includes(itemFolderPath);
+            var isLevelDescriptor_1 = item.path
+                .substring(item.path.length, item.path.lastIndexOf('/'))
+                .includes('crafter-level-descriptor.level.xml');
+            var isNotPreviewable = doesPathMatchRegex(item.path);
+            if (isNotPreviewable) {
+                showEditForm(item);
+                return;
+            }
+            var path_1;
+            if (props.paths.item[0]) {
+                var paths = Object.values(props.paths.item);
+                paths.map(function (p) {
+                    var path_without_extension = item.path.substring(0, item.path.lastIndexOf('/'));
+                    if (isLevelDescriptor_1 && path_without_extension.includes(p.source) && p.isLevelDescriptor) {
+                        path_1 = p;
+                        return;
+                    }
+                    if (path_without_extension.includes(p.source) && !p.isLevelDescriptor) {
+                        path_1 = p;
+                        return;
+                    }
+                });
+            }
+            else {
+                path_1 = props.paths.item;
+            }
+            // show preview
+            var url = getSystemLink({
+                site: siteId,
+                systemLinkId: 'preview',
+                authoringBase: '/studio',
+                page: item.path
+                    .substring(0, item.path.length - 4) // remove .xml extension
+                    .replace(path_1.source, path_1.target)
+            });
+            if (e.ctrlKey || e.metaKey) {
+                window.open(url);
+            }
+            else {
+                window.location.href = url;
+            }
+        }
+    };
+    var onPathSelected = function (item) {
+        dispatch(pathNavigatorFetchPath({
+            id: pathNavigatorId,
+            path: item.path
+        }));
+    };
+    var validConfigurationExists = function () {
+        return props.icon && props.label && props.rootPath && props.limit;
+    };
+    var showEditForm = function (item) {
+        var authoringBase = '/studio';
+        dispatch(showEditDialog({
+            path: item.path,
+            authoringBase: authoringBase,
+            site: siteId,
+            readonly: true
+        }));
+    };
+    return (jsxRuntimeExports.jsx("div", { children: validConfigurationExists() ? (jsxRuntimeExports.jsx(PathNavigator, { id: pathNavigatorId, label: props.label, rootPath: props.rootPath, onItemClicked: onItemClicked, icon: { id: props.icon }, limit: props.limit, excludes: (_b = (_a = props.excludedPaths) === null || _a === void 0 ? void 0 : _a.split(',')) !== null && _b !== void 0 ? _b : [] })) : (jsxRuntimeExports.jsxs(Alert, { severity: "warning", children: [jsxRuntimeExports.jsx(AlertTitle, { children: "Component Preview Path Navigator plugin configuration not found" }), "Please edit the ui.xml file and configure the widget as described in the README.md."] })) }));
+};
+
 var plugin = {
     locales: undefined,
     scripts: undefined,
     stylesheets: undefined,
     id: 'org.rd.plugin.uigoodies',
     widgets: {
+        'org.rd.plugin.uigoodies.component-preview-path-navigator': ComponentPreviewPathNavigator,
         'org.rd.plugin.uigoodies.EditOrViewCurrent': EditOrViewCurrent,
         'org.rd.plugin.uigoodies.PublishOrRequestPublish': PublishOrRequestPublish,
         'org.rd.plugin.uigoodies.ToolPanelAccordion': ToolPanelAccordion,
@@ -2164,4 +2313,4 @@ var plugin = {
     }
 };
 
-export { CopyCurrentPageUrl, EditOrViewCurrent, PublishOrRequestPublish, PullPushRemoteButtons, ToolPanelAccordion, plugin as default };
+export { BulkPublishView, ComponentPreviewPathNavigator, ContentUpload, CopyCurrentPageUrl, EditOrViewCurrent, OpenBulkPublishPanelButton, OpenBulkPublishToolbarButton, OpenContentUploadPanelButton, OpenContentUploadToolbarButton, PublishOrRequestPublish, PullPushRemoteButtons, ToolPanelAccordion, plugin as default };
