@@ -1925,17 +1925,26 @@ function isFolder(item) {
     return (item === null || item === void 0 ? void 0 : item.systemType) === 'folder';
 }
 
-// shim
-var PREVIEW_URL_PATH = '/preview';
-function getSystemLink(_a) {
-    var systemLinkId = _a.systemLinkId, authoringBase = _a.authoringBase, site = _a.site, _b = _a.page, page = _b === void 0 ? '/' : _b;
-    return {
-        preview: "".concat(authoringBase).concat(PREVIEW_URL_PATH, "#/?page=").concat(page, "&site=").concat(site),
-        siteTools: "".concat(authoringBase, "/site-config"),
-        siteSearch: "".concat(authoringBase, "/search"),
-        siteDashboard: "".concat(authoringBase, "/site-dashboard")
-    }[systemLinkId];
-}
+/*
+ * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License version 3 as published by
+ * the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+const contentTypeDropTargetsResponse = /*#__PURE__*/ createAction('CONTENT_TYPE_DROP_TARGETS_RESPONSE');
+const CHANGE_CURRENT_URL = 'CHANGE_CURRENT_URL';
+const changeCurrentUrl = /*#__PURE__*/ createAction(CHANGE_CURRENT_URL);
+/*#__PURE__*/ createAction(contentTypeDropTargetsResponse.type);
 
 var ComponentPreviewPathNavigator = function (props) {
     var _a, _b;
@@ -1992,22 +2001,12 @@ var ComponentPreviewPathNavigator = function (props) {
                 .substring(0, item.path.length - 4) // remove .xml extension
                 .replace(path_1.source, path_1.target);
             if (path_1.idParameter) {
+                // if optional idParameter is supplied, restructure previewPath with parameter
                 var id = previewPath.substring(previewPath.lastIndexOf("/") + 1);
                 previewPath = previewPath.replace("/" + id, "?" + path_1.idParameter + "=" + id);
             }
-            // show preview
-            var url = getSystemLink({
-                site: siteId,
-                systemLinkId: 'preview',
-                authoringBase: '/studio',
-                page: previewPath
-            });
-            if (e.ctrlKey || e.metaKey) {
-                window.open(url);
-            }
-            else {
-                window.location.href = url;
-            }
+            // Send path to preview in xb
+            dispatch(changeCurrentUrl(previewPath));
         }
     };
     var onPathSelected = function (item) {

@@ -8,6 +8,7 @@ import { DetailedItem } from '@craftercms/studio-ui';
 import { isFolder } from './utils';
 import { getSystemLink } from './system';
 import { showEditDialog } from '@craftercms/studio-ui/state/actions/dialogs';
+import { changeCurrentUrl} from '@craftercms/studio-ui/state/actions/preview';
 
 type Item = {
   source: string;
@@ -92,19 +93,8 @@ const ComponentPreviewPathNavigator = (props: ComponentPreviewPathNavigator) => 
         previewPath = previewPath.replace("/"+id, "?"+path.idParameter+"="+id)
       }
 
-      // show preview
-      const url = getSystemLink({
-        site: siteId,
-        systemLinkId: 'preview',
-        authoringBase: '/studio',
-        page: previewPath
-      });
-
-      if (e.ctrlKey || e.metaKey) {
-        window.open(url);
-      } else {
-        window.location.href = url;
-      }
+      // Send path to preview in xb
+      dispatch(changeCurrentUrl(previewPath));
     }
   };
 
