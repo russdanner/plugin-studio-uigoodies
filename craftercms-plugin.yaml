@@ -13,6 +13,7 @@ plugin:
   version:
     major: 1
     minor: 0
+    patch: 3
   description: A plugin to adds some UI goodies to your studio
   documentation: "https://raw.githubusercontent.com/russdanner/plugin-studio-uigoodies/master/README.md"
   website:
