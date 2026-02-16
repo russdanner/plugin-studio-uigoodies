@@ -13,7 +13,7 @@ plugin:
   version:
     major: 1
     minor: 0
-    patch: 1
+    patch: 2
   description: A plugin to adds some UI goodies to your studio
   documentation: "https://raw.githubusercontent.com/russdanner/plugin-studio-uigoodies/master/README.md"
   website:
@@ -25,30 +25,24 @@ plugin:
       email: russdanner@craftercms.com
       url: https://github.com/russdanner
   build:
-    id: cafebabe31300070207481d6ba87901d0b02716c9
-    date: 2023-02-07T00:00:00Z
+    id: cafebabe31300070207481d6ba87901d0b02716d1
+    date: 2025-02-16T00:00:00Z
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
   crafterCmsVersions:
     - major: 4
       minor: 0
-      patch: 0
     - major: 4
-      minor: 0
       patch: 1
     - major: 4
-      minor: 0
-      patch: 2
+      minor: 2
     - major: 4
-      minor: 0
-      patch: 3
+      minor: 3
     - major: 4
-      minor: 0
-      patch: 8
+      minor: 4
     - major: 4
-      minor: 1
-      patch: 3
+      minor: 5
   crafterCmsEditions:
     - community
     - enterprise
