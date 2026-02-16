@@ -1987,14 +1987,20 @@ var ComponentPreviewPathNavigator = function (props) {
             else {
                 path_1 = props.paths.item;
             }
+            // construct preview path
+            var previewPath = item.path
+                .substring(0, item.path.length - 4) // remove .xml extension
+                .replace(path_1.source, path_1.target);
+            if (path_1.idParameter) {
+                var id = previewPath.substring(previewPath.lastIndexOf("/") + 1);
+                previewPath = previewPath.replace("/" + id, "?" + path_1.idParameter + "=" + id);
+            }
             // show preview
             var url = getSystemLink({
                 site: siteId,
                 systemLinkId: 'preview',
                 authoringBase: '/studio',
-                page: item.path
-                    .substring(0, item.path.length - 4) // remove .xml extension
-                    .replace(path_1.source, path_1.target)
+                page: previewPath
             });
             if (e.ctrlKey || e.metaKey) {
                 window.open(url);

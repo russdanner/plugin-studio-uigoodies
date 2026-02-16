@@ -12,6 +12,7 @@ import { showEditDialog } from '@craftercms/studio-ui/state/actions/dialogs';
 type Item = {
   source: string;
   target: string;
+  idParameter: string;
 };
 
 type Paths = {
@@ -80,14 +81,23 @@ const ComponentPreviewPathNavigator = (props: ComponentPreviewPathNavigator) => 
         path = props.paths.item;
       }
 
+      // construct preview path
+      let previewPath = item.path
+          .substring(0, item.path.length - 4) // remove .xml extension
+          .replace(path.source, path.target)
+
+      if(path.idParameter) {
+        // if optional idParameter is supplied, restructure previewPath with parameter
+        let id = previewPath.substring(previewPath.lastIndexOf("/")+1)
+        previewPath = previewPath.replace("/"+id, "?"+path.idParameter+"="+id)
+      }
+
       // show preview
       const url = getSystemLink({
         site: siteId,
         systemLinkId: 'preview',
         authoringBase: '/studio',
-        page: item.path
-          .substring(0, item.path.length - 4) // remove .xml extension
-          .replace(path.source, path.target)
+        page: previewPath
       });
 
       if (e.ctrlKey || e.metaKey) {
