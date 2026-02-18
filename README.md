@@ -348,9 +348,9 @@ widget. Note that nonPreviewablePaths and `paths` require their own configuratio
   
   *Examples*:
   - Detail page (a single product page with pluggable products) where the component ID is part of the route:
-    - Target value `product` is transformed to `/product/{componentId}` 
+    - Target value `/product` is transformed to `/product/{componentId}` 
   - Detail page (a single product page with pluggable products) where the component ID is provided as a parameter:
-    - Target value `product?productId=` is transformed to `/product?productId={componentId}`
+    - Target value `/product?productId=` is transformed to `/product?productId={componentId}`
 - `nonPreviewablePaths`: A regex that will exclude paths from being previewed - items matching this regex will render
   the form instead of preview
 - `excludedPaths`: A comma-separated list of paths that will be excluded from the navigation tree entirely (this is a
