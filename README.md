@@ -345,7 +345,12 @@ widget. Note that nonPreviewablePaths and `paths` require their own configuratio
 - `paths`: a set of `source`:`target` pairs that provide the path substitution for the preview URL. The `source` is
   the Crafter store URL prefix (i.e. where the item lives in the Crafter repo), and the `target` is the path prefix in
   the preview URL. This is useful when the Crafter repo path does not match the preview URL path.
-  - `idParameter` an [optional] url parameter to use to pass the ID as instead of as part of the URL
+  
+  *Examples*:
+  - Detail page (a single product page with pluggable products) where the component ID is part of the route:
+    - Target value `product` is transformed to `/product/{componentId}` 
+  - Detail page (a single product page with pluggable products) where the component ID is provided as a parameter:
+    - Target value `product?productId=` is transformed to `/product?productId={componentId}`
 - `nonPreviewablePaths`: A regex that will exclude paths from being previewed - items matching this regex will render
   the form instead of preview
 - `excludedPaths`: A comma-separated list of paths that will be excluded from the navigation tree entirely (this is a
@@ -376,8 +381,7 @@ widget. Note that nonPreviewablePaths and `paths` require their own configuratio
             </item>
             <item>
                 <source>/site/components/content/products</source>
-                <target>/product</target>
-                <idParameter>productId</idParameter>
+                <target>/product?productId=</target>
             </item>
         </paths>
         <nonPreviewablePaths>.*\/crafter-level-descriptor.level.xml,.*/my-configs/.*</nonPreviewablePaths>
