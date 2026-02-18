@@ -2000,11 +2000,6 @@ var ComponentPreviewPathNavigator = function (props) {
             var previewPath = item.path
                 .substring(0, item.path.length - 4) // remove .xml extension
                 .replace(path_1.source, path_1.target);
-            if (path_1.idParameter) {
-                // if optional idParameter is supplied, restructure previewPath with parameter
-                var id = previewPath.substring(previewPath.lastIndexOf("/") + 1);
-                previewPath = previewPath.replace("/" + id, "?" + path_1.idParameter + "=" + id);
-            }
             // Send path to preview in xb
             dispatch(changeCurrentUrl(previewPath));
         }

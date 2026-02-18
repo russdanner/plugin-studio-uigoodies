@@ -13,7 +13,6 @@ import { changeCurrentUrl} from '@craftercms/studio-ui/state/actions/preview';
 type Item = {
   source: string;
   target: string;
-  idParameter: string;
 };
 
 type Paths = {
@@ -86,12 +85,6 @@ const ComponentPreviewPathNavigator = (props: ComponentPreviewPathNavigator) => 
       let previewPath = item.path
           .substring(0, item.path.length - 4) // remove .xml extension
           .replace(path.source, path.target)
-
-      if(path.idParameter) {
-        // if optional idParameter is supplied, restructure previewPath with parameter
-        let id = previewPath.substring(previewPath.lastIndexOf("/")+1)
-        previewPath = previewPath.replace("/"+id, "?"+path.idParameter+"="+id)
-      }
 
       // Send path to preview in xb
       dispatch(changeCurrentUrl(previewPath));
