@@ -46,6 +46,16 @@ curl --location --request POST 'http://localhost:8080/studio/api/2/marketplace/c
 }'
 ```
 
+### Installation note for Project Tools auto-wiring
+
+This plugin now includes auto-wiring in `craftercms-plugin.yaml` to add a Project Tools entry:
+
+- **Copy Content Types (cross-project)** (URL: `uigoodies-cross-site-content-types`)
+
+If you are upgrading from a previous install, re-install/upgrade the plugin so the auto-wiring section is applied.
+If your project manages `config/studio/ui.xml` manually, merge the generated tool entry into
+`//reference[@id='craftercms.siteTools']/tools`.
+
 # Building
 
 To build this plugin on your own, make your customizations as required, then run `yarn` and then `yarn dist` in the
@@ -304,6 +314,55 @@ remote and branches
 ```
 
 * `[URL]` and `[SITEID]` macros will be replaced by the actual page url and the site id
+
+## Project Tools: Cross-site Content Type Copy
+
+This widget adds a Project Tool that lets admins copy content type definitions from one site to another.
+
+### What it does
+
+1. Select a **source project**
+2. Select one or more **content types**
+3. Select a **destination project**
+4. Confirm and execute copy
+
+For each selected content type, it copies:
+
+- `/config/studio/content-types/.../config.xml`
+- `/config/studio/content-types/.../form-definition.xml`
+
+to the destination project (overwriting existing files of the same content type).
+
+### What it does not copy
+
+- Preview images and any other extra files under the content type folder
+- Content items that use the content type
+
+### Permissions
+
+The user running the tool should have:
+
+- Access to both source and destination sites
+- Configuration read access on source and write access on destination
+
+### Project Tools `tool` entry (ui.xml)
+
+```xml
+<tool>
+    <title id="uigoodies.crossSiteContentTypeCopy.title" defaultMessage="Content Type Copy"/>
+    <icon id="@mui/icons-material/FileCopyOutlined"/>
+    <url>uigoodies-cross-site-content-types</url>
+    <widget id="org.rd.plugin.uigoodies.CrossSiteContentTypeCopy">
+        <plugin
+                id="org.rd.plugin.uigoodies"
+                site="{site}"
+                type="apps"
+                name="uigoodies"
+                file="index.js"
+        />
+    </widget>
+</tool>
+```
 
 ## Sidebar Component Preview Path Navigator
 

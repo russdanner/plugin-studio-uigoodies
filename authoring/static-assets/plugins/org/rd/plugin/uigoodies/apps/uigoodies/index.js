@@ -1,8 +1,8 @@
 const React = craftercms.libs.React;
-const { useState, useRef, useEffect } = craftercms.libs.React;
+const { useState, useRef, useEffect, useMemo, useCallback } = craftercms.libs.React;
 const React__default = craftercms.libs.React && Object.prototype.hasOwnProperty.call(craftercms.libs.React, 'default') ? craftercms.libs.React['default'] : craftercms.libs.React;
 const { useSelector, useDispatch } = craftercms.libs.ReactRedux;
-const { Tooltip, useTheme, accordionClasses, accordionSummaryClasses, Accordion, AccordionSummary, Typography, AccordionDetails, Button: Button$1, CircularProgress, alpha, buttonClasses, Backdrop, Alert, Paper, Box: Box$1, AlertTitle } = craftercms.libs.MaterialUI;
+const { Tooltip, useTheme, accordionClasses, accordionSummaryClasses, Accordion, AccordionSummary, Typography, AccordionDetails, Button: Button$1, CircularProgress, alpha, buttonClasses, Backdrop, Alert, Paper, Box: Box$1, AlertTitle, Stepper, Step, StepLabel, Autocomplete, TextField: TextField$1, FormControlLabel, Checkbox, List, ListItem } = craftercms.libs.MaterialUI;
 const IconButton = craftercms.libs.MaterialUI.IconButton && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.IconButton, 'default') ? craftercms.libs.MaterialUI.IconButton['default'] : craftercms.libs.MaterialUI.IconButton;
 const Button = craftercms.libs.MaterialUI.Button && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Button, 'default') ? craftercms.libs.MaterialUI.Button['default'] : craftercms.libs.MaterialUI.Button;
 const SystemIcon = craftercms.components.SystemIcon && Object.prototype.hasOwnProperty.call(craftercms.components.SystemIcon, 'default') ? craftercms.components.SystemIcon['default'] : craftercms.components.SystemIcon;
@@ -22,17 +22,19 @@ const DownloadIcon = craftercms.utils.constants.components.get('@mui/icons-mater
 const PublishIcon = craftercms.utils.constants.components.get('@mui/icons-material/PublishOutlined') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/PublishOutlined'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/PublishOutlined')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/PublishOutlined');
 const Snackbar = craftercms.libs.MaterialUI.Snackbar && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Snackbar, 'default') ? craftercms.libs.MaterialUI.Snackbar['default'] : craftercms.libs.MaterialUI.Snackbar;
 const { FormattedMessage } = craftercms.libs.ReactIntl;
-const { of } = craftercms.libs.rxjs;
-const { concatMap, expand, toArray } = craftercms.libs.rxjs;
+const { of, from, concatMap: concatMap$1, forkJoin } = craftercms.libs.rxjs;
+const { concatMap, expand, toArray, catchError, switchMap } = craftercms.libs.rxjs;
 const { fetchUnpublished } = craftercms.services.dashboard;
 const { nou } = craftercms.utils.object;
 const { lookupItemByPath } = craftercms.utils.content;
-const { hasInitialPublish } = craftercms.services.sites;
+const { hasInitialPublish, fetchAll } = craftercms.services.sites;
 const { useTheme: useTheme$1 } = craftercms.libs.MaterialUI;
 const InfoOutlinedIcon = craftercms.utils.constants.components.get('@mui/icons-material/InfoOutlined') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/InfoOutlined'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/InfoOutlined')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/InfoOutlined');
 const Menu = craftercms.libs.MaterialUI.Menu && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Menu, 'default') ? craftercms.libs.MaterialUI.Menu['default'] : craftercms.libs.MaterialUI.Menu;
 const MenuItem = craftercms.libs.MaterialUI.MenuItem && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.MenuItem, 'default') ? craftercms.libs.MaterialUI.MenuItem['default'] : craftercms.libs.MaterialUI.MenuItem;
 const ExpandMoreRounded = craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreRounded');
+const { fetchContentTypes } = craftercms.services.contentTypes;
+const { fetchConfigurationXML, writeConfiguration } = craftercms.services.configuration;
 
 var jsxRuntime = {exports: {}};
 
@@ -2025,6 +2027,330 @@ var ComponentPreviewPathNavigator = function (props) {
     return (jsxRuntimeExports.jsx("div", { children: validConfigurationExists() ? (jsxRuntimeExports.jsx(PathNavigator, { id: pathNavigatorId, label: props.label, rootPath: props.rootPath, onItemClicked: onItemClicked, icon: { id: props.icon }, limit: props.limit, excludes: (_b = (_a = props.excludedPaths) === null || _a === void 0 ? void 0 : _a.split(',')) !== null && _b !== void 0 ? _b : [] })) : (jsxRuntimeExports.jsxs(Alert, { severity: "warning", children: [jsxRuntimeExports.jsx(AlertTitle, { children: "Component Preview Path Navigator plugin configuration not found" }), "Please edit the ui.xml file and configure the widget as described in the README.md."] })) }));
 };
 
+var MODULE = 'studio';
+function contentTypeConfigPaths(contentTypeId) {
+    var id = contentTypeId.startsWith('/') ? contentTypeId : "/".concat(contentTypeId);
+    var base = "/content-types".concat(id).replace(/\/{2,}/g, '/');
+    return {
+        configPath: "".concat(base, "/config.xml"),
+        formPath: "".concat(base, "/form-definition.xml")
+    };
+}
+function normalizeContentTypeId(value) {
+    var trimmed = (value !== null && value !== void 0 ? value : '').trim();
+    if (!trimmed) {
+        return '';
+    }
+    return trimmed.startsWith('/') ? trimmed : "/".concat(trimmed);
+}
+function suggestCopyId(baseId, takenIds) {
+    var normalizedBase = normalizeContentTypeId(baseId);
+    var suffix = '-copy';
+    var candidate = "".concat(normalizedBase).concat(suffix);
+    var counter = 2;
+    while (takenIds.has(candidate)) {
+        candidate = "".concat(normalizedBase).concat(suffix, "-").concat(counter);
+        counter += 1;
+    }
+    return candidate;
+}
+function assertValidXml(doc, xmlType) {
+    if (doc.querySelector('parsererror')) {
+        throw new Error("Unable to parse ".concat(xmlType, " XML while preparing copied content type."));
+    }
+}
+function transformConfigXml(xml, targetId, targetLabel) {
+    var parser = new DOMParser();
+    var doc = parser.parseFromString(xml, 'application/xml');
+    assertValidXml(doc, 'config');
+    var root = doc.querySelector('content-type');
+    if (root) {
+        root.setAttribute('name', targetId);
+    }
+    var labelNode = doc.querySelector('content-type > label');
+    if (labelNode) {
+        labelNode.textContent = targetLabel;
+    }
+    return new XMLSerializer().serializeToString(doc);
+}
+function transformFormDefinitionXml(xml, targetId, targetLabel) {
+    var parser = new DOMParser();
+    var doc = parser.parseFromString(xml, 'application/xml');
+    assertValidXml(doc, 'form-definition');
+    var contentTypeNode = doc.querySelector('form > content-type');
+    if (contentTypeNode) {
+        contentTypeNode.textContent = targetId;
+    }
+    var titleNode = doc.querySelector('form > title');
+    if (titleNode) {
+        titleNode.textContent = targetLabel;
+    }
+    return new XMLSerializer().serializeToString(doc);
+}
+function CrossSiteContentTypeCopy() {
+    var dispatch = useDispatch();
+    var activeSiteId = useActiveSiteId();
+    var _a = useState(0), activeStep = _a[0], setActiveStep = _a[1];
+    var _b = useState([]), sites = _b[0], setSites = _b[1];
+    var _c = useState(true), sitesLoading = _c[0], setSitesLoading = _c[1];
+    var _d = useState(null), sourceSite = _d[0], setSourceSite = _d[1];
+    var _e = useState(null), destSite = _e[0], setDestSite = _e[1];
+    var _f = useState(false), typesLoading = _f[0], setTypesLoading = _f[1];
+    var _g = useState([]), contentTypes = _g[0], setContentTypes = _g[1];
+    var _h = useState(''), typeFilter = _h[0], setTypeFilter = _h[1];
+    var _j = useState({}), selectedIds = _j[0], setSelectedIds = _j[1];
+    var _k = useState(new Set()), destinationTypeIds = _k[0], setDestinationTypeIds = _k[1];
+    var _l = useState(false), destinationTypesLoading = _l[0], setDestinationTypesLoading = _l[1];
+    var _m = useState({}), renameOverrides = _m[0], setRenameOverrides = _m[1];
+    var _o = useState(false), copying = _o[0], setCopying = _o[1];
+    useEffect(function () {
+        var sub = fetchAll({ limit: 500, offset: 0 }).subscribe({
+            next: function (sitesResponse) {
+                var list = (Array.isArray(sitesResponse) ? sitesResponse : []).filter(Boolean);
+                setSites(list);
+                setSitesLoading(false);
+            },
+            error: function (error) {
+                setSitesLoading(false);
+                dispatch(showErrorDialog(error));
+            }
+        });
+        return function () { return sub.unsubscribe(); };
+    }, [dispatch]);
+    useEffect(function () {
+        setSelectedIds({});
+    }, [sourceSite === null || sourceSite === void 0 ? void 0 : sourceSite.id]);
+    useEffect(function () {
+        if (!sourceSite) {
+            setContentTypes([]);
+            return;
+        }
+        setTypesLoading(true);
+        var sub = fetchContentTypes(sourceSite.id).subscribe({
+            next: function (types) {
+                var rows = (types !== null && types !== void 0 ? types : [])
+                    .map(function (t) {
+                    var _a, _b, _c;
+                    return ({
+                        id: ((_a = t.id) !== null && _a !== void 0 ? _a : '').trim(),
+                        name: ((_c = (_b = t.name) !== null && _b !== void 0 ? _b : t.id) !== null && _c !== void 0 ? _c : '').trim()
+                    });
+                })
+                    .filter(function (t) { return t.id.length > 0; })
+                    .sort(function (a, b) { return a.id.localeCompare(b.id); });
+                setContentTypes(rows);
+                setTypesLoading(false);
+            },
+            error: function (error) {
+                setTypesLoading(false);
+                dispatch(showErrorDialog(error));
+            }
+        });
+        return function () { return sub.unsubscribe(); };
+    }, [dispatch, sourceSite]);
+    useEffect(function () {
+        if (!destSite) {
+            setDestinationTypeIds(new Set());
+            return;
+        }
+        setDestinationTypesLoading(true);
+        var sub = fetchContentTypes(destSite.id).subscribe({
+            next: function (types) {
+                var ids = new Set((types !== null && types !== void 0 ? types : []).map(function (t) { var _a; return normalizeContentTypeId((_a = t.id) !== null && _a !== void 0 ? _a : ''); }).filter(Boolean));
+                setDestinationTypeIds(ids);
+                setDestinationTypesLoading(false);
+            },
+            error: function (error) {
+                setDestinationTypesLoading(false);
+                dispatch(showErrorDialog(error));
+            }
+        });
+        return function () { return sub.unsubscribe(); };
+    }, [dispatch, destSite]);
+    useEffect(function () {
+        if (activeSiteId && sites.length && !sourceSite) {
+            var current = sites.find(function (s) { return s.id === activeSiteId; });
+            if (current) {
+                setSourceSite(current);
+            }
+        }
+    }, [activeSiteId, sites, sourceSite]);
+    var filteredTypes = useMemo(function () {
+        var q = typeFilter.trim().toLowerCase();
+        if (!q) {
+            return contentTypes;
+        }
+        return contentTypes.filter(function (t) { return t.id.toLowerCase().includes(q) || t.name.toLowerCase().includes(q); });
+    }, [contentTypes, typeFilter]);
+    var selectedList = useMemo(function () { return contentTypes.filter(function (t) { return selectedIds[t.id]; }).map(function (t) { return t.id; }); }, [contentTypes, selectedIds]);
+    var selectedRows = useMemo(function () { return contentTypes.filter(function (t) { return selectedIds[t.id]; }); }, [contentTypes, selectedIds]);
+    var selectedLookup = useMemo(function () { return selectedRows.reduce(function (acc, row) {
+        var _a;
+        return (__assign(__assign({}, acc), (_a = {}, _a[row.id] = row, _a)));
+    }, {}); }, [selectedRows]);
+    var conflictingIds = useMemo(function () { return selectedList.filter(function (id) { return destinationTypeIds.has(normalizeContentTypeId(id)); }); }, [selectedList, destinationTypeIds]);
+    useEffect(function () {
+        if (!conflictingIds.length) {
+            setRenameOverrides({});
+            return;
+        }
+        setRenameOverrides(function (prev) {
+            var next = {};
+            var takenIds = new Set(destinationTypeIds);
+            selectedList.forEach(function (id) {
+                var _a, _b;
+                var normalizedId = normalizeContentTypeId(id);
+                if (!destinationTypeIds.has(normalizedId)) {
+                    return;
+                }
+                var existing = prev[id];
+                var defaultLabel = "".concat(((_a = selectedLookup[id]) === null || _a === void 0 ? void 0 : _a.name) || id, " Copy");
+                var newId = (existing === null || existing === void 0 ? void 0 : existing.newId) ? normalizeContentTypeId(existing.newId) : suggestCopyId(normalizedId, takenIds);
+                next[id] = {
+                    newId: newId,
+                    newLabel: (_b = existing === null || existing === void 0 ? void 0 : existing.newLabel) !== null && _b !== void 0 ? _b : defaultLabel
+                };
+                takenIds.add(newId);
+            });
+            return next;
+        });
+    }, [conflictingIds.length, destinationTypeIds, selectedList, selectedLookup]);
+    var toggleType = useCallback(function (id) {
+        setSelectedIds(function (prev) {
+            var _a;
+            return (__assign(__assign({}, prev), (_a = {}, _a[id] = !prev[id], _a)));
+        });
+    }, []);
+    var toggleAllFiltered = useCallback(function () {
+        var allOn = filteredTypes.every(function (t) { return selectedIds[t.id]; });
+        setSelectedIds(function (prev) {
+            var next = __assign({}, prev);
+            filteredTypes.forEach(function (t) {
+                next[t.id] = !allOn;
+            });
+            return next;
+        });
+    }, [filteredTypes, selectedIds]);
+    var canNextFromSource = Boolean(sourceSite);
+    var canNextFromTypes = selectedList.length > 0;
+    var conflictValidationErrors = useMemo(function () {
+        var errors = [];
+        if (!destSite) {
+            return errors;
+        }
+        var reserved = new Set(destinationTypeIds);
+        conflictingIds.forEach(function (id) {
+            var _a, _b;
+            var override = renameOverrides[id];
+            var newId = normalizeContentTypeId((_a = override === null || override === void 0 ? void 0 : override.newId) !== null && _a !== void 0 ? _a : '');
+            var newLabel = ((_b = override === null || override === void 0 ? void 0 : override.newLabel) !== null && _b !== void 0 ? _b : '').trim();
+            if (!newId) {
+                errors.push("Provide a new ID for ".concat(id, "."));
+                return;
+            }
+            if (newId === normalizeContentTypeId(id)) {
+                errors.push("New ID for ".concat(id, " must be different from existing ID."));
+            }
+            if (reserved.has(newId)) {
+                errors.push("ID ".concat(newId, " already exists in destination project."));
+            }
+            if (!newLabel) {
+                errors.push("Provide a new label for ".concat(id, "."));
+            }
+            reserved.add(newId);
+        });
+        return errors;
+    }, [conflictingIds, destinationTypeIds, renameOverrides, destSite]);
+    var canNextFromDest = Boolean(destSite);
+    var canCopy = canNextFromDest && selectedList.length > 0 && conflictValidationErrors.length === 0;
+    var handleNext = function () {
+        if (activeStep === 0 && !canNextFromSource) {
+            return;
+        }
+        if (activeStep === 1 && !canNextFromTypes) {
+            return;
+        }
+        if (activeStep === 2 && !canNextFromDest) {
+            return;
+        }
+        setActiveStep(function (s) { return Math.min(s + 1, 3); });
+    };
+    var handleBack = function () { return setActiveStep(function (s) { return Math.max(s - 1, 0); }); };
+    var runCopy = function () {
+        if (!sourceSite || !destSite || selectedList.length === 0) {
+            return;
+        }
+        setCopying(true);
+        from(selectedList)
+            .pipe(concatMap$1(function (sourceTypeId) {
+            var _a, _b, _c, _d;
+            var sourceRow = selectedLookup[sourceTypeId];
+            var isConflict = conflictingIds.includes(sourceTypeId);
+            var targetTypeId = isConflict
+                ? normalizeContentTypeId((_b = (_a = renameOverrides[sourceTypeId]) === null || _a === void 0 ? void 0 : _a.newId) !== null && _b !== void 0 ? _b : '')
+                : normalizeContentTypeId(sourceTypeId);
+            var targetLabel = isConflict
+                ? ((_d = (_c = renameOverrides[sourceTypeId]) === null || _c === void 0 ? void 0 : _c.newLabel) !== null && _d !== void 0 ? _d : '').trim()
+                : (sourceRow === null || sourceRow === void 0 ? void 0 : sourceRow.name) || sourceTypeId;
+            var sourcePaths = contentTypeConfigPaths(sourceTypeId);
+            var targetPaths = contentTypeConfigPaths(targetTypeId);
+            return forkJoin({
+                config: fetchConfigurationXML(sourceSite.id, sourcePaths.configPath, MODULE).pipe(catchError(function (err) {
+                    dispatch(showErrorDialog(err));
+                    throw err;
+                })),
+                form: fetchConfigurationXML(sourceSite.id, sourcePaths.formPath, MODULE).pipe(catchError(function (err) {
+                    dispatch(showErrorDialog(err));
+                    throw err;
+                }))
+            }).pipe(switchMap(function (_a) {
+                var config = _a.config, form = _a.form;
+                var configContent = isConflict ? transformConfigXml(config, targetTypeId, targetLabel) : config;
+                var formContent = isConflict ? transformFormDefinitionXml(form, targetTypeId, targetLabel) : form;
+                return forkJoin([
+                    writeConfiguration(destSite.id, targetPaths.configPath, MODULE, configContent),
+                    writeConfiguration(destSite.id, targetPaths.formPath, MODULE, formContent)
+                ]);
+            }));
+        }))
+            .subscribe({
+            complete: function () {
+                setCopying(false);
+                dispatch(showSystemNotification({
+                    message: "Copied ".concat(selectedList.length, " content type(s) from \"").concat(sourceSite.id, "\" to \"").concat(destSite.id, "\".")
+                }));
+                setActiveStep(0);
+                setSelectedIds({});
+                setDestSite(null);
+            },
+            error: function () {
+                setCopying(false);
+            }
+        });
+    };
+    var destOptions = useMemo(function () { return sites; }, [sites]);
+    return (jsxRuntimeExports.jsxs(Paper, { elevation: 2, sx: { height: '100%', display: 'flex', flexDirection: 'column' }, children: [jsxRuntimeExports.jsxs(Box$1, { sx: { p: 2, flex: 1, overflow: 'auto' }, children: [jsxRuntimeExports.jsx(Typography, { variant: "h6", gutterBottom: true, children: "Copy content types across projects" }), jsxRuntimeExports.jsxs(Typography, { variant: "body2", color: "text.secondary", sx: { mb: 2 }, children: ["Copies ", jsxRuntimeExports.jsx("code", { children: "config.xml" }), " and ", jsxRuntimeExports.jsx("code", { children: "form-definition.xml" }), " for each selected type from a source project to a destination project. If a selected ID already exists in destination, you must provide a new ID and label (supports same-project duplication). Preview images and other files in the type folder are not copied."] }), jsxRuntimeExports.jsxs(Stepper, { activeStep: activeStep, sx: { mb: 2 }, children: [jsxRuntimeExports.jsx(Step, { children: jsxRuntimeExports.jsx(StepLabel, { children: "Source project" }) }), jsxRuntimeExports.jsx(Step, { children: jsxRuntimeExports.jsx(StepLabel, { children: "Content types" }) }), jsxRuntimeExports.jsx(Step, { children: jsxRuntimeExports.jsx(StepLabel, { children: "Destination" }) }), jsxRuntimeExports.jsx(Step, { children: jsxRuntimeExports.jsx(StepLabel, { children: "Confirm" }) })] }), activeStep === 0 && (jsxRuntimeExports.jsx(DialogBody, { children: sitesLoading ? (jsxRuntimeExports.jsx(Box$1, { sx: { display: 'flex', justifyContent: 'center', py: 4 }, children: jsxRuntimeExports.jsx(CircularProgress, { size: 32 }) })) : (jsxRuntimeExports.jsx(Autocomplete, { options: sites, getOptionLabel: function (o) { return "".concat(o.name, " (").concat(o.id, ")"); }, value: sourceSite, onChange: function (_, v) { return setSourceSite(v); }, renderInput: function (params) { return jsxRuntimeExports.jsx(TextField$1, __assign({}, params, { label: "Source project", required: true })); } })) })), activeStep === 1 && (jsxRuntimeExports.jsx(DialogBody, { sx: { minHeight: '40vh' }, children: typesLoading ? (jsxRuntimeExports.jsx(Box$1, { sx: { display: 'flex', justifyContent: 'center', py: 4 }, children: jsxRuntimeExports.jsx(CircularProgress, { size: 32 }) })) : (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsx(TextField$1, { fullWidth: true, size: "small", label: "Filter types", value: typeFilter, onChange: function (e) { return setTypeFilter(e.target.value); }, sx: { mb: 1 } }), jsxRuntimeExports.jsx(FormControlLabel, { control: jsxRuntimeExports.jsx(Checkbox, { checked: filteredTypes.length > 0 && filteredTypes.every(function (t) { return selectedIds[t.id]; }), indeterminate: filteredTypes.some(function (t) { return selectedIds[t.id]; }) &&
+                                            !filteredTypes.every(function (t) { return selectedIds[t.id]; }), onChange: toggleAllFiltered }), label: "Select all (filtered)" }), jsxRuntimeExports.jsx(List, { dense: true, sx: { maxHeight: 360, overflow: 'auto', border: 1, borderColor: 'divider' }, children: filteredTypes.map(function (t) { return (jsxRuntimeExports.jsx(ListItem, { disablePadding: true, children: jsxRuntimeExports.jsx(FormControlLabel, { sx: { px: 1, width: '100%', m: 0 }, control: jsxRuntimeExports.jsx(Checkbox, { checked: Boolean(selectedIds[t.id]), onChange: function () { return toggleType(t.id); } }), label: jsxRuntimeExports.jsxs("span", { children: [jsxRuntimeExports.jsx(Typography, { component: "span", variant: "body2", sx: { fontFamily: 'monospace' }, children: t.id }), t.name && t.name !== t.id ? (jsxRuntimeExports.jsxs(Typography, { component: "span", variant: "body2", color: "text.secondary", sx: { ml: 1 }, children: ["\u2014 ", t.name] })) : null] }) }) }, t.id)); }) })] })) })), activeStep === 2 && (jsxRuntimeExports.jsx(DialogBody, { children: jsxRuntimeExports.jsx(Autocomplete, { options: destOptions, getOptionLabel: function (o) { return "".concat(o.name, " (").concat(o.id, ")"); }, value: destSite, onChange: function (_, v) { return setDestSite(v); }, renderInput: function (params) { return (jsxRuntimeExports.jsx(TextField$1, __assign({}, params, { label: "Destination project", required: true, helperText: destinationTypesLoading ? 'Loading destination content types...' : ' ' }))); } }) })), activeStep === 3 && (jsxRuntimeExports.jsxs(DialogBody, { children: [jsxRuntimeExports.jsx(Typography, { variant: "body1", gutterBottom: true, children: "Please confirm:" }), jsxRuntimeExports.jsxs(Typography, { variant: "body2", component: "div", children: [jsxRuntimeExports.jsx("strong", { children: "From:" }), " ", sourceSite === null || sourceSite === void 0 ? void 0 : sourceSite.name, " (", sourceSite === null || sourceSite === void 0 ? void 0 : sourceSite.id, ")"] }), jsxRuntimeExports.jsxs(Typography, { variant: "body2", component: "div", sx: { mt: 1 }, children: [jsxRuntimeExports.jsx("strong", { children: "To:" }), " ", destSite === null || destSite === void 0 ? void 0 : destSite.name, " (", destSite === null || destSite === void 0 ? void 0 : destSite.id, ")"] }), jsxRuntimeExports.jsx(Typography, { variant: "body2", sx: { mt: 2 }, children: jsxRuntimeExports.jsxs("strong", { children: ["Types (", selectedList.length, "):"] }) }), jsxRuntimeExports.jsx(Box$1, { component: "ul", sx: { mt: 0, pl: 2, maxHeight: 240, overflow: 'auto' }, children: selectedList.map(function (id) { return (jsxRuntimeExports.jsx("li", { children: jsxRuntimeExports.jsx(Typography, { variant: "body2", component: "code", children: id }) }, id)); }) }), conflictingIds.length > 0 && (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsxs(Alert, { severity: "warning", sx: { mt: 2 }, children: ["Destination already has ", conflictingIds.length, " selected content type ID(s). Provide a new label and new ID for each conflict."] }), jsxRuntimeExports.jsx(Box$1, { sx: { mt: 2, display: 'grid', gap: 2 }, children: conflictingIds.map(function (id) {
+                                            var _a, _b, _c, _d;
+                                            return (jsxRuntimeExports.jsxs(Box$1, { sx: { border: 1, borderColor: 'divider', p: 1.5, borderRadius: 1 }, children: [jsxRuntimeExports.jsxs(Typography, { variant: "body2", sx: { mb: 1 }, children: ["Existing ID: ", jsxRuntimeExports.jsx("code", { children: id })] }), jsxRuntimeExports.jsx(TextField$1, { fullWidth: true, label: "New content type ID", value: (_b = (_a = renameOverrides[id]) === null || _a === void 0 ? void 0 : _a.newId) !== null && _b !== void 0 ? _b : '', onChange: function (e) {
+                                                            return setRenameOverrides(function (prev) {
+                                                                var _a;
+                                                                var _b;
+                                                                return (__assign(__assign({}, prev), (_a = {}, _a[id] = __assign(__assign({}, ((_b = prev[id]) !== null && _b !== void 0 ? _b : { newLabel: '', newId: '' })), { newId: e.target.value }), _a)));
+                                                            });
+                                                        }, sx: { mb: 1 } }), jsxRuntimeExports.jsx(TextField$1, { fullWidth: true, label: "New label", value: (_d = (_c = renameOverrides[id]) === null || _c === void 0 ? void 0 : _c.newLabel) !== null && _d !== void 0 ? _d : '', onChange: function (e) {
+                                                            return setRenameOverrides(function (prev) {
+                                                                var _a;
+                                                                var _b;
+                                                                return (__assign(__assign({}, prev), (_a = {}, _a[id] = __assign(__assign({}, ((_b = prev[id]) !== null && _b !== void 0 ? _b : { newLabel: '', newId: '' })), { newLabel: e.target.value }), _a)));
+                                                            });
+                                                        } })] }, id));
+                                        }) })] })), conflictValidationErrors.length > 0 && (jsxRuntimeExports.jsx(Alert, { severity: "error", sx: { mt: 2 }, children: conflictValidationErrors[0] }))] }))] }), jsxRuntimeExports.jsxs(DialogFooter$1, { sx: { borderTop: 1, borderColor: 'divider' }, children: [jsxRuntimeExports.jsx(Button$1, { onClick: handleBack, disabled: activeStep === 0 || copying, children: "Back" }), activeStep < 3 ? (jsxRuntimeExports.jsx(Button$1, { variant: "contained", onClick: handleNext, disabled: copying ||
+                            (activeStep === 0 && !canNextFromSource) ||
+                            (activeStep === 1 && !canNextFromTypes) ||
+                            (activeStep === 2 && !canNextFromDest), children: "Next" })) : (jsxRuntimeExports.jsx(Button$1, { variant: "contained", color: "primary", onClick: runCopy, disabled: !canCopy || copying, children: copying ? jsxRuntimeExports.jsx(CircularProgress, { size: 22, color: "inherit" }) : 'Copy' }))] })] }));
+}
+
 var plugin = {
     locales: undefined,
     scripts: undefined,
@@ -2042,8 +2368,9 @@ var plugin = {
         'org.rd.plugin.uigoodies.bulkPublishView': BulkPublishView,
         'org.rd.plugin.uigoodies.openBulkPublishPanelButton': OpenBulkPublishPanelButton,
         'org.rd.plugin.uigoodies.openBulkPublishToolbarButton': OpenBulkPublishToolbarButton,
-        'org.rd.plugin.uigoodies.CopyCurrentPageUrl': CopyCurrentPageUrl
+        'org.rd.plugin.uigoodies.CopyCurrentPageUrl': CopyCurrentPageUrl,
+        'org.rd.plugin.uigoodies.CrossSiteContentTypeCopy': CrossSiteContentTypeCopy
     }
 };
 
-export { BulkPublishView, ComponentPreviewPathNavigator, ContentUpload, CopyCurrentPageUrl, EditOrViewCurrent, OpenBulkPublishPanelButton, OpenBulkPublishToolbarButton, OpenContentUploadPanelButton, OpenContentUploadToolbarButton, PublishOrRequestPublish, PullPushRemoteButtons, ToolPanelAccordion, plugin as default };
+export { BulkPublishView, ComponentPreviewPathNavigator, ContentUpload, CopyCurrentPageUrl, CrossSiteContentTypeCopy, EditOrViewCurrent, OpenBulkPublishPanelButton, OpenBulkPublishToolbarButton, OpenContentUploadPanelButton, OpenContentUploadToolbarButton, PublishOrRequestPublish, PullPushRemoteButtons, ToolPanelAccordion, plugin as default };

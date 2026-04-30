@@ -52,3 +52,42 @@ plugin:
   crafterCmsEditions:
     - community
     - enterprise
+
+# Auto-wire Project Tools entry (User Interface → site tools reference).
+# Re-install the plugin or merge this into `config/studio/ui.xml` if you manage UI config manually.
+installation:
+  - type: preview-app
+    parentXpath: //reference[@id='craftercms.siteTools']
+    elementXpath: //widget[@id='org.rd.plugin.uigoodies.CrossSiteContentTypeCopy']
+    element:
+      name: tools
+      children:
+        - name: tool
+          children:
+            - name: title
+              attributes:
+                - name: id
+                  value: uigoodies.crossSiteContentTypeCopy.title
+                - name: defaultMessage
+                  value: Content Type Copy
+            - name: icon
+              attributes:
+                - name: id
+                  value: "@mui/icons-material/FileCopyOutlined"
+            - name: url
+              value: uigoodies-cross-site-content-types
+            - name: widget
+              attributes:
+                - name: id
+                  value: org.rd.plugin.uigoodies.CrossSiteContentTypeCopy
+              children:
+                - name: plugin
+                  attributes:
+                    - name: id
+                      value: org.rd.plugin.uigoodies
+                    - name: type
+                      value: apps
+                    - name: name
+                      value: uigoodies
+                    - name: file
+                      value: index.js
