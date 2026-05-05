@@ -12,6 +12,8 @@ import OpenBulkPublishToolbarButton from './components/OpenBulkPublishToolbarBut
 import CopyCurrentPageUrl from './components/CopyCurrentPageUrl';
 import ComponentPreviewPathNavigator from './components/ComponentPreview/ComponentPreviewPathNavigator';
 import CrossSiteContentTypeCopy from './components/CrossSiteContentTypeCopy';
+import AudienceTargetingFlyoutToolbarButton from './components/AudienceTargetingFlyoutToolbarButton';
+import DeviceSimulatorFlyoutToolbarButton from './components/DeviceSimulatorFlyoutToolbarButton';
 
 const plugin: PluginDescriptor = {
   locales: undefined,
@@ -31,7 +33,9 @@ const plugin: PluginDescriptor = {
     'org.rd.plugin.uigoodies.openBulkPublishPanelButton': OpenBulkPublishPanelButton,
     'org.rd.plugin.uigoodies.openBulkPublishToolbarButton': OpenBulkPublishToolbarButton,
     'org.rd.plugin.uigoodies.CopyCurrentPageUrl': CopyCurrentPageUrl,
-    'org.rd.plugin.uigoodies.CrossSiteContentTypeCopy': CrossSiteContentTypeCopy
+    'org.rd.plugin.uigoodies.CrossSiteContentTypeCopy': CrossSiteContentTypeCopy,
+    'org.rd.plugin.uigoodies.AudienceTargetingFlyoutToolbarButton': AudienceTargetingFlyoutToolbarButton,
+    'org.rd.plugin.uigoodies.DeviceSimulatorFlyoutToolbarButton': DeviceSimulatorFlyoutToolbarButton
   }
 };
 
@@ -48,7 +52,9 @@ export {
   OpenBulkPublishPanelButton,
   OpenBulkPublishToolbarButton,
   CopyCurrentPageUrl,
-  CrossSiteContentTypeCopy
+  CrossSiteContentTypeCopy,
+  AudienceTargetingFlyoutToolbarButton,
+  DeviceSimulatorFlyoutToolbarButton
 };
 
 export default plugin;

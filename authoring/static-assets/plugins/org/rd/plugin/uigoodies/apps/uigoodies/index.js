@@ -35,6 +35,13 @@ const MenuItem = craftercms.libs.MaterialUI.MenuItem && Object.prototype.hasOwnP
 const ExpandMoreRounded = craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreRounded');
 const { fetchContentTypes } = craftercms.services.contentTypes;
 const { fetchConfigurationXML, writeConfiguration } = craftercms.services.configuration;
+const Popover = craftercms.libs.MaterialUI.Popover && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Popover, 'default') ? craftercms.libs.MaterialUI.Popover['default'] : craftercms.libs.MaterialUI.Popover;
+const Paper$1 = craftercms.libs.MaterialUI.Paper && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Paper, 'default') ? craftercms.libs.MaterialUI.Paper['default'] : craftercms.libs.MaterialUI.Paper;
+const Typography$1 = craftercms.libs.MaterialUI.Typography && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Typography, 'default') ? craftercms.libs.MaterialUI.Typography['default'] : craftercms.libs.MaterialUI.Typography;
+const Alert$1 = craftercms.libs.MaterialUI.Alert && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Alert, 'default') ? craftercms.libs.MaterialUI.Alert['default'] : craftercms.libs.MaterialUI.Alert;
+const PreviewAudiencesPanel = craftercms.components.PreviewAudiencesPanel && Object.prototype.hasOwnProperty.call(craftercms.components.PreviewAudiencesPanel, 'default') ? craftercms.components.PreviewAudiencesPanel['default'] : craftercms.components.PreviewAudiencesPanel;
+const { createLookupTable } = craftercms.utils.object;
+const PreviewSimulatorPanel = craftercms.components.PreviewSimulatorPanel && Object.prototype.hasOwnProperty.call(craftercms.components.PreviewSimulatorPanel, 'default') ? craftercms.components.PreviewSimulatorPanel['default'] : craftercms.components.PreviewSimulatorPanel;
 
 var jsxRuntime = {exports: {}};
 
@@ -2351,6 +2358,271 @@ function CrossSiteContentTypeCopy() {
                             (activeStep === 2 && !canNextFromDest), children: "Next" })) : (jsxRuntimeExports.jsx(Button$1, { variant: "contained", color: "primary", onClick: runCopy, disabled: !canCopy || copying, children: copying ? jsxRuntimeExports.jsx(CircularProgress, { size: 22, color: "inherit" }) : 'Copy' }))] })] }));
 }
 
+function objectValuesIfNumericKeys$1(obj) {
+    var keys = Object.keys(obj);
+    if (!keys.length || !keys.every(function (k) { return /^\d+$/.test(k); })) {
+        return [];
+    }
+    return keys.sort(function (a, b) { return Number(a) - Number(b); }).map(function (k) { return obj[k]; });
+}
+/**
+ * Toolbar transforms turn <values><value/></values> into arrays or { value: [...] } or { value: {0:{},1:{}} }.
+ * Dropdown expects field.values as an array of { label, value }.
+ */
+function coerceAudienceFieldValues(raw) {
+    if (raw == null) {
+        return undefined;
+    }
+    if (Array.isArray(raw)) {
+        return raw.filter(Boolean);
+    }
+    if (typeof raw !== 'object') {
+        return undefined;
+    }
+    var o = raw;
+    var inner = o.value;
+    if (Array.isArray(inner)) {
+        return inner.filter(Boolean);
+    }
+    if (inner && typeof inner === 'object' && !Array.isArray(inner)) {
+        var numeric = objectValuesIfNumericKeys$1(inner);
+        if (numeric.length) {
+            return numeric.filter(Boolean);
+        }
+        return [inner];
+    }
+    return undefined;
+}
+function scalarish(v) {
+    if (v == null) {
+        return undefined;
+    }
+    if (typeof v === 'string' || typeof v === 'number') {
+        return String(v);
+    }
+    if (Array.isArray(v)) {
+        return scalarish(v[0]);
+    }
+    if (typeof v === 'object' && '#text' in v) {
+        return scalarish(v['#text']);
+    }
+    return undefined;
+}
+function normalizeDropdownValueRow(row) {
+    var _a;
+    if (!row || typeof row !== 'object' || Array.isArray(row)) {
+        return null;
+    }
+    var r = row;
+    var value = (_a = scalarish(r.value)) !== null && _a !== void 0 ? _a : '';
+    var label = scalarish(r.label);
+    if (!label && r.label && typeof r.label === 'object') {
+        var dm = r.label.defaultMessage;
+        label = typeof dm === 'string' ? dm : undefined;
+    }
+    return { label: label !== null && label !== void 0 ? label : value, value: value };
+}
+function normalizeOneField(key, field) {
+    var _a, _b, _c, _d, _e, _f;
+    var id = (_a = scalarish(field.id)) !== null && _a !== void 0 ? _a : key;
+    var name = (_b = scalarish(field.name)) !== null && _b !== void 0 ? _b : id;
+    var rawValues = coerceAudienceFieldValues(field.values);
+    var coercedValues = rawValues === null || rawValues === void 0 ? void 0 : rawValues.map(function (row) { return normalizeDropdownValueRow(row); }).filter(function (row) { return row != null && row.value.length > 0; });
+    return __assign(__assign(__assign({}, field), { id: id, name: name, type: (_c = scalarish(field.type)) !== null && _c !== void 0 ? _c : 'input', description: field.description != null ? (_d = scalarish(field.description)) !== null && _d !== void 0 ? _d : '' : undefined, helpText: field.helpText != null ? (_e = scalarish(field.helpText)) !== null && _e !== void 0 ? _e : '' : undefined, defaultValue: field.defaultValue, validations: (_f = field.validations) !== null && _f !== void 0 ? _f : {} }), (coercedValues && coercedValues.length ? { values: coercedValues } : {}));
+}
+/**
+ * Toolbar ui.xml deserialization does not apply ICE-panel `lookupTables: ['fields']`.
+ * Normalize `<fields>` content into a lookup table for PreviewAudiencesPanel.
+ */
+function normalizeAudienceFields(raw) {
+    if (raw == null) {
+        return undefined;
+    }
+    if (Array.isArray(raw)) {
+        return createLookupTable(raw, 'id');
+    }
+    if (typeof raw !== 'object') {
+        return undefined;
+    }
+    var o = raw;
+    var out = {};
+    Object.keys(o).forEach(function (key) {
+        var _a;
+        var field = o[key];
+        if (!field || typeof field !== 'object' || Array.isArray(field)) {
+            return;
+        }
+        var id = (_a = scalarish(field.id)) !== null && _a !== void 0 ? _a : key;
+        out[id] = normalizeOneField(key, field);
+    });
+    return Object.keys(out).length ? out : undefined;
+}
+function buildAudienceFields(raw) {
+    return normalizeAudienceFields(raw);
+}
+
+var defaultIcon$1 = { id: '@mui/icons-material/EmojiPeopleRounded' };
+function rawFieldsFromProps(props, configuration) {
+    var _a;
+    if (configuration.fields != null) {
+        return configuration.fields;
+    }
+    if (props.fields != null) {
+        return props.fields;
+    }
+    var widget = props.widget;
+    return (_a = widget === null || widget === void 0 ? void 0 : widget.configuration) === null || _a === void 0 ? void 0 : _a.fields;
+}
+function AudienceTargetingFlyoutToolbarButton(props) {
+    var _a, _b, _c, _d;
+    var configuration = (_a = props.configuration) !== null && _a !== void 0 ? _a : {};
+    var title = (_b = configuration.title) !== null && _b !== void 0 ? _b : 'Audience targeting';
+    var tooltip = (_c = configuration.tooltip) !== null && _c !== void 0 ? _c : title;
+    var icon = (_d = configuration.icon) !== null && _d !== void 0 ? _d : defaultIcon$1;
+    var fields = buildAudienceFields(rawFieldsFromProps(props, configuration));
+    var _e = React.useState(null), anchorEl = _e[0], setAnchorEl = _e[1];
+    var open = Boolean(anchorEl);
+    return (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsx(Tooltip$1, { title: tooltip, children: jsxRuntimeExports.jsx(IconButton, { size: "small", "aria-label": title, "aria-haspopup": "true", "aria-expanded": open ? 'true' : undefined, onClick: function (e) { return setAnchorEl(anchorEl ? null : e.currentTarget); }, children: jsxRuntimeExports.jsx(SystemIcon, { icon: icon }) }) }), jsxRuntimeExports.jsx(Popover, { open: open, anchorEl: anchorEl, onClose: function () { return setAnchorEl(null); }, anchorOrigin: { vertical: 'bottom', horizontal: 'right' }, transformOrigin: { vertical: 'top', horizontal: 'right' }, slotProps: {
+                    paper: {
+                        elevation: 8,
+                        sx: { mt: 0.5, maxWidth: 'min(420px, calc(100vw - 32px))', maxHeight: 'min(480px, calc(100vh - 120px))' }
+                    }
+                }, children: jsxRuntimeExports.jsx(Paper$1, { variant: "outlined", sx: { overflow: 'auto' }, children: jsxRuntimeExports.jsx(Box, { sx: { minWidth: 320, minHeight: 280, p: 1 }, children: fields ? (jsxRuntimeExports.jsx(PreviewAudiencesPanel, { fields: fields })) : (jsxRuntimeExports.jsx(Alert$1, { severity: "warning", children: jsxRuntimeExports.jsx(Typography$1, { variant: "body2", children: "No audience fields were found for this toolbar button. Add a fields block under this widget's configuration in ui.xml (same structure as the Experience Builder audience tool)." }) })) }) }) })] }));
+}
+
+function scalarXmlValue(v) {
+    if (v == null) {
+        return undefined;
+    }
+    if (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean') {
+        return v;
+    }
+    if (Array.isArray(v)) {
+        return scalarXmlValue(v[0]);
+    }
+    if (typeof v === 'object' && v !== null && '#text' in v) {
+        return scalarXmlValue(v['#text']);
+    }
+    return undefined;
+}
+function parsePositiveInt(v) {
+    var s = scalarXmlValue(v);
+    if (s === undefined) {
+        return NaN;
+    }
+    var n = parseInt(String(s), 10);
+    return Number.isFinite(n) && n > 0 ? n : NaN;
+}
+function pickTitle(d, index) {
+    var t = d.title;
+    if (typeof t === 'string' && t.length) {
+        return t;
+    }
+    if (t && typeof t === 'object' && 'defaultMessage' in t) {
+        var m = t.defaultMessage;
+        if (typeof m === 'string' && m.length) {
+            return m;
+        }
+    }
+    return "device-".concat(index);
+}
+/**
+ * Preview toolbar widget config does not use ICE-panel `arrays: ['devices', ...]`, so
+ * `applyDeserializedXMLTransforms` may turn `<device>` lists into `{ 0: {...}, 1: {...} }`
+ * instead of an array. Coerce all common shapes into a device array for PreviewSimulatorPanel.
+ */
+function coercePreviewDeviceList(raw) {
+    if (raw == null) {
+        return [];
+    }
+    if (Array.isArray(raw)) {
+        return raw.filter(Boolean);
+    }
+    if (typeof raw !== 'object') {
+        return [];
+    }
+    var o = raw;
+    var inner = o.device;
+    if (Array.isArray(inner)) {
+        return inner.filter(Boolean);
+    }
+    if (inner && typeof inner === 'object' && !Array.isArray(inner)) {
+        var innerObj = inner;
+        var fromNumeric = objectValuesIfNumericKeys(innerObj);
+        if (fromNumeric.length > 0) {
+            return fromNumeric;
+        }
+        return [innerObj];
+    }
+    var topNumeric = objectValuesIfNumericKeys(o);
+    if (topNumeric.length > 0) {
+        return topNumeric;
+    }
+    return [];
+}
+function objectValuesIfNumericKeys(obj) {
+    var keys = Object.keys(obj);
+    if (keys.length === 0) {
+        return [];
+    }
+    var allNumeric = keys.every(function (k) { return /^\d+$/.test(k); });
+    if (!allNumeric) {
+        return [];
+    }
+    return keys
+        .sort(function (a, b) { return Number(a) - Number(b); })
+        .map(function (k) { return obj[k]; })
+        .filter(function (v) { return Boolean(v) && typeof v === 'object' && !Array.isArray(v); });
+}
+/**
+ * Produces width/height numbers Studio's PreviewSimulatorPanel can use (avoids NaN `value` keys).
+ * Falls back when XML shapes are odd or rows are invalid.
+ */
+function buildSimulatorDevices(raw, fallback) {
+    var rows = coercePreviewDeviceList(raw);
+    var out = rows
+        .map(function (d, i) { return ({
+        title: pickTitle(d, i),
+        width: parsePositiveInt(d.width),
+        height: parsePositiveInt(d.height)
+    }); })
+        .filter(function (d) { return Number.isFinite(d.width) && Number.isFinite(d.height); });
+    return out.length > 0 ? out : fallback;
+}
+
+var defaultIcon = { id: '@mui/icons-material/DevicesRounded' };
+var defaultDevices = [
+    { title: 'smartPhone', width: 375, height: 667 },
+    { title: 'tablet', width: 768, height: 1024 }
+];
+function rawDevicesFromProps(props, configuration) {
+    var _a;
+    if (configuration.devices != null) {
+        return configuration.devices;
+    }
+    if (props.devices != null) {
+        return props.devices;
+    }
+    var widget = props.widget;
+    return (_a = widget === null || widget === void 0 ? void 0 : widget.configuration) === null || _a === void 0 ? void 0 : _a.devices;
+}
+function DeviceSimulatorFlyoutToolbarButton(props) {
+    var _a, _b, _c, _d;
+    var configuration = (_a = props.configuration) !== null && _a !== void 0 ? _a : {};
+    var title = (_b = configuration.title) !== null && _b !== void 0 ? _b : 'Device simulator';
+    var tooltip = (_c = configuration.tooltip) !== null && _c !== void 0 ? _c : title;
+    var icon = (_d = configuration.icon) !== null && _d !== void 0 ? _d : defaultIcon;
+    var devices = buildSimulatorDevices(rawDevicesFromProps(props, configuration), defaultDevices);
+    var _e = React.useState(null), anchorEl = _e[0], setAnchorEl = _e[1];
+    var open = Boolean(anchorEl);
+    return (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsx(Tooltip$1, { title: tooltip, children: jsxRuntimeExports.jsx(IconButton, { size: "small", "aria-label": title, "aria-haspopup": "true", "aria-expanded": open ? 'true' : undefined, onClick: function (e) { return setAnchorEl(anchorEl ? null : e.currentTarget); }, children: jsxRuntimeExports.jsx(SystemIcon, { icon: icon }) }) }), jsxRuntimeExports.jsx(Popover, { open: open, anchorEl: anchorEl, onClose: function () { return setAnchorEl(null); }, anchorOrigin: { vertical: 'bottom', horizontal: 'right' }, transformOrigin: { vertical: 'top', horizontal: 'right' }, slotProps: {
+                    paper: {
+                        elevation: 8,
+                        sx: { mt: 0.5, maxWidth: 'min(420px, calc(100vw - 32px))', maxHeight: 'min(520px, calc(100vh - 120px))' }
+                    }
+                }, children: jsxRuntimeExports.jsx(Paper$1, { variant: "outlined", sx: { overflow: 'auto' }, children: jsxRuntimeExports.jsx(Box, { sx: { minWidth: 320 }, children: jsxRuntimeExports.jsx(PreviewSimulatorPanel, { devices: devices }) }) }) })] }));
+}
+
 var plugin = {
     locales: undefined,
     scripts: undefined,
@@ -2369,8 +2641,10 @@ var plugin = {
         'org.rd.plugin.uigoodies.openBulkPublishPanelButton': OpenBulkPublishPanelButton,
         'org.rd.plugin.uigoodies.openBulkPublishToolbarButton': OpenBulkPublishToolbarButton,
         'org.rd.plugin.uigoodies.CopyCurrentPageUrl': CopyCurrentPageUrl,
-        'org.rd.plugin.uigoodies.CrossSiteContentTypeCopy': CrossSiteContentTypeCopy
+        'org.rd.plugin.uigoodies.CrossSiteContentTypeCopy': CrossSiteContentTypeCopy,
+        'org.rd.plugin.uigoodies.AudienceTargetingFlyoutToolbarButton': AudienceTargetingFlyoutToolbarButton,
+        'org.rd.plugin.uigoodies.DeviceSimulatorFlyoutToolbarButton': DeviceSimulatorFlyoutToolbarButton
     }
 };
 
-export { BulkPublishView, ComponentPreviewPathNavigator, ContentUpload, CopyCurrentPageUrl, CrossSiteContentTypeCopy, EditOrViewCurrent, OpenBulkPublishPanelButton, OpenBulkPublishToolbarButton, OpenContentUploadPanelButton, OpenContentUploadToolbarButton, PublishOrRequestPublish, PullPushRemoteButtons, ToolPanelAccordion, plugin as default };
+export { AudienceTargetingFlyoutToolbarButton, BulkPublishView, ComponentPreviewPathNavigator, ContentUpload, CopyCurrentPageUrl, CrossSiteContentTypeCopy, DeviceSimulatorFlyoutToolbarButton, EditOrViewCurrent, OpenBulkPublishPanelButton, OpenBulkPublishToolbarButton, OpenContentUploadPanelButton, OpenContentUploadToolbarButton, PublishOrRequestPublish, PullPushRemoteButtons, ToolPanelAccordion, plugin as default };
