@@ -63,6 +63,10 @@ To build this plugin on your own, make your customizations as required, then run
 
 # Widget Description and Configuration Guide
 
+Toolbar flyouts for **audience targeting** and **device simulator** are documented below (widget IDs
+`org.rd.plugin.uigoodies.AudienceTargetingFlyoutToolbarButton` and
+`org.rd.plugin.uigoodies.DeviceSimulatorFlyoutToolbarButton`).
+
 ## Toolbar Edit button
 
 ```xml
@@ -314,6 +318,120 @@ remote and branches
 ```
 
 * `[URL]` and `[SITEID]` macros will be replaced by the actual page url and the site id
+
+## Toolbar Audience Targeting (flyout)
+
+Puts **Audience Targeting** on the preview toolbar as a compact **icon button**; the panel opens in a **popover**
+(flyout) instead of the Experience Builder right rail or a full dialog. It embeds Studio’s
+`PreviewAudiencesPanel` (same Redux targeting flow as the ICE tool).
+
+**Placement:** under `craftercms.components.PreviewToolbar` → `leftSection`, `middleSection`, or `rightSection` →
+`widgets`, same as other toolbar widgets.
+
+**Configuration:** use the same `<fields>` block as your `ICEToolsPanel` audience tool (`PreviewAudiencesPanel`
+under `ToolsPanelPageButton`). Toolbar XML parsing does not use ICE’s `lookupTables: ['fields']`; this widget
+normalizes `fields` and dropdown `values` so the panel still works.
+
+| Element | Required | Description |
+|--------|----------|-------------|
+| `title` | optional | Icon `aria-label` default |
+| `tooltip` | optional | Tooltip text (defaults to `title`) |
+| `icon` | optional | `SystemIcon` descriptor, e.g. `<icon id="@mui/icons-material/EmojiPeopleRounded"/>` |
+| `fields` | **yes** | Segment, dropdown, input, etc. (same structure as ICE audience configuration) |
+
+```xml
+<widget id="org.rd.plugin.uigoodies.AudienceTargetingFlyoutToolbarButton">
+    <plugin
+            id="org.rd.plugin.uigoodies"
+            site="{site}"
+            type="apps"
+            name="uigoodies"
+            file="index.js"
+    />
+    <configuration>
+        <title>Audience targeting</title>
+        <tooltip>Preview as a specific audience</tooltip>
+        <icon id="@mui/icons-material/EmojiPeopleRounded"/>
+        <fields>
+            <segment>
+                <id>segment</id>
+                <name>Segment</name>
+                <description>User segment.</description>
+                <type>dropdown</type>
+                <defaultValue>anonymous</defaultValue>
+                <values>
+                    <value>
+                        <label>Guy</label>
+                        <value>guy</value>
+                    </value>
+                    <value>
+                        <label>Gal</label>
+                        <value>gal</value>
+                    </value>
+                    <value>
+                        <label>Anonymous</label>
+                        <value>anonymous</value>
+                    </value>
+                </values>
+            </segment>
+            <name>
+                <id>name</id>
+                <name>Name</name>
+                <description>User's first and last name.</description>
+                <type>input</type>
+                <helpText>Optional help for authors.</helpText>
+            </name>
+        </fields>
+    </configuration>
+</widget>
+```
+
+If `fields` is missing, the flyout shows a warning instead of a blank panel.
+
+## Toolbar Device Simulator (flyout)
+
+Puts **Device Simulator** presets on the preview toolbar as an **icon button** with a **popover** flyout. It embeds
+Studio’s `PreviewSimulatorPanel` (same `setHostSize` behavior as the ICE tool).
+
+**Configuration:** use the same `<devices>` / `<device>` structure as the ICE simulator. Toolbar parsing does not
+mark `devices` as an array; this widget coerces common XML shapes (including numeric-key objects after transforms) and
+falls back to phone **375×667** and tablet **768×1024** if no valid devices remain.
+
+| Element | Required | Description |
+|--------|----------|-------------|
+| `title` | optional | Icon `aria-label` default |
+| `tooltip` | optional | Tooltip text |
+| `icon` | optional | e.g. `<icon id="@mui/icons-material/DevicesRounded"/>` |
+| `devices` | optional | List of `<device>` with `title`, `width`, `height` (pixels) |
+
+```xml
+<widget id="org.rd.plugin.uigoodies.DeviceSimulatorFlyoutToolbarButton">
+    <plugin
+            id="org.rd.plugin.uigoodies"
+            site="{site}"
+            type="apps"
+            name="uigoodies"
+            file="index.js"
+    />
+    <configuration>
+        <title>Device simulator</title>
+        <tooltip>Resize preview to a device preset</tooltip>
+        <icon id="@mui/icons-material/DevicesRounded"/>
+        <devices>
+            <device>
+                <title>smartPhone</title>
+                <width>375</width>
+                <height>667</height>
+            </device>
+            <device>
+                <title>tablet</title>
+                <width>768</width>
+                <height>1024</height>
+            </device>
+        </devices>
+    </configuration>
+</widget>
+```
 
 ## Project Tools: Cross-site Content Type Copy
 
