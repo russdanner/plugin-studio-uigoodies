@@ -1,0 +1,26 @@
+# Studio UI Goodies — widgets
+
+Each file in this folder documents one **registered widget** (or embedded view used by open buttons). Plugin id: **`org.rd.plugin.uigoodies`**, app bundle: **`uigoodies`** / `index.js`.
+
+| Widget ID | Description | Page |
+|-----------|-------------|------|
+| `org.rd.plugin.uigoodies.EditOrViewCurrent` | Toolbar edit / view toggle for the current preview item. | [edit-or-view-current.md](edit-or-view-current.md) |
+| `org.rd.plugin.uigoodies.PublishOrRequestPublish` | Toolbar publish or request-publish. | [publish-or-request-publish.md](publish-or-request-publish.md) |
+| `org.rd.plugin.uigoodies.ToolPanelAccordion` | Accordion grouping for multiple tools panel shortcuts. | [tool-panel-accordion.md](tool-panel-accordion.md) |
+| `org.rd.plugin.uigoodies.openContentUploadPanelButton` | Sidebar button → content upload dialog. | [open-content-upload-panel-button.md](open-content-upload-panel-button.md) |
+| `org.rd.plugin.uigoodies.openContentUploadToolbarButton` | Preview toolbar button → content upload dialog. | [open-content-upload-toolbar-button.md](open-content-upload-toolbar-button.md) |
+| `org.rd.plugin.uigoodies.ContentUpload` | Upload UI embedded in upload dialogs (usually not wired in `ui.xml` directly). | [content-upload-view.md](content-upload-view.md) |
+| `org.rd.plugin.uigoodies.openBulkPublishPanelButton` | Sidebar button → bulk publish from a root path. | [open-bulk-publish-panel-button.md](open-bulk-publish-panel-button.md) |
+| `org.rd.plugin.uigoodies.openBulkPublishToolbarButton` | Toolbar button → bulk publish dialog. | [open-bulk-publish-toolbar-button.md](open-bulk-publish-toolbar-button.md) |
+| `org.rd.plugin.uigoodies.bulkPublishView` | Bulk publish UI embedded in dialogs. | [bulk-publish-view.md](bulk-publish-view.md) |
+| `org.rd.plugin.uigoodies.PullPushRemoteButtons` | Toolbar Git pull/push for a configured remote and branches. | [pull-push-remote-buttons.md](pull-push-remote-buttons.md) |
+| `org.rd.plugin.uigoodies.CopyCurrentPageUrl` | Copy preview or environment URL with `[URL]` / `[SITEID]` patterns. | [copy-current-page-url.md](copy-current-page-url.md) |
+| `org.rd.plugin.uigoodies.AudienceTargetingFlyoutToolbarButton` | Audience targeting in a preview-toolbar popover. | [audience-targeting-flyout-toolbar-button.md](audience-targeting-flyout-toolbar-button.md) |
+| `org.rd.plugin.uigoodies.DeviceSimulatorFlyoutToolbarButton` | Device size presets in a preview-toolbar popover. | [device-simulator-flyout-toolbar-button.md](device-simulator-flyout-toolbar-button.md) |
+| `org.rd.plugin.uigoodies.openCannedSearchPanelButton` | Sidebar shortcut to Search with preset query or dialog. | [open-canned-search-panel-button.md](open-canned-search-panel-button.md) |
+| `org.rd.plugin.uigoodies.openCannedSearchToolbarButton` | Toolbar shortcut to Search with preset query or dialog. | [open-canned-search-toolbar-button.md](open-canned-search-toolbar-button.md) |
+| `org.rd.plugin.uigoodies.CrossSiteContentTypeCopy` | Project tool: copy content types between sites. | [cross-site-content-type-copy.md](cross-site-content-type-copy.md) |
+| `org.rd.plugin.uigoodies.ComponentPreviewPathNavigator` | Sidebar path navigator that opens component preview URLs. | [component-preview-path-navigator.md](component-preview-path-navigator.md) |
+| `org.rd.plugin.uigoodies.OpenSearchPlayground` | Project tool: inferred schema, clause builder, OpenSearch DSL editor, Engine `search.json`. | [open-search-playground.md](open-search-playground.md) |
+
+Back to repository root: [../../README.md](../../README.md).

@@ -91,3 +91,38 @@ installation:
                       value: uigoodies
                     - name: file
                       value: index.js
+  - type: preview-app
+    parentXpath: //reference[@id='craftercms.siteTools']
+    elementXpath: //widget[@id='org.rd.plugin.uigoodies.OpenSearchPlayground']
+    element:
+      name: tools
+      children:
+        - name: tool
+          children:
+            - name: title
+              attributes:
+                - name: id
+                  value: uigoodies.openSearchPlayground.title
+                - name: defaultMessage
+                  value: OpenSearch
+            - name: icon
+              attributes:
+                - name: id
+                  value: "@mui/icons-material/SearchRounded"
+            - name: url
+              value: uigoodies-opensearch-playground
+            - name: widget
+              attributes:
+                - name: id
+                  value: org.rd.plugin.uigoodies.OpenSearchPlayground
+              children:
+                - name: plugin
+                  attributes:
+                    - name: id
+                      value: org.rd.plugin.uigoodies
+                    - name: type
+                      value: apps
+                    - name: name
+                      value: uigoodies
+                    - name: file
+                      value: index.js

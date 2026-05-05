@@ -16,6 +16,7 @@ import AudienceTargetingFlyoutToolbarButton from './components/AudienceTargeting
 import DeviceSimulatorFlyoutToolbarButton from './components/DeviceSimulatorFlyoutToolbarButton';
 import OpenCannedSearchPanelButton from './components/OpenCannedSearchPanelButton';
 import OpenCannedSearchToolbarButton from './components/OpenCannedSearchToolbarButton';
+import OpenSearchPlayground from './components/OpenSearchPlayground';
 
 const plugin: PluginDescriptor = {
   locales: undefined,
@@ -39,7 +40,8 @@ const plugin: PluginDescriptor = {
     'org.rd.plugin.uigoodies.AudienceTargetingFlyoutToolbarButton': AudienceTargetingFlyoutToolbarButton,
     'org.rd.plugin.uigoodies.DeviceSimulatorFlyoutToolbarButton': DeviceSimulatorFlyoutToolbarButton,
     'org.rd.plugin.uigoodies.openCannedSearchPanelButton': OpenCannedSearchPanelButton,
-    'org.rd.plugin.uigoodies.openCannedSearchToolbarButton': OpenCannedSearchToolbarButton
+    'org.rd.plugin.uigoodies.openCannedSearchToolbarButton': OpenCannedSearchToolbarButton,
+    'org.rd.plugin.uigoodies.OpenSearchPlayground': OpenSearchPlayground
   }
 };
 
@@ -60,7 +62,8 @@ export {
   AudienceTargetingFlyoutToolbarButton,
   DeviceSimulatorFlyoutToolbarButton,
   OpenCannedSearchPanelButton,
-  OpenCannedSearchToolbarButton
+  OpenCannedSearchToolbarButton,
+  OpenSearchPlayground
 };
 
 export default plugin;
