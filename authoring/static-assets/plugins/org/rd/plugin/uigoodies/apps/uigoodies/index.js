@@ -2623,6 +2623,121 @@ function DeviceSimulatorFlyoutToolbarButton(props) {
                 }, children: jsxRuntimeExports.jsx(Paper$1, { variant: "outlined", sx: { overflow: 'auto' }, children: jsxRuntimeExports.jsx(Box, { sx: { minWidth: 320 }, children: jsxRuntimeExports.jsx(PreviewSimulatorPanel, { devices: devices }) }) }) })] }));
 }
 
+/*
+ * Copyright (C) 2007-2025 Crafter Software Corporation. All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 3 as published by
+ * the Free Software Foundation.
+ */
+/** Merge `configuration` from ui.xml onto props (Studio passes both on plugin widgets). */
+function mergePluginConfiguration(props) {
+    var configuration = props.configuration, rest = __rest(props, ["configuration"]);
+    var conf = configuration && typeof configuration === 'object' ? configuration : {};
+    return __assign(__assign({}, rest), conf);
+}
+/** Default: open Studio search in a new tab (matches legacy cannedsearch behavior). */
+function openInNewTabDefault(value) {
+    if (value === false || value === 0) {
+        return false;
+    }
+    if (value === true || value === 1) {
+        return true;
+    }
+    if (typeof value === 'string') {
+        var s = value.toLowerCase().trim();
+        if (s === 'false' || s === '0') {
+            return false;
+        }
+        if (s === 'true' || s === '1') {
+            return true;
+        }
+    }
+    return true;
+}
+function openCannedSearchStudioSearch(searchParams) {
+    var urlRoot = "".concat(window.location.protocol, "//").concat(window.location.host);
+    var windowUrl = "".concat(urlRoot, "/studio/search#/");
+    if (searchParams && searchParams.trim() !== '') {
+        windowUrl += "?".concat(searchParams);
+    }
+    window.open(windowUrl, '_studioSearch');
+}
+
+var DEFAULT_ICON$1 = { id: '@mui/icons-material/SavedSearchRounded' };
+function OpenCannedSearchPanelButton(props) {
+    var _a, _b;
+    var dispatch = useDispatch();
+    var p = mergePluginConfiguration(props);
+    var title = p.title || 'Search';
+    var icon = ((_a = p.icon) === null || _a === void 0 ? void 0 : _a.id) ? p.icon : DEFAULT_ICON$1;
+    var searchParams = String((_b = p.searchParams) !== null && _b !== void 0 ? _b : '');
+    var useNewTab = openInNewTabDefault(p.openInNewBrowserTab);
+    var initialParameters = p.initialParameters;
+    var onClick = function () {
+        if (useNewTab) {
+            openCannedSearchStudioSearch(searchParams);
+        }
+        else {
+            dispatch(showWidgetDialog({
+                id: 'CannedSearchDialog',
+                title: title,
+                widget: {
+                    id: 'craftercms.components.Search',
+                    configuration: {
+                        embedded: true,
+                        initialParameters: initialParameters
+                    }
+                }
+            }));
+        }
+    };
+    return jsxRuntimeExports.jsx(ToolsPanelListItemButton, { icon: icon, title: title, onClick: onClick });
+}
+
+var DEFAULT_ICON = { id: '@mui/icons-material/SavedSearchRounded' };
+function OpenCannedSearchToolbarButton(props) {
+    var _a;
+    var _b, _c;
+    var dispatch = useDispatch();
+    var p = mergePluginConfiguration(props);
+    var title = p.title || 'Search';
+    var tooltip = p.tooltip || title;
+    var dialogTitle = p.dialogTitle || title;
+    var icon = ((_b = p.icon) === null || _b === void 0 ? void 0 : _b.id) ? p.icon : DEFAULT_ICON;
+    var searchParams = String((_c = p.searchParams) !== null && _c !== void 0 ? _c : '');
+    var useNewTab = openInNewTabDefault(p.openInNewBrowserTab);
+    var initialParameters = p.initialParameters;
+    var useIcon = p.useIcon !== false;
+    var useIconWithText = Boolean(p.useIconWithText);
+    var buttonSize = p.buttonSize || 'small';
+    if (useIconWithText) {
+        useIcon = false;
+    }
+    var onClick = function () {
+        if (useNewTab) {
+            openCannedSearchStudioSearch(searchParams);
+        }
+        else {
+            dispatch(showWidgetDialog({
+                id: 'CannedSearchDialog',
+                title: dialogTitle,
+                widget: {
+                    id: 'craftercms.components.Search',
+                    configuration: {
+                        embedded: true,
+                        initialParameters: initialParameters
+                    }
+                }
+            }));
+        }
+    };
+    var applyTooltip = function (children) {
+        return useIcon || p.tooltip ? jsxRuntimeExports.jsx(Tooltip$1, { title: tooltip, children: children }) : children;
+    };
+    return applyTooltip(useIcon ? (jsxRuntimeExports.jsx(IconButton, { size: buttonSize, onClick: onClick, "aria-label": title, children: jsxRuntimeExports.jsx(SystemIcon, { icon: icon }) })) : (jsxRuntimeExports.jsx(Button$1, { size: buttonSize, onClick: onClick, startIcon: useIconWithText ? jsxRuntimeExports.jsx(SystemIcon, { icon: icon }) : undefined, sx: (_a = {}, _a[".".concat(buttonClasses.startIcon)] = { mr: 0.5 }, _a), children: title })));
+}
+
 var plugin = {
     locales: undefined,
     scripts: undefined,
@@ -2643,8 +2758,10 @@ var plugin = {
         'org.rd.plugin.uigoodies.CopyCurrentPageUrl': CopyCurrentPageUrl,
         'org.rd.plugin.uigoodies.CrossSiteContentTypeCopy': CrossSiteContentTypeCopy,
         'org.rd.plugin.uigoodies.AudienceTargetingFlyoutToolbarButton': AudienceTargetingFlyoutToolbarButton,
-        'org.rd.plugin.uigoodies.DeviceSimulatorFlyoutToolbarButton': DeviceSimulatorFlyoutToolbarButton
+        'org.rd.plugin.uigoodies.DeviceSimulatorFlyoutToolbarButton': DeviceSimulatorFlyoutToolbarButton,
+        'org.rd.plugin.uigoodies.openCannedSearchPanelButton': OpenCannedSearchPanelButton,
+        'org.rd.plugin.uigoodies.openCannedSearchToolbarButton': OpenCannedSearchToolbarButton
     }
 };
 
-export { AudienceTargetingFlyoutToolbarButton, BulkPublishView, ComponentPreviewPathNavigator, ContentUpload, CopyCurrentPageUrl, CrossSiteContentTypeCopy, DeviceSimulatorFlyoutToolbarButton, EditOrViewCurrent, OpenBulkPublishPanelButton, OpenBulkPublishToolbarButton, OpenContentUploadPanelButton, OpenContentUploadToolbarButton, PublishOrRequestPublish, PullPushRemoteButtons, ToolPanelAccordion, plugin as default };
+export { AudienceTargetingFlyoutToolbarButton, BulkPublishView, ComponentPreviewPathNavigator, ContentUpload, CopyCurrentPageUrl, CrossSiteContentTypeCopy, DeviceSimulatorFlyoutToolbarButton, EditOrViewCurrent, OpenBulkPublishPanelButton, OpenBulkPublishToolbarButton, OpenCannedSearchPanelButton, OpenCannedSearchToolbarButton, OpenContentUploadPanelButton, OpenContentUploadToolbarButton, PublishOrRequestPublish, PullPushRemoteButtons, ToolPanelAccordion, plugin as default };

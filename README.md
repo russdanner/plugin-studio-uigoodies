@@ -65,7 +65,9 @@ To build this plugin on your own, make your customizations as required, then run
 
 Toolbar flyouts for **audience targeting** and **device simulator** are documented below (widget IDs
 `org.rd.plugin.uigoodies.AudienceTargetingFlyoutToolbarButton` and
-`org.rd.plugin.uigoodies.DeviceSimulatorFlyoutToolbarButton`).
+`org.rd.plugin.uigoodies.DeviceSimulatorFlyoutToolbarButton`). **Canned search** shortcuts (previously the
+`plugin-studio-cannedsearch` plugin) are `org.rd.plugin.uigoodies.openCannedSearchPanelButton` and
+`org.rd.plugin.uigoodies.openCannedSearchToolbarButton`.
 
 ## Toolbar Edit button
 
@@ -429,6 +431,76 @@ falls back to phone **375×667** and tablet **768×1024** if no valid devices re
                 <height>1024</height>
             </device>
         </devices>
+    </configuration>
+</widget>
+```
+
+## Sidebar Canned Search (shortcut)
+
+Opens Studio **Search** with a **preset query string** (URL-encoded filters, sort, etc.), matching the behavior of the
+standalone **plugin-studio-cannedsearch** plugin (now included here so one install can cover both). Add one widget per
+shortcut under `craftercms.components.ToolsPanel` → `configuration` → `widgets`.
+
+| Element | Required | Description |
+|--------|----------|-------------|
+| `title` | optional | Label shown in the sidebar (default: `Search`) |
+| `icon` | optional | MUI icon id (default: Saved Search) |
+| `searchParams` | optional | Query string for `/studio/search#/?…` (use CDATA for `&` and special chars) |
+| `openInNewBrowserTab` | optional | `true` (default): new browser tab. `false`: embedded Search in a Studio dialog |
+| `initialParameters` | optional | When not using a new tab, object passed to `craftercms.components.Search` (filters, sort, path, etc.) |
+
+**New tab mode** (typical):
+
+```xml
+<widget id="org.rd.plugin.uigoodies.openCannedSearchPanelButton">
+    <plugin
+            id="org.rd.plugin.uigoodies"
+            site="{site}"
+            type="apps"
+            name="uigoodies"
+            file="index.js"
+    />
+    <configuration>
+        <title>Articles by last edit</title>
+        <icon id="@mui/icons-material/DescriptionRounded"/>
+        <searchParams><![CDATA[filters=%7B"content-type"%3A%5B"%2Fpage%2Farticle"%5D%7D&sortBy=last-edit-date&sortOrder=desc]]></searchParams>
+    </configuration>
+</widget>
+```
+
+**Dialog mode** (`openInNewBrowserTab` false): supply `initialParameters` using the same structure Studio’s Search
+expects (see Crafter Studio docs for Search / OpenSearch). Example shape: `query`, `keywords`, `offset`, `limit`,
+`sortBy`, `sortOrder`, `filters`, path constraints, etc.
+
+## Toolbar Canned Search (shortcut)
+
+Same as the sidebar canned search, as an **icon** or **text** control on the **preview toolbar** (`PreviewToolbar`).
+
+| Element | Required | Description |
+|--------|----------|-------------|
+| `title` | optional | Button label when not icon-only |
+| `tooltip` | optional | Tooltip (toolbar icon mode) |
+| `dialogTitle` | optional | Title of the Search dialog when `openInNewBrowserTab` is false |
+| `useIcon` | optional | `true` (default): icon button. `false`: text button |
+| `useIconWithText` | optional | `true`: text button with leading icon |
+| `buttonSize` | optional | `small` (default), `medium`, or `large` |
+| `icon`, `searchParams`, `openInNewBrowserTab`, `initialParameters` | | Same as sidebar canned search |
+
+```xml
+<widget id="org.rd.plugin.uigoodies.openCannedSearchToolbarButton">
+    <plugin
+            id="org.rd.plugin.uigoodies"
+            site="{site}"
+            type="apps"
+            name="uigoodies"
+            file="index.js"
+    />
+    <configuration>
+        <title>Articles</title>
+        <tooltip>Open article search</tooltip>
+        <useIcon>true</useIcon>
+        <icon id="@mui/icons-material/DescriptionRounded"/>
+        <searchParams><![CDATA[filters=%7B"content-type"%3A%5B"%2Fpage%2Farticle"%5D%7D&sortBy=last-edit-date&sortOrder=desc]]></searchParams>
     </configuration>
 </widget>
 ```

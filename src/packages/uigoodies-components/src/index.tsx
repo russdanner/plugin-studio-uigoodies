@@ -14,6 +14,8 @@ import ComponentPreviewPathNavigator from './components/ComponentPreview/Compone
 import CrossSiteContentTypeCopy from './components/CrossSiteContentTypeCopy';
 import AudienceTargetingFlyoutToolbarButton from './components/AudienceTargetingFlyoutToolbarButton';
 import DeviceSimulatorFlyoutToolbarButton from './components/DeviceSimulatorFlyoutToolbarButton';
+import OpenCannedSearchPanelButton from './components/OpenCannedSearchPanelButton';
+import OpenCannedSearchToolbarButton from './components/OpenCannedSearchToolbarButton';
 
 const plugin: PluginDescriptor = {
   locales: undefined,
@@ -35,7 +37,9 @@ const plugin: PluginDescriptor = {
     'org.rd.plugin.uigoodies.CopyCurrentPageUrl': CopyCurrentPageUrl,
     'org.rd.plugin.uigoodies.CrossSiteContentTypeCopy': CrossSiteContentTypeCopy,
     'org.rd.plugin.uigoodies.AudienceTargetingFlyoutToolbarButton': AudienceTargetingFlyoutToolbarButton,
-    'org.rd.plugin.uigoodies.DeviceSimulatorFlyoutToolbarButton': DeviceSimulatorFlyoutToolbarButton
+    'org.rd.plugin.uigoodies.DeviceSimulatorFlyoutToolbarButton': DeviceSimulatorFlyoutToolbarButton,
+    'org.rd.plugin.uigoodies.openCannedSearchPanelButton': OpenCannedSearchPanelButton,
+    'org.rd.plugin.uigoodies.openCannedSearchToolbarButton': OpenCannedSearchToolbarButton
   }
 };
 
@@ -54,7 +58,9 @@ export {
   CopyCurrentPageUrl,
   CrossSiteContentTypeCopy,
   AudienceTargetingFlyoutToolbarButton,
-  DeviceSimulatorFlyoutToolbarButton
+  DeviceSimulatorFlyoutToolbarButton,
+  OpenCannedSearchPanelButton,
+  OpenCannedSearchToolbarButton
 };
 
 export default plugin;
