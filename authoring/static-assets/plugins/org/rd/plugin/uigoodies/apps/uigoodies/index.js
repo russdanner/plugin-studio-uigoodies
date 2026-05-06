@@ -2,7 +2,7 @@ const React = craftercms.libs.React;
 const { useState, useRef, useEffect, useMemo, useCallback, createContext, useSyncExternalStore, useId, useImperativeHandle, useLayoutEffect, useContext, forwardRef } = craftercms.libs.React;
 const React__default = craftercms.libs.React && Object.prototype.hasOwnProperty.call(craftercms.libs.React, 'default') ? craftercms.libs.React['default'] : craftercms.libs.React;
 const { useSelector, useDispatch } = craftercms.libs.ReactRedux;
-const { Tooltip, useTheme, accordionClasses, accordionSummaryClasses, Accordion, AccordionSummary, Typography, AccordionDetails, Button: Button$1, CircularProgress, alpha, buttonClasses, Backdrop, Alert, Paper, Box: Box$1, AlertTitle, Stepper, Step, StepLabel, Autocomplete, TextField: TextField$1, FormControlLabel, Checkbox, List, ListItem, InputAdornment, ListItemText, Chip, IconButton: IconButton$1, Menu: Menu$1, MenuItem: MenuItem$1, Divider, Dialog, DialogTitle, DialogContent, DialogActions, Collapse, useMediaQuery } = craftercms.libs.MaterialUI;
+const { Tooltip, useTheme, accordionClasses, accordionSummaryClasses, Accordion, AccordionSummary, Typography, AccordionDetails, Button: Button$1, CircularProgress, alpha, buttonClasses, Backdrop, Alert, Paper, Box: Box$1, AlertTitle, Stepper, Step, StepLabel, Autocomplete, TextField: TextField$1, FormControlLabel, Checkbox, List, ListItem, InputAdornment, ListItemText, Chip, IconButton: IconButton$1, Menu: Menu$1, MenuItem: MenuItem$1, Divider, Dialog, DialogTitle, DialogContent, DialogActions, Collapse, useMediaQuery, Tabs, Tab } = craftercms.libs.MaterialUI;
 const IconButton = craftercms.libs.MaterialUI.IconButton && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.IconButton, 'default') ? craftercms.libs.MaterialUI.IconButton['default'] : craftercms.libs.MaterialUI.IconButton;
 const Button = craftercms.libs.MaterialUI.Button && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Button, 'default') ? craftercms.libs.MaterialUI.Button['default'] : craftercms.libs.MaterialUI.Button;
 const SystemIcon = craftercms.components.SystemIcon && Object.prototype.hasOwnProperty.call(craftercms.components.SystemIcon, 'default') ? craftercms.components.SystemIcon['default'] : craftercms.components.SystemIcon;
@@ -52,6 +52,8 @@ const KeyboardArrowDownRoundedIcon = craftercms.utils.constants.components.get('
 const KeyboardArrowUpRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/KeyboardArrowUpRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/KeyboardArrowUpRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/KeyboardArrowUpRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/KeyboardArrowUpRounded');
 const FullscreenRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/FullscreenRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/FullscreenRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/FullscreenRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/FullscreenRounded');
 const FullscreenExitRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/FullscreenExitRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/FullscreenExitRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/FullscreenExitRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/FullscreenExitRounded');
+const TravelExploreRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/TravelExploreRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/TravelExploreRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/TravelExploreRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/TravelExploreRounded');
+const MenuBookRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/MenuBookRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/MenuBookRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/MenuBookRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/MenuBookRounded');
 const ExpandLessRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/ExpandLessRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ExpandLessRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ExpandLessRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ExpandLessRounded');
 const MoreVertRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/MoreVertRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/MoreVertRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/MoreVertRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/MoreVertRounded');
 const RefreshRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/RefreshRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/RefreshRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/RefreshRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/RefreshRounded');
@@ -2095,7 +2097,7 @@ var ComponentPreviewPathNavigator = function (props) {
     return (jsxRuntimeExports.jsx("div", { children: validConfigurationExists() ? (jsxRuntimeExports.jsx(PathNavigator, { id: pathNavigatorId, label: props.label, rootPath: props.rootPath, onItemClicked: onItemClicked, icon: { id: props.icon }, limit: props.limit, excludes: (_b = (_a = props.excludedPaths) === null || _a === void 0 ? void 0 : _a.split(',')) !== null && _b !== void 0 ? _b : [] })) : (jsxRuntimeExports.jsxs(Alert, { severity: "warning", children: [jsxRuntimeExports.jsx(AlertTitle, { children: "Component Preview Path Navigator plugin configuration not found" }), "Please edit the ui.xml file and configure the widget as described in the README.md."] })) }));
 };
 
-var MODULE = 'studio';
+var MODULE$1 = 'studio';
 function contentTypeConfigPaths(contentTypeId) {
     var id = contentTypeId.startsWith('/') ? contentTypeId : "/".concat(contentTypeId);
     var base = "/content-types".concat(id).replace(/\/{2,}/g, '/');
@@ -2363,11 +2365,11 @@ function CrossSiteContentTypeCopy() {
             var sourcePaths = contentTypeConfigPaths(sourceTypeId);
             var targetPaths = contentTypeConfigPaths(targetTypeId);
             return forkJoin({
-                config: fetchConfigurationXML(sourceSite.id, sourcePaths.configPath, MODULE).pipe(catchError(function (err) {
+                config: fetchConfigurationXML(sourceSite.id, sourcePaths.configPath, MODULE$1).pipe(catchError(function (err) {
                     dispatch(showErrorDialog(err));
                     throw err;
                 })),
-                form: fetchConfigurationXML(sourceSite.id, sourcePaths.formPath, MODULE).pipe(catchError(function (err) {
+                form: fetchConfigurationXML(sourceSite.id, sourcePaths.formPath, MODULE$1).pipe(catchError(function (err) {
                     dispatch(showErrorDialog(err));
                     throw err;
                 }))
@@ -2376,8 +2378,8 @@ function CrossSiteContentTypeCopy() {
                 var configContent = isConflict ? transformConfigXml(config, targetTypeId, targetLabel) : config;
                 var formContent = isConflict ? transformFormDefinitionXml(form, targetTypeId, targetLabel) : form;
                 return forkJoin([
-                    writeConfiguration(destSite.id, targetPaths.configPath, MODULE, configContent),
-                    writeConfiguration(destSite.id, targetPaths.formPath, MODULE, formContent)
+                    writeConfiguration(destSite.id, targetPaths.configPath, MODULE$1, configContent),
+                    writeConfiguration(destSite.id, targetPaths.formPath, MODULE$1, formContent)
                 ]);
             }));
         }))
@@ -4905,7 +4907,7 @@ var CRAFTER_OPENSEARCH_FIELD_GROUPS = [
  * Executes a raw OpenSearch JSON body against Crafter Engine for the given site.
  * @see https://docs.craftercms.org/en/4.2/_static/api/engine.html#tag/search/operation/search
  */
-function executeOpenSearchOnEngine(siteId, jsonBody, extraIndexes) {
+function executeOpenSearchOnEngine(siteId, jsonBody, extraIndexes, queryParams) {
     return __awaiter(this, void 0, void 0, function () {
         var params, url, res, bodyText, parsedJson;
         return __generator(this, function (_a) {
@@ -4915,6 +4917,15 @@ function executeOpenSearchOnEngine(siteId, jsonBody, extraIndexes) {
                     params.set('crafterSite', siteId);
                     if (extraIndexes && extraIndexes.trim() !== '') {
                         params.set('index', extraIndexes.trim());
+                    }
+                    if (queryParams) {
+                        Object.entries(queryParams).forEach(function (_a) {
+                            var key = _a[0], value = _a[1];
+                            if (value === '' || value == null) {
+                                return;
+                            }
+                            params.set(key, String(value));
+                        });
                     }
                     url = "/api/1/site/search/search.json?".concat(params.toString());
                     return [4 /*yield*/, fetch(url, {
@@ -33252,6 +33263,95 @@ var TEMPLATES = [
         body: "{\n  \"size\": 10,\n  \"query\": {\n    \"term\": {\n      \"content-type\": {\n        \"value\": \"/page/article\"\n      }\n    }\n  }\n}"
     }
 ];
+var MODULE = 'studio';
+function singleQuoteEscape(text) {
+    return text.replace(/'/g, "'\"'\"'");
+}
+function buildCurlExport(siteId, extraIndexes, queryBody, queryParams) {
+    var params = new URLSearchParams();
+    params.set('crafterSite', siteId);
+    if (extraIndexes.trim()) {
+        params.set('index', extraIndexes.trim());
+    }
+    Object.entries(queryParams).forEach(function (_a) {
+        var key = _a[0], value = _a[1];
+        if (value === '' || value == null) {
+            return;
+        }
+        params.set(key, String(value));
+    });
+    var url = "/api/1/site/search/search.json?".concat(params.toString());
+    return [
+        "curl -X POST \"".concat(url, "\" \\"),
+        '  -H "Content-Type: application/json" \\',
+        '  -H "Accept: application/json" \\',
+        "  --data-binary '".concat(singleQuoteEscape(queryBody), "'")
+    ].join('\n');
+}
+function buildGroovyExport(siteId, extraIndexes, queryBody) {
+    return [
+        'import groovy.json.JsonSlurper',
+        '',
+        "def siteId = \"".concat(siteId, "\""),
+        "def extraIndexes = \"".concat(extraIndexes.trim(), "\""),
+        "def requestBody = new JsonSlurper().parseText('''",
+        queryBody,
+        "''') as Map",
+        '',
+        '// In Crafter scripts, use elasticsearch directly',
+        'def result = elasticsearch.search(requestBody)',
+        'return result'
+    ].join('\n');
+}
+function parseCsv(value) {
+    return value
+        .split(',')
+        .map(function (item) { return item.trim(); })
+        .filter(Boolean);
+}
+function applyMultiMatchFieldBoosts(value, fields) {
+    if (!value || typeof value !== 'object') {
+        return;
+    }
+    if (Array.isArray(value)) {
+        value.forEach(function (entry) { return applyMultiMatchFieldBoosts(entry, fields); });
+        return;
+    }
+    var obj = value;
+    if (obj.multi_match && typeof obj.multi_match === 'object' && !Array.isArray(obj.multi_match)) {
+        obj.multi_match.fields = fields;
+    }
+    Object.values(obj).forEach(function (entry) { return applyMultiMatchFieldBoosts(entry, fields); });
+}
+function parseFormDefinitionFields(xml) {
+    var doc = new DOMParser().parseFromString(xml, 'application/xml');
+    if (doc.querySelector('parsererror')) {
+        return [];
+    }
+    var nodes = Array.from(doc.querySelectorAll('form section field'));
+    var mapped = nodes
+        .map(function (node) {
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j;
+        var id = (_c = (_b = (_a = node.querySelector(':scope > id')) === null || _a === void 0 ? void 0 : _a.textContent) === null || _b === void 0 ? void 0 : _b.trim()) !== null && _c !== void 0 ? _c : '';
+        var type = (_f = (_e = (_d = node.querySelector(':scope > type')) === null || _d === void 0 ? void 0 : _d.textContent) === null || _e === void 0 ? void 0 : _e.trim()) !== null && _f !== void 0 ? _f : '';
+        var title = (_j = (_h = (_g = node.querySelector(':scope > title')) === null || _g === void 0 ? void 0 : _g.textContent) === null || _h === void 0 ? void 0 : _h.trim()) !== null && _j !== void 0 ? _j : '';
+        var required = Array.from(node.querySelectorAll(':scope > constraints > constraint')).some(function (c) {
+            var _a, _b, _c, _d, _e;
+            var name = (_b = (_a = c.querySelector(':scope > name')) === null || _a === void 0 ? void 0 : _a.textContent) === null || _b === void 0 ? void 0 : _b.trim();
+            var value = (_e = (_d = (_c = c.querySelector(':scope > value')) === null || _c === void 0 ? void 0 : _c.textContent) === null || _d === void 0 ? void 0 : _d.toLowerCase()) !== null && _e !== void 0 ? _e : '';
+            return name === 'required' && value.includes('true');
+        });
+        return { id: id, type: type, title: title, required: required };
+    })
+        .filter(function (entry) { return entry.id; });
+    var deduped = new Map();
+    mapped.forEach(function (entry) {
+        if (!deduped.has(entry.id)) {
+            deduped.set(entry.id, entry);
+        }
+    });
+    return Array.from(deduped.values());
+}
 function ResizeGrip(_a) {
     var vertical = _a.vertical;
     if (vertical) {
@@ -33261,28 +33361,74 @@ function ResizeGrip(_a) {
 }
 function OpenSearchPlayground() {
     var _this = this;
+    var _a, _b;
     var dispatch = useDispatch();
     var theme = useTheme();
     var isMdUp = useMediaQuery(theme.breakpoints.up('md'));
     var fullscreenRef = useRef(null);
     var explorerPanelRef = ln();
-    var _a = useState(false), isFullscreen = _a[0], setIsFullscreen = _a[1];
-    var _b = useState(false), explorerCollapsed = _b[0], setExplorerCollapsed = _b[1];
+    var dictionaryRequestKeyRef = useRef('');
+    var dictionaryFieldsRequestKeyRef = useRef('');
+    var _c = useState(false), isFullscreen = _c[0], setIsFullscreen = _c[1];
+    var _d = useState(false), explorerCollapsed = _d[0], setExplorerCollapsed = _d[1];
+    var _e = useState('explorer'), explorerTab = _e[0], setExplorerTab = _e[1];
+    var _f = useState(false), dictionaryLoading = _f[0], setDictionaryLoading = _f[1];
+    var _g = useState(''), dictionaryError = _g[0], setDictionaryError = _g[1];
+    var _h = useState(0), dictionaryReloadKey = _h[0], setDictionaryReloadKey = _h[1];
+    var _j = useState([]), dictionaryItems = _j[0], setDictionaryItems = _j[1];
+    var _k = useState(''), dictionarySelectedId = _k[0], setDictionarySelectedId = _k[1];
+    var _l = useState(false), dictionaryFieldsLoading = _l[0], setDictionaryFieldsLoading = _l[1];
+    var _m = useState(''), dictionaryFieldsError = _m[0], setDictionaryFieldsError = _m[1];
+    var _o = useState([]), dictionaryFields = _o[0], setDictionaryFields = _o[1];
     var siteId = useActiveSiteId();
-    var _c = useState(DEFAULT_QUERY), query = _c[0], setQuery = _c[1];
-    var _d = useState(''), response = _d[0], setResponse = _d[1];
-    var _e = useState(''), extraIndexes = _e[0], setExtraIndexes = _e[1];
-    var _f = useState(false), loading = _f[0], setLoading = _f[1];
-    var _g = useState(function () {
+    var _p = useState(DEFAULT_QUERY), query = _p[0], setQuery = _p[1];
+    var _q = useState(''), response = _q[0], setResponse = _q[1];
+    var _r = useState(''), extraIndexes = _r[0], setExtraIndexes = _r[1];
+    var _s = useState(false), loading = _s[0], setLoading = _s[1];
+    var _t = useState(function () {
         return Object.fromEntries(CRAFTER_OPENSEARCH_FIELD_GROUPS.map(function (g) { return [g.title, true]; }));
-    }), openGroups = _g[0], setOpenGroups = _g[1];
-    var _h = useState(0), templateMenuKey = _h[0], setTemplateMenuKey = _h[1];
-    var _j = useState([]), inferredFields = _j[0], setInferredFields = _j[1];
-    var _k = useState(''), builderField = _k[0], setBuilderField = _k[1];
-    var _l = useState('match'), builderMode = _l[0], setBuilderMode = _l[1];
-    var _m = useState(''), builderValue = _m[0], setBuilderValue = _m[1];
-    var _o = useState(''), builderGte = _o[0], setBuilderGte = _o[1];
-    var _p = useState(''), builderLte = _p[0], setBuilderLte = _p[1];
+    }), openGroups = _t[0], setOpenGroups = _t[1];
+    var _u = useState(0), templateMenuKey = _u[0], setTemplateMenuKey = _u[1];
+    var _v = useState([]), inferredFields = _v[0], setInferredFields = _v[1];
+    var _w = useState(''), builderField = _w[0], setBuilderField = _w[1];
+    var _x = useState('match'), builderMode = _x[0], setBuilderMode = _x[1];
+    var _y = useState(''), builderValue = _y[0], setBuilderValue = _y[1];
+    var _z = useState(''), builderGte = _z[0], setBuilderGte = _z[1];
+    var _0 = useState(''), builderLte = _0[0], setBuilderLte = _0[1];
+    var _1 = useState('select'), apiMethod = _1[0], setApiMethod = _1[1];
+    var _2 = useState('0'), optionFrom = _2[0], setOptionFrom = _2[1];
+    var _3 = useState('10'), optionSize = _3[0], setOptionSize = _3[1];
+    var _4 = useState('true'), optionTrackTotalHits = _4[0], setOptionTrackTotalHits = _4[1];
+    var _5 = useState(''), optionSortField = _5[0], setOptionSortField = _5[1];
+    var _6 = useState('desc'), optionSortOrder = _6[0], setOptionSortOrder = _6[1];
+    var _7 = useState('default'), optionSourceMode = _7[0], setOptionSourceMode = _7[1];
+    var _8 = useState('localId, internal-name, content-type'), optionSourceFields = _8[0], setOptionSourceFields = _8[1];
+    var _9 = useState('5s'), optionTimeout = _9[0], setOptionTimeout = _9[1];
+    var _10 = useState(''), optionTerminateAfter = _10[0], setOptionTerminateAfter = _10[1];
+    var _11 = useState(''), optionMinScore = _11[0], setOptionMinScore = _11[1];
+    var _12 = useState('false'), optionEnableHighlight = _12[0], setOptionEnableHighlight = _12[1];
+    var _13 = useState('title_t, body_html, description_html'), optionHighlightFields = _13[0], setOptionHighlightFields = _13[1];
+    var _14 = useState('150'), optionHighlightFragmentSize = _14[0], setOptionHighlightFragmentSize = _14[1];
+    var _15 = useState('2'), optionHighlightNumFragments = _15[0], setOptionHighlightNumFragments = _15[1];
+    var _16 = useState('false'), optionEnableFacets = _16[0], setOptionEnableFacets = _16[1];
+    var _17 = useState('content-type'), optionFacetField = _17[0], setOptionFacetField = _17[1];
+    var _18 = useState('20'), optionFacetSize = _18[0], setOptionFacetSize = _18[1];
+    var _19 = useState('false'), optionEnableBoosting = _19[0], setOptionEnableBoosting = _19[1];
+    var _20 = useState('title_t^3, internal-name^2, body_html'), optionQueryFieldBoosts = _20[0], setOptionQueryFieldBoosts = _20[1];
+    var _21 = useState(''), optionIndicesBoost = _21[0], setOptionIndicesBoost = _21[1];
+    var _22 = useState(''), optionPreference = _22[0], setOptionPreference = _22[1];
+    var _23 = useState(''), optionRouting = _23[0], setOptionRouting = _23[1];
+    var _24 = useState('query_then_fetch'), optionSearchType = _24[0], setOptionSearchType = _24[1];
+    var _25 = useState('true'), optionAllowNoIndices = _25[0], setOptionAllowNoIndices = _25[1];
+    var _26 = useState('true'), optionAllowPartialResults = _26[0], setOptionAllowPartialResults = _26[1];
+    var _27 = useState('false'), optionIgnoreUnavailable = _27[0], setOptionIgnoreUnavailable = _27[1];
+    var _28 = useState('false'), optionTrackScores = _28[0], setOptionTrackScores = _28[1];
+    var _29 = useState('false'), optionRestTotalHitsAsInt = _29[0], setOptionRestTotalHitsAsInt = _29[1];
+    var _30 = useState('true'), optionTypedKeys = _30[0], setOptionTypedKeys = _30[1];
+    var _31 = useState('false'), optionVersionParam = _31[0], setOptionVersionParam = _31[1];
+    var _32 = useState('false'), optionSeqNoPrimaryTermParam = _32[0], setOptionSeqNoPrimaryTermParam = _32[1];
+    var _33 = useState('{}'), optionAdvancedQueryParamsJson = _33[0], setOptionAdvancedQueryParamsJson = _33[1];
+    var _34 = useState('curl'), exportTarget = _34[0], setExportTarget = _34[1];
     useEffect(function () {
         var onFsChange = function () {
             setIsFullscreen(document.fullscreenElement === fullscreenRef.current);
@@ -33399,6 +33545,32 @@ function OpenSearchPlayground() {
             dispatch(showSystemNotification({ message: 'Fix invalid JSON in the query editor first.' }));
         }
     }, [builderField, builderGte, builderLte, builderMode, builderValue, dispatch, query]);
+    var searchQueryParams = useMemo(function () {
+        var advanced = {};
+        try {
+            var parsed = JSON.parse(optionAdvancedQueryParamsJson);
+            if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+                advanced = parsed;
+            }
+        }
+        catch (_a) {
+            advanced = {};
+        }
+        return __assign({ allow_no_indices: optionAllowNoIndices === 'true', allow_partial_search_results: optionAllowPartialResults === 'true', ignore_unavailable: optionIgnoreUnavailable === 'true', search_type: optionSearchType, preference: optionPreference.trim(), routing: optionRouting.trim(), track_scores: optionTrackScores === 'true', rest_total_hits_as_int: optionRestTotalHitsAsInt === 'true', typed_keys: optionTypedKeys === 'true', version: optionVersionParam === 'true', seq_no_primary_term: optionSeqNoPrimaryTermParam === 'true' }, advanced);
+    }, [
+        optionAdvancedQueryParamsJson,
+        optionAllowNoIndices,
+        optionAllowPartialResults,
+        optionIgnoreUnavailable,
+        optionPreference,
+        optionRestTotalHitsAsInt,
+        optionRouting,
+        optionSearchType,
+        optionSeqNoPrimaryTermParam,
+        optionTrackScores,
+        optionTypedKeys,
+        optionVersionParam
+    ]);
     var runQuery = useCallback(function () { return __awaiter(_this, void 0, void 0, function () {
         var result, pretty, e_1, msg;
         return __generator(this, function (_a) {
@@ -33413,7 +33585,7 @@ function OpenSearchPlayground() {
                     _a.label = 1;
                 case 1:
                     _a.trys.push([1, 3, 4, 5]);
-                    return [4 /*yield*/, executeOpenSearchOnEngine(siteId, query, extraIndexes)];
+                    return [4 /*yield*/, executeOpenSearchOnEngine(siteId, query, extraIndexes, searchQueryParams)];
                 case 2:
                     result = _a.sent();
                     pretty = result.parsedJson != null ? JSON.stringify(result.parsedJson, null, 2) : result.bodyText;
@@ -33436,7 +33608,228 @@ function OpenSearchPlayground() {
                 case 5: return [2 /*return*/];
             }
         });
-    }); }, [dispatch, extraIndexes, query, siteId]);
+    }); }, [dispatch, extraIndexes, query, searchQueryParams, siteId]);
+    useEffect(function () {
+        setDictionaryItems([]);
+        setDictionarySelectedId('');
+        setDictionaryFields([]);
+        setDictionaryError('');
+        setDictionaryFieldsError('');
+        dictionaryRequestKeyRef.current = '';
+        dictionaryFieldsRequestKeyRef.current = '';
+    }, [siteId]);
+    useEffect(function () {
+        if (explorerTab !== 'dictionary' || !siteId) {
+            return;
+        }
+        var requestKey = "".concat(siteId, "|").concat(dictionaryReloadKey);
+        if (dictionaryRequestKeyRef.current === requestKey) {
+            return;
+        }
+        dictionaryRequestKeyRef.current = requestKey;
+        setDictionaryLoading(true);
+        setDictionaryError('');
+        var sub = fetchContentTypes(siteId).subscribe({
+            next: function (types) {
+                var rows = (types !== null && types !== void 0 ? types : [])
+                    .map(function (type) { var _a, _b, _c; return ({ id: ((_a = type.id) !== null && _a !== void 0 ? _a : '').trim(), name: ((_c = (_b = type.name) !== null && _b !== void 0 ? _b : type.id) !== null && _c !== void 0 ? _c : '').trim() }); })
+                    .filter(function (type) { return type.id; })
+                    .sort(function (a, b) { return a.id.localeCompare(b.id); });
+                setDictionaryItems(rows);
+                setDictionarySelectedId(function (prev) { var _a, _b; return (prev && rows.some(function (row) { return row.id === prev; }) ? prev : (_b = (_a = rows[0]) === null || _a === void 0 ? void 0 : _a.id) !== null && _b !== void 0 ? _b : ''); });
+                setDictionaryLoading(false);
+            },
+            error: function (error) {
+                var msg = error instanceof Error ? error.message : String(error);
+                setDictionaryError(msg || 'Unable to load content types.');
+                setDictionaryItems([]);
+                setDictionaryLoading(false);
+            }
+        });
+        return function () { return sub.unsubscribe(); };
+    }, [dictionaryReloadKey, explorerTab, siteId]);
+    useEffect(function () {
+        dictionaryFieldsRequestKeyRef.current = '';
+    }, [dictionaryReloadKey]);
+    useEffect(function () {
+        if (explorerTab !== 'dictionary' || !siteId || !dictionarySelectedId) {
+            return;
+        }
+        var requestKey = "".concat(siteId, "|").concat(dictionarySelectedId);
+        if (dictionaryFieldsRequestKeyRef.current === requestKey) {
+            return;
+        }
+        dictionaryFieldsRequestKeyRef.current = requestKey;
+        var id = dictionarySelectedId.startsWith('/') ? dictionarySelectedId : "/".concat(dictionarySelectedId);
+        var formPath = "/content-types".concat(id, "/form-definition.xml").replace(/\/{2,}/g, '/');
+        setDictionaryFieldsLoading(true);
+        setDictionaryFieldsError('');
+        var sub = fetchConfigurationXML(siteId, formPath, MODULE).subscribe({
+            next: function (formXml) {
+                setDictionaryFields(parseFormDefinitionFields(formXml));
+                setDictionaryFieldsLoading(false);
+            },
+            error: function (error) {
+                var msg = error instanceof Error ? error.message : String(error);
+                setDictionaryFieldsError(msg || 'Unable to load form-definition.xml.');
+                setDictionaryFields([]);
+                setDictionaryFieldsLoading(false);
+            }
+        });
+        return function () { return sub.unsubscribe(); };
+    }, [dictionarySelectedId, explorerTab, siteId]);
+    var applyApiOptions = useCallback(function () {
+        var _a;
+        try {
+            var body = JSON.parse(query);
+            if (apiMethod === 'select') {
+                var size = Number(optionSize);
+                var from = Number(optionFrom);
+                if (!Number.isNaN(size) && size >= 0) {
+                    body.size = size;
+                }
+                if (!Number.isNaN(from) && from >= 0) {
+                    body.from = from;
+                }
+                body.track_total_hits = optionTrackTotalHits === 'true';
+                if (optionTimeout.trim()) {
+                    body.timeout = optionTimeout.trim();
+                }
+                else {
+                    delete body.timeout;
+                }
+                var terminateAfter = Number(optionTerminateAfter);
+                if (optionTerminateAfter.trim() && !Number.isNaN(terminateAfter) && terminateAfter > 0) {
+                    body.terminate_after = terminateAfter;
+                }
+                else {
+                    delete body.terminate_after;
+                }
+                var minScore = Number(optionMinScore);
+                if (optionMinScore.trim() && !Number.isNaN(minScore)) {
+                    body.min_score = minScore;
+                }
+                else {
+                    delete body.min_score;
+                }
+                if (optionSortField.trim()) {
+                    body.sort = [(_a = {}, _a[optionSortField.trim()] = { order: optionSortOrder }, _a)];
+                }
+                else {
+                    delete body.sort;
+                }
+                if (optionSourceMode === 'all') {
+                    body._source = true;
+                }
+                else if (optionSourceMode === 'custom') {
+                    var fields = parseCsv(optionSourceFields);
+                    body._source = fields.length > 0 ? fields : true;
+                }
+                else {
+                    delete body._source;
+                }
+                if (optionEnableHighlight === 'true') {
+                    var fields = parseCsv(optionHighlightFields);
+                    var fragmentSize_1 = Number(optionHighlightFragmentSize);
+                    var numFragments_1 = Number(optionHighlightNumFragments);
+                    body.highlight = {
+                        fields: fields.reduce(function (acc, field) {
+                            acc[field] = {
+                                fragment_size: !Number.isNaN(fragmentSize_1) && fragmentSize_1 > 0 ? fragmentSize_1 : 150,
+                                number_of_fragments: !Number.isNaN(numFragments_1) && numFragments_1 > 0 ? numFragments_1 : 2
+                            };
+                            return acc;
+                        }, {})
+                    };
+                }
+                else {
+                    delete body.highlight;
+                }
+                if (optionEnableFacets === 'true' && optionFacetField.trim()) {
+                    var facetSize = Number(optionFacetSize);
+                    body.aggs = {
+                        facet_terms: {
+                            terms: {
+                                field: optionFacetField.trim(),
+                                size: !Number.isNaN(facetSize) && facetSize > 0 ? facetSize : 20
+                            }
+                        }
+                    };
+                }
+                else {
+                    delete body.aggs;
+                }
+                if (optionEnableBoosting === 'true') {
+                    var boostFields = parseCsv(optionQueryFieldBoosts);
+                    if (boostFields.length > 0) {
+                        applyMultiMatchFieldBoosts(body.query, boostFields);
+                    }
+                    var indicesBoost = optionIndicesBoost
+                        .split(',')
+                        .map(function (part) { return part.trim(); })
+                        .filter(Boolean)
+                        .map(function (entry) { return entry.split('=').map(function (piece) { return piece.trim(); }); })
+                        .filter(function (tuple) { return tuple.length === 2 && tuple[0] && tuple[1]; })
+                        .map(function (_a) {
+                        var _b;
+                        var index = _a[0], weight = _a[1];
+                        var n = Number(weight);
+                        return Number.isNaN(n) ? null : (_b = {}, _b[index] = n, _b);
+                    })
+                        .filter(function (entry) { return entry != null; });
+                    if (indicesBoost.length > 0) {
+                        body.indices_boost = indicesBoost;
+                    }
+                    else {
+                        delete body.indices_boost;
+                    }
+                }
+                else {
+                    delete body.indices_boost;
+                }
+            }
+            setQuery(JSON.stringify(body, null, 2));
+            dispatch(showSystemNotification({ message: 'Applied API options to query JSON.' }));
+        }
+        catch (_b) {
+            dispatch(showSystemNotification({ message: 'Fix invalid JSON in the query editor first.' }));
+        }
+    }, [
+        apiMethod,
+        dispatch,
+        optionFrom,
+        optionSize,
+        optionSortField,
+        optionSortOrder,
+        optionSourceFields,
+        optionSourceMode,
+        optionTimeout,
+        optionTerminateAfter,
+        optionMinScore,
+        optionEnableHighlight,
+        optionHighlightFields,
+        optionHighlightFragmentSize,
+        optionHighlightNumFragments,
+        optionEnableFacets,
+        optionFacetField,
+        optionFacetSize,
+        optionEnableBoosting,
+        optionQueryFieldBoosts,
+        optionIndicesBoost,
+        optionTrackTotalHits,
+        query
+    ]);
+    var exportAsCode = useCallback(function () {
+        if (!siteId) {
+            dispatch(showSystemNotification({ message: 'No active site to export.' }));
+            return;
+        }
+        var code = exportTarget === 'curl'
+            ? buildCurlExport(siteId, extraIndexes, query, searchQueryParams)
+            : buildGroovyExport(siteId, extraIndexes, query);
+        setResponse(code);
+        dispatch(showSystemNotification({ message: "Exported as ".concat(exportTarget, ".") }));
+    }, [dispatch, exportTarget, extraIndexes, query, searchQueryParams, siteId]);
     var displayedResponse = useMemo(function () { return (loading && !response ? RESPONSE_LOADING_JSON : response || RESPONSE_EMPTY_JSON); }, [loading, response]);
     var onPrettify = useCallback(function () {
         try {
@@ -33456,9 +33849,18 @@ function OpenSearchPlayground() {
         dispatch(showSystemNotification({ message: 'Response copied to clipboard.' }));
     }, [dispatch, displayedResponse]);
     var orientationVertical = !isMdUp;
+    var fullscreenSelectProps = useMemo(function () {
+        var _a;
+        return ({
+            MenuProps: {
+                disablePortal: true,
+                container: (_a = fullscreenRef.current) !== null && _a !== void 0 ? _a : undefined
+            }
+        });
+    }, [isFullscreen]);
     return (jsxRuntimeExports.jsxs(Box$1, { ref: fullscreenRef, sx: __assign({ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 480, p: 2, gap: 1.5, boxSizing: 'border-box', bgcolor: 'background.default' }, (isFullscreen && {
             minHeight: '100vh'
-        })), children: [jsxRuntimeExports.jsxs(Box$1, { sx: { display: 'flex', alignItems: 'flex-start', gap: 1, flexWrap: 'wrap' }, children: [jsxRuntimeExports.jsx(SearchRoundedIcon, { color: "primary", sx: { mt: 0.5 } }), jsxRuntimeExports.jsx(Typography, { variant: "h5", component: "h1", children: "OpenSearch" }), jsxRuntimeExports.jsxs(Typography, { variant: "body2", color: "text.secondary", sx: { flex: '1 1 200px' }, children: ["Raw DSL against", ' ', jsxRuntimeExports.jsx(Typography, { component: "span", variant: "body2", fontFamily: "monospace", children: "POST /api/1/site/search/search.json?crafterSite=\u2026" }), ' ', "(same contract as Crafter Engine). Schema is inferred from sample", ' ', jsxRuntimeExports.jsx(Typography, { component: "span", variant: "body2", fontFamily: "monospace", children: "_source" }), ' ', "hits. Use ", jsxRuntimeExports.jsx("strong", { children: "Run" }), " / ", jsxRuntimeExports.jsx("strong", { children: "Prettify" }), " on the request panel; fold gutters collapse JSON blocks."] }), jsxRuntimeExports.jsx(Tooltip, { title: isFullscreen ? 'Exit full screen' : 'Full screen', children: jsxRuntimeExports.jsx(IconButton$1, { size: "small", onClick: toggleFullscreen, "aria-label": isFullscreen ? 'Exit full screen' : 'Enter full screen', sx: { flexShrink: 0 }, children: isFullscreen ? jsxRuntimeExports.jsx(FullscreenExitRoundedIcon, {}) : jsxRuntimeExports.jsx(FullscreenRoundedIcon, {}) }) })] }), jsxRuntimeExports.jsxs(Box$1, { sx: { display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }, children: [jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "Active site", value: siteId !== null && siteId !== void 0 ? siteId : '', disabled: true, sx: { minWidth: 160 } }), jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "Extra indexes (optional)", placeholder: "e.g. other-alias (see multi-index docs)", value: extraIndexes, onChange: function (e) { return setExtraIndexes(e.target.value); }, sx: { flex: '1 1 220px', minWidth: 200 } }), jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "Load template", defaultValue: "", sx: { minWidth: 200 }, SelectProps: { displayEmpty: true }, onChange: function (e) {
+        })), children: [jsxRuntimeExports.jsxs(Box$1, { sx: { display: 'flex', alignItems: 'flex-start', gap: 1, flexWrap: 'wrap' }, children: [jsxRuntimeExports.jsx(SearchRoundedIcon, { color: "primary", sx: { mt: 0.5 } }), jsxRuntimeExports.jsx(Typography, { variant: "h5", component: "h1", children: "OpenSearch" }), jsxRuntimeExports.jsxs(Typography, { variant: "body2", color: "text.secondary", sx: { flex: '1 1 200px' }, children: ["Raw DSL against", ' ', jsxRuntimeExports.jsx(Typography, { component: "span", variant: "body2", fontFamily: "monospace", children: "POST /api/1/site/search/search.json?crafterSite=\u2026" })] }), jsxRuntimeExports.jsx(Tooltip, { title: isFullscreen ? 'Exit full screen' : 'Full screen', children: jsxRuntimeExports.jsx(IconButton$1, { size: "small", onClick: toggleFullscreen, "aria-label": isFullscreen ? 'Exit full screen' : 'Enter full screen', sx: { flexShrink: 0 }, children: isFullscreen ? jsxRuntimeExports.jsx(FullscreenExitRoundedIcon, {}) : jsxRuntimeExports.jsx(FullscreenRoundedIcon, {}) }) })] }), jsxRuntimeExports.jsxs(Box$1, { sx: { display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }, children: [jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "Active site", value: siteId !== null && siteId !== void 0 ? siteId : '', disabled: true, sx: { minWidth: 160 } }), jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "Extra indexes (optional)", placeholder: "e.g. other-alias (see multi-index docs)", value: extraIndexes, onChange: function (e) { return setExtraIndexes(e.target.value); }, sx: { flex: '1 1 220px', minWidth: 200 } }), jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "Load template", defaultValue: "", sx: { minWidth: 200 }, SelectProps: __assign(__assign({}, fullscreenSelectProps), { displayEmpty: true }), onChange: function (e) {
                             var t = TEMPLATES.find(function (x) { return x.label === e.target.value; });
                             if (t) {
                                 setQuery(t.body);
@@ -33472,15 +33874,22 @@ function OpenSearchPlayground() {
                                     overflow: 'hidden',
                                     borderRadius: 1
                                 }, children: !explorerCollapsed ? (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsxs(Box$1, { sx: {
-                                                px: 1.5,
-                                                py: 1,
+                                                px: 1,
+                                                py: 0.5,
                                                 borderBottom: 1,
                                                 borderColor: 'divider',
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 gap: 0.5,
                                                 flexShrink: 0
-                                            }, children: [jsxRuntimeExports.jsx(Typography, { variant: "subtitle2", sx: { flex: 1, minWidth: 0 }, children: "Explorer & query builder" }), jsxRuntimeExports.jsx(Tooltip, { title: "Collapse explorer", children: jsxRuntimeExports.jsx(IconButton$1, { size: "small", onClick: collapseExplorerPanel, "aria-label": "Collapse explorer", edge: "end", children: orientationVertical ? jsxRuntimeExports.jsx(KeyboardArrowUpRoundedIcon, {}) : jsxRuntimeExports.jsx(ChevronLeftRoundedIcon, {}) }) })] }), jsxRuntimeExports.jsx(Box$1, { sx: { overflow: 'auto', flex: 1, minHeight: 0 }, children: jsxRuntimeExports.jsx(OpenSearchSchemaPanel, { siteId: siteId, extraIndexes: extraIndexes, query: query, setQuery: setQuery, openGroups: openGroups, setOpenGroups: setOpenGroups, selectedFields: selectedFields, toggleField: toggleField, onInferredFieldsChange: setInferredFields, sourceIsWildcard: sourceIsWildcard }) })] })) : (jsxRuntimeExports.jsx(Box$1, { sx: {
+                                            }, children: [jsxRuntimeExports.jsxs(Tabs, { value: explorerTab, onChange: function (_, value) { return setExplorerTab(value); }, sx: { minHeight: 36, '& .MuiTab-root': { minHeight: 36, py: 0.5 } }, children: [jsxRuntimeExports.jsx(Tab, { label: "Explorer", value: "explorer" }), jsxRuntimeExports.jsx(Tab, { label: "Dictionary", value: "dictionary" })] }), jsxRuntimeExports.jsx(Tooltip, { title: "Collapse explorer", children: jsxRuntimeExports.jsx(IconButton$1, { size: "small", onClick: collapseExplorerPanel, "aria-label": "Collapse explorer", edge: "end", children: orientationVertical ? jsxRuntimeExports.jsx(KeyboardArrowUpRoundedIcon, {}) : jsxRuntimeExports.jsx(ChevronLeftRoundedIcon, {}) }) })] }), explorerTab === 'explorer' ? (jsxRuntimeExports.jsx(Box$1, { sx: { overflow: 'auto', flex: 1, minHeight: 0 }, children: jsxRuntimeExports.jsx(OpenSearchSchemaPanel, { siteId: siteId, extraIndexes: extraIndexes, query: query, setQuery: setQuery, openGroups: openGroups, setOpenGroups: setOpenGroups, selectedFields: selectedFields, toggleField: toggleField, onInferredFieldsChange: setInferredFields, sourceIsWildcard: sourceIsWildcard }) })) : (jsxRuntimeExports.jsx(Box$1, { sx: { overflow: 'auto', flex: 1, minHeight: 0, p: 1 }, children: dictionaryLoading ? (jsxRuntimeExports.jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', gap: 1, p: 1 }, children: [jsxRuntimeExports.jsx(CircularProgress, { size: 16 }), jsxRuntimeExports.jsx(Typography, { variant: "body2", color: "text.secondary", children: "Loading content types..." })] })) : dictionaryError ? (jsxRuntimeExports.jsx(Typography, { variant: "body2", color: "error", sx: { p: 1 }, children: dictionaryError })) : dictionaryItems.length === 0 ? (jsxRuntimeExports.jsx(Typography, { variant: "body2", color: "text.secondary", sx: { p: 1 }, children: "No content types found." })) : (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsxs(Box$1, { sx: { display: 'flex', gap: 1, mb: 1 }, children: [jsxRuntimeExports.jsx(TextField$1, { select: true, size: "small", label: "Content type", value: dictionarySelectedId, onChange: function (e) { return setDictionarySelectedId(e.target.value); }, sx: { flex: 1 }, SelectProps: fullscreenSelectProps, children: dictionaryItems.map(function (entry) { return (jsxRuntimeExports.jsx(MenuItem$1, { value: entry.id, children: entry.id }, entry.id)); }) }), jsxRuntimeExports.jsx(Button$1, { size: "small", variant: "outlined", onClick: function () { return setDictionaryReloadKey(function (k) { return k + 1; }); }, children: "Refresh" })] }), jsxRuntimeExports.jsx(Typography, { variant: "caption", color: "text.secondary", sx: { display: 'block', mb: 1 }, children: (_b = (_a = dictionaryItems.find(function (entry) { return entry.id === dictionarySelectedId; })) === null || _a === void 0 ? void 0 : _a.name) !== null && _b !== void 0 ? _b : '' }), dictionaryFieldsLoading ? (jsxRuntimeExports.jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', gap: 1, p: 1 }, children: [jsxRuntimeExports.jsx(CircularProgress, { size: 16 }), jsxRuntimeExports.jsx(Typography, { variant: "body2", color: "text.secondary", children: "Loading fields..." })] })) : dictionaryFieldsError ? (jsxRuntimeExports.jsx(Typography, { variant: "body2", color: "error", sx: { p: 1 }, children: dictionaryFieldsError })) : dictionaryFields.length === 0 ? (jsxRuntimeExports.jsx(Typography, { variant: "body2", color: "text.secondary", sx: { p: 1 }, children: "No fields found in this content type." })) : (dictionaryFields.map(function (field) { return (jsxRuntimeExports.jsxs(Box$1, { sx: {
+                                                            p: 1,
+                                                            mb: 1,
+                                                            border: 1,
+                                                            borderColor: 'divider',
+                                                            borderRadius: 1,
+                                                            bgcolor: 'background.paper'
+                                                        }, children: [jsxRuntimeExports.jsx(Typography, { variant: "body2", fontFamily: "monospace", children: field.id }), jsxRuntimeExports.jsxs(Typography, { variant: "caption", color: "text.secondary", children: [field.type, field.required ? ' • required' : '', field.title ? " \u2022 ".concat(field.title) : ''] })] }, field.id)); }))] })) }))] })) : (jsxRuntimeExports.jsxs(Box$1, { sx: {
                                         display: 'flex',
                                         flexDirection: orientationVertical ? 'row' : 'column',
                                         alignItems: 'center',
@@ -33489,7 +33898,7 @@ function OpenSearchPlayground() {
                                         py: orientationVertical ? 0 : 1,
                                         px: orientationVertical ? 1 : 0,
                                         gap: 1
-                                    }, children: jsxRuntimeExports.jsx(Tooltip, { title: "Expand explorer", children: jsxRuntimeExports.jsx(IconButton$1, { size: "small", onClick: expandExplorerPanel, "aria-label": "Expand explorer", children: orientationVertical ? jsxRuntimeExports.jsx(KeyboardArrowDownRoundedIcon, {}) : jsxRuntimeExports.jsx(ChevronRightRoundedIcon, {}) }) }) })) }) }), jsxRuntimeExports.jsx(ResizeGrip, { vertical: orientationVertical }), jsxRuntimeExports.jsx(Yt, { id: "request", defaultSize: orientationVertical ? '35%' : '38%', minSize: "20%", children: jsxRuntimeExports.jsxs(Paper, { variant: "outlined", sx: {
+                                    }, children: [jsxRuntimeExports.jsx(Tooltip, { title: "Explorer", children: jsxRuntimeExports.jsx(IconButton$1, { size: "small", color: explorerTab === 'explorer' ? 'primary' : 'default', onClick: function () { return setExplorerTab('explorer'); }, "aria-label": "Explorer tab", children: jsxRuntimeExports.jsx(TravelExploreRoundedIcon, { fontSize: "small" }) }) }), jsxRuntimeExports.jsx(Tooltip, { title: "Dictionary", children: jsxRuntimeExports.jsx(IconButton$1, { size: "small", color: explorerTab === 'dictionary' ? 'primary' : 'default', onClick: function () { return setExplorerTab('dictionary'); }, "aria-label": "Dictionary tab", children: jsxRuntimeExports.jsx(MenuBookRoundedIcon, { fontSize: "small" }) }) }), jsxRuntimeExports.jsx(Tooltip, { title: "Expand explorer", children: jsxRuntimeExports.jsx(IconButton$1, { size: "small", onClick: expandExplorerPanel, "aria-label": "Expand explorer", children: orientationVertical ? jsxRuntimeExports.jsx(KeyboardArrowDownRoundedIcon, {}) : jsxRuntimeExports.jsx(ChevronRightRoundedIcon, {}) }) })] })) }) }), jsxRuntimeExports.jsx(ResizeGrip, { vertical: orientationVertical }), jsxRuntimeExports.jsx(Yt, { id: "request", defaultSize: orientationVertical ? '35%' : '38%', minSize: "20%", children: jsxRuntimeExports.jsxs(Paper, { variant: "outlined", sx: {
                                     height: '100%',
                                     minHeight: 0,
                                     display: 'flex',
@@ -33504,7 +33913,16 @@ function OpenSearchPlayground() {
                                             alignItems: 'center',
                                             gap: 1,
                                             flexWrap: 'wrap'
-                                        }, children: [jsxRuntimeExports.jsx(Typography, { variant: "subtitle2", sx: { flex: '1 1 auto' }, children: "Request body (OpenSearch DSL)" }), jsxRuntimeExports.jsx(Tooltip, { title: "Run query (\u2318/Ctrl+Enter in editor)", children: jsxRuntimeExports.jsx("span", { children: jsxRuntimeExports.jsx(Button$1, { size: "small", variant: "contained", color: "primary", startIcon: loading ? jsxRuntimeExports.jsx(CircularProgress, { size: 16, color: "inherit" }) : jsxRuntimeExports.jsx(PlayArrowRoundedIcon, {}), disabled: loading || !siteId, onClick: function () { return void runQuery(); }, children: "Run" }) }) }), jsxRuntimeExports.jsx(Tooltip, { title: "Prettify query JSON", children: jsxRuntimeExports.jsx(Button$1, { size: "small", variant: "outlined", startIcon: jsxRuntimeExports.jsx(AutoFixHighRoundedIcon, {}), onClick: onPrettify, children: "Prettify" }) }), jsxRuntimeExports.jsx(Tooltip, { title: "Copy query", children: jsxRuntimeExports.jsx(IconButton$1, { size: "small", onClick: onCopyQuery, "aria-label": "Copy query", children: jsxRuntimeExports.jsx(ContentCopyRoundedIcon, { fontSize: "small" }) }) })] }), jsxRuntimeExports.jsxs(Box$1, { sx: {
+                                        }, children: [jsxRuntimeExports.jsx(Typography, { variant: "subtitle2", sx: { flex: '1 1 auto' }, children: "Request body (OpenSearch DSL)" }), jsxRuntimeExports.jsx(Tooltip, { title: "Run query (\u2318/Ctrl+Enter in editor)", children: jsxRuntimeExports.jsx("span", { children: jsxRuntimeExports.jsx(Button$1, { size: "small", variant: "contained", color: "primary", startIcon: loading ? jsxRuntimeExports.jsx(CircularProgress, { size: 16, color: "inherit" }) : jsxRuntimeExports.jsx(PlayArrowRoundedIcon, {}), disabled: loading || !siteId, onClick: function () { return void runQuery(); }, children: "Run" }) }) }), jsxRuntimeExports.jsx(Tooltip, { title: "Prettify query JSON", children: jsxRuntimeExports.jsx(Button$1, { size: "small", variant: "outlined", startIcon: jsxRuntimeExports.jsx(AutoFixHighRoundedIcon, {}), onClick: onPrettify, children: "Prettify" }) }), jsxRuntimeExports.jsx(Tooltip, { title: "Copy query", children: jsxRuntimeExports.jsx(IconButton$1, { size: "small", onClick: onCopyQuery, "aria-label": "Copy query", children: jsxRuntimeExports.jsx(ContentCopyRoundedIcon, { fontSize: "small" }) }) })] }), jsxRuntimeExports.jsx(OpenSearchJsonEditor, { value: query, onChange: setQuery, onModEnter: function () { return void runQuery(); } }), jsxRuntimeExports.jsxs(Box$1, { sx: {
+                                            px: 1.5,
+                                            py: 1,
+                                            borderTop: 1,
+                                            borderBottom: 1,
+                                            borderColor: 'divider',
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            gap: 1
+                                        }, children: [jsxRuntimeExports.jsx(Typography, { variant: "caption", color: "text.secondary", children: "API method + options" }), jsxRuntimeExports.jsxs(Box$1, { sx: { display: 'flex', flexWrap: 'wrap', gap: 1 }, children: [jsxRuntimeExports.jsx(TextField$1, { select: true, size: "small", label: "Method", value: apiMethod, onChange: function (e) { return setApiMethod(e.target.value); }, sx: { width: 140 }, SelectProps: fullscreenSelectProps, children: jsxRuntimeExports.jsx(MenuItem$1, { value: "select", children: "select" }) }), jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "from", value: optionFrom, onChange: function (e) { return setOptionFrom(e.target.value); }, sx: { width: 110 } }), jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "size", value: optionSize, onChange: function (e) { return setOptionSize(e.target.value); }, sx: { width: 110 } }), jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "track_total_hits", value: optionTrackTotalHits, onChange: function (e) { return setOptionTrackTotalHits(e.target.value); }, sx: { width: 170 }, SelectProps: fullscreenSelectProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "true", children: "true" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "false", children: "false" })] }), jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "timeout", value: optionTimeout, onChange: function (e) { return setOptionTimeout(e.target.value); }, sx: { width: 110 } }), jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "terminate_after", value: optionTerminateAfter, onChange: function (e) { return setOptionTerminateAfter(e.target.value); }, sx: { width: 140 } }), jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "min_score", value: optionMinScore, onChange: function (e) { return setOptionMinScore(e.target.value); }, sx: { width: 110 } }), jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "preference", value: optionPreference, onChange: function (e) { return setOptionPreference(e.target.value); }, sx: { width: 170 } }), jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "routing", value: optionRouting, onChange: function (e) { return setOptionRouting(e.target.value); }, sx: { width: 140 } }), jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "search_type", value: optionSearchType, onChange: function (e) { return setOptionSearchType(e.target.value); }, sx: { width: 180 }, SelectProps: fullscreenSelectProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "query_then_fetch", children: "query_then_fetch" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "dfs_query_then_fetch", children: "dfs_query_then_fetch" })] }), jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "allow_no_indices", value: optionAllowNoIndices, onChange: function (e) { return setOptionAllowNoIndices(e.target.value); }, sx: { width: 160 }, SelectProps: fullscreenSelectProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "true", children: "true" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "false", children: "false" })] }), jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "allow_partial_results", value: optionAllowPartialResults, onChange: function (e) { return setOptionAllowPartialResults(e.target.value); }, sx: { width: 190 }, SelectProps: fullscreenSelectProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "true", children: "true" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "false", children: "false" })] }), jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "ignore_unavailable", value: optionIgnoreUnavailable, onChange: function (e) { return setOptionIgnoreUnavailable(e.target.value); }, sx: { width: 170 }, SelectProps: fullscreenSelectProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "true", children: "true" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "false", children: "false" })] }), jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "track_scores", value: optionTrackScores, onChange: function (e) { return setOptionTrackScores(e.target.value); }, sx: { width: 130 }, SelectProps: fullscreenSelectProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "true", children: "true" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "false", children: "false" })] }), jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "rest_total_hits_as_int", value: optionRestTotalHitsAsInt, onChange: function (e) { return setOptionRestTotalHitsAsInt(e.target.value); }, sx: { width: 190 }, SelectProps: fullscreenSelectProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "true", children: "true" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "false", children: "false" })] }), jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "typed_keys", value: optionTypedKeys, onChange: function (e) { return setOptionTypedKeys(e.target.value); }, sx: { width: 120 }, SelectProps: fullscreenSelectProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "true", children: "true" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "false", children: "false" })] }), jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "version", value: optionVersionParam, onChange: function (e) { return setOptionVersionParam(e.target.value); }, sx: { width: 110 }, SelectProps: fullscreenSelectProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "true", children: "true" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "false", children: "false" })] }), jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "seq_no_primary_term", value: optionSeqNoPrimaryTermParam, onChange: function (e) { return setOptionSeqNoPrimaryTermParam(e.target.value); }, sx: { width: 180 }, SelectProps: fullscreenSelectProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "true", children: "true" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "false", children: "false" })] }), jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "sort field", value: optionSortField, onChange: function (e) { return setOptionSortField(e.target.value); }, sx: { width: 170 } }), jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "sort order", value: optionSortOrder, onChange: function (e) { return setOptionSortOrder(e.target.value); }, sx: { width: 120 }, SelectProps: fullscreenSelectProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "desc", children: "desc" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "asc", children: "asc" })] }), jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "_source mode", value: optionSourceMode, onChange: function (e) { return setOptionSourceMode(e.target.value); }, sx: { width: 150 }, SelectProps: fullscreenSelectProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "default", children: "default" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "all", children: "all" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "custom", children: "custom" })] }), optionSourceMode === 'custom' ? (jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "_source fields (csv)", value: optionSourceFields, onChange: function (e) { return setOptionSourceFields(e.target.value); }, sx: { flex: '1 1 260px', minWidth: 220 } })) : null, jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "highlight", value: optionEnableHighlight, onChange: function (e) { return setOptionEnableHighlight(e.target.value); }, sx: { width: 120 }, SelectProps: fullscreenSelectProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "false", children: "off" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "true", children: "on" })] }), optionEnableHighlight === 'true' ? (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "highlight fields (csv)", value: optionHighlightFields, onChange: function (e) { return setOptionHighlightFields(e.target.value); }, sx: { flex: '2 1 240px', minWidth: 220 } }), jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "fragment size", value: optionHighlightFragmentSize, onChange: function (e) { return setOptionHighlightFragmentSize(e.target.value); }, sx: { width: 130 } }), jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "# fragments", value: optionHighlightNumFragments, onChange: function (e) { return setOptionHighlightNumFragments(e.target.value); }, sx: { width: 120 } })] })) : null, jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "faceting", value: optionEnableFacets, onChange: function (e) { return setOptionEnableFacets(e.target.value); }, sx: { width: 120 }, SelectProps: fullscreenSelectProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "false", children: "off" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "true", children: "on" })] }), optionEnableFacets === 'true' ? (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "facet field", value: optionFacetField, onChange: function (e) { return setOptionFacetField(e.target.value); }, sx: { width: 170 } }), jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "facet size", value: optionFacetSize, onChange: function (e) { return setOptionFacetSize(e.target.value); }, sx: { width: 120 } })] })) : null, jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "boosting", value: optionEnableBoosting, onChange: function (e) { return setOptionEnableBoosting(e.target.value); }, sx: { width: 120 }, SelectProps: fullscreenSelectProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "false", children: "off" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "true", children: "on" })] }), optionEnableBoosting === 'true' ? (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "query field boosts (csv)", value: optionQueryFieldBoosts, onChange: function (e) { return setOptionQueryFieldBoosts(e.target.value); }, sx: { flex: '2 1 240px', minWidth: 220 } }), jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "indices_boost (csv index=weight)", value: optionIndicesBoost, onChange: function (e) { return setOptionIndicesBoost(e.target.value); }, sx: { flex: '2 1 240px', minWidth: 220 } })] })) : null, jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "advanced query params JSON", value: optionAdvancedQueryParamsJson, onChange: function (e) { return setOptionAdvancedQueryParamsJson(e.target.value); }, sx: { flex: '2 1 320px', minWidth: 260 }, multiline: true, minRows: 2 }), jsxRuntimeExports.jsx(Button$1, { size: "small", variant: "outlined", onClick: applyApiOptions, children: "Apply options" })] })] }), jsxRuntimeExports.jsxs(Box$1, { sx: {
                                             px: 1.5,
                                             py: 1,
                                             borderBottom: 1,
@@ -33514,7 +33932,17 @@ function OpenSearchPlayground() {
                                             gap: 1
                                         }, children: [jsxRuntimeExports.jsxs(Typography, { variant: "caption", color: "text.secondary", children: ["Quick insert (appends to", ' ', jsxRuntimeExports.jsx(Typography, { component: "span", fontFamily: "monospace", children: "bool.must" }), "). Load schema first for field autocomplete."] }), jsxRuntimeExports.jsxs(Box$1, { sx: { display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'flex-start' }, children: [jsxRuntimeExports.jsx(TextField$1, { size: "small", sx: { flex: '1 1 180px', minWidth: 160 }, label: "Field path", placeholder: "localId", value: builderField, onChange: function (e) { return setBuilderField(e.target.value); }, inputProps: { list: 'uigoodies-opensearch-field-paths' } }), jsxRuntimeExports.jsx("datalist", { id: "uigoodies-opensearch-field-paths", children: pathOptions.map(function (p) { return (jsxRuntimeExports.jsx("option", { value: p }, p)); }) }), jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "Clause", value: builderMode, onChange: function (e) {
                                                             return setBuilderMode(e.target.value);
-                                                        }, sx: { width: 130 }, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "match", children: "match" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "term", children: "term" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "prefix", children: "prefix" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "wildcard", children: "wildcard" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "range", children: "range" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "exists", children: "exists" })] }), builderMode === 'range' ? (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "gte", value: builderGte, onChange: function (e) { return setBuilderGte(e.target.value); }, sx: { width: 140 } }), jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "lte", value: builderLte, onChange: function (e) { return setBuilderLte(e.target.value); }, sx: { width: 140 } })] })) : builderMode === 'exists' ? null : (jsxRuntimeExports.jsx(TextField$1, { size: "small", label: builderMode === 'wildcard' ? 'Pattern' : 'Value', value: builderValue, onChange: function (e) { return setBuilderValue(e.target.value); }, sx: { flex: '2 1 200px', minWidth: 160 }, multiline: builderMode === 'match', minRows: builderMode === 'match' ? 2 : 1 })), jsxRuntimeExports.jsx(Button$1, { size: "small", variant: "outlined", onClick: insertFromBuilderBar, children: "Insert clause" })] })] }), jsxRuntimeExports.jsx(OpenSearchJsonEditor, { value: query, onChange: setQuery, onModEnter: function () { return void runQuery(); } })] }) }), jsxRuntimeExports.jsx(ResizeGrip, { vertical: orientationVertical }), jsxRuntimeExports.jsx(Yt, { id: "response", defaultSize: orientationVertical ? '35%' : '38%', minSize: "20%", children: jsxRuntimeExports.jsxs(Paper, { variant: "outlined", sx: {
+                                                        }, sx: { width: 130 }, SelectProps: fullscreenSelectProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "match", children: "match" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "term", children: "term" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "prefix", children: "prefix" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "wildcard", children: "wildcard" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "range", children: "range" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "exists", children: "exists" })] }), builderMode === 'range' ? (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "gte", value: builderGte, onChange: function (e) { return setBuilderGte(e.target.value); }, sx: { width: 140 } }), jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "lte", value: builderLte, onChange: function (e) { return setBuilderLte(e.target.value); }, sx: { width: 140 } })] })) : builderMode === 'exists' ? null : (jsxRuntimeExports.jsx(TextField$1, { size: "small", label: builderMode === 'wildcard' ? 'Pattern' : 'Value', value: builderValue, onChange: function (e) { return setBuilderValue(e.target.value); }, sx: { flex: '2 1 200px', minWidth: 160 }, multiline: builderMode === 'match', minRows: builderMode === 'match' ? 2 : 1 })), jsxRuntimeExports.jsx(Button$1, { size: "small", variant: "outlined", onClick: insertFromBuilderBar, children: "Insert clause" })] })] }), jsxRuntimeExports.jsxs(Box$1, { sx: {
+                                            px: 1.5,
+                                            py: 1,
+                                            borderTop: 1,
+                                            borderColor: 'divider',
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'center',
+                                            gap: 1,
+                                            flexWrap: 'wrap'
+                                        }, children: [jsxRuntimeExports.jsx(Typography, { variant: "caption", color: "text.secondary", children: "Export as" }), jsxRuntimeExports.jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', gap: 1 }, children: [jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "Format", value: exportTarget, onChange: function (e) { return setExportTarget(e.target.value); }, sx: { width: 120 }, SelectProps: fullscreenSelectProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "curl", children: "Curl" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "groovy", children: "Groovy" })] }), jsxRuntimeExports.jsx(Button$1, { size: "small", variant: "outlined", onClick: exportAsCode, disabled: !siteId, children: "Export" })] })] })] }) }), jsxRuntimeExports.jsx(ResizeGrip, { vertical: orientationVertical }), jsxRuntimeExports.jsx(Yt, { id: "response", defaultSize: orientationVertical ? '35%' : '38%', minSize: "20%", children: jsxRuntimeExports.jsxs(Paper, { variant: "outlined", sx: {
                                     height: '100%',
                                     minHeight: 0,
                                     display: 'flex',

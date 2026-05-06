@@ -21,6 +21,6 @@ Each file in this folder documents one **registered widget** (or embedded view u
 | `org.rd.plugin.uigoodies.openCannedSearchToolbarButton` | Toolbar shortcut to Search with preset query or dialog. | [open-canned-search-toolbar-button.md](open-canned-search-toolbar-button.md) |
 | `org.rd.plugin.uigoodies.CrossSiteContentTypeCopy` | Project tool: copy content types between sites. | [cross-site-content-type-copy.md](cross-site-content-type-copy.md) |
 | `org.rd.plugin.uigoodies.ComponentPreviewPathNavigator` | Sidebar path navigator that opens component preview URLs. | [component-preview-path-navigator.md](component-preview-path-navigator.md) |
-| `org.rd.plugin.uigoodies.OpenSearchPlayground` | Project tool: inferred schema, clause builder, OpenSearch DSL editor, Engine `search.json`. | [open-search-playground.md](open-search-playground.md) |
+| `org.rd.plugin.uigoodies.OpenSearchPlayground` | Project tool: Explorer + Dictionary tabs, expanded Search API options, OpenSearch DSL editor, and Engine `search.json`. | [open-search-playground.md](open-search-playground.md) |
 
 Back to repository root: [../../README.md](../../README.md).

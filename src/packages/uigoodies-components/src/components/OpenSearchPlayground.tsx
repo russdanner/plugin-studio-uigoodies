@@ -15,6 +15,8 @@ import {
   IconButton,
   MenuItem,
   Paper,
+  Tab,
+  Tabs,
   TextField,
   Tooltip,
   Typography,
@@ -31,9 +33,13 @@ import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownR
 import KeyboardArrowUpRoundedIcon from '@mui/icons-material/KeyboardArrowUpRounded';
 import FullscreenRoundedIcon from '@mui/icons-material/FullscreenRounded';
 import FullscreenExitRoundedIcon from '@mui/icons-material/FullscreenExitRounded';
+import TravelExploreRoundedIcon from '@mui/icons-material/TravelExploreRounded';
+import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded';
 import { Group, Panel, Separator, usePanelRef } from 'react-resizable-panels';
 import useActiveSiteId from '@craftercms/studio-ui/hooks/useActiveSiteId';
 import { showSystemNotification } from '@craftercms/studio-ui/state/actions/system';
+import { fetchContentTypes } from '@craftercms/studio-ui/services/contentTypes';
+import { fetchConfigurationXML } from '@craftercms/studio-ui/services/configuration';
 import { CRAFTER_OPENSEARCH_FIELD_GROUPS } from '../utils/crafterOpenSearchFieldCatalog';
 import { executeOpenSearchOnEngine, prettifyJson } from '../utils/openSearchEngine';
 import {
@@ -93,6 +99,112 @@ const TEMPLATES: { label: string; body: string }[] = [
   }
 ];
 
+type ExportTarget = 'curl' | 'groovy';
+type SourceMode = 'default' | 'all' | 'custom';
+type ExplorerTab = 'explorer' | 'dictionary';
+type ContentTypeDictionaryEntry = {
+  id: string;
+  name: string;
+};
+type ContentTypeFieldEntry = { id: string; type: string; title: string; required: boolean };
+const MODULE = 'studio';
+
+function singleQuoteEscape(text: string): string {
+  return text.replace(/'/g, "'\"'\"'");
+}
+
+function buildCurlExport(
+  siteId: string,
+  extraIndexes: string,
+  queryBody: string,
+  queryParams: Record<string, string | number | boolean>
+): string {
+  const params = new URLSearchParams();
+  params.set('crafterSite', siteId);
+  if (extraIndexes.trim()) {
+    params.set('index', extraIndexes.trim());
+  }
+  Object.entries(queryParams).forEach(([key, value]) => {
+    if (value === '' || value == null) {
+      return;
+    }
+    params.set(key, String(value));
+  });
+  const url = `/api/1/site/search/search.json?${params.toString()}`;
+  return [
+    `curl -X POST "${url}" \\`,
+    '  -H "Content-Type: application/json" \\',
+    '  -H "Accept: application/json" \\',
+    `  --data-binary '${singleQuoteEscape(queryBody)}'`
+  ].join('\n');
+}
+
+function buildGroovyExport(siteId: string, extraIndexes: string, queryBody: string): string {
+  return [
+    'import groovy.json.JsonSlurper',
+    '',
+    `def siteId = "${siteId}"`,
+    `def extraIndexes = "${extraIndexes.trim()}"`,
+    "def requestBody = new JsonSlurper().parseText('''",
+    queryBody,
+    "''') as Map",
+    '',
+    '// In Crafter scripts, use elasticsearch directly',
+    'def result = elasticsearch.search(requestBody)',
+    'return result'
+  ].join('\n');
+}
+
+function parseCsv(value: string): string[] {
+  return value
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function applyMultiMatchFieldBoosts(value: unknown, fields: string[]): void {
+  if (!value || typeof value !== 'object') {
+    return;
+  }
+  if (Array.isArray(value)) {
+    value.forEach((entry) => applyMultiMatchFieldBoosts(entry, fields));
+    return;
+  }
+  const obj = value as Record<string, unknown>;
+  if (obj.multi_match && typeof obj.multi_match === 'object' && !Array.isArray(obj.multi_match)) {
+    (obj.multi_match as Record<string, unknown>).fields = fields;
+  }
+  Object.values(obj).forEach((entry) => applyMultiMatchFieldBoosts(entry, fields));
+}
+
+function parseFormDefinitionFields(xml: string): ContentTypeFieldEntry[] {
+  const doc = new DOMParser().parseFromString(xml, 'application/xml');
+  if (doc.querySelector('parsererror')) {
+    return [];
+  }
+  const nodes = Array.from(doc.querySelectorAll('form section field'));
+  const mapped = nodes
+    .map((node) => {
+      const id = node.querySelector(':scope > id')?.textContent?.trim() ?? '';
+      const type = node.querySelector(':scope > type')?.textContent?.trim() ?? '';
+      const title = node.querySelector(':scope > title')?.textContent?.trim() ?? '';
+      const required = Array.from(node.querySelectorAll(':scope > constraints > constraint')).some((c) => {
+        const name = c.querySelector(':scope > name')?.textContent?.trim();
+        const value = c.querySelector(':scope > value')?.textContent?.toLowerCase() ?? '';
+        return name === 'required' && value.includes('true');
+      });
+      return { id, type, title, required };
+    })
+    .filter((entry) => entry.id);
+  const deduped = new Map<string, ContentTypeFieldEntry>();
+  mapped.forEach((entry) => {
+    if (!deduped.has(entry.id)) {
+      deduped.set(entry.id, entry);
+    }
+  });
+  return Array.from(deduped.values());
+}
+
 function ResizeGrip({ vertical }: { vertical: boolean }) {
   if (vertical) {
     return (
@@ -114,8 +226,19 @@ export function OpenSearchPlayground() {
   const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
   const fullscreenRef = useRef<HTMLDivElement>(null);
   const explorerPanelRef = usePanelRef();
+  const dictionaryRequestKeyRef = useRef<string>('');
+  const dictionaryFieldsRequestKeyRef = useRef<string>('');
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [explorerCollapsed, setExplorerCollapsed] = useState(false);
+  const [explorerTab, setExplorerTab] = useState<ExplorerTab>('explorer');
+  const [dictionaryLoading, setDictionaryLoading] = useState(false);
+  const [dictionaryError, setDictionaryError] = useState('');
+  const [dictionaryReloadKey, setDictionaryReloadKey] = useState(0);
+  const [dictionaryItems, setDictionaryItems] = useState<ContentTypeDictionaryEntry[]>([]);
+  const [dictionarySelectedId, setDictionarySelectedId] = useState('');
+  const [dictionaryFieldsLoading, setDictionaryFieldsLoading] = useState(false);
+  const [dictionaryFieldsError, setDictionaryFieldsError] = useState('');
+  const [dictionaryFields, setDictionaryFields] = useState<ContentTypeFieldEntry[]>([]);
   const siteId = useActiveSiteId();
   const [query, setQuery] = useState(DEFAULT_QUERY);
   const [response, setResponse] = useState('');
@@ -133,6 +256,42 @@ export function OpenSearchPlayground() {
   const [builderValue, setBuilderValue] = useState('');
   const [builderGte, setBuilderGte] = useState('');
   const [builderLte, setBuilderLte] = useState('');
+  const [apiMethod, setApiMethod] = useState<'select'>('select');
+  const [optionFrom, setOptionFrom] = useState('0');
+  const [optionSize, setOptionSize] = useState('10');
+  const [optionTrackTotalHits, setOptionTrackTotalHits] = useState<'true' | 'false'>('true');
+  const [optionSortField, setOptionSortField] = useState('');
+  const [optionSortOrder, setOptionSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [optionSourceMode, setOptionSourceMode] = useState<SourceMode>('default');
+  const [optionSourceFields, setOptionSourceFields] = useState('localId, internal-name, content-type');
+  const [optionTimeout, setOptionTimeout] = useState('5s');
+  const [optionTerminateAfter, setOptionTerminateAfter] = useState('');
+  const [optionMinScore, setOptionMinScore] = useState('');
+  const [optionEnableHighlight, setOptionEnableHighlight] = useState<'true' | 'false'>('false');
+  const [optionHighlightFields, setOptionHighlightFields] = useState('title_t, body_html, description_html');
+  const [optionHighlightFragmentSize, setOptionHighlightFragmentSize] = useState('150');
+  const [optionHighlightNumFragments, setOptionHighlightNumFragments] = useState('2');
+  const [optionEnableFacets, setOptionEnableFacets] = useState<'true' | 'false'>('false');
+  const [optionFacetField, setOptionFacetField] = useState('content-type');
+  const [optionFacetSize, setOptionFacetSize] = useState('20');
+  const [optionEnableBoosting, setOptionEnableBoosting] = useState<'true' | 'false'>('false');
+  const [optionQueryFieldBoosts, setOptionQueryFieldBoosts] = useState('title_t^3, internal-name^2, body_html');
+  const [optionIndicesBoost, setOptionIndicesBoost] = useState('');
+  const [optionPreference, setOptionPreference] = useState('');
+  const [optionRouting, setOptionRouting] = useState('');
+  const [optionSearchType, setOptionSearchType] = useState<'query_then_fetch' | 'dfs_query_then_fetch'>(
+    'query_then_fetch'
+  );
+  const [optionAllowNoIndices, setOptionAllowNoIndices] = useState<'true' | 'false'>('true');
+  const [optionAllowPartialResults, setOptionAllowPartialResults] = useState<'true' | 'false'>('true');
+  const [optionIgnoreUnavailable, setOptionIgnoreUnavailable] = useState<'true' | 'false'>('false');
+  const [optionTrackScores, setOptionTrackScores] = useState<'true' | 'false'>('false');
+  const [optionRestTotalHitsAsInt, setOptionRestTotalHitsAsInt] = useState<'true' | 'false'>('false');
+  const [optionTypedKeys, setOptionTypedKeys] = useState<'true' | 'false'>('true');
+  const [optionVersionParam, setOptionVersionParam] = useState<'true' | 'false'>('false');
+  const [optionSeqNoPrimaryTermParam, setOptionSeqNoPrimaryTermParam] = useState<'true' | 'false'>('false');
+  const [optionAdvancedQueryParamsJson, setOptionAdvancedQueryParamsJson] = useState('{}');
+  const [exportTarget, setExportTarget] = useState<ExportTarget>('curl');
 
   useEffect(() => {
     const onFsChange = () => {
@@ -250,6 +409,46 @@ export function OpenSearchPlayground() {
     }
   }, [builderField, builderGte, builderLte, builderMode, builderValue, dispatch, query]);
 
+  const searchQueryParams = useMemo(() => {
+    let advanced: Record<string, string | number | boolean> = {};
+    try {
+      const parsed = JSON.parse(optionAdvancedQueryParamsJson) as unknown;
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+        advanced = parsed as Record<string, string | number | boolean>;
+      }
+    } catch {
+      advanced = {};
+    }
+
+    return {
+      allow_no_indices: optionAllowNoIndices === 'true',
+      allow_partial_search_results: optionAllowPartialResults === 'true',
+      ignore_unavailable: optionIgnoreUnavailable === 'true',
+      search_type: optionSearchType,
+      preference: optionPreference.trim(),
+      routing: optionRouting.trim(),
+      track_scores: optionTrackScores === 'true',
+      rest_total_hits_as_int: optionRestTotalHitsAsInt === 'true',
+      typed_keys: optionTypedKeys === 'true',
+      version: optionVersionParam === 'true',
+      seq_no_primary_term: optionSeqNoPrimaryTermParam === 'true',
+      ...advanced
+    };
+  }, [
+    optionAdvancedQueryParamsJson,
+    optionAllowNoIndices,
+    optionAllowPartialResults,
+    optionIgnoreUnavailable,
+    optionPreference,
+    optionRestTotalHitsAsInt,
+    optionRouting,
+    optionSearchType,
+    optionSeqNoPrimaryTermParam,
+    optionTrackScores,
+    optionTypedKeys,
+    optionVersionParam
+  ]);
+
   const runQuery = useCallback(async () => {
     if (!siteId) {
       dispatch(showSystemNotification({ message: 'No active site.' }));
@@ -258,7 +457,7 @@ export function OpenSearchPlayground() {
     setLoading(true);
     setResponse('');
     try {
-      const result = await executeOpenSearchOnEngine(siteId, query, extraIndexes);
+      const result = await executeOpenSearchOnEngine(siteId, query, extraIndexes, searchQueryParams);
       const pretty = result.parsedJson != null ? JSON.stringify(result.parsedJson, null, 2) : result.bodyText;
       setResponse(pretty);
       if (!result.ok) {
@@ -275,7 +474,231 @@ export function OpenSearchPlayground() {
     } finally {
       setLoading(false);
     }
-  }, [dispatch, extraIndexes, query, siteId]);
+  }, [dispatch, extraIndexes, query, searchQueryParams, siteId]);
+
+  useEffect(() => {
+    setDictionaryItems([]);
+    setDictionarySelectedId('');
+    setDictionaryFields([]);
+    setDictionaryError('');
+    setDictionaryFieldsError('');
+    dictionaryRequestKeyRef.current = '';
+    dictionaryFieldsRequestKeyRef.current = '';
+  }, [siteId]);
+
+  useEffect(() => {
+    if (explorerTab !== 'dictionary' || !siteId) {
+      return;
+    }
+    const requestKey = `${siteId}|${dictionaryReloadKey}`;
+    if (dictionaryRequestKeyRef.current === requestKey) {
+      return;
+    }
+    dictionaryRequestKeyRef.current = requestKey;
+    setDictionaryLoading(true);
+    setDictionaryError('');
+    const sub = fetchContentTypes(siteId).subscribe({
+      next(types: Array<{ id?: string; name?: string }>) {
+        const rows = (types ?? [])
+          .map((type) => ({ id: (type.id ?? '').trim(), name: (type.name ?? type.id ?? '').trim() }))
+          .filter((type) => type.id)
+          .sort((a, b) => a.id.localeCompare(b.id));
+        setDictionaryItems(rows);
+        setDictionarySelectedId((prev) => (prev && rows.some((row) => row.id === prev) ? prev : rows[0]?.id ?? ''));
+        setDictionaryLoading(false);
+      },
+      error(error) {
+        const msg = error instanceof Error ? error.message : String(error);
+        setDictionaryError(msg || 'Unable to load content types.');
+        setDictionaryItems([]);
+        setDictionaryLoading(false);
+      }
+    });
+    return () => sub.unsubscribe();
+  }, [dictionaryReloadKey, explorerTab, siteId]);
+
+  useEffect(() => {
+    dictionaryFieldsRequestKeyRef.current = '';
+  }, [dictionaryReloadKey]);
+
+  useEffect(() => {
+    if (explorerTab !== 'dictionary' || !siteId || !dictionarySelectedId) {
+      return;
+    }
+    const requestKey = `${siteId}|${dictionarySelectedId}`;
+    if (dictionaryFieldsRequestKeyRef.current === requestKey) {
+      return;
+    }
+    dictionaryFieldsRequestKeyRef.current = requestKey;
+    const id = dictionarySelectedId.startsWith('/') ? dictionarySelectedId : `/${dictionarySelectedId}`;
+    const formPath = `/content-types${id}/form-definition.xml`.replace(/\/{2,}/g, '/');
+    setDictionaryFieldsLoading(true);
+    setDictionaryFieldsError('');
+    const sub = fetchConfigurationXML(siteId, formPath, MODULE).subscribe({
+      next(formXml: string) {
+        setDictionaryFields(parseFormDefinitionFields(formXml));
+        setDictionaryFieldsLoading(false);
+      },
+      error(error) {
+        const msg = error instanceof Error ? error.message : String(error);
+        setDictionaryFieldsError(msg || 'Unable to load form-definition.xml.');
+        setDictionaryFields([]);
+        setDictionaryFieldsLoading(false);
+      }
+    });
+    return () => sub.unsubscribe();
+  }, [dictionarySelectedId, explorerTab, siteId]);
+
+  const applyApiOptions = useCallback(() => {
+    try {
+      const body = JSON.parse(query) as Record<string, unknown>;
+      if (apiMethod === 'select') {
+        const size = Number(optionSize);
+        const from = Number(optionFrom);
+
+        if (!Number.isNaN(size) && size >= 0) {
+          body.size = size;
+        }
+        if (!Number.isNaN(from) && from >= 0) {
+          body.from = from;
+        }
+
+        body.track_total_hits = optionTrackTotalHits === 'true';
+        if (optionTimeout.trim()) {
+          body.timeout = optionTimeout.trim();
+        } else {
+          delete body.timeout;
+        }
+
+        const terminateAfter = Number(optionTerminateAfter);
+        if (optionTerminateAfter.trim() && !Number.isNaN(terminateAfter) && terminateAfter > 0) {
+          body.terminate_after = terminateAfter;
+        } else {
+          delete body.terminate_after;
+        }
+
+        const minScore = Number(optionMinScore);
+        if (optionMinScore.trim() && !Number.isNaN(minScore)) {
+          body.min_score = minScore;
+        } else {
+          delete body.min_score;
+        }
+
+        if (optionSortField.trim()) {
+          body.sort = [{ [optionSortField.trim()]: { order: optionSortOrder } }];
+        } else {
+          delete body.sort;
+        }
+
+        if (optionSourceMode === 'all') {
+          body._source = true;
+        } else if (optionSourceMode === 'custom') {
+          const fields = parseCsv(optionSourceFields);
+          body._source = fields.length > 0 ? fields : true;
+        } else {
+          delete body._source;
+        }
+
+        if (optionEnableHighlight === 'true') {
+          const fields = parseCsv(optionHighlightFields);
+          const fragmentSize = Number(optionHighlightFragmentSize);
+          const numFragments = Number(optionHighlightNumFragments);
+          body.highlight = {
+            fields: fields.reduce<Record<string, Record<string, number>>>((acc, field) => {
+              acc[field] = {
+                fragment_size: !Number.isNaN(fragmentSize) && fragmentSize > 0 ? fragmentSize : 150,
+                number_of_fragments: !Number.isNaN(numFragments) && numFragments > 0 ? numFragments : 2
+              };
+              return acc;
+            }, {})
+          };
+        } else {
+          delete body.highlight;
+        }
+
+        if (optionEnableFacets === 'true' && optionFacetField.trim()) {
+          const facetSize = Number(optionFacetSize);
+          body.aggs = {
+            facet_terms: {
+              terms: {
+                field: optionFacetField.trim(),
+                size: !Number.isNaN(facetSize) && facetSize > 0 ? facetSize : 20
+              }
+            }
+          };
+        } else {
+          delete body.aggs;
+        }
+
+        if (optionEnableBoosting === 'true') {
+          const boostFields = parseCsv(optionQueryFieldBoosts);
+          if (boostFields.length > 0) {
+            applyMultiMatchFieldBoosts(body.query, boostFields);
+          }
+          const indicesBoost = optionIndicesBoost
+            .split(',')
+            .map((part) => part.trim())
+            .filter(Boolean)
+            .map((entry) => entry.split('=').map((piece) => piece.trim()))
+            .filter((tuple) => tuple.length === 2 && tuple[0] && tuple[1])
+            .map(([index, weight]) => {
+              const n = Number(weight);
+              return Number.isNaN(n) ? null : { [index]: n };
+            })
+            .filter((entry): entry is Record<string, number> => entry != null);
+          if (indicesBoost.length > 0) {
+            body.indices_boost = indicesBoost;
+          } else {
+            delete body.indices_boost;
+          }
+        } else {
+          delete body.indices_boost;
+        }
+      }
+
+      setQuery(JSON.stringify(body, null, 2));
+      dispatch(showSystemNotification({ message: 'Applied API options to query JSON.' }));
+    } catch {
+      dispatch(showSystemNotification({ message: 'Fix invalid JSON in the query editor first.' }));
+    }
+  }, [
+    apiMethod,
+    dispatch,
+    optionFrom,
+    optionSize,
+    optionSortField,
+    optionSortOrder,
+    optionSourceFields,
+    optionSourceMode,
+    optionTimeout,
+    optionTerminateAfter,
+    optionMinScore,
+    optionEnableHighlight,
+    optionHighlightFields,
+    optionHighlightFragmentSize,
+    optionHighlightNumFragments,
+    optionEnableFacets,
+    optionFacetField,
+    optionFacetSize,
+    optionEnableBoosting,
+    optionQueryFieldBoosts,
+    optionIndicesBoost,
+    optionTrackTotalHits,
+    query
+  ]);
+
+  const exportAsCode = useCallback(() => {
+    if (!siteId) {
+      dispatch(showSystemNotification({ message: 'No active site to export.' }));
+      return;
+    }
+    const code =
+      exportTarget === 'curl'
+        ? buildCurlExport(siteId, extraIndexes, query, searchQueryParams)
+        : buildGroovyExport(siteId, extraIndexes, query);
+    setResponse(code);
+    dispatch(showSystemNotification({ message: `Exported as ${exportTarget}.` }));
+  }, [dispatch, exportTarget, extraIndexes, query, searchQueryParams, siteId]);
 
   const displayedResponse = useMemo(
     () => (loading && !response ? RESPONSE_LOADING_JSON : response || RESPONSE_EMPTY_JSON),
@@ -302,6 +725,15 @@ export function OpenSearchPlayground() {
   }, [dispatch, displayedResponse]);
 
   const orientationVertical = !isMdUp;
+  const fullscreenSelectProps = useMemo(
+    () => ({
+      MenuProps: {
+        disablePortal: true,
+        container: fullscreenRef.current ?? undefined
+      }
+    }),
+    [isFullscreen]
+  );
 
   return (
     <Box
@@ -360,7 +792,7 @@ export function OpenSearchPlayground() {
           label="Load template"
           defaultValue=""
           sx={{ minWidth: 200 }}
-          SelectProps={{ displayEmpty: true }}
+          SelectProps={{ ...fullscreenSelectProps, displayEmpty: true }}
           onChange={(e) => {
             const t = TEMPLATES.find((x) => x.label === e.target.value);
             if (t) {
@@ -412,8 +844,8 @@ export function OpenSearchPlayground() {
                 <>
                   <Box
                     sx={{
-                      px: 1.5,
-                      py: 1,
+                      px: 1,
+                      py: 0.5,
                       borderBottom: 1,
                       borderColor: 'divider',
                       display: 'flex',
@@ -422,9 +854,14 @@ export function OpenSearchPlayground() {
                       flexShrink: 0
                     }}
                   >
-                    <Typography variant="subtitle2" sx={{ flex: 1, minWidth: 0 }}>
-                      Explorer &amp; query builder
-                    </Typography>
+                    <Tabs
+                      value={explorerTab}
+                      onChange={(_, value) => setExplorerTab(value as ExplorerTab)}
+                      sx={{ minHeight: 36, '& .MuiTab-root': { minHeight: 36, py: 0.5 } }}
+                    >
+                      <Tab label="Explorer" value="explorer" />
+                      <Tab label="Dictionary" value="dictionary" />
+                    </Tabs>
                     <Tooltip title="Collapse explorer">
                       <IconButton
                         size="small"
@@ -436,20 +873,106 @@ export function OpenSearchPlayground() {
                       </IconButton>
                     </Tooltip>
                   </Box>
-                  <Box sx={{ overflow: 'auto', flex: 1, minHeight: 0 }}>
-                    <OpenSearchSchemaPanel
-                      siteId={siteId}
-                      extraIndexes={extraIndexes}
-                      query={query}
-                      setQuery={setQuery}
-                      openGroups={openGroups}
-                      setOpenGroups={setOpenGroups}
-                      selectedFields={selectedFields}
-                      toggleField={toggleField}
-                      onInferredFieldsChange={setInferredFields}
-                      sourceIsWildcard={sourceIsWildcard}
-                    />
-                  </Box>
+                  {explorerTab === 'explorer' ? (
+                    <Box sx={{ overflow: 'auto', flex: 1, minHeight: 0 }}>
+                      <OpenSearchSchemaPanel
+                        siteId={siteId}
+                        extraIndexes={extraIndexes}
+                        query={query}
+                        setQuery={setQuery}
+                        openGroups={openGroups}
+                        setOpenGroups={setOpenGroups}
+                        selectedFields={selectedFields}
+                        toggleField={toggleField}
+                        onInferredFieldsChange={setInferredFields}
+                        sourceIsWildcard={sourceIsWildcard}
+                      />
+                    </Box>
+                  ) : (
+                    <Box sx={{ overflow: 'auto', flex: 1, minHeight: 0, p: 1 }}>
+                      {dictionaryLoading ? (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, p: 1 }}>
+                          <CircularProgress size={16} />
+                          <Typography variant="body2" color="text.secondary">
+                            Loading content types...
+                          </Typography>
+                        </Box>
+                      ) : dictionaryError ? (
+                        <Typography variant="body2" color="error" sx={{ p: 1 }}>
+                          {dictionaryError}
+                        </Typography>
+                      ) : dictionaryItems.length === 0 ? (
+                        <Typography variant="body2" color="text.secondary" sx={{ p: 1 }}>
+                          No content types found.
+                        </Typography>
+                      ) : (
+                        <>
+                          <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
+                            <TextField
+                              select
+                              size="small"
+                              label="Content type"
+                              value={dictionarySelectedId}
+                              onChange={(e) => setDictionarySelectedId(e.target.value)}
+                              sx={{ flex: 1 }}
+                              SelectProps={fullscreenSelectProps}
+                            >
+                              {dictionaryItems.map((entry) => (
+                                <MenuItem key={entry.id} value={entry.id}>
+                                  {entry.id}
+                                </MenuItem>
+                              ))}
+                            </TextField>
+                            <Button size="small" variant="outlined" onClick={() => setDictionaryReloadKey((k) => k + 1)}>
+                              Refresh
+                            </Button>
+                          </Box>
+                          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                            {dictionaryItems.find((entry) => entry.id === dictionarySelectedId)?.name ?? ''}
+                          </Typography>
+                          {dictionaryFieldsLoading ? (
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, p: 1 }}>
+                              <CircularProgress size={16} />
+                              <Typography variant="body2" color="text.secondary">
+                                Loading fields...
+                              </Typography>
+                            </Box>
+                          ) : dictionaryFieldsError ? (
+                            <Typography variant="body2" color="error" sx={{ p: 1 }}>
+                              {dictionaryFieldsError}
+                            </Typography>
+                          ) : dictionaryFields.length === 0 ? (
+                            <Typography variant="body2" color="text.secondary" sx={{ p: 1 }}>
+                              No fields found in this content type.
+                            </Typography>
+                          ) : (
+                            dictionaryFields.map((field) => (
+                              <Box
+                                key={field.id}
+                                sx={{
+                                  p: 1,
+                                  mb: 1,
+                                  border: 1,
+                                  borderColor: 'divider',
+                                  borderRadius: 1,
+                                  bgcolor: 'background.paper'
+                                }}
+                              >
+                                <Typography variant="body2" fontFamily="monospace">
+                                  {field.id}
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary">
+                                  {field.type}
+                                  {field.required ? ' • required' : ''}
+                                  {field.title ? ` • ${field.title}` : ''}
+                                </Typography>
+                              </Box>
+                            ))
+                          )}
+                        </>
+                      )}
+                    </Box>
+                  )}
                 </>
               ) : (
                 <Box
@@ -464,6 +987,26 @@ export function OpenSearchPlayground() {
                     gap: 1
                   }}
                 >
+                  <Tooltip title="Explorer">
+                    <IconButton
+                      size="small"
+                      color={explorerTab === 'explorer' ? 'primary' : 'default'}
+                      onClick={() => setExplorerTab('explorer')}
+                      aria-label="Explorer tab"
+                    >
+                      <TravelExploreRoundedIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Dictionary">
+                    <IconButton
+                      size="small"
+                      color={explorerTab === 'dictionary' ? 'primary' : 'default'}
+                      onClick={() => setExplorerTab('dictionary')}
+                      aria-label="Dictionary tab"
+                    >
+                      <MenuBookRoundedIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
                   <Tooltip title="Expand explorer">
                     <IconButton size="small" onClick={expandExplorerPanel} aria-label="Expand explorer">
                       {orientationVertical ? <KeyboardArrowDownRoundedIcon /> : <ChevronRightRoundedIcon />}
@@ -527,6 +1070,355 @@ export function OpenSearchPlayground() {
                   </IconButton>
                 </Tooltip>
               </Box>
+              <OpenSearchJsonEditor value={query} onChange={setQuery} onModEnter={() => void runQuery()} />
+              <Box
+                sx={{
+                  px: 1.5,
+                  py: 1,
+                  borderTop: 1,
+                  borderBottom: 1,
+                  borderColor: 'divider',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1
+                }}
+              >
+                <Typography variant="caption" color="text.secondary">
+                  API method + options
+                </Typography>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                  <TextField
+                    select
+                    size="small"
+                    label="Method"
+                    value={apiMethod}
+                    onChange={(e) => setApiMethod(e.target.value as 'select')}
+                    sx={{ width: 140 }}
+                    SelectProps={fullscreenSelectProps}
+                  >
+                    <MenuItem value="select">select</MenuItem>
+                  </TextField>
+                  <TextField
+                    size="small"
+                    label="from"
+                    value={optionFrom}
+                    onChange={(e) => setOptionFrom(e.target.value)}
+                    sx={{ width: 110 }}
+                  />
+                  <TextField
+                    size="small"
+                    label="size"
+                    value={optionSize}
+                    onChange={(e) => setOptionSize(e.target.value)}
+                    sx={{ width: 110 }}
+                  />
+                  <TextField
+                    select
+                    size="small"
+                    label="track_total_hits"
+                    value={optionTrackTotalHits}
+                    onChange={(e) => setOptionTrackTotalHits(e.target.value as 'true' | 'false')}
+                    sx={{ width: 170 }}
+                    SelectProps={fullscreenSelectProps}
+                  >
+                    <MenuItem value="true">true</MenuItem>
+                    <MenuItem value="false">false</MenuItem>
+                  </TextField>
+                  <TextField
+                    size="small"
+                    label="timeout"
+                    value={optionTimeout}
+                    onChange={(e) => setOptionTimeout(e.target.value)}
+                    sx={{ width: 110 }}
+                  />
+                  <TextField
+                    size="small"
+                    label="terminate_after"
+                    value={optionTerminateAfter}
+                    onChange={(e) => setOptionTerminateAfter(e.target.value)}
+                    sx={{ width: 140 }}
+                  />
+                  <TextField
+                    size="small"
+                    label="min_score"
+                    value={optionMinScore}
+                    onChange={(e) => setOptionMinScore(e.target.value)}
+                    sx={{ width: 110 }}
+                  />
+                  <TextField
+                    size="small"
+                    label="preference"
+                    value={optionPreference}
+                    onChange={(e) => setOptionPreference(e.target.value)}
+                    sx={{ width: 170 }}
+                  />
+                  <TextField
+                    size="small"
+                    label="routing"
+                    value={optionRouting}
+                    onChange={(e) => setOptionRouting(e.target.value)}
+                    sx={{ width: 140 }}
+                  />
+                  <TextField
+                    select
+                    size="small"
+                    label="search_type"
+                    value={optionSearchType}
+                    onChange={(e) => setOptionSearchType(e.target.value as 'query_then_fetch' | 'dfs_query_then_fetch')}
+                    sx={{ width: 180 }}
+                    SelectProps={fullscreenSelectProps}
+                  >
+                    <MenuItem value="query_then_fetch">query_then_fetch</MenuItem>
+                    <MenuItem value="dfs_query_then_fetch">dfs_query_then_fetch</MenuItem>
+                  </TextField>
+                  <TextField
+                    select
+                    size="small"
+                    label="allow_no_indices"
+                    value={optionAllowNoIndices}
+                    onChange={(e) => setOptionAllowNoIndices(e.target.value as 'true' | 'false')}
+                    sx={{ width: 160 }}
+                    SelectProps={fullscreenSelectProps}
+                  >
+                    <MenuItem value="true">true</MenuItem>
+                    <MenuItem value="false">false</MenuItem>
+                  </TextField>
+                  <TextField
+                    select
+                    size="small"
+                    label="allow_partial_results"
+                    value={optionAllowPartialResults}
+                    onChange={(e) => setOptionAllowPartialResults(e.target.value as 'true' | 'false')}
+                    sx={{ width: 190 }}
+                    SelectProps={fullscreenSelectProps}
+                  >
+                    <MenuItem value="true">true</MenuItem>
+                    <MenuItem value="false">false</MenuItem>
+                  </TextField>
+                  <TextField
+                    select
+                    size="small"
+                    label="ignore_unavailable"
+                    value={optionIgnoreUnavailable}
+                    onChange={(e) => setOptionIgnoreUnavailable(e.target.value as 'true' | 'false')}
+                    sx={{ width: 170 }}
+                    SelectProps={fullscreenSelectProps}
+                  >
+                    <MenuItem value="true">true</MenuItem>
+                    <MenuItem value="false">false</MenuItem>
+                  </TextField>
+                  <TextField
+                    select
+                    size="small"
+                    label="track_scores"
+                    value={optionTrackScores}
+                    onChange={(e) => setOptionTrackScores(e.target.value as 'true' | 'false')}
+                    sx={{ width: 130 }}
+                    SelectProps={fullscreenSelectProps}
+                  >
+                    <MenuItem value="true">true</MenuItem>
+                    <MenuItem value="false">false</MenuItem>
+                  </TextField>
+                  <TextField
+                    select
+                    size="small"
+                    label="rest_total_hits_as_int"
+                    value={optionRestTotalHitsAsInt}
+                    onChange={(e) => setOptionRestTotalHitsAsInt(e.target.value as 'true' | 'false')}
+                    sx={{ width: 190 }}
+                    SelectProps={fullscreenSelectProps}
+                  >
+                    <MenuItem value="true">true</MenuItem>
+                    <MenuItem value="false">false</MenuItem>
+                  </TextField>
+                  <TextField
+                    select
+                    size="small"
+                    label="typed_keys"
+                    value={optionTypedKeys}
+                    onChange={(e) => setOptionTypedKeys(e.target.value as 'true' | 'false')}
+                    sx={{ width: 120 }}
+                    SelectProps={fullscreenSelectProps}
+                  >
+                    <MenuItem value="true">true</MenuItem>
+                    <MenuItem value="false">false</MenuItem>
+                  </TextField>
+                  <TextField
+                    select
+                    size="small"
+                    label="version"
+                    value={optionVersionParam}
+                    onChange={(e) => setOptionVersionParam(e.target.value as 'true' | 'false')}
+                    sx={{ width: 110 }}
+                    SelectProps={fullscreenSelectProps}
+                  >
+                    <MenuItem value="true">true</MenuItem>
+                    <MenuItem value="false">false</MenuItem>
+                  </TextField>
+                  <TextField
+                    select
+                    size="small"
+                    label="seq_no_primary_term"
+                    value={optionSeqNoPrimaryTermParam}
+                    onChange={(e) => setOptionSeqNoPrimaryTermParam(e.target.value as 'true' | 'false')}
+                    sx={{ width: 180 }}
+                    SelectProps={fullscreenSelectProps}
+                  >
+                    <MenuItem value="true">true</MenuItem>
+                    <MenuItem value="false">false</MenuItem>
+                  </TextField>
+                  <TextField
+                    size="small"
+                    label="sort field"
+                    value={optionSortField}
+                    onChange={(e) => setOptionSortField(e.target.value)}
+                    sx={{ width: 170 }}
+                  />
+                  <TextField
+                    select
+                    size="small"
+                    label="sort order"
+                    value={optionSortOrder}
+                    onChange={(e) => setOptionSortOrder(e.target.value as 'asc' | 'desc')}
+                    sx={{ width: 120 }}
+                    SelectProps={fullscreenSelectProps}
+                  >
+                    <MenuItem value="desc">desc</MenuItem>
+                    <MenuItem value="asc">asc</MenuItem>
+                  </TextField>
+                  <TextField
+                    select
+                    size="small"
+                    label="_source mode"
+                    value={optionSourceMode}
+                    onChange={(e) => setOptionSourceMode(e.target.value as SourceMode)}
+                    sx={{ width: 150 }}
+                    SelectProps={fullscreenSelectProps}
+                  >
+                    <MenuItem value="default">default</MenuItem>
+                    <MenuItem value="all">all</MenuItem>
+                    <MenuItem value="custom">custom</MenuItem>
+                  </TextField>
+                  {optionSourceMode === 'custom' ? (
+                    <TextField
+                      size="small"
+                      label="_source fields (csv)"
+                      value={optionSourceFields}
+                      onChange={(e) => setOptionSourceFields(e.target.value)}
+                      sx={{ flex: '1 1 260px', minWidth: 220 }}
+                    />
+                  ) : null}
+                  <TextField
+                    select
+                    size="small"
+                    label="highlight"
+                    value={optionEnableHighlight}
+                    onChange={(e) => setOptionEnableHighlight(e.target.value as 'true' | 'false')}
+                    sx={{ width: 120 }}
+                    SelectProps={fullscreenSelectProps}
+                  >
+                    <MenuItem value="false">off</MenuItem>
+                    <MenuItem value="true">on</MenuItem>
+                  </TextField>
+                  {optionEnableHighlight === 'true' ? (
+                    <>
+                      <TextField
+                        size="small"
+                        label="highlight fields (csv)"
+                        value={optionHighlightFields}
+                        onChange={(e) => setOptionHighlightFields(e.target.value)}
+                        sx={{ flex: '2 1 240px', minWidth: 220 }}
+                      />
+                      <TextField
+                        size="small"
+                        label="fragment size"
+                        value={optionHighlightFragmentSize}
+                        onChange={(e) => setOptionHighlightFragmentSize(e.target.value)}
+                        sx={{ width: 130 }}
+                      />
+                      <TextField
+                        size="small"
+                        label="# fragments"
+                        value={optionHighlightNumFragments}
+                        onChange={(e) => setOptionHighlightNumFragments(e.target.value)}
+                        sx={{ width: 120 }}
+                      />
+                    </>
+                  ) : null}
+                  <TextField
+                    select
+                    size="small"
+                    label="faceting"
+                    value={optionEnableFacets}
+                    onChange={(e) => setOptionEnableFacets(e.target.value as 'true' | 'false')}
+                    sx={{ width: 120 }}
+                    SelectProps={fullscreenSelectProps}
+                  >
+                    <MenuItem value="false">off</MenuItem>
+                    <MenuItem value="true">on</MenuItem>
+                  </TextField>
+                  {optionEnableFacets === 'true' ? (
+                    <>
+                      <TextField
+                        size="small"
+                        label="facet field"
+                        value={optionFacetField}
+                        onChange={(e) => setOptionFacetField(e.target.value)}
+                        sx={{ width: 170 }}
+                      />
+                      <TextField
+                        size="small"
+                        label="facet size"
+                        value={optionFacetSize}
+                        onChange={(e) => setOptionFacetSize(e.target.value)}
+                        sx={{ width: 120 }}
+                      />
+                    </>
+                  ) : null}
+                  <TextField
+                    select
+                    size="small"
+                    label="boosting"
+                    value={optionEnableBoosting}
+                    onChange={(e) => setOptionEnableBoosting(e.target.value as 'true' | 'false')}
+                    sx={{ width: 120 }}
+                    SelectProps={fullscreenSelectProps}
+                  >
+                    <MenuItem value="false">off</MenuItem>
+                    <MenuItem value="true">on</MenuItem>
+                  </TextField>
+                  {optionEnableBoosting === 'true' ? (
+                    <>
+                      <TextField
+                        size="small"
+                        label="query field boosts (csv)"
+                        value={optionQueryFieldBoosts}
+                        onChange={(e) => setOptionQueryFieldBoosts(e.target.value)}
+                        sx={{ flex: '2 1 240px', minWidth: 220 }}
+                      />
+                      <TextField
+                        size="small"
+                        label="indices_boost (csv index=weight)"
+                        value={optionIndicesBoost}
+                        onChange={(e) => setOptionIndicesBoost(e.target.value)}
+                        sx={{ flex: '2 1 240px', minWidth: 220 }}
+                      />
+                    </>
+                  ) : null}
+                  <TextField
+                    size="small"
+                    label="advanced query params JSON"
+                    value={optionAdvancedQueryParamsJson}
+                    onChange={(e) => setOptionAdvancedQueryParamsJson(e.target.value)}
+                    sx={{ flex: '2 1 320px', minWidth: 260 }}
+                    multiline
+                    minRows={2}
+                  />
+                  <Button size="small" variant="outlined" onClick={applyApiOptions}>
+                    Apply options
+                  </Button>
+                </Box>
+              </Box>
               <Box
                 sx={{
                   px: 1.5,
@@ -569,6 +1461,7 @@ export function OpenSearchPlayground() {
                       setBuilderMode(e.target.value as 'match' | 'term' | 'prefix' | 'wildcard' | 'range' | 'exists')
                     }
                     sx={{ width: 130 }}
+                    SelectProps={fullscreenSelectProps}
                   >
                     <MenuItem value="match">match</MenuItem>
                     <MenuItem value="term">term</MenuItem>
@@ -610,7 +1503,40 @@ export function OpenSearchPlayground() {
                   </Button>
                 </Box>
               </Box>
-              <OpenSearchJsonEditor value={query} onChange={setQuery} onModEnter={() => void runQuery()} />
+              <Box
+                sx={{
+                  px: 1.5,
+                  py: 1,
+                  borderTop: 1,
+                  borderColor: 'divider',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  gap: 1,
+                  flexWrap: 'wrap'
+                }}
+              >
+                <Typography variant="caption" color="text.secondary">
+                  Export as
+                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <TextField
+                    select
+                    size="small"
+                    label="Format"
+                    value={exportTarget}
+                    onChange={(e) => setExportTarget(e.target.value as ExportTarget)}
+                    sx={{ width: 120 }}
+                    SelectProps={fullscreenSelectProps}
+                  >
+                    <MenuItem value="curl">Curl</MenuItem>
+                    <MenuItem value="groovy">Groovy</MenuItem>
+                  </TextField>
+                  <Button size="small" variant="outlined" onClick={exportAsCode} disabled={!siteId}>
+                    Export
+                  </Button>
+                </Box>
+              </Box>
             </Paper>
           </Panel>
 

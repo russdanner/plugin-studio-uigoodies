@@ -6,9 +6,9 @@
 
 | Area | Purpose |
 |------|---------|
-| **Left — Explorer & query builder** | Inferred **schema** from sample hits (refresh, filter paths, type chips, `_source` checkboxes), **common field shortcuts**, and a **⋮** menu per path to insert clauses or add to `_source`. |
-| **Middle — Request body** | **Run**, **Prettify**, and **Copy** for the request; **quick insert** bar; **CodeMirror** JSON editor with **syntax highlighting**, **line numbers**, and **code folding** (gutter chevrons). **⌘/Ctrl+Enter** runs the query. |
-| **Right — Response** | **Dark-theme** CodeMirror with the same **highlighting** and **folding**; shows pretty-printed JSON (or error text if the body is not JSON). |
+| **Left — Explorer / Dictionary** | **Tabbed panel**. **Explorer** contains inferred schema tools (refresh, filter paths, type chips, `_source` checkboxes, per-path insertion menu). **Dictionary** is a **project content-type browser**: lists real content types, loads a selected type's `form-definition.xml`, and shows field id/type/title/required metadata for query design. |
+| **Middle — Request body** | **Run**, **Prettify**, and **Copy** for the request; CodeMirror JSON editor first, then API options and quick insert; supports **⌘/Ctrl+Enter** to run. |
+| **Right — Response** | Light CodeMirror response viewer; pretty-printed JSON (or plain error text). |
 
 No query **history** is stored; each run is independent.
 
@@ -55,7 +55,7 @@ Minimal entry (matches plugin auto-wire in `craftercms-plugin.yaml`):
 
 If the plugin’s `installation` block in `craftercms-plugin.yaml` already merged this tool on install, you can still add or reorder it manually in `ui.xml`; avoid duplicate `<tool>` entries with the same `url`.
 
-## Schema explorer (inferred)
+## Explorer tab (inferred schema)
 
 There is no public Engine **mapping** API from the browser, so fields are **inferred** from indexed documents:
 
@@ -80,11 +80,25 @@ After a schema refresh, inferred paths appear in the **Field path** datalist. Ch
 
 **Caveats:** `term` and some wildcards often need **`.keyword`** (or other subfields) depending on your mapping. Inferred paths reflect **`_source`** keys, which may differ from internal index field names.
 
+## Dictionary tab (project content types)
+
+The Dictionary tab is for **content model discovery**, not search result inspection:
+
+1. Loads content types for the active site using Studio content-type services.
+2. Lets you choose a content type.
+3. Fetches and parses that content type's `form-definition.xml`.
+4. Displays form fields (`id`, `type`, `title`, and inferred `required`).
+
+This helps developers build better OpenSearch queries based on real project models.
+
 ## Other controls
 
 - **Common fields (shortcuts):** curated Crafter-style names for quick `_source` toggles.
 - **Templates:** quick-start bodies (match all, prefix on `localId`, term on `content-type`).
 - **Run / Prettify / Copy query:** on the **request** panel header (not only the page title row).
 - **Run shortcut:** **⌘+Enter** / **Ctrl+Enter** in the request JSON editor.
-- **Response panel:** darker background; fold blocks via the **gutter**; **Copy response** in the panel header.
+- **Response panel:** light background; fold blocks via the **gutter**; **Copy response** in the panel header.
+- **Collapsed left panel:** shows **vertical icon tabs** to switch Explorer/Dictionary before expanding.
+- **API options section:** expanded Search API support for pagination, sorting, `_source`, highlighting, faceting, boosting, and many URL query params (plus advanced query params JSON).
+- **Export section:** generate **Curl** or **Groovy** from the current request and show it in the response panel.
 - The plugin bundles **CodeMirror 6** (`@uiw/react-codemirror`, VS Code–style light/dark themes) for these editors (~1.3MB `index.js`).

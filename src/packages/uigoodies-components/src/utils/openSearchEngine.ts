@@ -12,12 +12,21 @@ export type OpenSearchEngineResult = {
 export async function executeOpenSearchOnEngine(
   siteId: string,
   jsonBody: string,
-  extraIndexes?: string
+  extraIndexes?: string,
+  queryParams?: Record<string, string | number | boolean>
 ): Promise<OpenSearchEngineResult> {
   const params = new URLSearchParams();
   params.set('crafterSite', siteId);
   if (extraIndexes && extraIndexes.trim() !== '') {
     params.set('index', extraIndexes.trim());
+  }
+  if (queryParams) {
+    Object.entries(queryParams).forEach(([key, value]) => {
+      if (value === '' || value == null) {
+        return;
+      }
+      params.set(key, String(value));
+    });
   }
   const url = `/api/1/site/search/search.json?${params.toString()}`;
   const res = await fetch(url, {
