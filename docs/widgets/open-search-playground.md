@@ -91,6 +91,11 @@ The Dictionary tab is for **content model discovery**, not search result inspect
 
 This helps developers build better OpenSearch queries based on real project models.
 
+Dictionary loading is guarded to avoid duplicate requests on rerender/fullscreen transitions:
+
+- content-type list fetch runs once per `(siteId, refresh-key)` pair
+- field-definition fetch runs once per `(siteId, selectedContentType)` pair
+
 ## Other controls
 
 - **Common fields (shortcuts):** curated Crafter-style names for quick `_source` toggles.
@@ -101,4 +106,5 @@ This helps developers build better OpenSearch queries based on real project mode
 - **Collapsed left panel:** shows **vertical icon tabs** to switch Explorer/Dictionary before expanding.
 - **API options section:** expanded Search API support for pagination, sorting, `_source`, highlighting, faceting, boosting, and many URL query params (plus advanced query params JSON).
 - **Export section:** generate **Curl** or **Groovy** from the current request and show it in the response panel.
+- **Fullscreen dropdown fix:** all MUI select menus are rendered inside the fullscreen container so dropdowns remain visible in fullscreen mode.
 - The plugin bundles **CodeMirror 6** (`@uiw/react-codemirror`, VS Code–style light/dark themes) for these editors (~1.3MB `index.js`).
