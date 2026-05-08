@@ -4961,6 +4961,95 @@ function prettifyJson(text) {
     }
     return JSON.stringify(JSON.parse(trimmed), null, 2);
 }
+/**
+ * Dump an index by paging `match_all` through Crafter's existing search endpoint
+ * (`/api/1/site/search/search.json`). Uses `from`/`size` pagination — same auth/CORS context
+ * as the regular Run button, so no extra configuration is needed.
+ *
+ * NOTE: OpenSearch's `from + size` is bounded by `index.max_result_window` (default 10,000).
+ * If the index has more docs than that, `truncated: true` is returned. For larger dumps,
+ * use the scroll or PIT/search_after API directly against OpenSearch.
+ */
+function dumpIndexThroughEngine(siteId_1) {
+    return __awaiter(this, arguments, void 0, function (siteId, opts) {
+        var batchSize, indexLabel, allHits, totalTook, batches, total, from, truncated, MAX_BATCHES, body, result, json, totalRaw, batch;
+        var _a, _b, _c, _d, _e, _f, _g;
+        if (opts === void 0) { opts = {}; }
+        return __generator(this, function (_h) {
+            switch (_h.label) {
+                case 0:
+                    if (!siteId || !siteId.trim()) {
+                        throw new Error('Active site is required.');
+                    }
+                    batchSize = Math.max(1, Math.min((_a = opts.batchSize) !== null && _a !== void 0 ? _a : 1000, 1000));
+                    indexLabel = ((_b = opts.extraIndexes) === null || _b === void 0 ? void 0 : _b.trim()) || siteId;
+                    allHits = [];
+                    totalTook = 0;
+                    batches = 0;
+                    total = null;
+                    from = 0;
+                    truncated = false;
+                    MAX_BATCHES = 10000;
+                    _h.label = 1;
+                case 1:
+                    if (!(batches < MAX_BATCHES)) return [3 /*break*/, 3];
+                    body = {
+                        from: from,
+                        size: batchSize,
+                        query: { match_all: {} },
+                        sort: [{ _doc: 'asc' }]
+                    };
+                    return [4 /*yield*/, executeOpenSearchOnEngine(siteId, JSON.stringify(body), opts.extraIndexes, { track_total_hits: true })];
+                case 2:
+                    result = _h.sent();
+                    if (!result.ok) {
+                        throw new Error("Crafter search.json HTTP ".concat(result.status, ": ").concat(result.bodyText.slice(0, 400)));
+                    }
+                    json = result.parsedJson;
+                    if (!json) {
+                        throw new Error('Crafter search.json returned a non-JSON body.');
+                    }
+                    totalTook += (_c = json.took) !== null && _c !== void 0 ? _c : 0;
+                    if (total === null) {
+                        totalRaw = (_d = json.hits) === null || _d === void 0 ? void 0 : _d.total;
+                        if (typeof totalRaw === 'number') {
+                            total = totalRaw;
+                        }
+                        else if (totalRaw && typeof totalRaw === 'object' && typeof totalRaw.value === 'number') {
+                            total = totalRaw.value;
+                        }
+                    }
+                    batch = (_f = (_e = json.hits) === null || _e === void 0 ? void 0 : _e.hits) !== null && _f !== void 0 ? _f : [];
+                    if (batch.length === 0) {
+                        return [3 /*break*/, 3];
+                    }
+                    allHits.push.apply(allHits, batch);
+                    batches += 1;
+                    (_g = opts.onProgress) === null || _g === void 0 ? void 0 : _g.call(opts, { fetched: allHits.length, total: total, batches: batches });
+                    if (batch.length < batchSize) {
+                        return [3 /*break*/, 3];
+                    }
+                    from += batchSize;
+                    // OpenSearch refuses from + size > index.max_result_window (default 10000).
+                    if (from + batchSize > 10000) {
+                        if (total !== null && allHits.length < total) {
+                            truncated = true;
+                        }
+                        return [3 /*break*/, 3];
+                    }
+                    return [3 /*break*/, 1];
+                case 3: return [2 /*return*/, {
+                        index: indexLabel,
+                        total: total,
+                        took_total_ms: totalTook,
+                        batches: batches,
+                        hits: allHits,
+                        truncated: truncated
+                    }];
+            }
+        });
+    });
+}
 
 /**
  * Merge OpenSearch query clauses into the request body while preserving size, _source, aggs, etc.
@@ -33267,41 +33356,196 @@ var MODULE = 'studio';
 function singleQuoteEscape(text) {
     return text.replace(/'/g, "'\"'\"'");
 }
+/**
+ * Defaults for the API Options panel — keep in sync with the useState initializers.
+ * Used to suppress params that match the playground default in exports.
+ */
+var DEFAULT_API_OPTIONS = {
+    allow_no_indices: true,
+    allow_partial_search_results: true,
+    ignore_unavailable: false,
+    search_type: 'query_then_fetch',
+    preference: '',
+    routing: '',
+    track_scores: false,
+    rest_total_hits_as_int: false,
+    typed_keys: true,
+    version: false,
+    seq_no_primary_term: false
+};
+/** True when the supplied option value is the same as the playground default for that key. */
+function isDefaultOptionValue(key, value) {
+    if (!(key in DEFAULT_API_OPTIONS))
+        return false;
+    var defaultValue = DEFAULT_API_OPTIONS[key];
+    if (typeof defaultValue === 'boolean') {
+        var asBool = typeof value === 'boolean' ? value : String(value) === 'true';
+        return asBool === defaultValue;
+    }
+    return String(value) === String(defaultValue);
+}
+/** Keep only options that are non-empty AND differ from playground defaults. */
+function filterNonDefaultQueryParams(queryParams) {
+    return Object.entries(queryParams).filter(function (_a) {
+        var key = _a[0], value = _a[1];
+        if (value === '' || value == null)
+            return false;
+        return !isDefaultOptionValue(key, value);
+    });
+}
+/** Trigger a JSON file download in the browser without leaving the page. */
+function downloadJsonFile(filename, data) {
+    var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { return URL.revokeObjectURL(url); }, 0);
+}
 function buildCurlExport(siteId, extraIndexes, queryBody, queryParams) {
     var params = new URLSearchParams();
     params.set('crafterSite', siteId);
     if (extraIndexes.trim()) {
         params.set('index', extraIndexes.trim());
     }
-    Object.entries(queryParams).forEach(function (_a) {
+    var nonDefault = filterNonDefaultQueryParams(queryParams);
+    var appliedOptions = [];
+    nonDefault.forEach(function (_a) {
         var key = _a[0], value = _a[1];
-        if (value === '' || value == null) {
-            return;
-        }
         params.set(key, String(value));
+        appliedOptions.push("#   ".concat(key, "=").concat(String(value)));
     });
     var url = "/api/1/site/search/search.json?".concat(params.toString());
-    return [
+    var header = [
+        "# OpenSearch Playground export \u2014 Curl",
+        "# Site: ".concat(siteId)
+    ];
+    if (extraIndexes.trim()) {
+        header.push("# Extra indexes (URL ?index=...): ".concat(extraIndexes.trim()));
+    }
+    if (appliedOptions.length > 0) {
+        header.push('# Non-default API options (also in URL query string):');
+        header.push.apply(header, appliedOptions);
+    }
+    else {
+        header.push('# All API options at playground defaults — only crafterSite is on the URL.');
+    }
+    header.push('#');
+    return __spreadArray(__spreadArray([], header, true), [
         "curl -X POST \"".concat(url, "\" \\"),
         '  -H "Content-Type: application/json" \\',
         '  -H "Accept: application/json" \\',
         "  --data-binary '".concat(singleQuoteEscape(queryBody), "'")
-    ].join('\n');
+    ], false).join('\n');
 }
-function buildGroovyExport(siteId, extraIndexes, queryBody) {
-    return [
-        'import groovy.json.JsonSlurper',
-        '',
-        "def siteId = \"".concat(siteId, "\""),
-        "def extraIndexes = \"".concat(extraIndexes.trim(), "\""),
-        "def requestBody = new JsonSlurper().parseText('''",
-        queryBody,
-        "''') as Map",
-        '',
-        '// In Crafter scripts, use elasticsearch directly',
-        'def result = elasticsearch.search(requestBody)',
-        'return result'
-    ].join('\n');
+/** Pretty-print JSON for readable Groovy export (falls back to raw text if invalid). */
+function prettifyJsonForGroovyExport(queryBody) {
+    try {
+        return JSON.stringify(JSON.parse(queryBody), null, 2);
+    }
+    catch (_a) {
+        return queryBody;
+    }
+}
+function snakeToPascal(s) {
+    return s
+        .split('_')
+        .filter(Boolean)
+        .map(function (part) { return part.charAt(0).toUpperCase() + part.slice(1); })
+        .join('');
+}
+function groovyStringLiteral(value) {
+    return "\"".concat(value.replace(/\\/g, '\\\\').replace(/"/g, '\\"'), "\"");
+}
+/**
+ * Map non-default playground "API Options" to opensearch-java SearchRequest.Builder setter calls.
+ * Defaults (matching the playground panel) are suppressed so generated code only contains overrides.
+ *
+ * Options that don't exist on SearchRequest (rest_total_hits_as_int, typed_keys, advanced JSON keys)
+ * are returned as inline comments separately.
+ */
+function buildGroovyApiOptionCalls(queryParams) {
+    var builderCalls = [];
+    var unmappedComments = [];
+    var get = function (key) { return queryParams[key]; };
+    var isPresentAndNonDefault = function (key) {
+        var v = get(key);
+        if (v === undefined || v === null || v === '')
+            return false;
+        return !isDefaultOptionValue(key, v);
+    };
+    var pushBool = function (key, method) {
+        if (!isPresentAndNonDefault(key))
+            return;
+        var v = get(key);
+        var b = typeof v === 'boolean' ? v : String(v) === 'true';
+        builderCalls.push(".".concat(method, "(").concat(b ? 'true' : 'false', ")"));
+    };
+    var pushString = function (key, method) {
+        if (!isPresentAndNonDefault(key))
+            return;
+        builderCalls.push(".".concat(method, "(").concat(groovyStringLiteral(String(get(key))), ")"));
+    };
+    pushBool('allow_no_indices', 'allowNoIndices');
+    pushBool('allow_partial_search_results', 'allowPartialSearchResults');
+    pushBool('ignore_unavailable', 'ignoreUnavailable');
+    if (isPresentAndNonDefault('search_type')) {
+        var searchType = String(get('search_type'));
+        builderCalls.push(".searchType(SearchType.".concat(snakeToPascal(searchType), ")"));
+    }
+    pushString('preference', 'preference');
+    pushString('routing', 'routing');
+    pushBool('track_scores', 'trackScores');
+    pushBool('seq_no_primary_term', 'seqNoPrimaryTerm');
+    pushBool('version', 'version');
+    var HANDLED_KEYS = new Set([
+        'allow_no_indices',
+        'allow_partial_search_results',
+        'ignore_unavailable',
+        'search_type',
+        'preference',
+        'routing',
+        'track_scores',
+        'seq_no_primary_term',
+        'version'
+    ]);
+    Object.entries(queryParams).forEach(function (_a) {
+        var k = _a[0], v = _a[1];
+        if (HANDLED_KEYS.has(k))
+            return;
+        if (v === undefined || v === null || v === '')
+            return;
+        if (isDefaultOptionValue(k, v))
+            return;
+        if (k === 'rest_total_hits_as_int' || k === 'typed_keys') {
+            unmappedComments.push("//   ".concat(k, "=").concat(String(v), "  // transport/serialization knob \u2014 not on SearchRequest; set via JsonpMapper attributes if needed."));
+        }
+        else {
+            unmappedComments.push("//   ".concat(k, "=").concat(String(v), "  // not mapped to SearchRequest.Builder; apply via your transport layer if needed."));
+        }
+    });
+    return { builderCalls: builderCalls, unmappedComments: unmappedComments };
+}
+function buildGroovyExport(siteId, extraIndexes, queryBody, queryParams) {
+    var safeComment = function (s) { return s.replace(/\*\//g, '* /').replace(/\r?\n/g, ' '); };
+    var indexLine = extraIndexes.trim()
+        ? "\n * Playground index query param (URL on search.json \u2014 not part of the JSON body): ".concat(safeComment(extraIndexes.trim()))
+        : '';
+    var pretty = prettifyJsonForGroovyExport(queryBody);
+    var indented = pretty.split('\n').map(function (line) { return "    ".concat(line); }).join('\n');
+    var _a = buildGroovyApiOptionCalls(queryParams), builderCalls = _a.builderCalls, unmappedComments = _a.unmappedComments;
+    var builderChain = builderCalls.length === 0
+        ? '      // All API options at playground defaults — request comes entirely from the JSON body above.'
+        : builderCalls.map(function (c) { return "      ".concat(c); }).join('\n');
+    var unmappedBlock = unmappedComments.length === 0
+        ? ''
+        : "\n    // Non-default playground options that do not map to SearchRequest.Builder:\n" +
+            unmappedComments.map(function (line) { return "    ".concat(line); }).join('\n') +
+            '\n';
+    return "package org.craftercms.sites.editorial\n\nimport java.io.StringReader\nimport org.craftercms.search.opensearch.client.OpenSearchClientWrapper\nimport org.opensearch.client.opensearch._types.SearchType\nimport org.opensearch.client.opensearch.core.SearchRequest\n// When you hand-author queries (editorial SearchHelper style), you will typically add:\n// import org.opensearch.client.opensearch._types.SortOrder\n// import org.opensearch.client.opensearch._types.query_dsl.BoolQuery\n// import org.opensearch.client.opensearch._types.query_dsl.Query\n// import org.opensearch.client.opensearch._types.query_dsl.TextQueryType\n// import org.opensearch.client.opensearch.core.search.Highlight\n// import org.craftercms.engine.service.UrlTransformationService\n\n/**\n * Generated from OpenSearch Playground.\n * Site id: ".concat(safeComment(siteId), "\n * In-process: opensearch-java SearchRequest + OpenSearchClientWrapper.search (same stack as blueprint SearchHelper).\n * Only **non-default** playground \"API Options\" are applied below via SearchRequest.Builder setters.").concat(indexLine, "\n */\nclass PlaygroundExportedQuery {\n\n  OpenSearchClientWrapper searchClient\n\n  PlaygroundExportedQuery(OpenSearchClientWrapper searchClient) {\n    this.searchClient = searchClient\n  }\n\n  /**\n   * Build SearchRequest from the JSON body using opensearch-java Builder.withJson,\n   * then apply playground \"API Options\" via builder setters.\n   */\n  static SearchRequest buildSearchRequest(String json) {\n    return new SearchRequest.Builder()\n      .withJson(new StringReader(json))\n").concat(builderChain, "\n      .build()\n  }\n\n  /**\n   * Execute the playground query in-process via searchClient.search(request, Map).\n   */\n  Map search() {\n    String queryJson = '''\n").concat(indented, "\n    '''\n").concat(unmappedBlock, "\n    SearchRequest request = buildSearchRequest(queryJson)\n    return searchClient.search(request, Map) as Map\n  }\n}\n");
 }
 function parseCsv(value) {
     return value
@@ -33429,13 +33673,31 @@ function OpenSearchPlayground() {
     var _32 = useState('false'), optionSeqNoPrimaryTermParam = _32[0], setOptionSeqNoPrimaryTermParam = _32[1];
     var _33 = useState('{}'), optionAdvancedQueryParamsJson = _33[0], setOptionAdvancedQueryParamsJson = _33[1];
     var _34 = useState('curl'), exportTarget = _34[0], setExportTarget = _34[1];
+    var _35 = useState(false), indexDumpRunning = _35[0], setIndexDumpRunning = _35[1];
     useEffect(function () {
         var onFsChange = function () {
-            setIsFullscreen(document.fullscreenElement === fullscreenRef.current);
+            // If the browser dropped real fullscreen (e.g. the user hit Esc), keep the CSS overlay in sync.
+            if (document.fullscreenElement !== fullscreenRef.current) {
+                setIsFullscreen(false);
+            }
         };
         document.addEventListener('fullscreenchange', onFsChange);
         return function () { return document.removeEventListener('fullscreenchange', onFsChange); };
     }, []);
+    useEffect(function () {
+        if (!isFullscreen)
+            return undefined;
+        var onKey = function (e) {
+            if (e.key === 'Escape') {
+                setIsFullscreen(false);
+                if (document.fullscreenElement) {
+                    void document.exitFullscreen().catch(function () { return undefined; });
+                }
+            }
+        };
+        window.addEventListener('keydown', onKey);
+        return function () { return window.removeEventListener('keydown', onKey); };
+    }, [isFullscreen]);
     useEffect(function () {
         var id = requestAnimationFrame(function () {
             var _a, _b;
@@ -33444,14 +33706,27 @@ function OpenSearchPlayground() {
         return function () { return cancelAnimationFrame(id); };
     }, [isMdUp]);
     var toggleFullscreen = useCallback(function () {
+        var _a;
         var el = fullscreenRef.current;
         if (!el)
             return;
-        if (document.fullscreenElement === el) {
-            void document.exitFullscreen().catch(function () { return undefined; });
+        var goingFullscreen = document.fullscreenElement !== el;
+        setIsFullscreen(goingFullscreen);
+        if (goingFullscreen) {
+            // Try the real browser Fullscreen API on top of the CSS overlay; if Studio's iframe
+            // doesn't allow it, the overlay still covers the whole viewport.
+            try {
+                var p = (_a = el.requestFullscreen) === null || _a === void 0 ? void 0 : _a.call(el);
+                if (p && typeof p.catch === 'function') {
+                    p.catch(function () { return undefined; });
+                }
+            }
+            catch (_b) {
+                // ignore — CSS overlay is sufficient on its own
+            }
         }
-        else {
-            void el.requestFullscreen().catch(function () { return undefined; });
+        else if (document.fullscreenElement) {
+            void document.exitFullscreen().catch(function () { return undefined; });
         }
     }, []);
     var syncExplorerCollapsed = useCallback(function () {
@@ -33826,10 +34101,80 @@ function OpenSearchPlayground() {
         }
         var code = exportTarget === 'curl'
             ? buildCurlExport(siteId, extraIndexes, query, searchQueryParams)
-            : buildGroovyExport(siteId, extraIndexes, query);
+            : buildGroovyExport(siteId, extraIndexes, query, searchQueryParams);
         setResponse(code);
         dispatch(showSystemNotification({ message: "Exported as ".concat(exportTarget, ".") }));
     }, [dispatch, exportTarget, extraIndexes, query, searchQueryParams, siteId]);
+    var downloadIndexDump = useCallback(function () { return __awaiter(_this, void 0, void 0, function () {
+        var indexName, result, ts, e_2, msg;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    if (!siteId) {
+                        dispatch(showSystemNotification({ message: 'No active site to dump.' }));
+                        return [2 /*return*/];
+                    }
+                    indexName = extraIndexes.trim() || siteId;
+                    setIndexDumpRunning(true);
+                    setResponse(JSON.stringify({
+                        _studioOpenSearch: 'Index dump in progress…',
+                        via: '/api/1/site/search/search.json',
+                        index: indexName
+                    }, null, 2));
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 3, 4, 5]);
+                    return [4 /*yield*/, dumpIndexThroughEngine(siteId, {
+                            extraIndexes: extraIndexes,
+                            batchSize: 1000,
+                            onProgress: function (_a) {
+                                var fetched = _a.fetched, total = _a.total, batches = _a.batches;
+                                setResponse(JSON.stringify({
+                                    _studioOpenSearch: 'Index dump in progress…',
+                                    via: '/api/1/site/search/search.json',
+                                    index: indexName,
+                                    batches: batches,
+                                    fetched: fetched,
+                                    total: total
+                                }, null, 2));
+                            }
+                        })];
+                case 2:
+                    result = _a.sent();
+                    ts = new Date().toISOString().replace(/[:.]/g, '-');
+                    downloadJsonFile("".concat(indexName, "-dump-").concat(ts, ".json"), result);
+                    setResponse(JSON.stringify({
+                        _studioOpenSearch: result.truncated
+                            ? 'Index dump complete (TRUNCATED at index.max_result_window — typically 10000 docs). Use scroll/PIT against OpenSearch directly for larger indexes.'
+                            : 'Index dump complete — JSON downloaded to your machine.',
+                        via: '/api/1/site/search/search.json',
+                        index: indexName,
+                        batches: result.batches,
+                        fetched: result.hits.length,
+                        total: result.total,
+                        took_total_ms: result.took_total_ms,
+                        truncated: result.truncated
+                    }, null, 2));
+                    dispatch(showSystemNotification({
+                        message: "Downloaded ".concat(result.hits.length, " docs from \"").concat(indexName, "\"").concat(result.truncated ? ' (truncated)' : '', ".")
+                    }));
+                    return [3 /*break*/, 5];
+                case 3:
+                    e_2 = _a.sent();
+                    msg = e_2 instanceof Error ? e_2.message : String(e_2);
+                    setResponse(JSON.stringify({
+                        _studioOpenSearch: 'Index dump failed',
+                        error: msg
+                    }, null, 2));
+                    dispatch(showSystemNotification({ message: "Index dump failed: ".concat(msg) }));
+                    return [3 /*break*/, 5];
+                case 4:
+                    setIndexDumpRunning(false);
+                    return [7 /*endfinally*/];
+                case 5: return [2 /*return*/];
+            }
+        });
+    }); }, [dispatch, extraIndexes, siteId]);
     var displayedResponse = useMemo(function () { return (loading && !response ? RESPONSE_LOADING_JSON : response || RESPONSE_EMPTY_JSON); }, [loading, response]);
     var onPrettify = useCallback(function () {
         try {
@@ -33859,8 +34204,16 @@ function OpenSearchPlayground() {
         });
     }, [isFullscreen]);
     return (jsxRuntimeExports.jsxs(Box$1, { ref: fullscreenRef, sx: __assign({ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 480, p: 2, gap: 1.5, boxSizing: 'border-box', bgcolor: 'background.default' }, (isFullscreen && {
-            minHeight: '100vh'
-        })), children: [jsxRuntimeExports.jsxs(Box$1, { sx: { display: 'flex', alignItems: 'flex-start', gap: 1, flexWrap: 'wrap' }, children: [jsxRuntimeExports.jsx(SearchRoundedIcon, { color: "primary", sx: { mt: 0.5 } }), jsxRuntimeExports.jsx(Typography, { variant: "h5", component: "h1", children: "OpenSearch" }), jsxRuntimeExports.jsxs(Typography, { variant: "body2", color: "text.secondary", sx: { flex: '1 1 200px' }, children: ["Raw DSL against", ' ', jsxRuntimeExports.jsx(Typography, { component: "span", variant: "body2", fontFamily: "monospace", children: "POST /api/1/site/search/search.json?crafterSite=\u2026" })] }), jsxRuntimeExports.jsx(Tooltip, { title: isFullscreen ? 'Exit full screen' : 'Full screen', children: jsxRuntimeExports.jsx(IconButton$1, { size: "small", onClick: toggleFullscreen, "aria-label": isFullscreen ? 'Exit full screen' : 'Enter full screen', sx: { flexShrink: 0 }, children: isFullscreen ? jsxRuntimeExports.jsx(FullscreenExitRoundedIcon, {}) : jsxRuntimeExports.jsx(FullscreenRoundedIcon, {}) }) })] }), jsxRuntimeExports.jsxs(Box$1, { sx: { display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }, children: [jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "Active site", value: siteId !== null && siteId !== void 0 ? siteId : '', disabled: true, sx: { minWidth: 160 } }), jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "Extra indexes (optional)", placeholder: "e.g. other-alias (see multi-index docs)", value: extraIndexes, onChange: function (e) { return setExtraIndexes(e.target.value); }, sx: { flex: '1 1 220px', minWidth: 200 } }), jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "Load template", defaultValue: "", sx: { minWidth: 200 }, SelectProps: __assign(__assign({}, fullscreenSelectProps), { displayEmpty: true }), onChange: function (e) {
+            // CSS-level overlay so we still fill the viewport even when the browser Fullscreen API
+            // is blocked (e.g. Studio's iframe without `allow="fullscreen"`).
+            position: 'fixed',
+            inset: 0,
+            width: '100vw',
+            height: '100vh',
+            minHeight: '100vh',
+            zIndex: function (theme) { return theme.zIndex.modal + 100; },
+            overflow: 'auto'
+        })), children: [jsxRuntimeExports.jsxs(Box$1, { sx: { display: 'flex', alignItems: 'flex-start', gap: 1, flexWrap: 'wrap' }, children: [jsxRuntimeExports.jsx(SearchRoundedIcon, { color: "primary", sx: { mt: 0.5 } }), jsxRuntimeExports.jsx(Typography, { variant: "h5", component: "h1", children: "OpenSearch" }), jsxRuntimeExports.jsx(Typography, { variant: "body2", color: "text.secondary", sx: { flex: '1 1 200px', fontFamily: 'monospace' }, children: "POST /api/1/site/search/search.json?crafterSite=\u2026" }), jsxRuntimeExports.jsx(Tooltip, { title: isFullscreen ? 'Exit full screen' : 'Full screen', children: jsxRuntimeExports.jsx(IconButton$1, { size: "small", onClick: toggleFullscreen, "aria-label": isFullscreen ? 'Exit full screen' : 'Enter full screen', sx: { flexShrink: 0 }, children: isFullscreen ? jsxRuntimeExports.jsx(FullscreenExitRoundedIcon, {}) : jsxRuntimeExports.jsx(FullscreenRoundedIcon, {}) }) })] }), jsxRuntimeExports.jsxs(Box$1, { sx: { display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }, children: [jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "Active site", value: siteId !== null && siteId !== void 0 ? siteId : '', disabled: true, sx: { minWidth: 160 } }), jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "Extra indexes (optional)", placeholder: "e.g. other-alias (see multi-index docs)", value: extraIndexes, onChange: function (e) { return setExtraIndexes(e.target.value); }, sx: { flex: '1 1 220px', minWidth: 200 } }), jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "Load template", defaultValue: "", sx: { minWidth: 200 }, SelectProps: __assign(__assign({}, fullscreenSelectProps), { displayEmpty: true }), onChange: function (e) {
                             var t = TEMPLATES.find(function (x) { return x.label === e.target.value; });
                             if (t) {
                                 setQuery(t.body);
@@ -33942,7 +34295,17 @@ function OpenSearchPlayground() {
                                             alignItems: 'center',
                                             gap: 1,
                                             flexWrap: 'wrap'
-                                        }, children: [jsxRuntimeExports.jsx(Typography, { variant: "caption", color: "text.secondary", children: "Export as" }), jsxRuntimeExports.jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', gap: 1 }, children: [jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "Format", value: exportTarget, onChange: function (e) { return setExportTarget(e.target.value); }, sx: { width: 120 }, SelectProps: fullscreenSelectProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "curl", children: "Curl" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "groovy", children: "Groovy" })] }), jsxRuntimeExports.jsx(Button$1, { size: "small", variant: "outlined", onClick: exportAsCode, disabled: !siteId, children: "Export" })] })] })] }) }), jsxRuntimeExports.jsx(ResizeGrip, { vertical: orientationVertical }), jsxRuntimeExports.jsx(Yt, { id: "response", defaultSize: orientationVertical ? '35%' : '38%', minSize: "20%", children: jsxRuntimeExports.jsxs(Paper, { variant: "outlined", sx: {
+                                        }, children: [jsxRuntimeExports.jsx(Typography, { variant: "caption", color: "text.secondary", children: "Export as" }), jsxRuntimeExports.jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }, children: [jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "Format", value: exportTarget, onChange: function (e) { return setExportTarget(e.target.value); }, sx: { width: 120 }, SelectProps: fullscreenSelectProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "curl", children: "Curl" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "groovy", children: "Groovy" })] }), jsxRuntimeExports.jsx(Button$1, { size: "small", variant: "outlined", onClick: exportAsCode, disabled: !siteId, children: "Export" })] })] }), jsxRuntimeExports.jsxs(Box$1, { sx: {
+                                            px: 1.5,
+                                            py: 1,
+                                            borderTop: 1,
+                                            borderColor: 'divider',
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'center',
+                                            gap: 1,
+                                            flexWrap: 'wrap'
+                                        }, children: [jsxRuntimeExports.jsx(Typography, { variant: "caption", color: "text.secondary", children: "Download index" }), jsxRuntimeExports.jsx(Tooltip, { title: "Page match_all (size=1000) through Crafter's search.json and download the merged hits as JSON. Capped by OpenSearch index.max_result_window (default 10000).", children: jsxRuntimeExports.jsx("span", { children: jsxRuntimeExports.jsx(Button$1, { size: "small", variant: "outlined", onClick: downloadIndexDump, disabled: !siteId || indexDumpRunning, startIcon: indexDumpRunning ? jsxRuntimeExports.jsx(CircularProgress, { size: 14 }) : undefined, children: indexDumpRunning ? 'Dumping…' : 'Download index' }) }) })] })] }) }), jsxRuntimeExports.jsx(ResizeGrip, { vertical: orientationVertical }), jsxRuntimeExports.jsx(Yt, { id: "response", defaultSize: orientationVertical ? '35%' : '38%', minSize: "20%", children: jsxRuntimeExports.jsxs(Paper, { variant: "outlined", sx: {
                                     height: '100%',
                                     minHeight: 0,
                                     display: 'flex',

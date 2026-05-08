@@ -105,6 +105,15 @@ Dictionary loading is guarded to avoid duplicate requests on rerender/fullscreen
 - **Response panel:** light background; fold blocks via the **gutter**; **Copy response** in the panel header.
 - **Collapsed left panel:** shows **vertical icon tabs** to switch Explorer/Dictionary before expanding.
 - **API options section:** expanded Search API support for pagination, sorting, `_source`, highlighting, faceting, boosting, and many URL query params (plus advanced query params JSON).
-- **Export section:** generate **Curl** or **Groovy** from the current request and show it in the response panel.
+- **Download index button:** dumps the index by paging `match_all` through the **same Crafter search endpoint** (`/api/1/site/search/search.json?crafterSite=…`) the regular Run button uses — no extra URL or auth setup needed.
+  - **Index** — defaults to the active site id; the **Extra indexes** field overrides it.
+  - **Behavior** — pages `{ from, size: 1000, query: { match_all: {} }, sort: [{ "_doc": "asc" }] }` until the result set is exhausted (or the OpenSearch `from + size` window cap of `index.max_result_window`, default 10000, is hit).
+  - **Progress** — the response panel shows `batches`, `fetched`, and `total` while running.
+  - **Output file** — `<index>-dump-<iso-timestamp>.json` containing `{ index, total, took_total_ms, batches, hits: [...], truncated }`.
+  - **Truncation** — if the index has more docs than `index.max_result_window`, `truncated: true` is returned and a notification surfaces it. For larger dumps, hit OpenSearch directly with the scroll or PIT/`search_after` API.
+- **Export section:** generate **Curl** or **Groovy** from the current request and show it in the response panel. Both exports include only **non-default** values from the **API Options** panel (anything left at the playground default is suppressed to keep the output minimal):
+  - **Curl** — non-default options are appended to the URL query string and listed in a `# Non-default API options:` comment block above the `curl` command. If everything is at defaults, only `crafterSite` is on the URL and a single comment line says so.
+  - **Groovy** — non-default options are applied via `SearchRequest.Builder` setters (`allowNoIndices`, `allowPartialSearchResults`, `ignoreUnavailable`, `searchType`, `preference`, `routing`, `trackScores`, `seqNoPrimaryTerm`, `version`). The body comes from `Builder().withJson(new StringReader(queryJson))`, and the request is executed in-process via `OpenSearchClientWrapper.search(request, Map)`. Non-default options that don't map to `SearchRequest` (e.g. `rest_total_hits_as_int`, `typed_keys`) are emitted as inline comments noting they are transport / `JsonpMapper` concerns.
+- **Full screen:** clicking the toggle pins the playground as a fixed overlay covering the whole viewport (`position: fixed; inset: 0`) and also requests the browser **Fullscreen API** on top so the OS chrome / Studio chrome are hidden. If the iframe blocks the Fullscreen API the CSS overlay still fills the entire viewport, and `Escape` exits.
 - **Fullscreen dropdown fix:** all MUI select menus are rendered inside the fullscreen container so dropdowns remain visible in fullscreen mode.
 - The plugin bundles **CodeMirror 6** (`@uiw/react-codemirror`, VS Code–style light/dark themes) for these editors (~1.3MB `index.js`).
