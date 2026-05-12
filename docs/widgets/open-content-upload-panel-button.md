@@ -4,7 +4,9 @@ Opens the **content upload** flow from the **Tools Panel** (sidebar). Optional s
 
 See also: [Content upload view](content-upload-view.md) (embedded dialog body) and [Content upload — toolbar](open-content-upload-toolbar-button.md).
 
-## Configuration
+## Configuration (`config/studio/ui.xml`)
+
+**Placement:** under **`craftercms.components.ToolsPanel`** → `configuration` → `widgets`.
 
 ```xml
 <widget id="org.rd.plugin.uigoodies.openContentUploadPanelButton">

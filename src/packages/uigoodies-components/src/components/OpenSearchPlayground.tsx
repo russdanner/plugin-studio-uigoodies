@@ -99,7 +99,7 @@ const TEMPLATES: { label: string; body: string }[] = [
   }
 ];
 
-type ExportTarget = 'curl' | 'groovy';
+type ExportTarget = 'curl' | 'groovy' | 'csv';
 type SourceMode = 'default' | 'all' | 'custom';
 type ExplorerTab = 'explorer' | 'dictionary';
 type ContentTypeDictionaryEntry = {
@@ -131,6 +131,215 @@ const DEFAULT_API_OPTIONS: Record<string, string | boolean> = {
   seq_no_primary_term: false
 };
 
+/**
+ * Body-shaping options the user can pick in the **API Options** panel that the
+ * playground writes **into the JSON body** (not the URL query string). The
+ * runtime "Apply options" button mutates the editor with these; the export
+ * pipeline applies the same transforms — but only the ones that differ from
+ * the playground defaults — so generated Curl / Groovy reflects what the user
+ * actually picked.
+ */
+type BodyShapingOptions = {
+  from: string;
+  size: string;
+  trackTotalHits: 'true' | 'false';
+  sortField: string;
+  sortOrder: 'asc' | 'desc';
+  sourceMode: SourceMode;
+  sourceFields: string;
+  timeout: string;
+  terminateAfter: string;
+  minScore: string;
+  enableHighlight: 'true' | 'false';
+  highlightFields: string;
+  highlightFragmentSize: string;
+  highlightNumFragments: string;
+  enableFacets: 'true' | 'false';
+  facetField: string;
+  facetSize: string;
+  enableBoosting: 'true' | 'false';
+  queryFieldBoosts: string;
+  indicesBoost: string;
+};
+
+/** Defaults — keep in sync with the useState initializers for the matching `option*` state vars. */
+const DEFAULT_BODY_OPTIONS: BodyShapingOptions = {
+  from: '0',
+  size: '10',
+  trackTotalHits: 'true',
+  sortField: '',
+  sortOrder: 'desc',
+  sourceMode: 'default',
+  sourceFields: 'localId, internal-name, content-type',
+  timeout: '5s',
+  terminateAfter: '',
+  minScore: '',
+  enableHighlight: 'false',
+  highlightFields: 'title_t, body_html, description_html',
+  highlightFragmentSize: '150',
+  highlightNumFragments: '2',
+  enableFacets: 'false',
+  facetField: 'content-type',
+  facetSize: '20',
+  enableBoosting: 'false',
+  queryFieldBoosts: 'title_t^3, internal-name^2, body_html',
+  indicesBoost: ''
+};
+
+/**
+ * Merge **non-default** body-shaping options from the API Options panel into
+ * the JSON request body. Used by the export pipeline so generated Curl /
+ * Groovy contains the options the user picked. Options left at their
+ * playground defaults are suppressed.
+ *
+ * Returns the new body JSON (pretty-printed), plus an `applied` summary of
+ * which options were merged in — used to render a comment block in the
+ * exported code. `error` is non-null if the input JSON could not be parsed.
+ */
+function mergeNonDefaultBodyOptionsIntoJson(
+  queryBody: string,
+  options: BodyShapingOptions
+): { json: string; applied: string[]; error: string | null } {
+  let body: Record<string, unknown>;
+  try {
+    body = JSON.parse(queryBody) as Record<string, unknown>;
+    if (!body || typeof body !== 'object' || Array.isArray(body)) {
+      return { json: queryBody, applied: [], error: 'Query body is not a JSON object.' };
+    }
+  } catch (e) {
+    return {
+      json: queryBody,
+      applied: [],
+      error: e instanceof Error ? e.message : 'Invalid JSON in query editor.'
+    };
+  }
+
+  const applied: string[] = [];
+
+  if (options.from !== DEFAULT_BODY_OPTIONS.from) {
+    const n = Number(options.from);
+    if (!Number.isNaN(n) && n >= 0) {
+      body.from = n;
+      applied.push(`from=${n}`);
+    }
+  }
+  if (options.size !== DEFAULT_BODY_OPTIONS.size) {
+    const n = Number(options.size);
+    if (!Number.isNaN(n) && n >= 0) {
+      body.size = n;
+      applied.push(`size=${n}`);
+    }
+  }
+  if (options.trackTotalHits !== DEFAULT_BODY_OPTIONS.trackTotalHits) {
+    const v = options.trackTotalHits === 'true';
+    body.track_total_hits = v;
+    applied.push(`track_total_hits=${v}`);
+  }
+  if (options.timeout !== DEFAULT_BODY_OPTIONS.timeout) {
+    if (options.timeout.trim()) {
+      body.timeout = options.timeout.trim();
+      applied.push(`timeout=${options.timeout.trim()}`);
+    } else {
+      delete body.timeout;
+      applied.push('timeout cleared');
+    }
+  }
+  if (options.terminateAfter !== DEFAULT_BODY_OPTIONS.terminateAfter) {
+    const n = Number(options.terminateAfter);
+    if (options.terminateAfter.trim() && !Number.isNaN(n) && n > 0) {
+      body.terminate_after = n;
+      applied.push(`terminate_after=${n}`);
+    }
+  }
+  if (options.minScore !== DEFAULT_BODY_OPTIONS.minScore) {
+    const n = Number(options.minScore);
+    if (options.minScore.trim() && !Number.isNaN(n)) {
+      body.min_score = n;
+      applied.push(`min_score=${n}`);
+    }
+  }
+  if (
+    options.sortField !== DEFAULT_BODY_OPTIONS.sortField ||
+    (options.sortField.trim() && options.sortOrder !== DEFAULT_BODY_OPTIONS.sortOrder)
+  ) {
+    if (options.sortField.trim()) {
+      body.sort = [{ [options.sortField.trim()]: { order: options.sortOrder } }];
+      applied.push(`sort=${options.sortField.trim()} ${options.sortOrder}`);
+    }
+  }
+  if (options.sourceMode !== DEFAULT_BODY_OPTIONS.sourceMode) {
+    if (options.sourceMode === 'all') {
+      body._source = true;
+      applied.push('_source=true (all fields)');
+    } else if (options.sourceMode === 'custom') {
+      const fields = parseCsv(options.sourceFields);
+      body._source = fields.length > 0 ? fields : true;
+      applied.push(`_source=[${fields.join(', ') || 'true'}]`);
+    }
+  }
+  if (options.enableHighlight !== DEFAULT_BODY_OPTIONS.enableHighlight && options.enableHighlight === 'true') {
+    const fields = parseCsv(options.highlightFields);
+    const fragmentSize = Number(options.highlightFragmentSize);
+    const numFragments = Number(options.highlightNumFragments);
+    const safeFragmentSize = !Number.isNaN(fragmentSize) && fragmentSize > 0 ? fragmentSize : 150;
+    const safeNumFragments = !Number.isNaN(numFragments) && numFragments > 0 ? numFragments : 2;
+    body.highlight = {
+      fields: fields.reduce<Record<string, Record<string, number>>>((acc, field) => {
+        acc[field] = {
+          fragment_size: safeFragmentSize,
+          number_of_fragments: safeNumFragments
+        };
+        return acc;
+      }, {})
+    };
+    applied.push(
+      `highlight fields=[${fields.join(', ')}] fragment_size=${safeFragmentSize} number_of_fragments=${safeNumFragments}`
+    );
+  }
+  if (
+    options.enableFacets !== DEFAULT_BODY_OPTIONS.enableFacets &&
+    options.enableFacets === 'true' &&
+    options.facetField.trim()
+  ) {
+    const facetSize = Number(options.facetSize);
+    const safeFacetSize = !Number.isNaN(facetSize) && facetSize > 0 ? facetSize : 20;
+    body.aggs = {
+      facet_terms: {
+        terms: {
+          field: options.facetField.trim(),
+          size: safeFacetSize
+        }
+      }
+    };
+    applied.push(`aggs.facet_terms field=${options.facetField.trim()} size=${safeFacetSize}`);
+  }
+  if (options.enableBoosting !== DEFAULT_BODY_OPTIONS.enableBoosting && options.enableBoosting === 'true') {
+    const boostFields = parseCsv(options.queryFieldBoosts);
+    if (boostFields.length > 0) {
+      applyMultiMatchFieldBoosts(body.query, boostFields);
+      applied.push(`multi_match.fields=[${boostFields.join(', ')}]`);
+    }
+    const indicesBoost = options.indicesBoost
+      .split(',')
+      .map((part) => part.trim())
+      .filter(Boolean)
+      .map((entry) => entry.split('=').map((piece) => piece.trim()))
+      .filter((tuple) => tuple.length === 2 && tuple[0] && tuple[1])
+      .map(([index, weight]) => {
+        const n = Number(weight);
+        return Number.isNaN(n) ? null : { [index]: n };
+      })
+      .filter((entry): entry is Record<string, number> => entry != null);
+    if (indicesBoost.length > 0) {
+      body.indices_boost = indicesBoost;
+      const pretty = indicesBoost.map((e) => Object.entries(e).map(([k, v]) => `${k}=${v}`).join('')).join(', ');
+      applied.push(`indices_boost=[${pretty}]`);
+    }
+  }
+
+  return { json: JSON.stringify(body, null, 2), applied, error: null };
+}
+
 /** True when the supplied option value is the same as the playground default for that key. */
 function isDefaultOptionValue(key: string, value: string | number | boolean): boolean {
   if (!(key in DEFAULT_API_OPTIONS)) return false;
@@ -155,6 +364,16 @@ function filterNonDefaultQueryParams(
 /** Trigger a JSON file download in the browser without leaving the page. */
 function downloadJsonFile(filename: string, data: unknown): void {
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  triggerBlobDownload(filename, blob);
+}
+
+/** Trigger a text/CSV file download in the browser. Adds a BOM so Excel detects UTF-8. */
+function downloadTextFile(filename: string, text: string, mimeType: string): void {
+  const blob = new Blob(['\ufeff', text], { type: `${mimeType};charset=utf-8` });
+  triggerBlobDownload(filename, blob);
+}
+
+function triggerBlobDownload(filename: string, blob: Blob): void {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -165,11 +384,84 @@ function downloadJsonFile(filename: string, data: unknown): void {
   setTimeout(() => URL.revokeObjectURL(url), 0);
 }
 
+/** Recursively flatten `_source` into dot-separated keys; nested arrays of primitives joined with "; ". */
+function flattenSourceValue(value: unknown, prefix: string, out: Record<string, unknown>): void {
+  const set = (v: unknown) => {
+    out[prefix.replace(/\.$/, '')] = v;
+  };
+  if (value === null || value === undefined) {
+    set('');
+    return;
+  }
+  if (Array.isArray(value)) {
+    if (value.length === 0) {
+      set('');
+      return;
+    }
+    const allPrimitive = value.every((v) => v === null || (typeof v !== 'object' && typeof v !== 'function'));
+    if (allPrimitive) {
+      set(value.map((v) => (v == null ? '' : String(v))).join('; '));
+      return;
+    }
+    set(JSON.stringify(value));
+    return;
+  }
+  if (typeof value === 'object') {
+    Object.entries(value as Record<string, unknown>).forEach(([k, v]) => {
+      flattenSourceValue(v, `${prefix}${k}.`, out);
+    });
+    return;
+  }
+  set(value as string | number | boolean);
+}
+
+function escapeCsvCell(v: unknown): string {
+  if (v === null || v === undefined) return '';
+  const s = typeof v === 'string' ? v : typeof v === 'object' ? JSON.stringify(v) : String(v);
+  if (/[",\n\r]/.test(s)) {
+    return `"${s.replace(/"/g, '""')}"`;
+  }
+  return s;
+}
+
+type OpenSearchHit = {
+  _id?: string;
+  _index?: string;
+  _score?: number | null;
+  _source?: Record<string, unknown>;
+};
+
+const CSV_PREFERRED_COLUMNS = ['_id', '_index', '_score', 'localId', 'internal-name', 'content-type'];
+
+function hitsToCsv(hits: OpenSearchHit[]): string {
+  const rows = hits.map((h) => {
+    const flat: Record<string, unknown> = {};
+    if (h._id !== undefined) flat._id = h._id;
+    if (h._index !== undefined) flat._index = h._index;
+    if (h._score !== undefined && h._score !== null) flat._score = h._score;
+    if (h._source && typeof h._source === 'object') {
+      flattenSourceValue(h._source, '', flat);
+    }
+    return flat;
+  });
+  const columnSet = new Set<string>();
+  rows.forEach((r) => Object.keys(r).forEach((k) => columnSet.add(k)));
+  const present = (col: string) => columnSet.has(col);
+  const rest = Array.from(columnSet)
+    .filter((c) => !CSV_PREFERRED_COLUMNS.includes(c))
+    .sort((a, b) => a.localeCompare(b));
+  const columns = [...CSV_PREFERRED_COLUMNS.filter(present), ...rest];
+  const header = columns.map(escapeCsvCell).join(',');
+  const body = rows.map((r) => columns.map((c) => escapeCsvCell(r[c])).join(',')).join('\n');
+  return rows.length > 0 ? `${header}\n${body}` : header;
+}
+
 function buildCurlExport(
   siteId: string,
   extraIndexes: string,
   queryBody: string,
-  queryParams: Record<string, string | number | boolean>
+  queryParams: Record<string, string | number | boolean>,
+  bodyApplied: string[]
 ): string {
   const params = new URLSearchParams();
   params.set('crafterSite', siteId);
@@ -191,10 +483,16 @@ function buildCurlExport(
     header.push(`# Extra indexes (URL ?index=...): ${extraIndexes.trim()}`);
   }
   if (appliedOptions.length > 0) {
-    header.push('# Non-default API options (also in URL query string):');
+    header.push('# Non-default API options (URL query string):');
     header.push(...appliedOptions);
   } else {
-    header.push('# All API options at playground defaults — only crafterSite is on the URL.');
+    header.push('# All URL-level API options at playground defaults — only crafterSite is on the URL.');
+  }
+  if (bodyApplied.length > 0) {
+    header.push('# Non-default body-shaping options (merged into the JSON body below):');
+    bodyApplied.forEach((line) => header.push(`#   ${line}`));
+  } else {
+    header.push('# All body-shaping options at playground defaults — JSON body is exactly as in the editor.');
   }
   header.push('#');
   return [
@@ -304,7 +602,8 @@ function buildGroovyExport(
   siteId: string,
   extraIndexes: string,
   queryBody: string,
-  queryParams: Record<string, string | number | boolean>
+  queryParams: Record<string, string | number | boolean>,
+  bodyApplied: string[]
 ): string {
   const safeComment = (s: string) => s.replace(/\*\//g, '* /').replace(/\r?\n/g, ' ');
   const indexLine = extraIndexes.trim()
@@ -317,7 +616,7 @@ function buildGroovyExport(
   const { builderCalls, unmappedComments } = buildGroovyApiOptionCalls(queryParams);
   const builderChain =
     builderCalls.length === 0
-      ? '      // All API options at playground defaults — request comes entirely from the JSON body above.'
+      ? '      // All URL-level API options at playground defaults — request comes entirely from the JSON body above.'
       : builderCalls.map((c) => `      ${c}`).join('\n');
   const unmappedBlock =
     unmappedComments.length === 0
@@ -325,6 +624,12 @@ function buildGroovyExport(
       : `\n    // Non-default playground options that do not map to SearchRequest.Builder:\n` +
         unmappedComments.map((line) => `    ${line}`).join('\n') +
         '\n';
+
+  const bodyAppliedBlock =
+    bodyApplied.length === 0
+      ? ' * All body-shaping options at playground defaults — JSON body is exactly as in the editor.'
+      : ' * Non-default body-shaping options merged into the JSON body below:\n' +
+        bodyApplied.map((line) => ` *   ${safeComment(line)}`).join('\n');
 
   return `package org.craftercms.sites.editorial
 
@@ -345,6 +650,8 @@ import org.opensearch.client.opensearch.core.SearchRequest
  * Site id: ${safeComment(siteId)}
  * In-process: opensearch-java SearchRequest + OpenSearchClientWrapper.search (same stack as blueprint SearchHelper).
  * Only **non-default** playground "API Options" are applied below via SearchRequest.Builder setters.${indexLine}
+ *
+${bodyAppliedBlock}
  */
 class PlaygroundExportedQuery {
 
@@ -941,18 +1248,148 @@ export function OpenSearchPlayground() {
     query
   ]);
 
-  const exportAsCode = useCallback(() => {
+  const bodyShapingOptions = useMemo<BodyShapingOptions>(
+    () => ({
+      from: optionFrom,
+      size: optionSize,
+      trackTotalHits: optionTrackTotalHits,
+      sortField: optionSortField,
+      sortOrder: optionSortOrder,
+      sourceMode: optionSourceMode,
+      sourceFields: optionSourceFields,
+      timeout: optionTimeout,
+      terminateAfter: optionTerminateAfter,
+      minScore: optionMinScore,
+      enableHighlight: optionEnableHighlight,
+      highlightFields: optionHighlightFields,
+      highlightFragmentSize: optionHighlightFragmentSize,
+      highlightNumFragments: optionHighlightNumFragments,
+      enableFacets: optionEnableFacets,
+      facetField: optionFacetField,
+      facetSize: optionFacetSize,
+      enableBoosting: optionEnableBoosting,
+      queryFieldBoosts: optionQueryFieldBoosts,
+      indicesBoost: optionIndicesBoost
+    }),
+    [
+      optionFrom,
+      optionSize,
+      optionTrackTotalHits,
+      optionSortField,
+      optionSortOrder,
+      optionSourceMode,
+      optionSourceFields,
+      optionTimeout,
+      optionTerminateAfter,
+      optionMinScore,
+      optionEnableHighlight,
+      optionHighlightFields,
+      optionHighlightFragmentSize,
+      optionHighlightNumFragments,
+      optionEnableFacets,
+      optionFacetField,
+      optionFacetSize,
+      optionEnableBoosting,
+      optionQueryFieldBoosts,
+      optionIndicesBoost
+    ]
+  );
+
+  const exportAsCode = useCallback(async () => {
     if (!siteId) {
       dispatch(showSystemNotification({ message: 'No active site to export.' }));
       return;
     }
+    if (exportTarget === 'csv') {
+      try {
+        JSON.parse(query);
+      } catch {
+        dispatch(showSystemNotification({ message: 'Fix invalid JSON in the query editor first.' }));
+        return;
+      }
+      setLoading(true);
+      setResponse(
+        JSON.stringify(
+          {
+            _studioOpenSearch: 'Running current query for CSV export…',
+            via: '/api/1/site/search/search.json'
+          },
+          null,
+          2
+        )
+      );
+      try {
+        const result = await executeOpenSearchOnEngine(siteId, query, extraIndexes, searchQueryParams);
+        if (!result.ok) {
+          setResponse(result.bodyText);
+          dispatch(
+            showSystemNotification({
+              message: `CSV export aborted — OpenSearch returned HTTP ${result.status}.`
+            })
+          );
+          return;
+        }
+        const parsed = result.parsedJson as
+          | { hits?: { hits?: OpenSearchHit[]; total?: number | { value?: number } } }
+          | null;
+        const hits = parsed?.hits?.hits ?? [];
+        const csv = hitsToCsv(hits);
+        const ts = new Date().toISOString().replace(/[:.]/g, '-');
+        downloadTextFile(`${siteId}-query-${ts}.csv`, csv, 'text/csv');
+        const totalRaw = parsed?.hits?.total;
+        const total =
+          typeof totalRaw === 'number'
+            ? totalRaw
+            : totalRaw && typeof totalRaw === 'object' && typeof totalRaw.value === 'number'
+            ? totalRaw.value
+            : null;
+        setResponse(
+          JSON.stringify(
+            {
+              _studioOpenSearch: 'CSV downloaded.',
+              via: '/api/1/site/search/search.json',
+              rows: hits.length,
+              total,
+              note:
+                total !== null && hits.length < total
+                  ? 'Only the current page of results was exported. Increase "size" or use Download index for the full set.'
+                  : undefined
+            },
+            null,
+            2
+          )
+        );
+        dispatch(
+          showSystemNotification({
+            message: `Exported ${hits.length} row${hits.length === 1 ? '' : 's'} as CSV.`
+          })
+        );
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        setResponse(msg);
+        dispatch(showSystemNotification({ message: `CSV export failed: ${msg}` }));
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+    const merged = mergeNonDefaultBodyOptionsIntoJson(query, bodyShapingOptions);
+    if (merged.error) {
+      dispatch(
+        showSystemNotification({
+          message: `Cannot apply API options to export — ${merged.error}`
+        })
+      );
+    }
+    const effectiveBody = merged.error ? query : merged.json;
     const code =
       exportTarget === 'curl'
-        ? buildCurlExport(siteId, extraIndexes, query, searchQueryParams)
-        : buildGroovyExport(siteId, extraIndexes, query, searchQueryParams);
+        ? buildCurlExport(siteId, extraIndexes, effectiveBody, searchQueryParams, merged.applied)
+        : buildGroovyExport(siteId, extraIndexes, effectiveBody, searchQueryParams, merged.applied);
     setResponse(code);
-    dispatch(showSystemNotification({ message: `Exported as ${exportTarget}.` }));
-  }, [dispatch, exportTarget, extraIndexes, query, searchQueryParams, siteId]);
+    const bodyNote = merged.applied.length > 0 ? ` (with ${merged.applied.length} body option${merged.applied.length === 1 ? '' : 's'})` : '';
+    dispatch(showSystemNotification({ message: `Exported as ${exportTarget}${bodyNote}.` }));
+  }, [bodyShapingOptions, dispatch, exportTarget, extraIndexes, query, searchQueryParams, siteId]);
 
   const downloadIndexDump = useCallback(async () => {
     if (!siteId) {
@@ -1876,6 +2313,7 @@ export function OpenSearchPlayground() {
                   >
                     <MenuItem value="curl">Curl</MenuItem>
                     <MenuItem value="groovy">Groovy</MenuItem>
+                    <MenuItem value="csv">CSV (download)</MenuItem>
                   </TextField>
                   <Button size="small" variant="outlined" onClick={exportAsCode} disabled={!siteId}>
                     Export

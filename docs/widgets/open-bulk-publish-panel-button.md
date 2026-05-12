@@ -4,7 +4,9 @@ Opens **bulk publish** from the **Tools Panel**, starting from a configurable ro
 
 See also: [Bulk publish view](bulk-publish-view.md) and [Bulk publish — toolbar](open-bulk-publish-toolbar-button.md).
 
-## Configuration
+## Configuration (`config/studio/ui.xml`)
+
+**Placement:** under **`craftercms.components.ToolsPanel`** → `configuration` → `widgets`.
 
 ```xml
 <widget id="org.rd.plugin.uigoodies.openBulkPublishPanelButton">

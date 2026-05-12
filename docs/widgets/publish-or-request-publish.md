@@ -2,7 +2,9 @@
 
 Toolbar control for **publish** or **request publish** flows, depending on permissions and site setup.
 
-## Configuration
+## Configuration (`config/studio/ui.xml`)
+
+**Placement:** under **`craftercms.components.PreviewToolbar`** → `leftSection`, `middleSection`, or `rightSection` → `widgets`.
 
 ```xml
 <widget id="org.rd.plugin.uigoodies.PublishOrRequestPublish">

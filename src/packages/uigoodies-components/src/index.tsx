@@ -17,6 +17,7 @@ import DeviceSimulatorFlyoutToolbarButton from './components/DeviceSimulatorFlyo
 import OpenCannedSearchPanelButton from './components/OpenCannedSearchPanelButton';
 import OpenCannedSearchToolbarButton from './components/OpenCannedSearchToolbarButton';
 import OpenSearchPlayground from './components/OpenSearchPlayground';
+import LogTail from './components/LogTail';
 
 const plugin: PluginDescriptor = {
   locales: undefined,
@@ -41,7 +42,8 @@ const plugin: PluginDescriptor = {
     'org.rd.plugin.uigoodies.DeviceSimulatorFlyoutToolbarButton': DeviceSimulatorFlyoutToolbarButton,
     'org.rd.plugin.uigoodies.openCannedSearchPanelButton': OpenCannedSearchPanelButton,
     'org.rd.plugin.uigoodies.openCannedSearchToolbarButton': OpenCannedSearchToolbarButton,
-    'org.rd.plugin.uigoodies.OpenSearchPlayground': OpenSearchPlayground
+    'org.rd.plugin.uigoodies.OpenSearchPlayground': OpenSearchPlayground,
+    'org.rd.plugin.uigoodies.LogTail': LogTail
   }
 };
 
@@ -63,7 +65,8 @@ export {
   DeviceSimulatorFlyoutToolbarButton,
   OpenCannedSearchPanelButton,
   OpenCannedSearchToolbarButton,
-  OpenSearchPlayground
+  OpenSearchPlayground,
+  LogTail
 };
 
 export default plugin;

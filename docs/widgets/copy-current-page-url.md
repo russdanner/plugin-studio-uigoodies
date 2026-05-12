@@ -2,7 +2,9 @@
 
 Toolbar control that copies a **full preview or environment URL** for the current page. Patterns use **`[URL]`** and **`[SITEID]`** placeholders, replaced at runtime with the page URL and site id.
 
-## Configuration
+## Configuration (`config/studio/ui.xml`)
+
+**Placement:** under **`craftercms.components.PreviewToolbar`** → `leftSection`, `middleSection`, or `rightSection` → `widgets`.
 
 ```xml
 <widget id="org.rd.plugin.uigoodies.CopyCurrentPageUrl">

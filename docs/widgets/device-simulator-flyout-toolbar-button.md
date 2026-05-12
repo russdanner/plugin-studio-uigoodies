@@ -2,7 +2,11 @@
 
 Puts **Device Simulator** presets on the **preview toolbar** as an **icon** with a **popover** flyout. It embeds Studio’s **`PreviewSimulatorPanel`** (same `setHostSize` behavior as the ICE tool).
 
-**Configuration:** use the same `<devices>` / `<device>` structure as the ICE simulator. Toolbar parsing does not mark `devices` as an array; this widget coerces common XML shapes (including numeric-key objects after transforms) and falls back to phone **375×667** and tablet **768×1024** if no valid devices remain.
+## Configuration (`config/studio/ui.xml`)
+
+**Placement:** under **`craftercms.components.PreviewToolbar`** → `leftSection`, `middleSection`, or `rightSection` → `widgets`.
+
+Use the same `<devices>` / `<device>` structure as the ICE simulator. Toolbar parsing does not mark `devices` as an array; this widget coerces common XML shapes (including numeric-key objects after transforms) and falls back to phone **375×667** and tablet **768×1024** if no valid devices remain.
 
 | Element | Required | Description |
 |--------|----------|-------------|

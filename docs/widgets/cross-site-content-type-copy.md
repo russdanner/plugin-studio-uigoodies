@@ -28,7 +28,9 @@ The user running the tool should have:
 - Access to both source and destination sites
 - Configuration read access on source and write access on destination
 
-## Project Tools `tool` entry (`ui.xml`)
+## Configuration (`config/studio/ui.xml`)
+
+**Placement:** merge a `<tool>` under **`//reference[@id='craftercms.siteTools']/tools`**.
 
 ```xml
 <tool>

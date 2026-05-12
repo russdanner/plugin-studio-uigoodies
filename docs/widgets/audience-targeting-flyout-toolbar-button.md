@@ -2,9 +2,11 @@
 
 Puts **Audience Targeting** on the **preview toolbar** as a compact **icon**; the panel opens in a **popover** (flyout) instead of the Experience Builder right rail or a full dialog. It embeds Studio’s **`PreviewAudiencesPanel`** (same Redux targeting flow as the ICE tool).
 
-**Placement:** under `craftercms.components.PreviewToolbar` → `leftSection`, `middleSection`, or `rightSection` → `widgets`, same as other toolbar widgets.
+## Configuration (`config/studio/ui.xml`)
 
-**Configuration:** use the same `<fields>` block as your `ICEToolsPanel` audience tool (`PreviewAudiencesPanel` under `ToolsPanelPageButton`). Toolbar XML parsing does not use ICE’s `lookupTables: ['fields']`; this widget normalizes `fields` and dropdown `values` so the panel still works.
+**Placement:** under **`craftercms.components.PreviewToolbar`** → `leftSection`, `middleSection`, or `rightSection` → `widgets`, same as other toolbar widgets.
+
+Use the same `<fields>` block as your `ICEToolsPanel` audience tool (`PreviewAudiencesPanel` under `ToolsPanelPageButton`). Toolbar XML parsing does not use ICE’s `lookupTables: ['fields']`; this widget normalizes `fields` and dropdown `values` so the panel still works.
 
 | Element | Required | Description |
 |--------|----------|-------------|

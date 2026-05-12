@@ -2,6 +2,10 @@
 
 Same as the [sidebar canned search](open-canned-search-panel-button.md), as an **icon** or **text** control on the **preview toolbar** (`PreviewToolbar`).
 
+## Configuration (`config/studio/ui.xml`)
+
+**Placement:** under **`craftercms.components.PreviewToolbar`** → `leftSection`, `middleSection`, or `rightSection` → `widgets`.
+
 | Element | Required | Description |
 |--------|----------|-------------|
 | `title` | optional | Button label when not icon-only |

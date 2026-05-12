@@ -4,7 +4,9 @@ Same **content upload** behavior as the sidebar button, as a **preview toolbar**
 
 See also: [Content upload view](content-upload-view.md).
 
-## Configuration
+## Configuration (`config/studio/ui.xml`)
+
+**Placement:** under **`craftercms.components.PreviewToolbar`** → `leftSection`, `middleSection`, or `rightSection` → `widgets`.
 
 ```xml
 <widget id="org.rd.plugin.uigoodies.openContentUploadToolbarButton">

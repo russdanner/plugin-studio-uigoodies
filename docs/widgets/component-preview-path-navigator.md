@@ -16,7 +16,9 @@ http://localhost:8080/studio/preview#/?page=/card/bb8847b4-7b14-7962-5255-f7290c
 
 Map storage paths to app routes with the `paths` element (`source` → `target`). Your app must handle the resulting URLs.
 
-Add under `craftercms.components.ToolsPanel` → `pages` (or as documented for your Studio version).
+## Configuration (`config/studio/ui.xml`)
+
+**Placement:** add the widget under **`craftercms.components.ToolsPanel`** → `configuration` → `widgets` (or `pages`, depending on your Studio version — same place as other sidebar tools).
 
 | Configuration | Purpose |
 |---------------|---------|

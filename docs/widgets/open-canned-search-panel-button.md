@@ -1,6 +1,10 @@
 # Canned search — sidebar (`org.rd.plugin.uigoodies.openCannedSearchPanelButton`)
 
-Opens Studio **Search** with a **preset query string** (URL-encoded filters, sort, etc.), matching the behavior of the standalone **plugin-studio-cannedsearch** plugin (now included here). Add one widget per shortcut under `craftercms.components.ToolsPanel` → `configuration` → `widgets`.
+Opens Studio **Search** with a **preset query string** (URL-encoded filters, sort, etc.), matching the behavior of the standalone **plugin-studio-cannedsearch** plugin (now included here).
+
+## Configuration (`config/studio/ui.xml`)
+
+**Placement:** add one widget per shortcut under **`craftercms.components.ToolsPanel`** → `configuration` → `widgets`.
 
 | Element | Required | Description |
 |--------|----------|-------------|

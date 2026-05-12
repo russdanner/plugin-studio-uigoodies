@@ -52,6 +52,7 @@ This plugin now includes auto-wiring in `craftercms-plugin.yaml` to add Project 
 
 - **Copy Content Types (cross-project)** (URL: `uigoodies-cross-site-content-types`)
 - **OpenSearch playground** (URL: `uigoodies-opensearch-playground`) — raw OpenSearch DSL against Engine `search.json` for the active site
+- **Tomcat Log** (URL: `uigoodies-log-tail`) — live SSE tail of `catalina.out` via an Engine REST script; the server only streams while the panel is open
 
 If you are upgrading from a previous install, re-install/upgrade the plugin so the auto-wiring section is applied.
 If your project manages `config/studio/ui.xml` manually, merge the generated tool entry into
@@ -64,7 +65,7 @@ To build this plugin on your own, make your customizations as required, then run
 
 # Widgets
 
-Registered widgets use plugin id **`org.rd.plugin.uigoodies`**, app **`uigoodies`**, file **`index.js`**. Full XML, tables, and notes for each widget live under **[`docs/widgets/`](docs/widgets/README.md)**.
+Registered widgets use plugin id **`org.rd.plugin.uigoodies`**, app **`uigoodies`**, file **`index.js`**. Each doc under **[`docs/widgets/`](docs/widgets/README.md)** includes a **`## Configuration`** section with copy-paste **`ui.xml`** (or Project Tools `<tool>`) examples, or TypeScript for embedded-only views.
 
 | Widget ID | What it does | Doc |
 |-----------|----------------|-----|
@@ -86,3 +87,5 @@ Registered widgets use plugin id **`org.rd.plugin.uigoodies`**, app **`uigoodies
 | `org.rd.plugin.uigoodies.CrossSiteContentTypeCopy` | Project tool: copy `config.xml` + `form-definition.xml` for content types between sites. | [cross-site-content-type-copy.md](docs/widgets/cross-site-content-type-copy.md) |
 | `org.rd.plugin.uigoodies.ComponentPreviewPathNavigator` | Path navigator that opens headless/component preview URLs with path mapping. | [component-preview-path-navigator.md](docs/widgets/component-preview-path-navigator.md) |
 | `org.rd.plugin.uigoodies.OpenSearchPlayground` | Project tool: Explorer + Dictionary tabs for schema/content-type discovery, expanded Search API options, and raw OpenSearch JSON against Engine `search.json`. | [open-search-playground.md](docs/widgets/open-search-playground.md) |
+| `org.rd.plugin.uigoodies.LogTail` | Project tool: SSE live tail of `catalina.out` (colorized, collapsible stack traces, fullscreen). Server-side script streams only while the panel is open. | [log-tail.md](docs/widgets/log-tail.md) |
+  

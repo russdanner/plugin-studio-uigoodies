@@ -2,7 +2,9 @@
 
 Wraps multiple **Tools Panel** shortcuts in a **single accordion** section (title + icon + nested `widgets`). Use it under `craftercms.components.ToolsPanel` when you want grouped embedded tools instead of many top-level entries.
 
-## Configuration
+## Configuration (`config/studio/ui.xml`)
+
+**Placement:** under **`craftercms.components.ToolsPanel`** → `configuration` → `widgets` (wrap other sidebar shortcuts in `<widgets>` inside this accordion).
 
 ```xml
 <widget id="org.rd.plugin.uigoodies.ToolPanelAccordion">

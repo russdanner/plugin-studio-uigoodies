@@ -2,7 +2,9 @@
 
 Toolbar control that toggles between **edit** and **view** for the current preview item (same idea as Studio’s default edit/view behavior, packaged as a plugin widget).
 
-## Configuration
+## Configuration (`config/studio/ui.xml`)
+
+**Placement:** under **`craftercms.components.PreviewToolbar`** → `leftSection`, `middleSection`, or `rightSection` → `widgets`.
 
 ```xml
 <widget id="org.rd.plugin.uigoodies.EditOrViewCurrent">

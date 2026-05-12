@@ -4,7 +4,9 @@ Same **bulk publish** flow as the sidebar button, from the **preview toolbar** (
 
 See also: [Bulk publish view](bulk-publish-view.md).
 
-## Configuration
+## Configuration (`config/studio/ui.xml`)
+
+**Placement:** under **`craftercms.components.PreviewToolbar`** → `leftSection`, `middleSection`, or `rightSection` → `widgets`.
 
 ```xml
 <widget id="org.rd.plugin.uigoodies.openBulkPublishToolbarButton">

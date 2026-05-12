@@ -2,6 +2,8 @@
 
 Each file in this folder documents one **registered widget** (or embedded view used by open buttons). Plugin id: **`org.rd.plugin.uigoodies`**, app bundle: **`uigoodies`** / `index.js`.
 
+**Every widget doc includes a `## Configuration` section** with a copy-paste **`config/studio/ui.xml`** example: either a `<widget>` snippet (toolbar / tools panel) or a full **Project Tools** `<tool>` block where that applies.
+
 | Widget ID | Description | Page |
 |-----------|-------------|------|
 | `org.rd.plugin.uigoodies.EditOrViewCurrent` | Toolbar edit / view toggle for the current preview item. | [edit-or-view-current.md](edit-or-view-current.md) |
@@ -22,5 +24,6 @@ Each file in this folder documents one **registered widget** (or embedded view u
 | `org.rd.plugin.uigoodies.CrossSiteContentTypeCopy` | Project tool: copy content types between sites. | [cross-site-content-type-copy.md](cross-site-content-type-copy.md) |
 | `org.rd.plugin.uigoodies.ComponentPreviewPathNavigator` | Sidebar path navigator that opens component preview URLs. | [component-preview-path-navigator.md](component-preview-path-navigator.md) |
 | `org.rd.plugin.uigoodies.OpenSearchPlayground` | Project tool: Explorer + Dictionary tabs, expanded Search API options, OpenSearch DSL editor, and Engine `search.json`. | [open-search-playground.md](open-search-playground.md) |
+| `org.rd.plugin.uigoodies.LogTail` | Project tool: live SSE tail of Tomcat `catalina.out`, colorized levels, collapsible stack traces, fullscreen. Server streams only while the panel is open. | [log-tail.md](log-tail.md) |
 
 Back to repository root: [../../README.md](../../README.md).

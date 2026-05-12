@@ -126,3 +126,60 @@ installation:
                       value: uigoodies
                     - name: file
                       value: index.js
+  - type: preview-app
+    parentXpath: //reference[@id='craftercms.siteTools']
+    elementXpath: //widget[@id='org.rd.plugin.uigoodies.LogTail']
+    element:
+      name: tools
+      children:
+        - name: tool
+          children:
+            - name: title
+              attributes:
+                - name: id
+                  value: uigoodies.logTail.title
+                - name: defaultMessage
+                  value: Log Tail
+            - name: icon
+              attributes:
+                - name: id
+                  value: "@mui/icons-material/TerminalRounded"
+            - name: url
+              value: uigoodies-log-tail
+            - name: widget
+              attributes:
+                - name: id
+                  value: org.rd.plugin.uigoodies.LogTail
+              children:
+                - name: plugin
+                  attributes:
+                    - name: id
+                      value: org.rd.plugin.uigoodies
+                    - name: type
+                      value: apps
+                    - name: name
+                      value: uigoodies
+                    - name: file
+                      value: index.js
+                - name: configuration
+                  children:
+                    - name: files
+                      children:
+                        - name: file
+                          children:
+                            - name: label
+                              value: Tomcat
+                            - name: path
+                              value: ../logs/tomcat/catalina.out
+                        - name: file
+                          children:
+                            - name: label
+                              value: Deployer
+                            - name: path
+                              value: ../logs/deployer/crafter-deployer.out
+                        - name: file
+                          children:
+                            - name: label
+                              value: Search
+                            - name: path
+                              value: ../logs/search/opensearch.log

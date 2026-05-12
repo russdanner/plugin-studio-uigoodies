@@ -57,6 +57,12 @@ const MenuBookRoundedIcon = craftercms.utils.constants.components.get('@mui/icon
 const ExpandLessRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/ExpandLessRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ExpandLessRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ExpandLessRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ExpandLessRounded');
 const MoreVertRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/MoreVertRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/MoreVertRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/MoreVertRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/MoreVertRounded');
 const RefreshRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/RefreshRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/RefreshRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/RefreshRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/RefreshRounded');
+const StopRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/StopRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/StopRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/StopRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/StopRounded');
+const DeleteSweepRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/DeleteSweepRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/DeleteSweepRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/DeleteSweepRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/DeleteSweepRounded');
+const PowerSettingsNewRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/PowerSettingsNewRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/PowerSettingsNewRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/PowerSettingsNewRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/PowerSettingsNewRounded');
+const KeyboardArrowRightRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/KeyboardArrowRightRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/KeyboardArrowRightRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/KeyboardArrowRightRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/KeyboardArrowRightRounded');
+const TerminalRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/TerminalRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/TerminalRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/TerminalRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/TerminalRounded');
+const { getGlobalHeaders } = craftercms.utils.ajax;
 
 var jsxRuntime = {exports: {}};
 
@@ -33373,6 +33379,170 @@ var DEFAULT_API_OPTIONS = {
     version: false,
     seq_no_primary_term: false
 };
+/** Defaults — keep in sync with the useState initializers for the matching `option*` state vars. */
+var DEFAULT_BODY_OPTIONS = {
+    from: '0',
+    size: '10',
+    trackTotalHits: 'true',
+    sortField: '',
+    sortOrder: 'desc',
+    sourceMode: 'default',
+    timeout: '5s',
+    terminateAfter: '',
+    minScore: '',
+    enableHighlight: 'false',
+    enableFacets: 'false',
+    enableBoosting: 'false'};
+/**
+ * Merge **non-default** body-shaping options from the API Options panel into
+ * the JSON request body. Used by the export pipeline so generated Curl /
+ * Groovy contains the options the user picked. Options left at their
+ * playground defaults are suppressed.
+ *
+ * Returns the new body JSON (pretty-printed), plus an `applied` summary of
+ * which options were merged in — used to render a comment block in the
+ * exported code. `error` is non-null if the input JSON could not be parsed.
+ */
+function mergeNonDefaultBodyOptionsIntoJson(queryBody, options) {
+    var _a;
+    var body;
+    try {
+        body = JSON.parse(queryBody);
+        if (!body || typeof body !== 'object' || Array.isArray(body)) {
+            return { json: queryBody, applied: [], error: 'Query body is not a JSON object.' };
+        }
+    }
+    catch (e) {
+        return {
+            json: queryBody,
+            applied: [],
+            error: e instanceof Error ? e.message : 'Invalid JSON in query editor.'
+        };
+    }
+    var applied = [];
+    if (options.from !== DEFAULT_BODY_OPTIONS.from) {
+        var n = Number(options.from);
+        if (!Number.isNaN(n) && n >= 0) {
+            body.from = n;
+            applied.push("from=".concat(n));
+        }
+    }
+    if (options.size !== DEFAULT_BODY_OPTIONS.size) {
+        var n = Number(options.size);
+        if (!Number.isNaN(n) && n >= 0) {
+            body.size = n;
+            applied.push("size=".concat(n));
+        }
+    }
+    if (options.trackTotalHits !== DEFAULT_BODY_OPTIONS.trackTotalHits) {
+        var v = options.trackTotalHits === 'true';
+        body.track_total_hits = v;
+        applied.push("track_total_hits=".concat(v));
+    }
+    if (options.timeout !== DEFAULT_BODY_OPTIONS.timeout) {
+        if (options.timeout.trim()) {
+            body.timeout = options.timeout.trim();
+            applied.push("timeout=".concat(options.timeout.trim()));
+        }
+        else {
+            delete body.timeout;
+            applied.push('timeout cleared');
+        }
+    }
+    if (options.terminateAfter !== DEFAULT_BODY_OPTIONS.terminateAfter) {
+        var n = Number(options.terminateAfter);
+        if (options.terminateAfter.trim() && !Number.isNaN(n) && n > 0) {
+            body.terminate_after = n;
+            applied.push("terminate_after=".concat(n));
+        }
+    }
+    if (options.minScore !== DEFAULT_BODY_OPTIONS.minScore) {
+        var n = Number(options.minScore);
+        if (options.minScore.trim() && !Number.isNaN(n)) {
+            body.min_score = n;
+            applied.push("min_score=".concat(n));
+        }
+    }
+    if (options.sortField !== DEFAULT_BODY_OPTIONS.sortField ||
+        (options.sortField.trim() && options.sortOrder !== DEFAULT_BODY_OPTIONS.sortOrder)) {
+        if (options.sortField.trim()) {
+            body.sort = [(_a = {}, _a[options.sortField.trim()] = { order: options.sortOrder }, _a)];
+            applied.push("sort=".concat(options.sortField.trim(), " ").concat(options.sortOrder));
+        }
+    }
+    if (options.sourceMode !== DEFAULT_BODY_OPTIONS.sourceMode) {
+        if (options.sourceMode === 'all') {
+            body._source = true;
+            applied.push('_source=true (all fields)');
+        }
+        else if (options.sourceMode === 'custom') {
+            var fields = parseCsv(options.sourceFields);
+            body._source = fields.length > 0 ? fields : true;
+            applied.push("_source=[".concat(fields.join(', ') || 'true', "]"));
+        }
+    }
+    if (options.enableHighlight !== DEFAULT_BODY_OPTIONS.enableHighlight && options.enableHighlight === 'true') {
+        var fields = parseCsv(options.highlightFields);
+        var fragmentSize = Number(options.highlightFragmentSize);
+        var numFragments = Number(options.highlightNumFragments);
+        var safeFragmentSize_1 = !Number.isNaN(fragmentSize) && fragmentSize > 0 ? fragmentSize : 150;
+        var safeNumFragments_1 = !Number.isNaN(numFragments) && numFragments > 0 ? numFragments : 2;
+        body.highlight = {
+            fields: fields.reduce(function (acc, field) {
+                acc[field] = {
+                    fragment_size: safeFragmentSize_1,
+                    number_of_fragments: safeNumFragments_1
+                };
+                return acc;
+            }, {})
+        };
+        applied.push("highlight fields=[".concat(fields.join(', '), "] fragment_size=").concat(safeFragmentSize_1, " number_of_fragments=").concat(safeNumFragments_1));
+    }
+    if (options.enableFacets !== DEFAULT_BODY_OPTIONS.enableFacets &&
+        options.enableFacets === 'true' &&
+        options.facetField.trim()) {
+        var facetSize = Number(options.facetSize);
+        var safeFacetSize = !Number.isNaN(facetSize) && facetSize > 0 ? facetSize : 20;
+        body.aggs = {
+            facet_terms: {
+                terms: {
+                    field: options.facetField.trim(),
+                    size: safeFacetSize
+                }
+            }
+        };
+        applied.push("aggs.facet_terms field=".concat(options.facetField.trim(), " size=").concat(safeFacetSize));
+    }
+    if (options.enableBoosting !== DEFAULT_BODY_OPTIONS.enableBoosting && options.enableBoosting === 'true') {
+        var boostFields = parseCsv(options.queryFieldBoosts);
+        if (boostFields.length > 0) {
+            applyMultiMatchFieldBoosts(body.query, boostFields);
+            applied.push("multi_match.fields=[".concat(boostFields.join(', '), "]"));
+        }
+        var indicesBoost = options.indicesBoost
+            .split(',')
+            .map(function (part) { return part.trim(); })
+            .filter(Boolean)
+            .map(function (entry) { return entry.split('=').map(function (piece) { return piece.trim(); }); })
+            .filter(function (tuple) { return tuple.length === 2 && tuple[0] && tuple[1]; })
+            .map(function (_a) {
+            var _b;
+            var index = _a[0], weight = _a[1];
+            var n = Number(weight);
+            return Number.isNaN(n) ? null : (_b = {}, _b[index] = n, _b);
+        })
+            .filter(function (entry) { return entry != null; });
+        if (indicesBoost.length > 0) {
+            body.indices_boost = indicesBoost;
+            var pretty = indicesBoost.map(function (e) { return Object.entries(e).map(function (_a) {
+                var k = _a[0], v = _a[1];
+                return "".concat(k, "=").concat(v);
+            }).join(''); }).join(', ');
+            applied.push("indices_boost=[".concat(pretty, "]"));
+        }
+    }
+    return { json: JSON.stringify(body, null, 2), applied: applied, error: null };
+}
 /** True when the supplied option value is the same as the playground default for that key. */
 function isDefaultOptionValue(key, value) {
     if (!(key in DEFAULT_API_OPTIONS))
@@ -33396,6 +33566,14 @@ function filterNonDefaultQueryParams(queryParams) {
 /** Trigger a JSON file download in the browser without leaving the page. */
 function downloadJsonFile(filename, data) {
     var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    triggerBlobDownload(filename, blob);
+}
+/** Trigger a text/CSV file download in the browser. Adds a BOM so Excel detects UTF-8. */
+function downloadTextFile(filename, text, mimeType) {
+    var blob = new Blob(['\ufeff', text], { type: "".concat(mimeType, ";charset=utf-8") });
+    triggerBlobDownload(filename, blob);
+}
+function triggerBlobDownload(filename, blob) {
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
     a.href = url;
@@ -33405,7 +33583,73 @@ function downloadJsonFile(filename, data) {
     document.body.removeChild(a);
     setTimeout(function () { return URL.revokeObjectURL(url); }, 0);
 }
-function buildCurlExport(siteId, extraIndexes, queryBody, queryParams) {
+/** Recursively flatten `_source` into dot-separated keys; nested arrays of primitives joined with "; ". */
+function flattenSourceValue(value, prefix, out) {
+    var set = function (v) {
+        out[prefix.replace(/\.$/, '')] = v;
+    };
+    if (value === null || value === undefined) {
+        set('');
+        return;
+    }
+    if (Array.isArray(value)) {
+        if (value.length === 0) {
+            set('');
+            return;
+        }
+        var allPrimitive = value.every(function (v) { return v === null || (typeof v !== 'object' && typeof v !== 'function'); });
+        if (allPrimitive) {
+            set(value.map(function (v) { return (v == null ? '' : String(v)); }).join('; '));
+            return;
+        }
+        set(JSON.stringify(value));
+        return;
+    }
+    if (typeof value === 'object') {
+        Object.entries(value).forEach(function (_a) {
+            var k = _a[0], v = _a[1];
+            flattenSourceValue(v, "".concat(prefix).concat(k, "."), out);
+        });
+        return;
+    }
+    set(value);
+}
+function escapeCsvCell(v) {
+    if (v === null || v === undefined)
+        return '';
+    var s = typeof v === 'string' ? v : typeof v === 'object' ? JSON.stringify(v) : String(v);
+    if (/[",\n\r]/.test(s)) {
+        return "\"".concat(s.replace(/"/g, '""'), "\"");
+    }
+    return s;
+}
+var CSV_PREFERRED_COLUMNS = ['_id', '_index', '_score', 'localId', 'internal-name', 'content-type'];
+function hitsToCsv(hits) {
+    var rows = hits.map(function (h) {
+        var flat = {};
+        if (h._id !== undefined)
+            flat._id = h._id;
+        if (h._index !== undefined)
+            flat._index = h._index;
+        if (h._score !== undefined && h._score !== null)
+            flat._score = h._score;
+        if (h._source && typeof h._source === 'object') {
+            flattenSourceValue(h._source, '', flat);
+        }
+        return flat;
+    });
+    var columnSet = new Set();
+    rows.forEach(function (r) { return Object.keys(r).forEach(function (k) { return columnSet.add(k); }); });
+    var present = function (col) { return columnSet.has(col); };
+    var rest = Array.from(columnSet)
+        .filter(function (c) { return !CSV_PREFERRED_COLUMNS.includes(c); })
+        .sort(function (a, b) { return a.localeCompare(b); });
+    var columns = __spreadArray(__spreadArray([], CSV_PREFERRED_COLUMNS.filter(present), true), rest, true);
+    var header = columns.map(escapeCsvCell).join(',');
+    var body = rows.map(function (r) { return columns.map(function (c) { return escapeCsvCell(r[c]); }).join(','); }).join('\n');
+    return rows.length > 0 ? "".concat(header, "\n").concat(body) : header;
+}
+function buildCurlExport(siteId, extraIndexes, queryBody, queryParams, bodyApplied) {
     var params = new URLSearchParams();
     params.set('crafterSite', siteId);
     if (extraIndexes.trim()) {
@@ -33427,11 +33671,18 @@ function buildCurlExport(siteId, extraIndexes, queryBody, queryParams) {
         header.push("# Extra indexes (URL ?index=...): ".concat(extraIndexes.trim()));
     }
     if (appliedOptions.length > 0) {
-        header.push('# Non-default API options (also in URL query string):');
+        header.push('# Non-default API options (URL query string):');
         header.push.apply(header, appliedOptions);
     }
     else {
-        header.push('# All API options at playground defaults — only crafterSite is on the URL.');
+        header.push('# All URL-level API options at playground defaults — only crafterSite is on the URL.');
+    }
+    if (bodyApplied.length > 0) {
+        header.push('# Non-default body-shaping options (merged into the JSON body below):');
+        bodyApplied.forEach(function (line) { return header.push("#   ".concat(line)); });
+    }
+    else {
+        header.push('# All body-shaping options at playground defaults — JSON body is exactly as in the editor.');
     }
     header.push('#');
     return __spreadArray(__spreadArray([], header, true), [
@@ -33529,7 +33780,7 @@ function buildGroovyApiOptionCalls(queryParams) {
     });
     return { builderCalls: builderCalls, unmappedComments: unmappedComments };
 }
-function buildGroovyExport(siteId, extraIndexes, queryBody, queryParams) {
+function buildGroovyExport(siteId, extraIndexes, queryBody, queryParams, bodyApplied) {
     var safeComment = function (s) { return s.replace(/\*\//g, '* /').replace(/\r?\n/g, ' '); };
     var indexLine = extraIndexes.trim()
         ? "\n * Playground index query param (URL on search.json \u2014 not part of the JSON body): ".concat(safeComment(extraIndexes.trim()))
@@ -33538,14 +33789,18 @@ function buildGroovyExport(siteId, extraIndexes, queryBody, queryParams) {
     var indented = pretty.split('\n').map(function (line) { return "    ".concat(line); }).join('\n');
     var _a = buildGroovyApiOptionCalls(queryParams), builderCalls = _a.builderCalls, unmappedComments = _a.unmappedComments;
     var builderChain = builderCalls.length === 0
-        ? '      // All API options at playground defaults — request comes entirely from the JSON body above.'
+        ? '      // All URL-level API options at playground defaults — request comes entirely from the JSON body above.'
         : builderCalls.map(function (c) { return "      ".concat(c); }).join('\n');
     var unmappedBlock = unmappedComments.length === 0
         ? ''
         : "\n    // Non-default playground options that do not map to SearchRequest.Builder:\n" +
             unmappedComments.map(function (line) { return "    ".concat(line); }).join('\n') +
             '\n';
-    return "package org.craftercms.sites.editorial\n\nimport java.io.StringReader\nimport org.craftercms.search.opensearch.client.OpenSearchClientWrapper\nimport org.opensearch.client.opensearch._types.SearchType\nimport org.opensearch.client.opensearch.core.SearchRequest\n// When you hand-author queries (editorial SearchHelper style), you will typically add:\n// import org.opensearch.client.opensearch._types.SortOrder\n// import org.opensearch.client.opensearch._types.query_dsl.BoolQuery\n// import org.opensearch.client.opensearch._types.query_dsl.Query\n// import org.opensearch.client.opensearch._types.query_dsl.TextQueryType\n// import org.opensearch.client.opensearch.core.search.Highlight\n// import org.craftercms.engine.service.UrlTransformationService\n\n/**\n * Generated from OpenSearch Playground.\n * Site id: ".concat(safeComment(siteId), "\n * In-process: opensearch-java SearchRequest + OpenSearchClientWrapper.search (same stack as blueprint SearchHelper).\n * Only **non-default** playground \"API Options\" are applied below via SearchRequest.Builder setters.").concat(indexLine, "\n */\nclass PlaygroundExportedQuery {\n\n  OpenSearchClientWrapper searchClient\n\n  PlaygroundExportedQuery(OpenSearchClientWrapper searchClient) {\n    this.searchClient = searchClient\n  }\n\n  /**\n   * Build SearchRequest from the JSON body using opensearch-java Builder.withJson,\n   * then apply playground \"API Options\" via builder setters.\n   */\n  static SearchRequest buildSearchRequest(String json) {\n    return new SearchRequest.Builder()\n      .withJson(new StringReader(json))\n").concat(builderChain, "\n      .build()\n  }\n\n  /**\n   * Execute the playground query in-process via searchClient.search(request, Map).\n   */\n  Map search() {\n    String queryJson = '''\n").concat(indented, "\n    '''\n").concat(unmappedBlock, "\n    SearchRequest request = buildSearchRequest(queryJson)\n    return searchClient.search(request, Map) as Map\n  }\n}\n");
+    var bodyAppliedBlock = bodyApplied.length === 0
+        ? ' * All body-shaping options at playground defaults — JSON body is exactly as in the editor.'
+        : ' * Non-default body-shaping options merged into the JSON body below:\n' +
+            bodyApplied.map(function (line) { return " *   ".concat(safeComment(line)); }).join('\n');
+    return "package org.craftercms.sites.editorial\n\nimport java.io.StringReader\nimport org.craftercms.search.opensearch.client.OpenSearchClientWrapper\nimport org.opensearch.client.opensearch._types.SearchType\nimport org.opensearch.client.opensearch.core.SearchRequest\n// When you hand-author queries (editorial SearchHelper style), you will typically add:\n// import org.opensearch.client.opensearch._types.SortOrder\n// import org.opensearch.client.opensearch._types.query_dsl.BoolQuery\n// import org.opensearch.client.opensearch._types.query_dsl.Query\n// import org.opensearch.client.opensearch._types.query_dsl.TextQueryType\n// import org.opensearch.client.opensearch.core.search.Highlight\n// import org.craftercms.engine.service.UrlTransformationService\n\n/**\n * Generated from OpenSearch Playground.\n * Site id: ".concat(safeComment(siteId), "\n * In-process: opensearch-java SearchRequest + OpenSearchClientWrapper.search (same stack as blueprint SearchHelper).\n * Only **non-default** playground \"API Options\" are applied below via SearchRequest.Builder setters.").concat(indexLine, "\n *\n").concat(bodyAppliedBlock, "\n */\nclass PlaygroundExportedQuery {\n\n  OpenSearchClientWrapper searchClient\n\n  PlaygroundExportedQuery(OpenSearchClientWrapper searchClient) {\n    this.searchClient = searchClient\n  }\n\n  /**\n   * Build SearchRequest from the JSON body using opensearch-java Builder.withJson,\n   * then apply playground \"API Options\" via builder setters.\n   */\n  static SearchRequest buildSearchRequest(String json) {\n    return new SearchRequest.Builder()\n      .withJson(new StringReader(json))\n").concat(builderChain, "\n      .build()\n  }\n\n  /**\n   * Execute the playground query in-process via searchClient.search(request, Map).\n   */\n  Map search() {\n    String queryJson = '''\n").concat(indented, "\n    '''\n").concat(unmappedBlock, "\n    SearchRequest request = buildSearchRequest(queryJson)\n    return searchClient.search(request, Map) as Map\n  }\n}\n");
 }
 function parseCsv(value) {
     return value
@@ -34094,19 +34349,139 @@ function OpenSearchPlayground() {
         optionTrackTotalHits,
         query
     ]);
-    var exportAsCode = useCallback(function () {
-        if (!siteId) {
-            dispatch(showSystemNotification({ message: 'No active site to export.' }));
-            return;
-        }
-        var code = exportTarget === 'curl'
-            ? buildCurlExport(siteId, extraIndexes, query, searchQueryParams)
-            : buildGroovyExport(siteId, extraIndexes, query, searchQueryParams);
-        setResponse(code);
-        dispatch(showSystemNotification({ message: "Exported as ".concat(exportTarget, ".") }));
-    }, [dispatch, exportTarget, extraIndexes, query, searchQueryParams, siteId]);
+    var bodyShapingOptions = useMemo(function () { return ({
+        from: optionFrom,
+        size: optionSize,
+        trackTotalHits: optionTrackTotalHits,
+        sortField: optionSortField,
+        sortOrder: optionSortOrder,
+        sourceMode: optionSourceMode,
+        sourceFields: optionSourceFields,
+        timeout: optionTimeout,
+        terminateAfter: optionTerminateAfter,
+        minScore: optionMinScore,
+        enableHighlight: optionEnableHighlight,
+        highlightFields: optionHighlightFields,
+        highlightFragmentSize: optionHighlightFragmentSize,
+        highlightNumFragments: optionHighlightNumFragments,
+        enableFacets: optionEnableFacets,
+        facetField: optionFacetField,
+        facetSize: optionFacetSize,
+        enableBoosting: optionEnableBoosting,
+        queryFieldBoosts: optionQueryFieldBoosts,
+        indicesBoost: optionIndicesBoost
+    }); }, [
+        optionFrom,
+        optionSize,
+        optionTrackTotalHits,
+        optionSortField,
+        optionSortOrder,
+        optionSourceMode,
+        optionSourceFields,
+        optionTimeout,
+        optionTerminateAfter,
+        optionMinScore,
+        optionEnableHighlight,
+        optionHighlightFields,
+        optionHighlightFragmentSize,
+        optionHighlightNumFragments,
+        optionEnableFacets,
+        optionFacetField,
+        optionFacetSize,
+        optionEnableBoosting,
+        optionQueryFieldBoosts,
+        optionIndicesBoost
+    ]);
+    var exportAsCode = useCallback(function () { return __awaiter(_this, void 0, void 0, function () {
+        var result, parsed, hits, csv, ts, totalRaw, total, e_2, msg, merged, effectiveBody, code, bodyNote;
+        var _a, _b, _c;
+        return __generator(this, function (_d) {
+            switch (_d.label) {
+                case 0:
+                    if (!siteId) {
+                        dispatch(showSystemNotification({ message: 'No active site to export.' }));
+                        return [2 /*return*/];
+                    }
+                    if (!(exportTarget === 'csv')) return [3 /*break*/, 6];
+                    try {
+                        JSON.parse(query);
+                    }
+                    catch (_e) {
+                        dispatch(showSystemNotification({ message: 'Fix invalid JSON in the query editor first.' }));
+                        return [2 /*return*/];
+                    }
+                    setLoading(true);
+                    setResponse(JSON.stringify({
+                        _studioOpenSearch: 'Running current query for CSV export…',
+                        via: '/api/1/site/search/search.json'
+                    }, null, 2));
+                    _d.label = 1;
+                case 1:
+                    _d.trys.push([1, 3, 4, 5]);
+                    return [4 /*yield*/, executeOpenSearchOnEngine(siteId, query, extraIndexes, searchQueryParams)];
+                case 2:
+                    result = _d.sent();
+                    if (!result.ok) {
+                        setResponse(result.bodyText);
+                        dispatch(showSystemNotification({
+                            message: "CSV export aborted \u2014 OpenSearch returned HTTP ".concat(result.status, ".")
+                        }));
+                        return [2 /*return*/];
+                    }
+                    parsed = result.parsedJson;
+                    hits = (_b = (_a = parsed === null || parsed === void 0 ? void 0 : parsed.hits) === null || _a === void 0 ? void 0 : _a.hits) !== null && _b !== void 0 ? _b : [];
+                    csv = hitsToCsv(hits);
+                    ts = new Date().toISOString().replace(/[:.]/g, '-');
+                    downloadTextFile("".concat(siteId, "-query-").concat(ts, ".csv"), csv, 'text/csv');
+                    totalRaw = (_c = parsed === null || parsed === void 0 ? void 0 : parsed.hits) === null || _c === void 0 ? void 0 : _c.total;
+                    total = typeof totalRaw === 'number'
+                        ? totalRaw
+                        : totalRaw && typeof totalRaw === 'object' && typeof totalRaw.value === 'number'
+                            ? totalRaw.value
+                            : null;
+                    setResponse(JSON.stringify({
+                        _studioOpenSearch: 'CSV downloaded.',
+                        via: '/api/1/site/search/search.json',
+                        rows: hits.length,
+                        total: total,
+                        note: total !== null && hits.length < total
+                            ? 'Only the current page of results was exported. Increase "size" or use Download index for the full set.'
+                            : undefined
+                    }, null, 2));
+                    dispatch(showSystemNotification({
+                        message: "Exported ".concat(hits.length, " row").concat(hits.length === 1 ? '' : 's', " as CSV.")
+                    }));
+                    return [3 /*break*/, 5];
+                case 3:
+                    e_2 = _d.sent();
+                    msg = e_2 instanceof Error ? e_2.message : String(e_2);
+                    setResponse(msg);
+                    dispatch(showSystemNotification({ message: "CSV export failed: ".concat(msg) }));
+                    return [3 /*break*/, 5];
+                case 4:
+                    setLoading(false);
+                    return [7 /*endfinally*/];
+                case 5: return [2 /*return*/];
+                case 6:
+                    merged = mergeNonDefaultBodyOptionsIntoJson(query, bodyShapingOptions);
+                    if (merged.error) {
+                        dispatch(showSystemNotification({
+                            message: "Cannot apply API options to export \u2014 ".concat(merged.error)
+                        }));
+                    }
+                    effectiveBody = merged.error ? query : merged.json;
+                    code = exportTarget === 'curl'
+                        ? buildCurlExport(siteId, extraIndexes, effectiveBody, searchQueryParams, merged.applied)
+                        : buildGroovyExport(siteId, extraIndexes, effectiveBody, searchQueryParams, merged.applied);
+                    setResponse(code);
+                    bodyNote = merged.applied.length > 0 ? " (with ".concat(merged.applied.length, " body option").concat(merged.applied.length === 1 ? '' : 's', ")") : '';
+                    dispatch(showSystemNotification({ message: "Exported as ".concat(exportTarget).concat(bodyNote, ".") }));
+                    return [2 /*return*/];
+            }
+        });
+    }); }, [bodyShapingOptions, dispatch, exportTarget, extraIndexes, query, searchQueryParams, siteId]);
     var downloadIndexDump = useCallback(function () { return __awaiter(_this, void 0, void 0, function () {
-        var indexName, result, ts, e_2, msg;
+        var indexName, result, ts, e_3, msg;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -34160,8 +34535,8 @@ function OpenSearchPlayground() {
                     }));
                     return [3 /*break*/, 5];
                 case 3:
-                    e_2 = _a.sent();
-                    msg = e_2 instanceof Error ? e_2.message : String(e_2);
+                    e_3 = _a.sent();
+                    msg = e_3 instanceof Error ? e_3.message : String(e_3);
                     setResponse(JSON.stringify({
                         _studioOpenSearch: 'Index dump failed',
                         error: msg
@@ -34295,7 +34670,7 @@ function OpenSearchPlayground() {
                                             alignItems: 'center',
                                             gap: 1,
                                             flexWrap: 'wrap'
-                                        }, children: [jsxRuntimeExports.jsx(Typography, { variant: "caption", color: "text.secondary", children: "Export as" }), jsxRuntimeExports.jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }, children: [jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "Format", value: exportTarget, onChange: function (e) { return setExportTarget(e.target.value); }, sx: { width: 120 }, SelectProps: fullscreenSelectProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "curl", children: "Curl" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "groovy", children: "Groovy" })] }), jsxRuntimeExports.jsx(Button$1, { size: "small", variant: "outlined", onClick: exportAsCode, disabled: !siteId, children: "Export" })] })] }), jsxRuntimeExports.jsxs(Box$1, { sx: {
+                                        }, children: [jsxRuntimeExports.jsx(Typography, { variant: "caption", color: "text.secondary", children: "Export as" }), jsxRuntimeExports.jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }, children: [jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "Format", value: exportTarget, onChange: function (e) { return setExportTarget(e.target.value); }, sx: { width: 120 }, SelectProps: fullscreenSelectProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "curl", children: "Curl" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "groovy", children: "Groovy" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "csv", children: "CSV (download)" })] }), jsxRuntimeExports.jsx(Button$1, { size: "small", variant: "outlined", onClick: exportAsCode, disabled: !siteId, children: "Export" })] })] }), jsxRuntimeExports.jsxs(Box$1, { sx: {
                                             px: 1.5,
                                             py: 1,
                                             borderTop: 1,
@@ -34326,6 +34701,669 @@ function OpenSearchPlayground() {
                                         }, children: [jsxRuntimeExports.jsx(Typography, { variant: "subtitle2", color: "text.primary", children: "Response" }), jsxRuntimeExports.jsx(Tooltip, { title: "Copy response JSON", children: jsxRuntimeExports.jsx(IconButton$1, { size: "small", onClick: onCopyResponse, "aria-label": "Copy response", children: jsxRuntimeExports.jsx(ContentCopyRoundedIcon, { fontSize: "small" }) }) })] }), jsxRuntimeExports.jsx(OpenSearchJsonEditor, { readOnly: true, value: displayedResponse })] }) })] }, isMdUp ? 'opensearch-layout-wide' : 'opensearch-layout-stack') })] }));
 }
 
+var MAX_BUFFERED_ENTRIES = 5000;
+/** Delay before reconnecting after the server sends a `bye` (time-cap) event. */
+var RECONNECT_AFTER_BYE_MS = 750;
+var LEVEL_PATTERNS = [
+    { level: 'ERROR', rx: /\b(ERROR|FATAL|SEVERE)\b/ },
+    { level: 'WARN', rx: /\b(WARN|WARNING)\b/ },
+    { level: 'INFO', rx: /\b(INFO|NOTICE)\b/ },
+    { level: 'DEBUG', rx: /\b(DEBUG|FINE)\b/ },
+    { level: 'TRACE', rx: /\b(TRACE|FINER|FINEST)\b/ }
+];
+/** Level row styling tuned for dark log panel background. */
+var LEVEL_COLORS_DARK = {
+    ERROR: { fg: '#ffd2d2', bg: 'rgba(244, 67, 54, 0.18)', chip: '#f44336' },
+    WARN: { fg: '#ffe4ad', bg: 'rgba(255, 152, 0, 0.18)', chip: '#ff9800' },
+    INFO: { fg: '#cfe7ff', bg: 'rgba(33, 150, 243, 0.12)', chip: '#2196f3' },
+    DEBUG: { fg: '#cdcdcd', bg: 'rgba(120, 120, 120, 0.12)', chip: '#9e9e9e' },
+    TRACE: { fg: '#b8b8b8', bg: 'rgba(120, 120, 120, 0.08)', chip: '#757575' },
+    OTHER: { fg: '#e0e0e0', bg: 'transparent', chip: '#616161' }
+};
+/** Level row styling tuned for light log panel background. */
+var LEVEL_COLORS_LIGHT = {
+    ERROR: { fg: '#7f1d1d', bg: 'rgba(244, 67, 54, 0.1)', chip: '#d32f2f' },
+    WARN: { fg: '#7c2d12', bg: 'rgba(255, 152, 0, 0.12)', chip: '#ef6c00' },
+    INFO: { fg: '#0d47a1', bg: 'rgba(33, 150, 243, 0.08)', chip: '#1565c0' },
+    DEBUG: { fg: '#424242', bg: 'rgba(97, 97, 97, 0.06)', chip: '#616161' },
+    TRACE: { fg: '#616161', bg: 'rgba(97, 97, 97, 0.05)', chip: '#757575' },
+    OTHER: { fg: '#212121', bg: 'transparent', chip: '#616161' }
+};
+var ENTRY_START_RX = /^\s*(\d{2,4}[-/]\d{2}[-/]\d{2,4}[ T]\d{2}:\d{2}:\d{2}|\[\d{2,4}-\d{2}-\d{2}|\d{2}:\d{2}:\d{2}|[A-Z][a-z]{2}\s+\d{1,2},\s+\d{4})/;
+var TRACE_LINE_RX = /^(\s+at\s|\s*Caused by:|\s*Suppressed:|\s+\.{3}\s+\d+\s+more)/;
+function detectLevel(line) {
+    for (var _i = 0, LEVEL_PATTERNS_1 = LEVEL_PATTERNS; _i < LEVEL_PATTERNS_1.length; _i++) {
+        var _a = LEVEL_PATTERNS_1[_i], level = _a.level, rx = _a.rx;
+        if (rx.test(line)) {
+            return level;
+        }
+    }
+    return 'OTHER';
+}
+function isTraceLine(line) {
+    return TRACE_LINE_RX.test(line);
+}
+function isEntryHead(line) {
+    if (isTraceLine(line))
+        return false;
+    return ENTRY_START_RX.test(line) || /\b(ERROR|WARN|INFO|DEBUG|TRACE|FATAL|SEVERE)\b/.test(line);
+}
+/**
+ * Default file list used when neither `<path>` nor `<files>` is supplied in
+ * the widget's `ui.xml` `<configuration>`. These match the defaults wired
+ * into `craftercms-plugin.yaml` so a fresh install of the plugin shows
+ * something useful even if the admin never edits `ui.xml`.
+ *
+ * Paths are relative to the JVM working directory (typically
+ * `crafter-authoring/bin`), which lands in the standard CrafterCMS `logs/`
+ * tree on a default install.
+ */
+var DEFAULT_FILES = [
+    { label: 'Tomcat', path: '../logs/tomcat/catalina.out' },
+    { label: 'Deployer', path: '../logs/deployer/crafter-deployer.out' },
+    { label: 'Search', path: '../logs/search/opensearch.log' }
+];
+function normalizeFiles(files) {
+    var _a;
+    if (!files)
+        return [];
+    var raw = Array.isArray(files) || typeof files !== 'object' ? files : (_a = files.file) !== null && _a !== void 0 ? _a : files;
+    if (!raw)
+        return [];
+    var list;
+    if (Array.isArray(raw)) {
+        list = raw;
+    }
+    else if (typeof raw === 'object') {
+        var obj_1 = raw;
+        // Object keyed by integer (multi `<file>` after XML→JSON), or single object literal.
+        var numericKeys = Object.keys(obj_1).filter(function (k) { return /^\d+$/.test(k); });
+        if (numericKeys.length > 0 && numericKeys.length === Object.keys(obj_1).length) {
+            list = numericKeys.map(function (k) { return obj_1[k]; });
+        }
+        else if ('path' in obj_1 || 'label' in obj_1) {
+            list = [obj_1];
+        }
+        else {
+            list = [];
+        }
+    }
+    else {
+        list = [];
+    }
+    return list
+        .filter(function (f) { return Boolean(f && typeof f === 'object'); })
+        .map(function (f) { return ({
+        label: typeof f.label === 'string' ? f.label.trim() : undefined,
+        path: typeof f.path === 'string' ? f.path.trim() : undefined
+    }); })
+        .filter(function (f) { return Boolean(f.path); });
+}
+function LogTail(props) {
+    var _this = this;
+    if (props === void 0) { props = {}; }
+    var dispatch = useDispatch();
+    var siteId = useActiveSiteId();
+    var theme = useTheme();
+    var fullscreenRef = useRef(null);
+    var scrollRef = useRef(null);
+    /**
+     * AbortController for the in-flight fetch() stream. Set to null when no
+     * stream is active. Calling .abort() cancels the response stream, which
+     * makes the server-side writer.checkError() flip and the loop exits.
+     */
+    var abortRef = useRef(null);
+    /**
+     * Generation token; incremented on every (re)connect. Async callbacks check
+     * this before mutating state so a stale stream from a previous selection
+     * cannot overwrite the current view.
+     */
+    var generationRef = useRef(0);
+    /** Pending reconnect timer id (after a `bye` event). */
+    var reconnectTimerRef = useRef(null);
+    var nextIdRef = useRef(1);
+    var configuredFiles = useMemo(function () {
+        var list = normalizeFiles(props.files);
+        if (list.length > 0)
+            return list;
+        if (props.path && typeof props.path === 'string' && props.path.trim()) {
+            return [{ label: props.path.trim(), path: props.path.trim() }];
+        }
+        // Nothing in ui.xml — fall back to the same defaults the plugin's
+        // installation block ships, so a fresh install still works without
+        // any per-environment editing.
+        return DEFAULT_FILES;
+    }, [props.files, props.path]);
+    var _a = useState([]), entries = _a[0], setEntries = _a[1];
+    var _b = useState('idle'), status = _b[0], setStatus = _b[1];
+    var _c = useState(null), errorMessage = _c[0], setErrorMessage = _c[1];
+    var _d = useState(false), isFullscreen = _d[0], setIsFullscreen = _d[1];
+    var _e = useState(true), autoScroll = _e[0], setAutoScroll = _e[1];
+    var _f = useState(''), filter = _f[0], setFilter = _f[1];
+    var _g = useState('ALL'), levelFilter = _g[0], setLevelFilter = _g[1];
+    var _h = useState(function () { var _a, _b; return (_b = (_a = configuredFiles[0]) === null || _a === void 0 ? void 0 : _a.path) !== null && _b !== void 0 ? _b : ''; }), selectedPath = _h[0], setSelectedPath = _h[1];
+    var _j = useState(null), serverInfo = _j[0], setServerInfo = _j[1];
+    // If the configured list changes (e.g. ui.xml edit) and the current
+    // selection is no longer valid, drop back to the first configured path.
+    useEffect(function () {
+        var _a;
+        if (configuredFiles.length === 0) {
+            if (selectedPath)
+                setSelectedPath('');
+            return;
+        }
+        if (!configuredFiles.some(function (f) { return f.path === selectedPath; })) {
+            setSelectedPath((_a = configuredFiles[0].path) !== null && _a !== void 0 ? _a : '');
+        }
+    }, [configuredFiles, selectedPath]);
+    var endpoint = useMemo(function () {
+        if (!siteId || !selectedPath)
+            return '';
+        var params = new URLSearchParams();
+        params.set('siteId', siteId);
+        params.set('path', selectedPath);
+        return "/studio/api/2/plugin/script/plugins/org/rd/plugin/uigoodies/log-tail?".concat(params.toString());
+    }, [siteId, selectedPath]);
+    var closeStream = useCallback(function () {
+        if (reconnectTimerRef.current != null) {
+            window.clearTimeout(reconnectTimerRef.current);
+            reconnectTimerRef.current = null;
+        }
+        if (abortRef.current) {
+            abortRef.current.abort();
+            abortRef.current = null;
+        }
+        // Bump generation so any pending async readers stop touching state.
+        generationRef.current += 1;
+        setStatus(function (s) { return (s === 'idle' ? s : 'closed'); });
+    }, []);
+    var appendLine = useCallback(function (rawLine) {
+        setEntries(function (prev) {
+            var next = prev.slice();
+            if (next.length > 0 && (isTraceLine(rawLine) || !isEntryHead(rawLine))) {
+                var last = next[next.length - 1];
+                next[next.length - 1] = __assign(__assign({}, last), { trace: __spreadArray(__spreadArray([], last.trace, true), [rawLine], false) });
+            }
+            else {
+                next.push({
+                    id: nextIdRef.current++,
+                    head: rawLine,
+                    level: detectLevel(rawLine),
+                    trace: [],
+                    open: false
+                });
+            }
+            if (next.length > MAX_BUFFERED_ENTRIES) {
+                next.splice(0, next.length - MAX_BUFFERED_ENTRIES);
+            }
+            return next;
+        });
+    }, []);
+    /**
+     * Open a fetch() streaming request to the log-tail script and consume
+     * NDJSON events from the response body. We use fetch() (not EventSource)
+     * because Studio authenticates with `Authorization: Bearer <jwt>` set as
+     * a global header by `@craftercms/studio-ui`; EventSource cannot send
+     * custom headers and would always be rejected with HTTP 401.
+     */
+    var startStream = useCallback(function () {
+        if (!siteId) {
+            dispatch(showSystemNotification({ message: 'No active site for log tail.' }));
+            return;
+        }
+        if (!selectedPath || !endpoint) {
+            // Should not happen in practice — `configuredFiles` always has at least
+            // one entry (the DEFAULT_FILES fallback). Fires only if siteId is empty
+            // or `<files>` was supplied with no usable children.
+            setStatus('error');
+            setErrorMessage('No log file selected for this widget.');
+            return;
+        }
+        // Cancel any prior stream / pending reconnect.
+        if (reconnectTimerRef.current != null) {
+            window.clearTimeout(reconnectTimerRef.current);
+            reconnectTimerRef.current = null;
+        }
+        if (abortRef.current) {
+            abortRef.current.abort();
+            abortRef.current = null;
+        }
+        var generation = ++generationRef.current;
+        var controller = new AbortController();
+        abortRef.current = controller;
+        setStatus('connecting');
+        setErrorMessage(null);
+        var url = endpoint;
+        void (function () { return __awaiter(_this, void 0, void 0, function () {
+            var res, e_1, msg, detail, body, parsed, reader, decoder, buffer, helloSeen, serverSentBye, _b, value, done, nl, rawLine, trimmed, evt, e_2, msg;
+            var _d, _e;
+            return __generator(this, function (_f) {
+                switch (_f.label) {
+                    case 0:
+                        _f.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, fetch(url, {
+                                method: 'GET',
+                                signal: controller.signal,
+                                credentials: 'include',
+                                headers: __assign(__assign({}, getGlobalHeaders()), { Accept: 'application/x-ndjson' })
+                            })];
+                    case 1:
+                        res = _f.sent();
+                        return [3 /*break*/, 3];
+                    case 2:
+                        e_1 = _f.sent();
+                        if (generation !== generationRef.current)
+                            return [2 /*return*/];
+                        if (controller.signal.aborted)
+                            return [2 /*return*/];
+                        msg = e_1 instanceof Error ? e_1.message : String(e_1);
+                        setStatus('error');
+                        setErrorMessage("Network error: ".concat(msg));
+                        return [2 /*return*/];
+                    case 3:
+                        if (generation !== generationRef.current)
+                            return [2 /*return*/];
+                        if (!(!res.ok || !res.body)) return [3 /*break*/, 8];
+                        detail = '';
+                        _f.label = 4;
+                    case 4:
+                        _f.trys.push([4, 6, , 7]);
+                        return [4 /*yield*/, res.text()];
+                    case 5:
+                        body = _f.sent();
+                        if (body) {
+                            try {
+                                parsed = JSON.parse(body);
+                                detail = parsed.error || ((_d = parsed.response) === null || _d === void 0 ? void 0 : _d.message) || body.slice(0, 500);
+                            }
+                            catch (_g) {
+                                detail = body.slice(0, 500);
+                            }
+                        }
+                        return [3 /*break*/, 7];
+                    case 6:
+                        _f.sent();
+                        return [3 /*break*/, 7];
+                    case 7:
+                        if (generation !== generationRef.current)
+                            return [2 /*return*/];
+                        setStatus('error');
+                        setErrorMessage("HTTP ".concat(res.status, " \u2014 ").concat(detail || res.statusText || 'no response body'));
+                        return [2 /*return*/];
+                    case 8:
+                        reader = res.body.getReader();
+                        decoder = new TextDecoder('utf-8');
+                        buffer = '';
+                        helloSeen = false;
+                        serverSentBye = false;
+                        _f.label = 9;
+                    case 9:
+                        _f.trys.push([9, 18, , 19]);
+                        _f.label = 10;
+                    case 10:
+                        return [4 /*yield*/, reader.read()];
+                    case 11:
+                        _b = _f.sent(), value = _b.value, done = _b.done;
+                        if (done)
+                            return [3 /*break*/, 17];
+                        if (!(generation !== generationRef.current)) return [3 /*break*/, 16];
+                        _f.label = 12;
+                    case 12:
+                        _f.trys.push([12, 14, , 15]);
+                        return [4 /*yield*/, reader.cancel()];
+                    case 13:
+                        _f.sent();
+                        return [3 /*break*/, 15];
+                    case 14:
+                        _f.sent();
+                        return [3 /*break*/, 15];
+                    case 15: return [2 /*return*/];
+                    case 16:
+                        buffer += decoder.decode(value, { stream: true });
+                        nl = void 0;
+                        while ((nl = buffer.indexOf('\n')) >= 0) {
+                            rawLine = buffer.slice(0, nl);
+                            buffer = buffer.slice(nl + 1);
+                            trimmed = rawLine.trim();
+                            if (!trimmed)
+                                continue;
+                            evt = null;
+                            try {
+                                evt = JSON.parse(trimmed);
+                            }
+                            catch (_h) {
+                                continue;
+                            }
+                            if (!evt || typeof evt.type !== 'string')
+                                continue;
+                            switch (evt.type) {
+                                case 'hello':
+                                    helloSeen = true;
+                                    setServerInfo({ path: evt.path, active: evt.active });
+                                    setErrorMessage(null);
+                                    setStatus('open');
+                                    break;
+                                case 'log':
+                                    if (typeof evt.line === 'string') {
+                                        appendLine(evt.line);
+                                    }
+                                    break;
+                                case 'rotated':
+                                    appendLine('--- log rotated ---');
+                                    break;
+                                case 'hb':
+                                    // Heartbeat — nothing to do; receipt confirms liveness.
+                                    break;
+                                case 'bye':
+                                    serverSentBye = true;
+                                    break;
+                                case 'error':
+                                    setStatus('error');
+                                    setErrorMessage((_e = evt.message) !== null && _e !== void 0 ? _e : 'Server reported an error.');
+                                    break;
+                            }
+                        }
+                        return [3 /*break*/, 10];
+                    case 17: return [3 /*break*/, 19];
+                    case 18:
+                        e_2 = _f.sent();
+                        if (generation !== generationRef.current)
+                            return [2 /*return*/];
+                        if (controller.signal.aborted)
+                            return [2 /*return*/];
+                        msg = e_2 instanceof Error ? e_2.message : String(e_2);
+                        setStatus('error');
+                        setErrorMessage(helloSeen ? "Stream interrupted: ".concat(msg) : "Connection failed: ".concat(msg));
+                        return [2 /*return*/];
+                    case 19:
+                        if (generation !== generationRef.current)
+                            return [2 /*return*/];
+                        // Stream closed cleanly. If the server sent `bye` we reconnect (it
+                        // closes the response after MAX_RUN_MILLIS to avoid pinning a thread).
+                        if (serverSentBye) {
+                            setStatus('connecting');
+                            reconnectTimerRef.current = window.setTimeout(function () {
+                                reconnectTimerRef.current = null;
+                                startStream();
+                            }, RECONNECT_AFTER_BYE_MS);
+                        }
+                        else {
+                            setStatus('closed');
+                        }
+                        return [2 /*return*/];
+                }
+            });
+        }); })();
+    }, [appendLine, dispatch, endpoint, selectedPath, siteId]);
+    // Auto-start when the panel mounts; auto-close when it unmounts.
+    useEffect(function () {
+        startStream();
+        return function () {
+            closeStream();
+        };
+    }, [closeStream, startStream]);
+    // Pause when the tab is hidden so we don't pile up entries while not visible.
+    useEffect(function () {
+        var onVisibility = function () {
+            if (document.hidden) {
+                closeStream();
+            }
+            else if (status !== 'open' && status !== 'connecting') {
+                startStream();
+            }
+        };
+        document.addEventListener('visibilitychange', onVisibility);
+        return function () { return document.removeEventListener('visibilitychange', onVisibility); };
+    }, [closeStream, startStream, status]);
+    // Auto-scroll to bottom when new entries arrive.
+    useEffect(function () {
+        if (!autoScroll)
+            return;
+        var el = scrollRef.current;
+        if (el) {
+            el.scrollTop = el.scrollHeight;
+        }
+    }, [autoScroll, entries.length]);
+    useEffect(function () {
+        if (!isFullscreen)
+            return undefined;
+        var onKey = function (e) {
+            if (e.key === 'Escape') {
+                setIsFullscreen(false);
+                if (document.fullscreenElement) {
+                    void document.exitFullscreen().catch(function () { return undefined; });
+                }
+            }
+        };
+        window.addEventListener('keydown', onKey);
+        return function () { return window.removeEventListener('keydown', onKey); };
+    }, [isFullscreen]);
+    var toggleFullscreen = useCallback(function () {
+        var _a;
+        var el = fullscreenRef.current;
+        if (!el)
+            return;
+        var goingFullscreen = document.fullscreenElement !== el;
+        setIsFullscreen(goingFullscreen);
+        if (goingFullscreen) {
+            try {
+                var p = (_a = el.requestFullscreen) === null || _a === void 0 ? void 0 : _a.call(el);
+                if (p && typeof p.catch === 'function') {
+                    p.catch(function () { return undefined; });
+                }
+            }
+            catch (_b) {
+                /* CSS overlay covers it */
+            }
+        }
+        else if (document.fullscreenElement) {
+            void document.exitFullscreen().catch(function () { return undefined; });
+        }
+    }, []);
+    var toggleEntry = useCallback(function (id) {
+        setEntries(function (prev) { return prev.map(function (e) { return (e.id === id ? __assign(__assign({}, e), { open: !e.open }) : e); }); });
+    }, []);
+    var onClear = useCallback(function () { return setEntries([]); }, []);
+    var _k = useState(false), dropAllInFlight = _k[0], setDropAllInFlight = _k[1];
+    /**
+     * Server-side fan-out kill switch. Calls the companion plugin script
+     * `log-tail-drop-all`, which bumps a "drop generation" counter on the
+     * Studio servlet context. Every active streaming loop samples that
+     * counter once per iteration and exits cleanly when it changes, so all
+     * users — not just the one clicking this button — get cut off. Also
+     * closes our own local stream immediately, then notifies the user with
+     * how many connections were dropped.
+     */
+    var dropAllConnections = useCallback(function () { return __awaiter(_this, void 0, void 0, function () {
+        var ok, params, url, res, body, msg, dropped, e_3, msg;
+        var _b;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
+                case 0:
+                    if (dropAllInFlight)
+                        return [2 /*return*/];
+                    if (!siteId) {
+                        dispatch(showSystemNotification({ message: 'No active site for log tail.' }));
+                        return [2 /*return*/];
+                    }
+                    ok = window.confirm('Drop ALL active log-tail connections for every user in this Studio?\n\n' +
+                        'Each affected viewer will need to click Start to reconnect.');
+                    if (!ok)
+                        return [2 /*return*/];
+                    setDropAllInFlight(true);
+                    closeStream();
+                    _c.label = 1;
+                case 1:
+                    _c.trys.push([1, 7, 8, 9]);
+                    params = new URLSearchParams();
+                    params.set('siteId', siteId);
+                    url = "/studio/api/2/plugin/script/plugins/org/rd/plugin/uigoodies/log-tail-drop-all?".concat(params.toString());
+                    return [4 /*yield*/, fetch(url, {
+                            method: 'GET',
+                            credentials: 'include',
+                            headers: __assign(__assign({}, getGlobalHeaders()), { Accept: 'application/json' })
+                        })];
+                case 2:
+                    res = _c.sent();
+                    body = {};
+                    _c.label = 3;
+                case 3:
+                    _c.trys.push([3, 5, , 6]);
+                    return [4 /*yield*/, res.json()];
+                case 4:
+                    body = (_c.sent());
+                    return [3 /*break*/, 6];
+                case 5:
+                    _c.sent();
+                    return [3 /*break*/, 6];
+                case 6:
+                    if (!res.ok) {
+                        msg = body.error || res.statusText || "HTTP ".concat(res.status);
+                        dispatch(showSystemNotification({ message: "Drop all failed: ".concat(msg) }));
+                        return [2 /*return*/];
+                    }
+                    dropped = (_b = body.previousActive) !== null && _b !== void 0 ? _b : 0;
+                    dispatch(showSystemNotification({
+                        message: dropped === 0
+                            ? 'No active log-tail connections to drop.'
+                            : "Dropped ".concat(dropped, " active log-tail connection").concat(dropped === 1 ? '' : 's', ".")
+                    }));
+                    return [3 /*break*/, 9];
+                case 7:
+                    e_3 = _c.sent();
+                    msg = e_3 instanceof Error ? e_3.message : String(e_3);
+                    dispatch(showSystemNotification({ message: "Drop all error: ".concat(msg) }));
+                    return [3 /*break*/, 9];
+                case 8:
+                    setDropAllInFlight(false);
+                    return [7 /*endfinally*/];
+                case 9: return [2 /*return*/];
+            }
+        });
+    }); }, [closeStream, dispatch, dropAllInFlight, siteId]);
+    var filtered = useMemo(function () {
+        var q = filter.trim().toLowerCase();
+        if (!q && levelFilter === 'ALL') {
+            return entries;
+        }
+        return entries.filter(function (e) {
+            if (levelFilter !== 'ALL' && e.level !== levelFilter)
+                return false;
+            if (!q)
+                return true;
+            var haystack = __spreadArray([e.head], e.trace, true).join('\n').toLowerCase();
+            return haystack.includes(q);
+        });
+    }, [entries, filter, levelFilter]);
+    // Render Select menus inside the fullscreen container while the panel is
+    // fullscreen. MUI's default is to portal menus into `document.body`, but
+    // `document.fullscreenElement` masks everything outside its subtree, so a
+    // body-level portal would be invisible. Re-memoize whenever fullscreen
+    // changes so the underlying Popover picks up the new container.
+    var selectMenuProps = useMemo(function () { return ({
+        MenuProps: {
+            container: function () { return (isFullscreen ? fullscreenRef.current : document.body); }
+        }
+    }); }, [isFullscreen]);
+    return (jsxRuntimeExports.jsxs(Box$1, { ref: fullscreenRef, sx: __assign({ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 480, p: 2, gap: 1.5, boxSizing: 'border-box', bgcolor: 'background.default' }, (isFullscreen && {
+            position: 'fixed',
+            inset: 0,
+            width: '100vw',
+            height: '100vh',
+            minHeight: '100vh',
+            zIndex: function (theme) { return theme.zIndex.modal + 100; },
+            overflow: 'auto'
+        })), children: [jsxRuntimeExports.jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }, children: [jsxRuntimeExports.jsx(TerminalRoundedIcon, { color: "primary" }), jsxRuntimeExports.jsx(Typography, { variant: "h5", component: "h1", sx: { flex: 1 }, children: "Log Tail" }), jsxRuntimeExports.jsx(Tooltip, { title: isFullscreen ? 'Exit full screen' : 'Full screen', children: jsxRuntimeExports.jsx(IconButton$1, { size: "small", onClick: toggleFullscreen, "aria-label": isFullscreen ? 'Exit full screen' : 'Enter full screen', sx: { flexShrink: 0 }, children: isFullscreen ? jsxRuntimeExports.jsx(FullscreenExitRoundedIcon, {}) : jsxRuntimeExports.jsx(FullscreenRoundedIcon, {}) }) })] }), jsxRuntimeExports.jsxs(Box$1, { sx: { display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }, children: [jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "Active site", value: siteId !== null && siteId !== void 0 ? siteId : '', disabled: true, sx: { minWidth: 160 } }), configuredFiles.length > 1 ? (jsxRuntimeExports.jsx(TextField$1, { select: true, size: "small", label: "Log file", value: selectedPath, onChange: function (e) { return setSelectedPath(e.target.value); }, sx: { minWidth: 220 }, SelectProps: selectMenuProps, children: configuredFiles.map(function (f) { return (jsxRuntimeExports.jsx(MenuItem$1, { value: f.path, children: f.label || f.path }, f.path)); }) })) : null, jsxRuntimeExports.jsx(Chip, { label: status === 'open'
+                            ? 'Streaming'
+                            : status === 'connecting'
+                                ? 'Connecting…'
+                                : status === 'error'
+                                    ? 'Connection error'
+                                    : status === 'closed'
+                                        ? 'Disconnected'
+                                        : 'Idle', color: status === 'open'
+                            ? 'success'
+                            : status === 'connecting'
+                                ? 'info'
+                                : status === 'error'
+                                    ? 'error'
+                                    : 'default', size: "small" }), (serverInfo === null || serverInfo === void 0 ? void 0 : serverInfo.active) != null && (jsxRuntimeExports.jsx(Chip, { label: "active connections: ".concat(serverInfo.active), size: "small", variant: "outlined" })), jsxRuntimeExports.jsx(Box$1, { sx: { flex: 1 } }), jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "Filter", placeholder: "Search line text\u2026", value: filter, onChange: function (e) { return setFilter(e.target.value); }, sx: { minWidth: 200, flex: '0 1 280px' } }), jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "Level", value: levelFilter, onChange: function (e) { return setLevelFilter(e.target.value); }, sx: { width: 130 }, SelectProps: selectMenuProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "ALL", children: "All" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "ERROR", children: "Error" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "WARN", children: "Warn" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "INFO", children: "Info" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "DEBUG", children: "Debug" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "TRACE", children: "Trace" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "OTHER", children: "Other" })] }), jsxRuntimeExports.jsx(Button$1, { size: "small", variant: autoScroll ? 'contained' : 'outlined', onClick: function () { return setAutoScroll(function (v) { return !v; }); }, children: autoScroll ? 'Auto-scroll: on' : 'Auto-scroll: off' }), status === 'open' || status === 'connecting' ? (jsxRuntimeExports.jsx(Tooltip, { title: "Close this panel\u2019s streaming request only. Other users keep streaming.", children: jsxRuntimeExports.jsx(Button$1, { size: "small", variant: "outlined", onClick: closeStream, startIcon: jsxRuntimeExports.jsx(StopRoundedIcon, {}), children: "Stop" }) })) : (jsxRuntimeExports.jsx(Tooltip, { title: "Open a streaming connection for the selected log file.", children: jsxRuntimeExports.jsx(Button$1, { size: "small", variant: "outlined", onClick: startStream, startIcon: jsxRuntimeExports.jsx(PlayArrowRoundedIcon, {}), children: "Start" }) })), jsxRuntimeExports.jsx(Tooltip, { title: "Remove all lines from this view only. Does not truncate log files on the server.", children: jsxRuntimeExports.jsx("span", { children: jsxRuntimeExports.jsx(Button$1, { size: "small", variant: "outlined", onClick: onClear, startIcon: jsxRuntimeExports.jsx(DeleteSweepRoundedIcon, {}), children: "Clear" }) }) }), jsxRuntimeExports.jsx(Tooltip, { title: "Server-wide: close every active log-tail stream for ALL users in this Studio. Frees server-side tail slots; log files on disk are unchanged.", children: jsxRuntimeExports.jsx("span", { children: jsxRuntimeExports.jsx(Button$1, { size: "small", variant: "outlined", color: "error", onClick: dropAllConnections, disabled: dropAllInFlight, startIcon: jsxRuntimeExports.jsx(PowerSettingsNewRoundedIcon, {}), children: dropAllInFlight ? 'Dropping…' : 'Drop all connections' }) }) })] }), status === 'error' && errorMessage && (jsxRuntimeExports.jsxs(Paper, { variant: "outlined", sx: {
+                    p: 1.25,
+                    bgcolor: 'rgba(244, 67, 54, 0.08)',
+                    borderColor: 'rgba(244, 67, 54, 0.5)',
+                    color: 'error.main',
+                    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+                    fontSize: 12.5,
+                    whiteSpace: 'pre-wrap',
+                    wordBreak: 'break-word'
+                }, children: [jsxRuntimeExports.jsx("strong", { children: "Log tail server error:" }), " ", errorMessage] })), jsxRuntimeExports.jsx(Paper, { variant: "outlined", ref: scrollRef, sx: {
+                    flex: 1,
+                    minHeight: 0,
+                    overflow: 'auto',
+                    p: 0,
+                    bgcolor: theme.palette.mode === 'dark' ? '#101418' : theme.palette.grey[100],
+                    color: theme.palette.mode === 'dark' ? '#e6e6e6' : theme.palette.text.primary,
+                    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+                    fontSize: 12.5,
+                    lineHeight: 1.45
+                }, children: filtered.length > 0 ? (filtered.map(function (entry) { return (jsxRuntimeExports.jsx(LogEntryRow, { entry: entry, onToggle: toggleEntry }, entry.id)); })) : entries.length > 0 ? (jsxRuntimeExports.jsxs(Box$1, { sx: { p: 2, color: 'text.secondary' }, children: [jsxRuntimeExports.jsx(Typography, { variant: "body2", component: "p", sx: { mb: 1 }, children: "No log entries match the current filter or level." }), (filter.trim() || levelFilter !== 'ALL') && (jsxRuntimeExports.jsxs(Typography, { variant: "caption", component: "p", sx: { fontFamily: 'monospace' }, children: [filter.trim() ? "Filter: \"".concat(filter.trim(), "\"") : null, filter.trim() && levelFilter !== 'ALL' ? ' · ' : null, levelFilter !== 'ALL' ? "Level: ".concat(levelFilter) : null, ' — ', entries.length, " entr", entries.length === 1 ? 'y' : 'ies', " loaded"] }))] })) : (jsxRuntimeExports.jsx(Box$1, { sx: { p: 2, color: 'text.secondary' }, children: status === 'connecting'
+                        ? 'Connecting to log stream…'
+                        : status === 'error'
+                            ? errorMessage !== null && errorMessage !== void 0 ? errorMessage : 'Connection error. Click Start to retry.'
+                            : status === 'closed'
+                                ? 'Stopped.'
+                                : 'Waiting for log lines…' })) })] }));
+}
+function LogEntryRow(_a) {
+    var entry = _a.entry, onToggle = _a.onToggle;
+    var theme = useTheme();
+    var isDark = theme.palette.mode === 'dark';
+    var palette = (isDark ? LEVEL_COLORS_DARK : LEVEL_COLORS_LIGHT)[entry.level];
+    var hasTrace = entry.trace.length > 0;
+    return (jsxRuntimeExports.jsxs(Box$1, { sx: {
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: 1,
+            px: 1.5,
+            py: 0.5,
+            borderBottom: '1px solid',
+            borderColor: 'divider',
+            bgcolor: palette.bg,
+            color: palette.fg,
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-word'
+        }, children: [jsxRuntimeExports.jsx(Box$1, { sx: {
+                    width: 50,
+                    flexShrink: 0,
+                    fontSize: 10,
+                    fontWeight: 700,
+                    color: '#fff',
+                    bgcolor: palette.chip,
+                    borderRadius: 0.5,
+                    textAlign: 'center',
+                    py: 0.25,
+                    mt: 0.25
+                }, children: entry.level === 'OTHER' ? '·' : entry.level }), jsxRuntimeExports.jsxs(Box$1, { sx: { flex: 1, minWidth: 0 }, children: [jsxRuntimeExports.jsxs(Box$1, { sx: { display: 'flex', alignItems: 'flex-start', gap: 0.5 }, children: [hasTrace && (jsxRuntimeExports.jsx(IconButton$1, { size: "small", onClick: function () { return onToggle(entry.id); }, sx: { p: 0, color: 'inherit', mt: '-2px' }, "aria-label": entry.open ? 'Collapse stack trace' : 'Expand stack trace', children: entry.open ? (jsxRuntimeExports.jsx(KeyboardArrowDownRoundedIcon, { fontSize: "small" })) : (jsxRuntimeExports.jsx(KeyboardArrowRightRoundedIcon, { fontSize: "small" })) })), jsxRuntimeExports.jsx(Box$1, { sx: { flex: 1, minWidth: 0 }, children: entry.head }), hasTrace && (jsxRuntimeExports.jsx(Box$1, { onClick: function () { return onToggle(entry.id); }, sx: {
+                                    cursor: 'pointer',
+                                    fontSize: 11,
+                                    px: 0.75,
+                                    py: 0.25,
+                                    borderRadius: 0.5,
+                                    border: '1px solid',
+                                    borderColor: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)',
+                                    color: isDark ? '#ffd6a8' : '#b45309',
+                                    flexShrink: 0,
+                                    ml: 1
+                                }, children: entry.open ? 'hide trace' : "".concat(entry.trace.length, " trace line").concat(entry.trace.length === 1 ? '' : 's') }))] }), hasTrace && entry.open && (jsxRuntimeExports.jsx(Box$1, { sx: {
+                            mt: 0.5,
+                            pl: 2,
+                            borderLeft: '2px solid',
+                            borderColor: isDark ? 'rgba(255,214,168,0.4)' : 'rgba(234, 88, 12, 0.35)',
+                            color: isDark ? '#c8c8c8' : 'text.secondary',
+                            fontSize: 12
+                        }, children: entry.trace.map(function (line, i) { return (jsxRuntimeExports.jsx(Box$1, { children: line }, i)); }) }))] })] }));
+}
+
 var plugin = {
     locales: undefined,
     scripts: undefined,
@@ -34349,8 +35387,9 @@ var plugin = {
         'org.rd.plugin.uigoodies.DeviceSimulatorFlyoutToolbarButton': DeviceSimulatorFlyoutToolbarButton,
         'org.rd.plugin.uigoodies.openCannedSearchPanelButton': OpenCannedSearchPanelButton,
         'org.rd.plugin.uigoodies.openCannedSearchToolbarButton': OpenCannedSearchToolbarButton,
-        'org.rd.plugin.uigoodies.OpenSearchPlayground': OpenSearchPlayground
+        'org.rd.plugin.uigoodies.OpenSearchPlayground': OpenSearchPlayground,
+        'org.rd.plugin.uigoodies.LogTail': LogTail
     }
 };
 
-export { AudienceTargetingFlyoutToolbarButton, BulkPublishView, ComponentPreviewPathNavigator, ContentUpload, CopyCurrentPageUrl, CrossSiteContentTypeCopy, DeviceSimulatorFlyoutToolbarButton, EditOrViewCurrent, OpenBulkPublishPanelButton, OpenBulkPublishToolbarButton, OpenCannedSearchPanelButton, OpenCannedSearchToolbarButton, OpenContentUploadPanelButton, OpenContentUploadToolbarButton, OpenSearchPlayground, PublishOrRequestPublish, PullPushRemoteButtons, ToolPanelAccordion, plugin as default };
+export { AudienceTargetingFlyoutToolbarButton, BulkPublishView, ComponentPreviewPathNavigator, ContentUpload, CopyCurrentPageUrl, CrossSiteContentTypeCopy, DeviceSimulatorFlyoutToolbarButton, EditOrViewCurrent, LogTail, OpenBulkPublishPanelButton, OpenBulkPublishToolbarButton, OpenCannedSearchPanelButton, OpenCannedSearchToolbarButton, OpenContentUploadPanelButton, OpenContentUploadToolbarButton, OpenSearchPlayground, PublishOrRequestPublish, PullPushRemoteButtons, ToolPanelAccordion, plugin as default };

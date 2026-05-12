@@ -2,7 +2,9 @@
 
 Toolbar **Pull** / **Push** actions against a named **remote** and **branches**. Useful when authors participate in a **DevContentOps** workflow (pull updates, push to an environment) without leaving Studio.
 
-## Configuration
+## Configuration (`config/studio/ui.xml`)
+
+**Placement:** under **`craftercms.components.PreviewToolbar`** → `leftSection`, `middleSection`, or `rightSection` → `widgets`.
 
 ```xml
 <widget id="org.rd.plugin.uigoodies.PullPushRemoteButtons">
