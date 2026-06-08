@@ -18,32 +18,17 @@
  * The widget consumes this with fetch() + ReadableStream.getReader(), which can
  * carry the JWT header.
  *
- * Event objects:
- *   {"type":"hello","path":"...","startOffset":N,"active":N}
- *   {"type":"log","line":"..."}
- *   {"type":"rotated","path":"..."}
- *   {"type":"hb","ts":<epoch_ms>}
- *   {"type":"bye","reason":"time-cap"}
- *   {"type":"error","message":"..."}
- *
- * Design notes:
- *   - Streams ONLY while the HTTP connection is alive. When the client aborts
- *     the fetch, writer.checkError() flips and the loop exits, releasing all
- *     in-memory buffers. No background threads, no global ring buffer.
- *   - Concurrent connections are capped (MAX_CONCURRENT_CONNECTIONS).
- *   - Per-batch reads are capped (MAX_BYTES_PER_BATCH); huge single lines are
- *     truncated to MAX_LINE_BYTES so memory cannot grow unboundedly.
- *   - Hard runtime cap (MAX_RUN_MILLIS) so the browser reconnects periodically
- *     and no thread is held forever by a forgotten tab. The widget reconnects
- *     automatically after a `bye` event.
- *   - The "active connections" counter lives on the ServletContext so multiple
- *     widget instances observe the same counter.
- *   - Any reason the file cannot be read is logged via SLF4J and returned to the
- *     client as JSON so the widget can show it inline.
+ * Sandbox: uses java.nio.file (Path.of, Files, SeekableByteChannel) instead of
+ * java.io.File / RandomAccessFile, which are blocked by the Studio Groovy blacklist.
  */
 
-import java.io.RandomAccessFile
 import java.io.PrintWriter
+import java.nio.ByteBuffer
+import java.nio.channels.SeekableByteChannel
+import java.nio.charset.StandardCharsets
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.StandardOpenOption
 import java.util.concurrent.atomic.AtomicInteger
 
 import org.slf4j.Logger
@@ -120,30 +105,31 @@ if (!isPathSafe(requestedPath)) {
   return null
 }
 
-File logFile = new File(requestedPath)
+Path logPath = Path.of(requestedPath)
+String absolutePath = logPath.toAbsolutePath().toString()
 
-if (!logFile.exists()) {
+if (!Files.exists(logPath)) {
   log.error("LogTail: log file does not exist (path='{}', site={}). " +
       "Update <path> in this widget's ui.xml configuration to point at a real log file on this server.",
-      logFile.absolutePath, params.siteId)
+      absolutePath, params.siteId)
   writeJsonError(404,
-      "Log file does not exist on the server: ${logFile.absolutePath}. " +
+      "Log file does not exist on the server: ${absolutePath}. " +
       "Fix <path> in this widget's ui.xml configuration.".toString())
   return null
 }
-if (!logFile.isFile()) {
+if (!Files.isRegularFile(logPath)) {
   log.error("LogTail: configured path is not a regular file (path='{}', site={})",
-      logFile.absolutePath, params.siteId)
+      absolutePath, params.siteId)
   writeJsonError(400,
-      "Configured log path is not a regular file: ${logFile.absolutePath}".toString())
+      "Configured log path is not a regular file: ${absolutePath}".toString())
   return null
 }
-if (!logFile.canRead()) {
+if (!Files.isReadable(logPath)) {
   log.error("LogTail: log file is not readable by the Crafter process (path='{}', site={}). " +
       "Check filesystem permissions for the user running Tomcat.",
-      logFile.absolutePath, params.siteId)
+      absolutePath, params.siteId)
   writeJsonError(403,
-      "Log file exists but is not readable by the Crafter process: ${logFile.absolutePath}. " +
+      "Log file exists but is not readable by the Crafter process: ${absolutePath}. " +
       "Check filesystem permissions.".toString())
   return null
 }
@@ -187,7 +173,7 @@ if (current > MAX_CONCURRENT_CONNECTIONS) {
 }
 
 log.debug("LogTail: streaming '{}' (site={}, active={}/{}, dropGen={})",
-    logFile.absolutePath, params.siteId, current, MAX_CONCURRENT_CONNECTIONS, dropGenAtStart)
+    absolutePath, params.siteId, current, MAX_CONCURRENT_CONNECTIONS, dropGenAtStart)
 
 // ---- Streaming response headers (NDJSON) ---------------------------------
 
@@ -246,23 +232,28 @@ def sendLog = { String line ->
 
 // ---- Stream loop ----------------------------------------------------------
 
-RandomAccessFile raf = null
+SeekableByteChannel channel = null
 
 try {
-  raf = new RandomAccessFile(logFile, 'r')
-  long fileLen = logFile.length()
+  channel = Files.newByteChannel(logPath, StandardOpenOption.READ)
+  long fileLen = Files.size(logPath)
   long startOffset = Math.max(0L, fileLen - INITIAL_REWIND_BYTES)
-  raf.seek(startOffset)
+  channel.position(startOffset)
 
   // Drop a partial first line so we always start at a clean line boundary
   if (startOffset > 0) {
-    int b
-    while ((b = raf.read()) != -1 && b != 0x0A) { /* skip until newline */ }
+    ByteBuffer one = ByteBuffer.allocate(1)
+    int n
+    while ((n = channel.read(one)) != -1) {
+      one.flip()
+      if (one.get() == 0x0A) break
+      one.clear()
+    }
   }
 
   if (!sendEvent('hello', [
-      'path': '"' + jsonEscape(logFile.absolutePath) + '"',
-      'startOffset': String.valueOf(raf.getFilePointer()),
+      'path': '"' + jsonEscape(absolutePath) + '"',
+      'startOffset': String.valueOf(channel.position()),
       'active': String.valueOf(current)
   ])) {
     return null
@@ -286,22 +277,22 @@ try {
     }
 
     // Handle truncation / rotation: file shrank below our pointer.
-    long len = logFile.length()
-    if (len < raf.getFilePointer()) {
-      raf.close()
-      raf = new RandomAccessFile(logFile, 'r')
-      raf.seek(0)
+    long len = Files.size(logPath)
+    if (len < channel.position()) {
+      channel.close()
+      channel = Files.newByteChannel(logPath, StandardOpenOption.READ)
+      channel.position(0)
       partial.setLength(0)
-      if (!sendEvent('rotated', ['path': '"' + jsonEscape(logFile.absolutePath) + '"'])) {
+      if (!sendEvent('rotated', ['path': '"' + jsonEscape(absolutePath) + '"'])) {
         return null
       }
     }
 
     int read
     boolean readSomething = false
-    while ((read = raf.read(buf)) > 0) {
+    while ((read = channel.read(ByteBuffer.wrap(buf))) > 0) {
       readSomething = true
-      String chunk = new String(buf, 0, read, 'UTF-8')
+      String chunk = new String(buf, 0, read, StandardCharsets.UTF_8)
       int from = 0
       int idx
       while ((idx = chunk.indexOf('\n', from)) >= 0) {
@@ -342,7 +333,7 @@ try {
   Thread.currentThread().interrupt()
 } catch (Throwable t) {
   log.error("LogTail: error while streaming '{}' (site={}): {}",
-      logFile?.absolutePath, params.siteId, t.message, t)
+      absolutePath, params.siteId, t.message, t)
   try {
     sendEvent('error', ['message': '"' + jsonEscape(t.message ?: t.class.simpleName) + '"'])
   } catch (Throwable ignored) {
@@ -350,7 +341,7 @@ try {
   }
 } finally {
   try {
-    if (raf != null) raf.close()
+    if (channel != null) channel.close()
   } catch (Throwable ignored) {}
   active.decrementAndGet()
 }

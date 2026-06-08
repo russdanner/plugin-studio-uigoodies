@@ -13,7 +13,7 @@ plugin:
   version:
     major: 1
     minor: 0
-    patch: 1
+    patch: 7
   description: A plugin to adds some UI goodies to your studio
   documentation: "https://raw.githubusercontent.com/russdanner/plugin-studio-uigoodies/master/README.md"
   website:
@@ -58,7 +58,7 @@ plugin:
 installation:
   - type: preview-app
     parentXpath: //reference[@id='craftercms.siteTools']
-    elementXpath: //widget[@id='org.rd.plugin.uigoodies.CrossSiteContentTypeCopy']
+    elementXpath: //reference[@id='craftercms.siteTools']//widget[@id='org.rd.plugin.uigoodies.CrossSiteContentTypeCopy']
     element:
       name: tools
       children:
@@ -93,7 +93,42 @@ installation:
                       value: index.js
   - type: preview-app
     parentXpath: //reference[@id='craftercms.siteTools']
-    elementXpath: //widget[@id='org.rd.plugin.uigoodies.OpenSearchPlayground']
+    elementXpath: //reference[@id='craftercms.siteTools']//widget[@id='org.rd.plugin.uigoodies.CrossSiteContentCopy']
+    element:
+      name: tools
+      children:
+        - name: tool
+          children:
+            - name: title
+              attributes:
+                - name: id
+                  value: uigoodies.crossSiteContentCopy.title
+                - name: defaultMessage
+                  value: Cross Site Copy
+            - name: icon
+              attributes:
+                - name: id
+                  value: "@mui/icons-material/ContentCopyOutlined"
+            - name: url
+              value: uigoodies-cross-site-content-copy
+            - name: widget
+              attributes:
+                - name: id
+                  value: org.rd.plugin.uigoodies.CrossSiteContentCopy
+              children:
+                - name: plugin
+                  attributes:
+                    - name: id
+                      value: org.rd.plugin.uigoodies
+                    - name: type
+                      value: apps
+                    - name: name
+                      value: uigoodies
+                    - name: file
+                      value: index.js
+  - type: preview-app
+    parentXpath: //reference[@id='craftercms.siteTools']
+    elementXpath: //reference[@id='craftercms.siteTools']//widget[@id='org.rd.plugin.uigoodies.OpenSearchPlayground']
     element:
       name: tools
       children:
@@ -128,7 +163,7 @@ installation:
                       value: index.js
   - type: preview-app
     parentXpath: //reference[@id='craftercms.siteTools']
-    elementXpath: //widget[@id='org.rd.plugin.uigoodies.LogTail']
+    elementXpath: //reference[@id='craftercms.siteTools']//widget[@id='org.rd.plugin.uigoodies.LogTail']
     element:
       name: tools
       children:

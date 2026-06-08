@@ -51,6 +51,7 @@ curl --location --request POST 'http://localhost:8080/studio/api/2/marketplace/c
 This plugin now includes auto-wiring in `craftercms-plugin.yaml` to add Project Tools entries:
 
 - **Copy Content Types (cross-project)** (URL: `uigoodies-cross-site-content-types`)
+- **Cross Site Copy** (URL: `uigoodies-cross-site-content-copy`) — copy content items (and optional dependencies) to another project
 - **OpenSearch playground** (URL: `uigoodies-opensearch-playground`) — raw OpenSearch DSL against Engine `search.json` for the active site
 - **Tomcat Log** (URL: `uigoodies-log-tail`) — live SSE tail of `catalina.out` via an Engine REST script; the server only streams while the panel is open
 
@@ -62,6 +63,17 @@ If your project manages `config/studio/ui.xml` manually, merge the generated too
 
 To build this plugin on your own, make your customizations as required, then run `yarn` and then `yarn dist` in the
 `uigoodies-components` folder. The output will be placed in the `/authoring` folder of this project.
+
+## CodeRabbit review (working tree)
+
+Review uncommitted plugin source with the [CodeRabbit CLI](https://docs.coderabbit.ai/cli):
+
+```bash
+cr auth login
+./scripts/coderabbit-review-working-tree.sh
+```
+
+By default the script reviews changes under `src/packages/uigoodies-components/src`, `authoring/scripts`, and `docs` (not the generated bundle in `authoring/static-assets/`). Use `--full` for the entire working tree, or `--dir PATH` for a single path. Agent-friendly output: `./scripts/coderabbit-review-working-tree.sh --agent`.
 
 # Widgets
 
@@ -85,6 +97,7 @@ Registered widgets use plugin id **`org.rd.plugin.uigoodies`**, app **`uigoodies
 | `org.rd.plugin.uigoodies.openCannedSearchPanelButton` | Sidebar shortcut to Search (replaces standalone canned-search plugin). | [open-canned-search-panel-button.md](docs/widgets/open-canned-search-panel-button.md) |
 | `org.rd.plugin.uigoodies.openCannedSearchToolbarButton` | Toolbar shortcut to Search with the same options as the sidebar widget. | [open-canned-search-toolbar-button.md](docs/widgets/open-canned-search-toolbar-button.md) |
 | `org.rd.plugin.uigoodies.CrossSiteContentTypeCopy` | Project tool: copy `config.xml` + `form-definition.xml` for content types between sites. | [cross-site-content-type-copy.md](docs/widgets/cross-site-content-type-copy.md) |
+| `org.rd.plugin.uigoodies.CrossSiteContentCopy` | Project tool: multi-select cross-site content copy with plan preview, per-item actions, and switch-to-destination after copy. | [cross-site-content-copy.md](docs/widgets/cross-site-content-copy.md) |
 | `org.rd.plugin.uigoodies.ComponentPreviewPathNavigator` | Path navigator that opens headless/component preview URLs with path mapping. | [component-preview-path-navigator.md](docs/widgets/component-preview-path-navigator.md) |
 | `org.rd.plugin.uigoodies.OpenSearchPlayground` | Project tool: Explorer + Dictionary tabs for schema/content-type discovery, expanded Search API options, and raw OpenSearch JSON against Engine `search.json`. | [open-search-playground.md](docs/widgets/open-search-playground.md) |
 | `org.rd.plugin.uigoodies.LogTail` | Project tool: SSE live tail of `catalina.out` (colorized, collapsible stack traces, fullscreen). Server-side script streams only while the panel is open. | [log-tail.md](docs/widgets/log-tail.md) |

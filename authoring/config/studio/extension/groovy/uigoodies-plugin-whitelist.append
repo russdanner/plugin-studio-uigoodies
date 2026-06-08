@@ -1,0 +1,77 @@
+# Studio UI Goodies plugin (org.rd.plugin.uigoodies) — append to site whitelist when
+# studio.scripting.sandbox.whitelist.enable is true.
+# See docs/GROOVY_SANDBOX.md
+
+# Beans (applicationContext.get)
+method org.craftercms.commons.spring.context.ApplicationContextAccessor get java.lang.String
+
+# Content (bean: cstudioContentService)
+method org.craftercms.studio.api.v1.service.content.ContentService contentExists java.lang.String java.lang.String
+method org.craftercms.studio.api.v1.service.content.ContentService getContentItem java.lang.String java.lang.String
+method org.craftercms.studio.api.v1.service.content.ContentService getContentItemTree java.lang.String java.lang.String int
+method org.craftercms.studio.api.v1.service.content.ContentService getContent java.lang.String java.lang.String
+method org.craftercms.studio.api.v1.service.content.ContentService writeContent java.lang.String java.lang.String java.lang.String java.lang.String java.io.InputStream java.lang.String java.lang.String java.lang.String
+method org.craftercms.studio.api.v1.service.content.ContentService writeContentAsset java.lang.String java.lang.String java.lang.String java.io.InputStream java.lang.String java.lang.String java.lang.String java.lang.String java.lang.String java.lang.String java.lang.String
+method org.craftercms.studio.api.v1.service.content.ContentService createFolder java.lang.String java.lang.String java.lang.String
+
+# Dependencies (bean: dependencyServiceInternal)
+method org.craftercms.studio.api.v2.service.dependency.internal.DependencyServiceInternal getItemSpecificDependencies java.lang.String java.lang.String
+method org.craftercms.studio.api.v2.service.dependency.internal.DependencyServiceInternal getItemSpecificDependencies java.lang.String java.util.List
+
+# ContentItemTO
+method org.craftercms.studio.api.v1.to.ContentItemTO getUri
+method org.craftercms.studio.api.v1.to.ContentItemTO getChildren
+method org.craftercms.studio.api.v1.to.ContentItemTO getFolder
+method org.craftercms.studio.api.v1.to.ContentItemTO getContentType
+
+# IO (cross-site copy)
+new java.io.ByteArrayInputStream byte[]
+method java.io.InputStream close
+method java.io.InputStream readAllBytes
+
+# NIO (log tail — avoids blacklisted java.io.File / RandomAccessFile)
+staticMethod java.nio.file.Path of java.lang.String
+staticMethod java.nio.file.Path of java.lang.String java.lang.String[]
+method java.nio.file.Path toAbsolutePath
+method java.nio.file.Path toString
+staticMethod java.nio.file.Files exists java.nio.file.Path java.nio.file.LinkOption[]
+staticMethod java.nio.file.Files isRegularFile java.nio.file.Path java.nio.file.LinkOption[]
+staticMethod java.nio.file.Files isReadable java.nio.file.Path
+staticMethod java.nio.file.Files size java.nio.file.Path
+staticMethod java.nio.file.Files newByteChannel java.nio.file.Path java.nio.file.OpenOption[]
+method java.nio.channels.SeekableByteChannel position long
+method java.nio.channels.SeekableByteChannel position
+method java.nio.channels.SeekableByteChannel read java.nio.ByteBuffer
+method java.nio.channels.SeekableByteChannel close
+staticMethod java.nio.ByteBuffer allocate int
+staticMethod java.nio.ByteBuffer wrap byte[]
+method java.nio.ByteBuffer flip
+method java.nio.ByteBuffer clear
+method java.nio.ByteBuffer get
+method java.nio.charset.Charset forName java.lang.String
+
+# Servlet / streaming
+method javax.servlet.http.HttpServletRequest getReader
+method javax.servlet.http.HttpServletRequest getServletContext
+method javax.servlet.http.HttpServletRequest getRemoteAddr
+method javax.servlet.http.HttpServletRequest getRemoteUser
+method javax.servlet.ServletContext getAttribute java.lang.String
+method javax.servlet.ServletContext setAttribute java.lang.String java.lang.Object
+method javax.servlet.http.HttpServletResponse setStatus int
+method javax.servlet.http.HttpServletResponse setContentType java.lang.String
+method javax.servlet.http.HttpServletResponse setCharacterEncoding java.lang.String
+method javax.servlet.http.HttpServletResponse setHeader java.lang.String java.lang.String
+method javax.servlet.http.HttpServletResponse flushBuffer
+method javax.servlet.http.HttpServletResponse getWriter
+method java.io.PrintWriter print java.lang.String
+method java.io.PrintWriter flush
+method java.io.PrintWriter checkError
+
+# Concurrency (log tail drop-all / active connection cap)
+new java.util.concurrent.atomic.AtomicInteger
+new java.util.concurrent.atomic.AtomicInteger int
+method java.util.concurrent.atomic.AtomicInteger get
+method java.util.concurrent.atomic.AtomicInteger incrementAndGet
+method java.util.concurrent.atomic.AtomicInteger decrementAndGet
+staticMethod java.lang.Thread sleep long
+staticMethod java.lang.Thread currentThread

@@ -1,19 +1,20 @@
-const React = craftercms.libs.React;
-const { useState, useRef, useEffect, useMemo, useCallback, createContext, useSyncExternalStore, useId, useImperativeHandle, useLayoutEffect, useContext, forwardRef } = craftercms.libs.React;
-const React__default = craftercms.libs.React && Object.prototype.hasOwnProperty.call(craftercms.libs.React, 'default') ? craftercms.libs.React['default'] : craftercms.libs.React;
+const { jsx, Fragment, jsxs } = craftercms.libs.reactJsxRuntime;
 const { useSelector, useDispatch } = craftercms.libs.ReactRedux;
-const { Tooltip, useTheme, accordionClasses, accordionSummaryClasses, Accordion, AccordionSummary, Typography, AccordionDetails, Button: Button$1, CircularProgress, alpha, buttonClasses, Backdrop, Alert, Paper, Box: Box$1, AlertTitle, Stepper, Step, StepLabel, Autocomplete, TextField: TextField$1, FormControlLabel, Checkbox, List, ListItem, InputAdornment, ListItemText, Chip, IconButton: IconButton$1, Menu: Menu$1, MenuItem: MenuItem$1, Divider, Dialog, DialogTitle, DialogContent, DialogActions, Collapse, useMediaQuery, Tabs, Tab } = craftercms.libs.MaterialUI;
+const { Tooltip, useTheme, accordionClasses, accordionSummaryClasses, Accordion, AccordionSummary, Typography, AccordionDetails, Button: Button$1, CircularProgress, alpha, buttonClasses, Backdrop, Alert, Paper, Box: Box$1, AlertTitle, Stepper, Step, StepLabel, Autocomplete, TextField: TextField$1, FormControlLabel, Checkbox, List, ListItem, Stack: Stack$1, TableRow, TableCell, IconButton: IconButton$1, Menu: Menu$1, MenuItem: MenuItem$1, Divider, Chip, Table, TableHead, TableBody, InputAdornment, ListItemText, Dialog, DialogTitle, DialogContent, DialogActions, Collapse, useMediaQuery, Tabs, Tab } = craftercms.libs.MaterialUI;
 const IconButton = craftercms.libs.MaterialUI.IconButton && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.IconButton, 'default') ? craftercms.libs.MaterialUI.IconButton['default'] : craftercms.libs.MaterialUI.IconButton;
 const Button = craftercms.libs.MaterialUI.Button && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Button, 'default') ? craftercms.libs.MaterialUI.Button['default'] : craftercms.libs.MaterialUI.Button;
 const SystemIcon = craftercms.components.SystemIcon && Object.prototype.hasOwnProperty.call(craftercms.components.SystemIcon, 'default') ? craftercms.components.SystemIcon['default'] : craftercms.components.SystemIcon;
 const { isItemLockedForMe } = craftercms.utils.content;
+const React = craftercms.libs.React;
+const { useState, useRef, useEffect, useMemo, useCallback, createContext, useSyncExternalStore, useId, useImperativeHandle, useLayoutEffect, useContext, forwardRef } = craftercms.libs.React;
+const React__default = craftercms.libs.React && Object.prototype.hasOwnProperty.call(craftercms.libs.React, 'default') ? craftercms.libs.React['default'] : craftercms.libs.React;
 const { SystemIcon: SystemIcon$1, WidgetsGrid, DialogBody, DialogFooter: DialogFooter$1 } = craftercms.components;
 const ExpandMore = craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreOutlined') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreOutlined'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreOutlined')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreOutlined');
 const { createCustomDocumentEventListener } = craftercms.utils.dom;
 const TextField = craftercms.libs.MaterialUI.TextField && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.TextField, 'default') ? craftercms.libs.MaterialUI.TextField['default'] : craftercms.libs.MaterialUI.TextField;
 const Container = craftercms.libs.MaterialUI.Container && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Container, 'default') ? craftercms.libs.MaterialUI.Container['default'] : craftercms.libs.MaterialUI.Container;
 const Box = craftercms.libs.MaterialUI.Box && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Box, 'default') ? craftercms.libs.MaterialUI.Box['default'] : craftercms.libs.MaterialUI.Box;
-const { writeContent } = craftercms.services.content;
+const { writeContent, fetchDetailedItems } = craftercms.services.content;
 const { DialogFooter, PathNavigator } = craftercms.components;
 const ToolsPanelListItemButton = craftercms.components.ToolsPanelListItemButton && Object.prototype.hasOwnProperty.call(craftercms.components.ToolsPanelListItemButton, 'default') ? craftercms.components.ToolsPanelListItemButton['default'] : craftercms.components.ToolsPanelListItemButton;
 const Tooltip$1 = craftercms.libs.MaterialUI.Tooltip && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Tooltip, 'default') ? craftercms.libs.MaterialUI.Tooltip['default'] : craftercms.libs.MaterialUI.Tooltip;
@@ -23,7 +24,7 @@ const PublishIcon = craftercms.utils.constants.components.get('@mui/icons-materi
 const Snackbar = craftercms.libs.MaterialUI.Snackbar && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Snackbar, 'default') ? craftercms.libs.MaterialUI.Snackbar['default'] : craftercms.libs.MaterialUI.Snackbar;
 const { FormattedMessage } = craftercms.libs.ReactIntl;
 const { of, from, concatMap: concatMap$1, forkJoin } = craftercms.libs.rxjs;
-const { concatMap, expand, toArray, catchError, switchMap } = craftercms.libs.rxjs;
+const { concatMap, expand, toArray, catchError, switchMap, map } = craftercms.libs.rxjs;
 const { fetchUnpublished } = craftercms.services.dashboard;
 const { nou } = craftercms.utils.object;
 const { lookupItemByPath } = craftercms.utils.content;
@@ -35,6 +36,12 @@ const MenuItem = craftercms.libs.MaterialUI.MenuItem && Object.prototype.hasOwnP
 const ExpandMoreRounded = craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreRounded');
 const { fetchContentTypes } = craftercms.services.contentTypes;
 const { fetchConfigurationXML, writeConfiguration } = craftercms.services.configuration;
+const { createSvgIcon } = craftercms.libs.MaterialUI;
+const ItemPublishingTargetIcon = craftercms.components.ItemPublishingTargetIcon && Object.prototype.hasOwnProperty.call(craftercms.components.ItemPublishingTargetIcon, 'default') ? craftercms.components.ItemPublishingTargetIcon['default'] : craftercms.components.ItemPublishingTargetIcon;
+const ItemStateIcon = craftercms.components.ItemStateIcon && Object.prototype.hasOwnProperty.call(craftercms.components.ItemStateIcon, 'default') ? craftercms.components.ItemStateIcon['default'] : craftercms.components.ItemStateIcon;
+const ItemTypeIcon = craftercms.components.ItemTypeIcon && Object.prototype.hasOwnProperty.call(craftercms.components.ItemTypeIcon, 'default') ? craftercms.components.ItemTypeIcon['default'] : craftercms.components.ItemTypeIcon;
+const { postJSON, getGlobalHeaders } = craftercms.utils.ajax;
+const { getRootPath } = craftercms.utils.path;
 const Popover = craftercms.libs.MaterialUI.Popover && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Popover, 'default') ? craftercms.libs.MaterialUI.Popover['default'] : craftercms.libs.MaterialUI.Popover;
 const Paper$1 = craftercms.libs.MaterialUI.Paper && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Paper, 'default') ? craftercms.libs.MaterialUI.Paper['default'] : craftercms.libs.MaterialUI.Paper;
 const Typography$1 = craftercms.libs.MaterialUI.Typography && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Typography, 'default') ? craftercms.libs.MaterialUI.Typography['default'] : craftercms.libs.MaterialUI.Typography;
@@ -62,45 +69,6 @@ const DeleteSweepRoundedIcon = craftercms.utils.constants.components.get('@mui/i
 const PowerSettingsNewRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/PowerSettingsNewRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/PowerSettingsNewRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/PowerSettingsNewRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/PowerSettingsNewRounded');
 const KeyboardArrowRightRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/KeyboardArrowRightRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/KeyboardArrowRightRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/KeyboardArrowRightRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/KeyboardArrowRightRounded');
 const TerminalRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/TerminalRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/TerminalRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/TerminalRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/TerminalRounded');
-const { getGlobalHeaders } = craftercms.utils.ajax;
-
-var jsxRuntime = {exports: {}};
-
-var reactJsxRuntime_production_min = {};
-
-/**
- * @license React
- * react-jsx-runtime.production.min.js
- *
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
-
-var hasRequiredReactJsxRuntime_production_min;
-
-function requireReactJsxRuntime_production_min () {
-	if (hasRequiredReactJsxRuntime_production_min) return reactJsxRuntime_production_min;
-	hasRequiredReactJsxRuntime_production_min = 1;
-var f=React__default,k=Symbol.for("react.element"),l=Symbol.for("react.fragment"),m=Object.prototype.hasOwnProperty,n=f.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentOwner,p={key:true,ref:true,__self:true,__source:true};
-	function q(c,a,g){var b,d={},e=null,h=null;void 0!==g&&(e=""+g);void 0!==a.key&&(e=""+a.key);void 0!==a.ref&&(h=a.ref);for(b in a)m.call(a,b)&&!p.hasOwnProperty(b)&&(d[b]=a[b]);if(c&&c.defaultProps)for(b in a=c.defaultProps,a) void 0===d[b]&&(d[b]=a[b]);return {$$typeof:k,type:c,key:e,ref:h,props:d,_owner:n.current}}reactJsxRuntime_production_min.Fragment=l;reactJsxRuntime_production_min.jsx=q;reactJsxRuntime_production_min.jsxs=q;
-	return reactJsxRuntime_production_min;
-}
-
-var hasRequiredJsxRuntime;
-
-function requireJsxRuntime () {
-	if (hasRequiredJsxRuntime) return jsxRuntime.exports;
-	hasRequiredJsxRuntime = 1;
-
-	{
-	  jsxRuntime.exports = requireReactJsxRuntime_production_min();
-	}
-	return jsxRuntime.exports;
-}
-
-var jsxRuntimeExports = requireJsxRuntime();
 
 /*
  * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
@@ -1133,10 +1101,15 @@ function formatProdErrorMessage(code) {
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// region History
+const showHistoryDialog = /*#__PURE__*/ createAction('SHOW_HISTORY_DIALOG');
 // endregion
 // region Publish
 const showPublishDialog = /*#__PURE__*/ createAction('SHOW_PUBLISH_DIALOG');
 const closePublishDialog = /*#__PURE__*/ createAction('CLOSE_PUBLISH_DIALOG');
+// endregion
+// region Dependencies
+const showDependenciesDialog = /*#__PURE__*/ createAction('SHOW_DEPENDENCIES_DIALOG');
 // endregion
 // region Legacy Form
 const showEditDialog = /*#__PURE__*/ createAction('SHOW_EDIT_DIALOG');
@@ -1178,7 +1151,7 @@ function EditOrViewCurrent(props) {
             }));
         }
     };
-    return useIcon ? (jsxRuntimeExports.jsx(Tooltip, { title: item ? "".concat(label, " (shift+e)") : '', children: jsxRuntimeExports.jsx(IconButton, { size: "small", onClick: handleClick, disabled: !item, children: jsxRuntimeExports.jsx(SystemIcon, { icon: { id: iconId } }) }) })) : (jsxRuntimeExports.jsx(Button, { size: "small", variant: "text", onClick: handleClick, disabled: !item, children: label }));
+    return useIcon ? (jsx(Tooltip, { title: item ? "".concat(label, " (shift+e)") : '', children: jsx(IconButton, { size: "small", onClick: handleClick, disabled: !item, children: jsx(SystemIcon, { icon: { id: iconId } }) }) })) : (jsx(Button, { size: "small", variant: "text", onClick: handleClick, disabled: !item, children: label }));
 }
 
 function PublishOrRequestPublish(props) {
@@ -1196,7 +1169,7 @@ function PublishOrRequestPublish(props) {
     var handleClick = function (event) {
         dispatch(showPublishDialog({ items: [item], onSuccess: closePublishDialog() }));
     };
-    return showButton === true ? (useIcon ? (jsxRuntimeExports.jsx(Tooltip, { title: item ? label : '', children: jsxRuntimeExports.jsx(IconButton, { size: "small", onClick: handleClick, disabled: !item, children: jsxRuntimeExports.jsx(SystemIcon, { icon: { id: iconId } }) }) })) : (jsxRuntimeExports.jsx(Button, { size: "small", variant: "text", onClick: handleClick, disabled: !item, children: label }))) : (jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, {}));
+    return showButton === true ? (useIcon ? (jsx(Tooltip, { title: item ? label : '', children: jsx(IconButton, { size: "small", onClick: handleClick, disabled: !item, children: jsx(SystemIcon, { icon: { id: iconId } }) }) })) : (jsx(Button, { size: "small", variant: "text", onClick: handleClick, disabled: !item, children: label }))) : (jsx(Fragment, {}));
 }
 
 /******************************************************************************
@@ -1299,7 +1272,7 @@ function ToolPanelAccordion(props) {
     var theme = useTheme();
     var expandedClass = accordionClasses.expanded;
     var contentClass = accordionSummaryClasses.content;
-    return (jsxRuntimeExports.jsxs(Accordion, { expanded: open, onChange: function (e, isExpanded) { return setOpen(isExpanded); }, sx: __assign((_a = { boxShadow: 0 }, _a["&.".concat(expandedClass)] = { margin: 0 }, _a), sxs === null || sxs === void 0 ? void 0 : sxs.accordion), children: [jsxRuntimeExports.jsxs(AccordionSummary, { expandIcon: jsxRuntimeExports.jsx(ExpandMore, {}), sx: __assign((_b = { alignItems: 'center' }, _b["&, &.".concat(expandedClass)] = { minHeight: '48px' }, _b[".".concat(contentClass, ", .").concat(contentClass, ".").concat(expandedClass)] = { margin: 0 }, _b), sxs === null || sxs === void 0 ? void 0 : sxs.accordionSummary), children: [icon && jsxRuntimeExports.jsx(SystemIcon$1, { icon: icon, style: { marginRight: '10px', color: theme.palette.action.active } }), jsxRuntimeExports.jsx(Typography, { children: title })] }), jsxRuntimeExports.jsx(AccordionDetails, { sx: __assign({ padding: 0 }, sxs === null || sxs === void 0 ? void 0 : sxs.accordionDetails), children: jsxRuntimeExports.jsx(WidgetsGrid, { container: true, spacing: 0, direction: "column", widgets: props.widgets, sx: sxs === null || sxs === void 0 ? void 0 : sxs.widgetsGrid }) })] }));
+    return (jsxs(Accordion, { expanded: open, onChange: function (e, isExpanded) { return setOpen(isExpanded); }, sx: __assign((_a = { boxShadow: 0 }, _a["&.".concat(expandedClass)] = { margin: 0 }, _a), sxs === null || sxs === void 0 ? void 0 : sxs.accordion), children: [jsxs(AccordionSummary, { expandIcon: jsx(ExpandMore, {}), sx: __assign((_b = { alignItems: 'center' }, _b["&, &.".concat(expandedClass)] = { minHeight: '48px' }, _b[".".concat(contentClass, ", .").concat(contentClass, ".").concat(expandedClass)] = { margin: 0 }, _b), sxs === null || sxs === void 0 ? void 0 : sxs.accordionSummary), children: [icon && jsx(SystemIcon$1, { icon: icon, style: { marginRight: '10px', color: theme.palette.action.active } }), jsx(Typography, { children: title })] }), jsx(AccordionDetails, { sx: __assign({ padding: 0 }, sxs === null || sxs === void 0 ? void 0 : sxs.accordionDetails), children: jsx(WidgetsGrid, { container: true, spacing: 0, direction: "column", widgets: props.widgets, sx: sxs === null || sxs === void 0 ? void 0 : sxs.widgetsGrid }) })] }));
 }
 
 /*
@@ -1347,7 +1320,7 @@ const dispatchDOMEvent = /*#__PURE__*/ createAction('DISPATCH_DOM_EVENT');
 
 var MyLoadingButton = function (props) {
     var loading = props.loading, children = props.children, rest = __rest(props, ["loading", "children"]);
-    return (jsxRuntimeExports.jsx(Button$1, __assign({ startIcon: loading ? jsxRuntimeExports.jsx(CircularProgress, { size: 16 }) : undefined }, rest, { children: children })));
+    return (jsx(Button$1, __assign({ startIcon: loading ? jsx(CircularProgress, { size: 16 }) : undefined }, rest, { children: children })));
 };
 
 function ContentUpload(props) {
@@ -1437,18 +1410,18 @@ function ContentUpload(props) {
             }
         });
     };
-    return (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsxs(Container, { sx: {
+    return (jsxs(Fragment, { children: [jsxs(Container, { sx: {
                     'padding-top': '40px',
                     'padding-bottom': '40px'
-                }, children: [jsxRuntimeExports.jsxs(Box, { sx: {
+                }, children: [jsxs(Box, { sx: {
                             display: 'flex',
                             marginBottom: '20px',
                             alignItems: 'center'
-                        }, children: [jsxRuntimeExports.jsx(TextField, { label: "Path to upload", id: "path-read-only-input", sx: { minWidth: '450px' }, InputProps: { readOnly: !props.allowPathInput }, value: path, onChange: props.allowPathInput
+                        }, children: [jsx(TextField, { label: "Path to upload", id: "path-read-only-input", sx: { minWidth: '450px' }, InputProps: { readOnly: !props.allowPathInput }, value: path, onChange: props.allowPathInput
                                     ? function (e) {
                                         setPath(e.target.value);
                                     }
-                                    : undefined }), props.allowPathSelection && (jsxRuntimeExports.jsx(Button, { variant: "outlined", onClick: handleSelectPath, disabled: processing, sx: { minWidth: '130px', marginLeft: '20px' }, children: "Select Path" }))] }), jsxRuntimeExports.jsx(Box, { sx: function (theme) { return ({
+                                    : undefined }), props.allowPathSelection && (jsx(Button, { variant: "outlined", onClick: handleSelectPath, disabled: processing, sx: { minWidth: '130px', marginLeft: '20px' }, children: "Select Path" }))] }), jsx(Box, { sx: function (theme) { return ({
                             'font-family': '"Source Sans Pro", "Open Sans", sans-serif',
                             '& input::file-selector-button': {
                                 display: 'inline-flex',
@@ -1484,9 +1457,9 @@ function ContentUpload(props) {
                                     border: "1px solid ".concat(theme.palette.primary.main)
                                 }
                             }
-                        }); }, children: jsxRuntimeExports.jsx("input", { ref: inputRef, type: "file", accept: ".xml", onChange: onFileChange, onClick: function () {
+                        }); }, children: jsx("input", { ref: inputRef, type: "file", accept: ".xml", onChange: onFileChange, onClick: function () {
                                 inputRef.current.value = null;
-                            } }) })] }), jsxRuntimeExports.jsx(DialogFooter, { children: jsxRuntimeExports.jsx(MyLoadingButton, { variant: "contained", onClick: handleUploadXMLFile, loading: processing, disabled: !content, sx: { minWidth: '130px' }, children: "Upload Content" }) })] }));
+                            } }) })] }), jsx(DialogFooter, { children: jsx(MyLoadingButton, { variant: "contained", onClick: handleUploadXMLFile, loading: processing, disabled: !content, sx: { minWidth: '130px' }, children: "Upload Content" }) })] }));
 }
 
 var CONTENT_UPLOAD_DEFAULTS = {
@@ -1541,7 +1514,7 @@ function useOpenBulkPublish(props) {
 function OpenContentUploadPanelButton(props) {
     var _a = props.title, title = _a === void 0 ? CONTENT_UPLOAD_DEFAULTS.title : _a, _b = props.icon, icon = _b === void 0 ? CONTENT_UPLOAD_DEFAULTS.icon : _b, _c = props.dialogTitle, dialogTitle = _c === void 0 ? title : _c;
     var handleClick = useOpenContentUpload(__assign(__assign({}, props), { title: dialogTitle }));
-    return jsxRuntimeExports.jsx(ToolsPanelListItemButton, { icon: icon, title: title, onClick: handleClick });
+    return jsx(ToolsPanelListItemButton, { icon: icon, title: title, onClick: handleClick });
 }
 
 function OpenContentUploadToolbarButton(props) {
@@ -1553,9 +1526,9 @@ function OpenContentUploadToolbarButton(props) {
     }
     var handleClick = useOpenContentUpload(__assign(__assign({}, props), { title: dialogTitle }));
     var applyTooltip = function (children) {
-        return useIcon || props.tooltip ? jsxRuntimeExports.jsx(Tooltip$1, { title: tooltip, children: children }) : children;
+        return useIcon || props.tooltip ? jsx(Tooltip$1, { title: tooltip, children: children }) : children;
     };
-    return applyTooltip(useIcon ? (jsxRuntimeExports.jsx(IconButton, { size: buttonSize, onClick: handleClick, children: jsxRuntimeExports.jsx(SystemIcon, { icon: icon }) })) : (jsxRuntimeExports.jsx(Button$1, { size: buttonSize, onClick: handleClick, startIcon: useIconWithText ? jsxRuntimeExports.jsx(SystemIcon, { icon: icon }) : void 0, sx: (_a = {}, _a[".".concat(buttonClasses.startIcon)] = { mr: 0.5 }, _a), children: title })));
+    return applyTooltip(useIcon ? (jsx(IconButton, { size: buttonSize, onClick: handleClick, children: jsx(SystemIcon, { icon: icon }) })) : (jsx(Button$1, { size: buttonSize, onClick: handleClick, startIcon: useIconWithText ? jsx(SystemIcon, { icon: icon }) : void 0, sx: (_a = {}, _a[".".concat(buttonClasses.startIcon)] = { mr: 0.5 }, _a), children: title })));
 }
 
 /*
@@ -1689,7 +1662,7 @@ function PullPushRemoteButtons(props) {
         setProgressShow(false);
         setSnackShow(false);
     }
-    return (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [useIcon ? (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [shouldShowButton(enablePull) ? (jsxRuntimeExports.jsx(Tooltip, { title: pullLabel ? pullLabel : "Pull", children: jsxRuntimeExports.jsx(IconButton, { size: "small", onClick: handlePullClick, children: jsxRuntimeExports.jsx(DownloadIcon, {}) }) })) : (jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, {})), shouldShowButton(enablePush) ? (jsxRuntimeExports.jsx(Tooltip, { title: pushLabel ? pushLabel : "Push", children: jsxRuntimeExports.jsx(IconButton, { size: "small", onClick: handlePushClick, children: jsxRuntimeExports.jsx(PublishIcon, {}) }) })) : (jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, {}))] })) : (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [shouldShowButton(enablePull) ? (jsxRuntimeExports.jsx(Button, { size: "small", variant: "text", onClick: handlePullClick, children: pullLabel ? pullLabel : "Pull" })) : (jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, {})), shouldShowButton(enablePush) ? (jsxRuntimeExports.jsx(Button, { size: "small", variant: "text", onClick: handlePushClick, children: pushLabel ? pushLabel : "Push" })) : (jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, {}))] })), jsxRuntimeExports.jsxs(Backdrop, { sx: { color: '#fff', zIndex: function (theme) { return theme.zIndex.drawer + 1; } }, open: progressShow, children: [jsxRuntimeExports.jsx(CircularProgress, { color: "inherit" }), jsxRuntimeExports.jsx(Snackbar, { anchorOrigin: { vertical: 'top', horizontal: 'center' }, open: snackShow, autoHideDuration: 5000, onClose: handleSnackClose, children: jsxRuntimeExports.jsx(Alert, { severity: snackSuccess ? "success" : "error", sx: { width: '100%' }, children: snackMessage }) })] })] }));
+    return (jsxs(Fragment, { children: [useIcon ? (jsxs(Fragment, { children: [shouldShowButton(enablePull) ? (jsx(Tooltip, { title: pullLabel ? pullLabel : "Pull", children: jsx(IconButton, { size: "small", onClick: handlePullClick, children: jsx(DownloadIcon, {}) }) })) : (jsx(Fragment, {})), shouldShowButton(enablePush) ? (jsx(Tooltip, { title: pushLabel ? pushLabel : "Push", children: jsx(IconButton, { size: "small", onClick: handlePushClick, children: jsx(PublishIcon, {}) }) })) : (jsx(Fragment, {}))] })) : (jsxs(Fragment, { children: [shouldShowButton(enablePull) ? (jsx(Button, { size: "small", variant: "text", onClick: handlePullClick, children: pullLabel ? pullLabel : "Pull" })) : (jsx(Fragment, {})), shouldShowButton(enablePush) ? (jsx(Button, { size: "small", variant: "text", onClick: handlePushClick, children: pushLabel ? pushLabel : "Push" })) : (jsx(Fragment, {}))] })), jsxs(Backdrop, { sx: { color: '#fff', zIndex: function (theme) { return theme.zIndex.drawer + 1; } }, open: progressShow, children: [jsx(CircularProgress, { color: "inherit" }), jsx(Snackbar, { anchorOrigin: { vertical: 'top', horizontal: 'center' }, open: snackShow, autoHideDuration: 5000, onClose: handleSnackClose, children: jsx(Alert, { severity: snackSuccess ? "success" : "error", sx: { width: '100%' }, children: snackMessage }) })] })] }));
 }
 
 /*
@@ -1869,30 +1842,30 @@ function BulkPublishView(props) {
         setSelectedPath(value.replace('/index.xml', ''));
     };
     if (hasInitialPublish$1 === null) {
-        return jsxRuntimeExports.jsx(Paper, { elevation: 2, sx: { height: '100%' } });
+        return jsx(Paper, { elevation: 2, sx: { height: '100%' } });
     }
-    return (jsxRuntimeExports.jsx(Paper, { elevation: 2, sx: { height: '100%' }, children: jsxRuntimeExports.jsx(Box$1, { sx: { p: 1 }, children: hasInitialPublish$1 ? (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsxs(DialogBody, { sx: { minHeight: '24vh', minWidth: '48vh' }, children: [jsxRuntimeExports.jsx(Typography, { variant: "body1", sx: {
+    return (jsx(Paper, { elevation: 2, sx: { height: '100%' }, children: jsx(Box$1, { sx: { p: 1 }, children: hasInitialPublish$1 ? (jsxs(Fragment, { children: [jsxs(DialogBody, { sx: { minHeight: '24vh', minWidth: '48vh' }, children: [jsx(Typography, { variant: "body1", sx: {
                                     paddingBottom: 2,
                                     float: 'left'
-                                }, children: "Select a path to calculate publish packages." }), jsxRuntimeExports.jsx(Box$1, { sx: { paddingBottom: 1 }, children: jsxRuntimeExports.jsx(PathSelector, { value: selectedPath, disabled: false, onPathSelected: onPathSelected, stripXmlIndex: false }) })] }), jsxRuntimeExports.jsx(DialogFooter$1, { children: jsxRuntimeExports.jsx(Button$1, { sx: { float: 'right' }, variant: "contained", color: "primary", disabled: isSubmitting, onClick: onSubmitBulkPublish, children: "Bulk Publish" }) })] })) : (jsxRuntimeExports.jsxs(Box$1, { sx: {
+                                }, children: "Select a path to calculate publish packages." }), jsx(Box$1, { sx: { paddingBottom: 1 }, children: jsx(PathSelector, { value: selectedPath, disabled: false, onPathSelected: onPathSelected, stripXmlIndex: false }) })] }), jsx(DialogFooter$1, { children: jsx(Button$1, { sx: { float: 'right' }, variant: "contained", color: "primary", disabled: isSubmitting, onClick: onSubmitBulkPublish, children: "Bulk Publish" }) })] })) : (jsxs(Box$1, { sx: {
                     display: 'flex',
                     alignItems: 'center',
                     flexDirection: 'column',
                     rowGap: theme.spacing(2),
                     padding: theme.spacing(5)
-                }, children: [jsxRuntimeExports.jsx(InfoOutlinedIcon, { sx: {
+                }, children: [jsx(InfoOutlinedIcon, { sx: {
                             color: theme.palette.text.secondary,
                             fontSize: '1.75rem'
-                        } }), jsxRuntimeExports.jsx(Typography, { variant: "body1", sx: {
+                        } }), jsx(Typography, { variant: "body1", sx: {
                             maxWidth: '470px',
                             textAlign: 'center'
-                        }, children: jsxRuntimeExports.jsx(FormattedMessage, { id: "publishOnDemand.noInitialPublish", defaultMessage: "The project needs to undergo its initial publish before other publishing options become available" }) }), hasPublishPermission && (jsxRuntimeExports.jsx(MyLoadingButton, { loading: false, variant: "contained", color: "primary", onClick: onInitialPublish, children: jsxRuntimeExports.jsx(FormattedMessage, { id: "publishOnDemand.publishEntireProject", defaultMessage: "Publish Entire Project" }) }))] })) }) }));
+                        }, children: jsx(FormattedMessage, { id: "publishOnDemand.noInitialPublish", defaultMessage: "The project needs to undergo its initial publish before other publishing options become available" }) }), hasPublishPermission && (jsx(MyLoadingButton, { loading: false, variant: "contained", color: "primary", onClick: onInitialPublish, children: jsx(FormattedMessage, { id: "publishOnDemand.publishEntireProject", defaultMessage: "Publish Entire Project" }) }))] })) }) }));
 }
 
 function OpenBulkPublishPanelButton(props) {
     var _a = props.title, title = _a === void 0 ? BULK_PUBLISH_DEFAULTS.title : _a, _b = props.icon, icon = _b === void 0 ? BULK_PUBLISH_DEFAULTS.icon : _b, _c = props.dialogTitle, dialogTitle = _c === void 0 ? title : _c;
     var handleClick = useOpenBulkPublish(__assign(__assign({}, props), { title: dialogTitle }));
-    return jsxRuntimeExports.jsx(ToolsPanelListItemButton, { icon: icon, title: title, onClick: handleClick });
+    return jsx(ToolsPanelListItemButton, { icon: icon, title: title, onClick: handleClick });
 }
 
 function OpenBulkPublishToolbarButton(props) {
@@ -1904,9 +1877,9 @@ function OpenBulkPublishToolbarButton(props) {
     }
     var handleClick = useOpenBulkPublish(__assign(__assign({}, props), { title: dialogTitle }));
     var applyTooltip = function (children) {
-        return useIcon || props.tooltip ? jsxRuntimeExports.jsx(Tooltip$1, { title: tooltip, children: children }) : children;
+        return useIcon || props.tooltip ? jsx(Tooltip$1, { title: tooltip, children: children }) : children;
     };
-    return applyTooltip(useIcon ? (jsxRuntimeExports.jsx(IconButton, { size: buttonSize, onClick: handleClick, children: jsxRuntimeExports.jsx(SystemIcon, { icon: icon }) })) : (jsxRuntimeExports.jsx(Button$1, { size: buttonSize, onClick: handleClick, startIcon: useIconWithText ? jsxRuntimeExports.jsx(SystemIcon, { icon: icon }) : void 0, sx: (_a = {}, _a[".".concat(buttonClasses.startIcon)] = { mr: 0.5 }, _a), children: title })));
+    return applyTooltip(useIcon ? (jsx(IconButton, { size: buttonSize, onClick: handleClick, children: jsx(SystemIcon, { icon: icon }) })) : (jsx(Button$1, { size: buttonSize, onClick: handleClick, startIcon: useIconWithText ? jsx(SystemIcon, { icon: icon }) : void 0, sx: (_a = {}, _a[".".concat(buttonClasses.startIcon)] = { mr: 0.5 }, _a), children: title })));
 }
 
 function copyToClipboard(text) {
@@ -1945,18 +1918,18 @@ function CopyCurrentPageUrl(props) {
             setOptionMenuAnchorEl(null);
         }, 50);
     };
-    return (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [useIcon ? (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsx(Tooltip, { title: "Copy Page URL", children: jsxRuntimeExports.jsx(IconButton, { size: "small", onClick: handleClick, children: jsxRuntimeExports.jsx(SystemIcon, { icon: { id: iconId } }) }) }), options && options.length > 0 && (jsxRuntimeExports.jsx(Button, { id: "urls-select-button", variant: "text", color: "inherit", onClick: handleOptionMenuClick, "aria-controls": optionMenuAnchorEl ? 'urls-select-menu' : undefined, "aria-haspopup": "true", "aria-expanded": Boolean(optionMenuAnchorEl), sx: {
+    return (jsxs(Fragment, { children: [useIcon ? (jsxs(Fragment, { children: [jsx(Tooltip, { title: "Copy Page URL", children: jsx(IconButton, { size: "small", onClick: handleClick, children: jsx(SystemIcon, { icon: { id: iconId } }) }) }), options && options.length > 0 && (jsx(Button, { id: "urls-select-button", variant: "text", color: "inherit", onClick: handleOptionMenuClick, "aria-controls": optionMenuAnchorEl ? 'urls-select-menu' : undefined, "aria-haspopup": "true", "aria-expanded": Boolean(optionMenuAnchorEl), sx: {
                             typography: 'subtitle1',
                             textTransform: 'none',
                             borderRadius: 1,
                             minWidth: 0
-                        }, endIcon: jsxRuntimeExports.jsx(ExpandMoreRounded, {}), children: "Copy URLs" }))] })) : (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsx(Button, { size: "small", variant: "text", onClick: handleClick, children: "Copy Page URL" }), options && options.length > 0 && (jsxRuntimeExports.jsx(Tooltip, { title: "Copy more URLs", children: jsxRuntimeExports.jsx(IconButton, { id: "urls-select-button", color: "inherit", size: "small", "aria-controls": optionMenuAnchorEl ? 'urls-select-menu' : undefined, "aria-haspopup": "true", onClick: handleOptionMenuClick, children: jsxRuntimeExports.jsx(ExpandMoreRounded, {}) }) }))] })), options && options.length > 0 && (jsxRuntimeExports.jsx(Menu, { id: "urls-select-menu", anchorEl: optionMenuAnchorEl, open: Boolean(optionMenuAnchorEl), onClose: function () { return setOptionMenuAnchorEl(null); }, MenuListProps: {
+                        }, endIcon: jsx(ExpandMoreRounded, {}), children: "Copy URLs" }))] })) : (jsxs(Fragment, { children: [jsx(Button, { size: "small", variant: "text", onClick: handleClick, children: "Copy Page URL" }), options && options.length > 0 && (jsx(Tooltip, { title: "Copy more URLs", children: jsx(IconButton, { id: "urls-select-button", color: "inherit", size: "small", "aria-controls": optionMenuAnchorEl ? 'urls-select-menu' : undefined, "aria-haspopup": "true", onClick: handleOptionMenuClick, children: jsx(ExpandMoreRounded, {}) }) }))] })), options && options.length > 0 && (jsx(Menu, { id: "urls-select-menu", anchorEl: optionMenuAnchorEl, open: Boolean(optionMenuAnchorEl), onClose: function () { return setOptionMenuAnchorEl(null); }, MenuListProps: {
                     'aria-labelledby': 'urls-select-button'
                 }, slotProps: {
                     paper: {
                         style: { minWidth: 132 }
                     }
-                }, children: options.map(function (option) { return (jsxRuntimeExports.jsx(MenuItem, { onClick: function () { return handleOptionSelect(option.label, option.pattern); }, children: option.label }, option.label)); }) }))] }));
+                }, children: options.map(function (option) { return (jsx(MenuItem, { onClick: function () { return handleOptionSelect(option.label, option.pattern); }, children: option.label }, option.label)); }) }))] }));
 }
 
 /*
@@ -2100,7 +2073,7 @@ var ComponentPreviewPathNavigator = function (props) {
             readonly: true
         }));
     };
-    return (jsxRuntimeExports.jsx("div", { children: validConfigurationExists() ? (jsxRuntimeExports.jsx(PathNavigator, { id: pathNavigatorId, label: props.label, rootPath: props.rootPath, onItemClicked: onItemClicked, icon: { id: props.icon }, limit: props.limit, excludes: (_b = (_a = props.excludedPaths) === null || _a === void 0 ? void 0 : _a.split(',')) !== null && _b !== void 0 ? _b : [] })) : (jsxRuntimeExports.jsxs(Alert, { severity: "warning", children: [jsxRuntimeExports.jsx(AlertTitle, { children: "Component Preview Path Navigator plugin configuration not found" }), "Please edit the ui.xml file and configure the widget as described in the README.md."] })) }));
+    return (jsx("div", { children: validConfigurationExists() ? (jsx(PathNavigator, { id: pathNavigatorId, label: props.label, rootPath: props.rootPath, onItemClicked: onItemClicked, icon: { id: props.icon }, limit: props.limit, excludes: (_b = (_a = props.excludedPaths) === null || _a === void 0 ? void 0 : _a.split(',')) !== null && _b !== void 0 ? _b : [] })) : (jsxs(Alert, { severity: "warning", children: [jsx(AlertTitle, { children: "Component Preview Path Navigator plugin configuration not found" }), "Please edit the ui.xml file and configure the widget as described in the README.md."] })) }));
 };
 
 var MODULE$1 = 'studio';
@@ -2405,26 +2378,646 @@ function CrossSiteContentTypeCopy() {
         });
     };
     var destOptions = useMemo(function () { return sites; }, [sites]);
-    return (jsxRuntimeExports.jsxs(Paper, { elevation: 2, sx: { height: '100%', display: 'flex', flexDirection: 'column' }, children: [jsxRuntimeExports.jsxs(Box$1, { sx: { p: 2, flex: 1, overflow: 'auto' }, children: [jsxRuntimeExports.jsx(Typography, { variant: "h6", gutterBottom: true, children: "Copy content types across projects" }), jsxRuntimeExports.jsxs(Typography, { variant: "body2", color: "text.secondary", sx: { mb: 2 }, children: ["Copies ", jsxRuntimeExports.jsx("code", { children: "config.xml" }), " and ", jsxRuntimeExports.jsx("code", { children: "form-definition.xml" }), " for each selected type from a source project to a destination project. If a selected ID already exists in destination, you must provide a new ID and label (supports same-project duplication). Preview images and other files in the type folder are not copied."] }), jsxRuntimeExports.jsxs(Stepper, { activeStep: activeStep, sx: { mb: 2 }, children: [jsxRuntimeExports.jsx(Step, { children: jsxRuntimeExports.jsx(StepLabel, { children: "Source project" }) }), jsxRuntimeExports.jsx(Step, { children: jsxRuntimeExports.jsx(StepLabel, { children: "Content types" }) }), jsxRuntimeExports.jsx(Step, { children: jsxRuntimeExports.jsx(StepLabel, { children: "Destination" }) }), jsxRuntimeExports.jsx(Step, { children: jsxRuntimeExports.jsx(StepLabel, { children: "Confirm" }) })] }), activeStep === 0 && (jsxRuntimeExports.jsx(DialogBody, { children: sitesLoading ? (jsxRuntimeExports.jsx(Box$1, { sx: { display: 'flex', justifyContent: 'center', py: 4 }, children: jsxRuntimeExports.jsx(CircularProgress, { size: 32 }) })) : (jsxRuntimeExports.jsx(Autocomplete, { options: sites, getOptionLabel: function (o) { return "".concat(o.name, " (").concat(o.id, ")"); }, value: sourceSite, onChange: function (_, v) { return setSourceSite(v); }, renderInput: function (params) { return jsxRuntimeExports.jsx(TextField$1, __assign({}, params, { label: "Source project", required: true })); } })) })), activeStep === 1 && (jsxRuntimeExports.jsx(DialogBody, { sx: { minHeight: '40vh' }, children: typesLoading ? (jsxRuntimeExports.jsx(Box$1, { sx: { display: 'flex', justifyContent: 'center', py: 4 }, children: jsxRuntimeExports.jsx(CircularProgress, { size: 32 }) })) : (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsx(TextField$1, { fullWidth: true, size: "small", label: "Filter types", value: typeFilter, onChange: function (e) { return setTypeFilter(e.target.value); }, sx: { mb: 1 } }), jsxRuntimeExports.jsx(FormControlLabel, { control: jsxRuntimeExports.jsx(Checkbox, { checked: filteredTypes.length > 0 && filteredTypes.every(function (t) { return selectedIds[t.id]; }), indeterminate: filteredTypes.some(function (t) { return selectedIds[t.id]; }) &&
-                                            !filteredTypes.every(function (t) { return selectedIds[t.id]; }), onChange: toggleAllFiltered }), label: "Select all (filtered)" }), jsxRuntimeExports.jsx(List, { dense: true, sx: { maxHeight: 360, overflow: 'auto', border: 1, borderColor: 'divider' }, children: filteredTypes.map(function (t) { return (jsxRuntimeExports.jsx(ListItem, { disablePadding: true, children: jsxRuntimeExports.jsx(FormControlLabel, { sx: { px: 1, width: '100%', m: 0 }, control: jsxRuntimeExports.jsx(Checkbox, { checked: Boolean(selectedIds[t.id]), onChange: function () { return toggleType(t.id); } }), label: jsxRuntimeExports.jsxs("span", { children: [jsxRuntimeExports.jsx(Typography, { component: "span", variant: "body2", sx: { fontFamily: 'monospace' }, children: t.id }), t.name && t.name !== t.id ? (jsxRuntimeExports.jsxs(Typography, { component: "span", variant: "body2", color: "text.secondary", sx: { ml: 1 }, children: ["\u2014 ", t.name] })) : null] }) }) }, t.id)); }) })] })) })), activeStep === 2 && (jsxRuntimeExports.jsx(DialogBody, { children: jsxRuntimeExports.jsx(Autocomplete, { options: destOptions, getOptionLabel: function (o) { return "".concat(o.name, " (").concat(o.id, ")"); }, value: destSite, onChange: function (_, v) { return setDestSite(v); }, renderInput: function (params) { return (jsxRuntimeExports.jsx(TextField$1, __assign({}, params, { label: "Destination project", required: true, helperText: destinationTypesLoading ? 'Loading destination content types...' : ' ' }))); } }) })), activeStep === 3 && (jsxRuntimeExports.jsxs(DialogBody, { children: [jsxRuntimeExports.jsx(Typography, { variant: "body1", gutterBottom: true, children: "Please confirm:" }), jsxRuntimeExports.jsxs(Typography, { variant: "body2", component: "div", children: [jsxRuntimeExports.jsx("strong", { children: "From:" }), " ", sourceSite === null || sourceSite === void 0 ? void 0 : sourceSite.name, " (", sourceSite === null || sourceSite === void 0 ? void 0 : sourceSite.id, ")"] }), jsxRuntimeExports.jsxs(Typography, { variant: "body2", component: "div", sx: { mt: 1 }, children: [jsxRuntimeExports.jsx("strong", { children: "To:" }), " ", destSite === null || destSite === void 0 ? void 0 : destSite.name, " (", destSite === null || destSite === void 0 ? void 0 : destSite.id, ")"] }), jsxRuntimeExports.jsx(Typography, { variant: "body2", sx: { mt: 2 }, children: jsxRuntimeExports.jsxs("strong", { children: ["Types (", selectedList.length, "):"] }) }), jsxRuntimeExports.jsx(Box$1, { component: "ul", sx: { mt: 0, pl: 2, maxHeight: 240, overflow: 'auto' }, children: selectedList.map(function (id) { return (jsxRuntimeExports.jsx("li", { children: jsxRuntimeExports.jsx(Typography, { variant: "body2", component: "code", children: id }) }, id)); }) }), conflictingIds.length > 0 && (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsxs(Alert, { severity: "warning", sx: { mt: 2 }, children: ["Destination already has ", conflictingIds.length, " selected content type ID(s). Provide a new label and new ID for each conflict."] }), jsxRuntimeExports.jsx(Box$1, { sx: { mt: 2, display: 'grid', gap: 2 }, children: conflictingIds.map(function (id) {
+    return (jsxs(Paper, { elevation: 2, sx: { height: '100%', display: 'flex', flexDirection: 'column' }, children: [jsxs(Box$1, { sx: { p: 2, flex: 1, overflow: 'auto' }, children: [jsx(Typography, { variant: "h6", gutterBottom: true, children: "Copy content types across projects" }), jsxs(Typography, { variant: "body2", color: "text.secondary", sx: { mb: 2 }, children: ["Copies ", jsx("code", { children: "config.xml" }), " and ", jsx("code", { children: "form-definition.xml" }), " for each selected type from a source project to a destination project. If a selected ID already exists in destination, you must provide a new ID and label (supports same-project duplication). Preview images and other files in the type folder are not copied."] }), jsxs(Stepper, { activeStep: activeStep, sx: { mb: 2 }, children: [jsx(Step, { children: jsx(StepLabel, { children: "Source project" }) }), jsx(Step, { children: jsx(StepLabel, { children: "Content types" }) }), jsx(Step, { children: jsx(StepLabel, { children: "Destination" }) }), jsx(Step, { children: jsx(StepLabel, { children: "Confirm" }) })] }), activeStep === 0 && (jsx(DialogBody, { children: sitesLoading ? (jsx(Box$1, { sx: { display: 'flex', justifyContent: 'center', py: 4 }, children: jsx(CircularProgress, { size: 32 }) })) : (jsx(Autocomplete, { options: sites, getOptionLabel: function (o) { return "".concat(o.name, " (").concat(o.id, ")"); }, value: sourceSite, onChange: function (_, v) { return setSourceSite(v); }, renderInput: function (params) { return jsx(TextField$1, __assign({}, params, { label: "Source project", required: true })); } })) })), activeStep === 1 && (jsx(DialogBody, { sx: { minHeight: '40vh' }, children: typesLoading ? (jsx(Box$1, { sx: { display: 'flex', justifyContent: 'center', py: 4 }, children: jsx(CircularProgress, { size: 32 }) })) : (jsxs(Fragment, { children: [jsx(TextField$1, { fullWidth: true, size: "small", label: "Filter types", value: typeFilter, onChange: function (e) { return setTypeFilter(e.target.value); }, sx: { mb: 1 } }), jsx(FormControlLabel, { control: jsx(Checkbox, { checked: filteredTypes.length > 0 && filteredTypes.every(function (t) { return selectedIds[t.id]; }), indeterminate: filteredTypes.some(function (t) { return selectedIds[t.id]; }) &&
+                                            !filteredTypes.every(function (t) { return selectedIds[t.id]; }), onChange: toggleAllFiltered }), label: "Select all (filtered)" }), jsx(List, { dense: true, sx: { maxHeight: 360, overflow: 'auto', border: 1, borderColor: 'divider' }, children: filteredTypes.map(function (t) { return (jsx(ListItem, { disablePadding: true, children: jsx(FormControlLabel, { sx: { px: 1, width: '100%', m: 0 }, control: jsx(Checkbox, { checked: Boolean(selectedIds[t.id]), onChange: function () { return toggleType(t.id); } }), label: jsxs("span", { children: [jsx(Typography, { component: "span", variant: "body2", sx: { fontFamily: 'monospace' }, children: t.id }), t.name && t.name !== t.id ? (jsxs(Typography, { component: "span", variant: "body2", color: "text.secondary", sx: { ml: 1 }, children: ["\u2014 ", t.name] })) : null] }) }) }, t.id)); }) })] })) })), activeStep === 2 && (jsx(DialogBody, { children: jsx(Autocomplete, { options: destOptions, getOptionLabel: function (o) { return "".concat(o.name, " (").concat(o.id, ")"); }, value: destSite, onChange: function (_, v) { return setDestSite(v); }, renderInput: function (params) { return (jsx(TextField$1, __assign({}, params, { label: "Destination project", required: true, helperText: destinationTypesLoading ? 'Loading destination content types...' : ' ' }))); } }) })), activeStep === 3 && (jsxs(DialogBody, { children: [jsx(Typography, { variant: "body1", gutterBottom: true, children: "Please confirm:" }), jsxs(Typography, { variant: "body2", component: "div", children: [jsx("strong", { children: "From:" }), " ", sourceSite === null || sourceSite === void 0 ? void 0 : sourceSite.name, " (", sourceSite === null || sourceSite === void 0 ? void 0 : sourceSite.id, ")"] }), jsxs(Typography, { variant: "body2", component: "div", sx: { mt: 1 }, children: [jsx("strong", { children: "To:" }), " ", destSite === null || destSite === void 0 ? void 0 : destSite.name, " (", destSite === null || destSite === void 0 ? void 0 : destSite.id, ")"] }), jsx(Typography, { variant: "body2", sx: { mt: 2 }, children: jsxs("strong", { children: ["Types (", selectedList.length, "):"] }) }), jsx(Box$1, { component: "ul", sx: { mt: 0, pl: 2, maxHeight: 240, overflow: 'auto' }, children: selectedList.map(function (id) { return (jsx("li", { children: jsx(Typography, { variant: "body2", component: "code", children: id }) }, id)); }) }), conflictingIds.length > 0 && (jsxs(Fragment, { children: [jsxs(Alert, { severity: "warning", sx: { mt: 2 }, children: ["Destination already has ", conflictingIds.length, " selected content type ID(s). Provide a new label and new ID for each conflict."] }), jsx(Box$1, { sx: { mt: 2, display: 'grid', gap: 2 }, children: conflictingIds.map(function (id) {
                                             var _a, _b, _c, _d;
-                                            return (jsxRuntimeExports.jsxs(Box$1, { sx: { border: 1, borderColor: 'divider', p: 1.5, borderRadius: 1 }, children: [jsxRuntimeExports.jsxs(Typography, { variant: "body2", sx: { mb: 1 }, children: ["Existing ID: ", jsxRuntimeExports.jsx("code", { children: id })] }), jsxRuntimeExports.jsx(TextField$1, { fullWidth: true, label: "New content type ID", value: (_b = (_a = renameOverrides[id]) === null || _a === void 0 ? void 0 : _a.newId) !== null && _b !== void 0 ? _b : '', onChange: function (e) {
+                                            return (jsxs(Box$1, { sx: { border: 1, borderColor: 'divider', p: 1.5, borderRadius: 1 }, children: [jsxs(Typography, { variant: "body2", sx: { mb: 1 }, children: ["Existing ID: ", jsx("code", { children: id })] }), jsx(TextField$1, { fullWidth: true, label: "New content type ID", value: (_b = (_a = renameOverrides[id]) === null || _a === void 0 ? void 0 : _a.newId) !== null && _b !== void 0 ? _b : '', onChange: function (e) {
                                                             return setRenameOverrides(function (prev) {
                                                                 var _a;
                                                                 var _b;
                                                                 return (__assign(__assign({}, prev), (_a = {}, _a[id] = __assign(__assign({}, ((_b = prev[id]) !== null && _b !== void 0 ? _b : { newLabel: '', newId: '' })), { newId: e.target.value }), _a)));
                                                             });
-                                                        }, sx: { mb: 1 } }), jsxRuntimeExports.jsx(TextField$1, { fullWidth: true, label: "New label", value: (_d = (_c = renameOverrides[id]) === null || _c === void 0 ? void 0 : _c.newLabel) !== null && _d !== void 0 ? _d : '', onChange: function (e) {
+                                                        }, sx: { mb: 1 } }), jsx(TextField$1, { fullWidth: true, label: "New label", value: (_d = (_c = renameOverrides[id]) === null || _c === void 0 ? void 0 : _c.newLabel) !== null && _d !== void 0 ? _d : '', onChange: function (e) {
                                                             return setRenameOverrides(function (prev) {
                                                                 var _a;
                                                                 var _b;
                                                                 return (__assign(__assign({}, prev), (_a = {}, _a[id] = __assign(__assign({}, ((_b = prev[id]) !== null && _b !== void 0 ? _b : { newLabel: '', newId: '' })), { newLabel: e.target.value }), _a)));
                                                             });
                                                         } })] }, id));
-                                        }) })] })), conflictValidationErrors.length > 0 && (jsxRuntimeExports.jsx(Alert, { severity: "error", sx: { mt: 2 }, children: conflictValidationErrors[0] }))] }))] }), jsxRuntimeExports.jsxs(DialogFooter$1, { sx: { borderTop: 1, borderColor: 'divider' }, children: [jsxRuntimeExports.jsx(Button$1, { onClick: handleBack, disabled: activeStep === 0 || copying, children: "Back" }), activeStep < 3 ? (jsxRuntimeExports.jsx(Button$1, { variant: "contained", onClick: handleNext, disabled: copying ||
+                                        }) })] })), conflictValidationErrors.length > 0 && (jsx(Alert, { severity: "error", sx: { mt: 2 }, children: conflictValidationErrors[0] }))] }))] }), jsxs(DialogFooter$1, { sx: { borderTop: 1, borderColor: 'divider' }, children: [jsx(Button$1, { onClick: handleBack, disabled: activeStep === 0 || copying, children: "Back" }), activeStep < 3 ? (jsx(Button$1, { variant: "contained", onClick: handleNext, disabled: copying ||
                             (activeStep === 0 && !canNextFromSource) ||
                             (activeStep === 1 && !canNextFromTypes) ||
-                            (activeStep === 2 && !canNextFromDest), children: "Next" })) : (jsxRuntimeExports.jsx(Button$1, { variant: "contained", color: "primary", onClick: runCopy, disabled: !canCopy || copying, children: copying ? jsxRuntimeExports.jsx(CircularProgress, { size: 22, color: "inherit" }) : 'Copy' }))] })] }));
+                            (activeStep === 2 && !canNextFromDest), children: "Next" })) : (jsx(Button$1, { variant: "contained", color: "primary", onClick: runCopy, disabled: !canCopy || copying, children: copying ? jsx(CircularProgress, { size: 22, color: "inherit" }) : 'Copy' }))] })] }));
+}
+
+var DeleteOutlineIcon = createSvgIcon(/*#__PURE__*/jsx("path", {
+  d: "M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6zM8 9h8v10H8zm7.5-5-1-1h-5l-1 1H5v2h14V4z"
+}), 'DeleteOutline');
+
+var CheckCircleIcon = createSvgIcon(/*#__PURE__*/jsx("path", {
+  d: "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"
+}), 'CheckCircle');
+
+var CancelIcon = createSvgIcon(/*#__PURE__*/jsx("path", {
+  d: "M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2m5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12z"
+}), 'Cancel');
+
+var MoreVertIcon = createSvgIcon(/*#__PURE__*/jsx("path", {
+  d: "M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2m0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
+}), 'MoreVert');
+
+/*
+ * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License version 3 as published by
+ * the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+function changeSite(nextSite, nextUrl = '/') {
+  return {
+    type: changeSite.type,
+    payload: { nextSite, nextUrl }
+  };
+}
+changeSite.type = 'CHANGE_SITE';
+
+/*
+ * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License version 3 as published by
+ * the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+const fetchItemVersions = /*#__PURE__*/ createAction('FETCH_ITEM_VERSIONS');
+
+function isInWorkflow(stateMap) {
+    return stateMap
+        ? Boolean(stateMap.deleted ||
+            stateMap.disabled ||
+            stateMap.systemProcessing ||
+            stateMap.locked ||
+            stateMap.submittedToLive ||
+            stateMap.submittedToStaging ||
+            stateMap.submitted ||
+            stateMap.scheduled ||
+            stateMap.new ||
+            stateMap.modified ||
+            stateMap.publishing)
+        : false;
+}
+function isKeepFile(path) {
+    return path.endsWith('/.keep');
+}
+function asPlainString(value) {
+    if (value == null) {
+        return '';
+    }
+    if (typeof value === 'string') {
+        return value;
+    }
+    if (typeof value === 'object') {
+        var gstring = value;
+        if (typeof gstring.bytes === 'string' && gstring.bytes) {
+            try {
+                return atob(gstring.bytes);
+            }
+            catch (_a) {
+                /* fall through */
+            }
+        }
+    }
+    return String(value);
+}
+function pluginScriptUrl(scriptName, sourceSiteId) {
+    return ('/studio/api/2/plugin/script/plugins/org/rd/plugin/uigoodies/' +
+        scriptName +
+        '?siteId=' +
+        encodeURIComponent(sourceSiteId));
+}
+function isApiResponse(value) {
+    if (!value || typeof value !== 'object') {
+        return false;
+    }
+    var obj = value;
+    return 'code' in obj && 'message' in obj;
+}
+function isAjaxResponse(value) {
+    if (!value || typeof value !== 'object') {
+        return false;
+    }
+    var obj = value;
+    return 'response' in obj && ('status' in obj || 'xhr' in obj);
+}
+function isPlanPayload(value) {
+    return 'sourceSiteId' in value || 'sourcePath' in value || 'sourcePaths' in value || 'items' in value;
+}
+function isCopyResultPayload(value) {
+    return 'successCount' in value || 'successes' in value || 'failureCount' in value;
+}
+function isApiErrorCode(code) {
+    return typeof code === 'number' && code >= 1000;
+}
+function unwrapPluginResponse(response, payloadCheck) {
+    if (payloadCheck === void 0) { payloadCheck = isPlanPayload; }
+    var current = response;
+    for (var depth = 0; depth < 6; depth++) {
+        if (!current || typeof current !== 'object') {
+            break;
+        }
+        if (isAjaxResponse(current)) {
+            current = current.response;
+            continue;
+        }
+        var obj = current;
+        if (isApiResponse(obj)) {
+            if (isApiErrorCode(obj.code)) {
+                break;
+            }
+            if (obj.response != null && typeof obj.response === 'object' && !payloadCheck(obj)) {
+                current = obj.response;
+                continue;
+            }
+        }
+        if ('result' in obj && obj.result != null && typeof obj.result === 'object' && !payloadCheck(obj)) {
+            current = obj.result;
+            continue;
+        }
+        break;
+    }
+    return (current !== null && current !== void 0 ? current : {});
+}
+function parsePlanResponse(response) {
+    var _a;
+    var raw = unwrapPluginResponse(response, isPlanPayload);
+    if (raw.error) {
+        return __assign(__assign({}, raw), { items: [] });
+    }
+    if (isApiResponse(raw) && isApiErrorCode(raw.code)) {
+        return { error: (_a = raw.message) !== null && _a !== void 0 ? _a : 'Failed to build copy plan', items: [] };
+    }
+    if (!raw.sourceSiteId && !Array.isArray(raw.items) && !raw.sourcePath && !raw.sourcePaths) {
+        return { error: 'Invalid copy plan response from server', items: [], sourcePaths: [] };
+    }
+    var items = Array.isArray(raw.items)
+        ? raw.items
+            .map(function (entry) { return ({
+            path: asPlainString(entry === null || entry === void 0 ? void 0 : entry.path),
+            folder: Boolean(entry === null || entry === void 0 ? void 0 : entry.folder),
+            existsOnDestination: Boolean(entry === null || entry === void 0 ? void 0 : entry.existsOnDestination),
+            role: ((entry === null || entry === void 0 ? void 0 : entry.role) === 'dependency' ? 'dependency' : 'primary'),
+            sourceSelection: (entry === null || entry === void 0 ? void 0 : entry.sourceSelection) ? asPlainString(entry.sourceSelection) : undefined
+        }); })
+            .filter(function (entry) { return !isKeepFile(entry.path); })
+        : [];
+    return __assign(__assign({}, raw), { error: raw.error ? asPlainString(raw.error) : undefined, sourcePaths: Array.isArray(raw.sourcePaths)
+            ? raw.sourcePaths.map(asPlainString)
+            : raw.sourcePath
+                ? [asPlainString(raw.sourcePath)]
+                : [], items: items });
+}
+function parseCopyResponse(response) {
+    var _a;
+    var raw = unwrapPluginResponse(response, isCopyResultPayload);
+    if (raw.error) {
+        return {
+            successCount: 0,
+            failureCount: 0,
+            skippedCount: 0,
+            successes: [],
+            failures: [],
+            skipped: [],
+            error: raw.error
+        };
+    }
+    if (isApiResponse(raw) && isApiErrorCode(raw.code)) {
+        return {
+            successCount: 0,
+            failureCount: 0,
+            skippedCount: 0,
+            successes: [],
+            failures: [],
+            skipped: [],
+            error: (_a = raw.message) !== null && _a !== void 0 ? _a : 'Copy failed'
+        };
+    }
+    var successes = (Array.isArray(raw.successes)
+        ? raw.successes.map(function (entry) { return ({
+            path: asPlainString(entry === null || entry === void 0 ? void 0 : entry.path),
+            destinationPath: asPlainString(entry === null || entry === void 0 ? void 0 : entry.destinationPath),
+            overwritten: Boolean(entry === null || entry === void 0 ? void 0 : entry.overwritten)
+        }); })
+        : []).filter(function (entry) { return !isKeepFile(entry.path); });
+    var failures = (Array.isArray(raw.failures)
+        ? raw.failures.map(function (entry) { return ({
+            path: asPlainString(entry === null || entry === void 0 ? void 0 : entry.path),
+            message: asPlainString(entry === null || entry === void 0 ? void 0 : entry.message)
+        }); })
+        : []).filter(function (entry) { return !isKeepFile(entry.path); });
+    var skipped = (Array.isArray(raw.skipped)
+        ? raw.skipped.map(function (entry) { return ({
+            path: asPlainString(entry === null || entry === void 0 ? void 0 : entry.path),
+            reason: asPlainString(entry === null || entry === void 0 ? void 0 : entry.reason)
+        }); })
+        : []).filter(function (entry) { return !isKeepFile(entry.path); });
+    return {
+        successCount: successes.length,
+        failureCount: failures.length,
+        skippedCount: skipped.length,
+        successes: successes,
+        failures: failures,
+        skipped: skipped,
+        error: raw.error ? asPlainString(raw.error) : undefined,
+        sourceSiteId: raw.sourceSiteId ? asPlainString(raw.sourceSiteId) : undefined,
+        destinationSiteId: raw.destinationSiteId ? asPlainString(raw.destinationSiteId) : undefined,
+        sourcePath: raw.sourcePath ? asPlainString(raw.sourcePath) : undefined,
+        sourcePaths: Array.isArray(raw.sourcePaths)
+            ? raw.sourcePaths.map(asPlainString)
+            : raw.sourcePath
+                ? [asPlainString(raw.sourcePath)]
+                : []
+    };
+}
+function extractAjaxErrorMessage(error, fallback) {
+    var _a, _b, _c;
+    var e = error;
+    var nested = (_a = e === null || e === void 0 ? void 0 : e.response) === null || _a === void 0 ? void 0 : _a.response;
+    if (nested && typeof nested === 'object') {
+        if (typeof ((_b = nested.result) === null || _b === void 0 ? void 0 : _b.error) === 'string' && nested.result.error) {
+            return nested.result.error;
+        }
+        if (typeof nested.error === 'string' && nested.error) {
+            return nested.error;
+        }
+        if (typeof nested.message === 'string' && nested.message) {
+            return nested.message;
+        }
+    }
+    var ajaxBody = e === null || e === void 0 ? void 0 : e.response;
+    if (ajaxBody && typeof ajaxBody === 'object') {
+        if (typeof ((_c = ajaxBody.result) === null || _c === void 0 ? void 0 : _c.error) === 'string' && ajaxBody.result.error) {
+            return ajaxBody.result.error;
+        }
+        if (typeof ajaxBody.error === 'string' && ajaxBody.error) {
+            return ajaxBody.error;
+        }
+        if (typeof ajaxBody.message === 'string' && ajaxBody.message && ajaxBody.message !== 'OK') {
+            return ajaxBody.message;
+        }
+    }
+    if (typeof (e === null || e === void 0 ? void 0 : e.message) === 'string' && e.message) {
+        return e.message;
+    }
+    return fallback;
+}
+function callPlan(sourceSiteId, body) {
+    return postJSON(pluginScriptUrl('cross-site-content-copy-plan', sourceSiteId), body).pipe(map(function (response) { return parsePlanResponse(response); }), catchError(function (error) {
+        return of({ error: extractAjaxErrorMessage(error, 'Failed to build copy plan'), items: [] });
+    }));
+}
+function callCopy(sourceSiteId, body) {
+    return postJSON(pluginScriptUrl('cross-site-content-copy', sourceSiteId), body).pipe(map(function (response) { return parseCopyResponse(response); }), catchError(function (error) {
+        return of({
+            error: extractAjaxErrorMessage(error, 'Copy failed'),
+            successCount: 0,
+            failureCount: 0,
+            skippedCount: 0,
+            successes: [],
+            failures: [],
+            skipped: []
+        });
+    }));
+}
+function ContentItemRow(_a) {
+    var item = _a.item, path = _a.path, loading = _a.loading, trailing = _a.trailing, leading = _a.leading;
+    return (jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', gap: 0.5, minWidth: 0, flex: 1 }, children: [leading, loading && !item && jsx(CircularProgress, { size: 16, sx: { flexShrink: 0 } }), item && (jsxs(Fragment, { children: [isInWorkflow(item.stateMap) || item.systemType === 'folder' ? (jsx(Box$1, { component: "span", sx: { fontSize: '1.1rem', flexShrink: 0, display: 'inline-flex' }, children: jsx(ItemStateIcon, { item: item }) })) : (jsx(Box$1, { component: "span", sx: { fontSize: '1.1rem', flexShrink: 0, display: 'inline-flex' }, children: jsx(ItemPublishingTargetIcon, { item: item }) })), jsx(Box$1, { component: "span", sx: { fontSize: '1.1rem', flexShrink: 0, display: 'inline-flex' }, children: jsx(ItemTypeIcon, { item: item }) })] })), jsx(Typography, { variant: "body2", noWrap: true, title: item ? "".concat(item.label, " \u2014 ").concat(path) : path, sx: { minWidth: 0, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' }, children: item ? (jsxs(Fragment, { children: [asPlainString(item.label), jsx(Box$1, { component: "span", sx: { color: 'text.secondary', fontFamily: 'monospace', ml: 1 }, children: path })] })) : loading ? ('Loading…') : (jsx(Box$1, { component: "span", sx: { fontFamily: 'monospace' }, children: path })) }), trailing] }));
+}
+function useDetailedItemsByPath(siteId, paths) {
+    var _a = useState({}), itemsByPath = _a[0], setItemsByPath = _a[1];
+    var _b = useState(false), loading = _b[0], setLoading = _b[1];
+    var pathsKey = paths.join('\0');
+    useEffect(function () {
+        if (!siteId || paths.length === 0) {
+            setItemsByPath({});
+            setLoading(false);
+            return;
+        }
+        setLoading(true);
+        var sub = fetchDetailedItems(siteId, paths).subscribe({
+            next: function (items) {
+                var next = {};
+                paths.forEach(function (path, index) {
+                    if (items[index]) {
+                        next[path] = items[index];
+                    }
+                });
+                setItemsByPath(next);
+                setLoading(false);
+            },
+            error: function () {
+                setItemsByPath({});
+                setLoading(false);
+            }
+        });
+        return function () { return sub.unsubscribe(); };
+    }, [siteId, pathsKey]);
+    return { itemsByPath: itemsByPath, loading: loading };
+}
+function PlanItemTrailing(_a) {
+    var planItem = _a.planItem;
+    return (jsxs(Stack$1, { direction: "row", spacing: 0.5, sx: { flexShrink: 0, ml: 0.5 }, children: [jsx(Chip, { size: "small", variant: "outlined", label: planItem.role === 'dependency' ? 'Dependency' : 'Primary', sx: { height: 22, '& .MuiChip-label': { px: 0.75, fontSize: '0.7rem' } } }), jsx(Chip, { size: "small", variant: "outlined", color: planItem.existsOnDestination ? 'warning' : 'success', label: planItem.existsOnDestination ? 'Overwrite' : 'Create', sx: { height: 22, '& .MuiChip-label': { px: 0.75, fontSize: '0.7rem' } } })] }));
+}
+function CopyStatusIcon(_a) {
+    var status = _a.status;
+    if (status === 'success') {
+        return jsx(CheckCircleIcon, { color: "success", sx: { fontSize: '1.1rem', flexShrink: 0 } });
+    }
+    if (status === 'failure') {
+        return jsx(CancelIcon, { color: "error", sx: { fontSize: '1.1rem', flexShrink: 0 } });
+    }
+    return null;
+}
+function ItemListTable(_a) {
+    var headerLabel = _a.headerLabel, children = _a.children, _b = _a.actionsColumn, actionsColumn = _b === void 0 ? false : _b, sx = _a.sx;
+    return (jsx(Paper, { variant: "outlined", sx: sx, children: jsxs(Table, { size: "small", children: [jsx(TableHead, { children: jsxs(TableRow, { children: [jsx(TableCell, { children: headerLabel }), actionsColumn && (jsx(TableCell, { align: "right", width: 88, children: "Actions" }))] }) }), jsx(TableBody, { children: children })] }) }));
+}
+function CrossSiteContentCopy() {
+    var _a, _b;
+    var dispatch = useDispatch();
+    var activeSiteId = useActiveSiteId();
+    var env = useEnv();
+    var _c = useState([]), sites = _c[0], setSites = _c[1];
+    var _d = useState(true), sitesLoading = _d[0], setSitesLoading = _d[1];
+    var _e = useState([]), sourcePaths = _e[0], setSourcePaths = _e[1];
+    var _f = useState(null), itemMenuAnchor = _f[0], setItemMenuAnchor = _f[1];
+    var _g = useState(null), itemMenuPath = _g[0], setItemMenuPath = _g[1];
+    var _h = useState(null), addPathError = _h[0], setAddPathError = _h[1];
+    var _j = useState(null), destSite = _j[0], setDestSite = _j[1];
+    var _k = useState(true), copyDependencies = _k[0], setCopyDependencies = _k[1];
+    var _l = useState(null), plan = _l[0], setPlan = _l[1];
+    var _m = useState(null), planError = _m[0], setPlanError = _m[1];
+    var _o = useState(false), planLoading = _o[0], setPlanLoading = _o[1];
+    var _p = useState(false), copying = _p[0], setCopying = _p[1];
+    var _q = useState(null), copyResult = _q[0], setCopyResult = _q[1];
+    var mountedRef = useRef(true);
+    var copySubRef = useRef(null);
+    useEffect(function () {
+        mountedRef.current = true;
+        return function () {
+            var _a;
+            mountedRef.current = false;
+            (_a = copySubRef.current) === null || _a === void 0 ? void 0 : _a.unsubscribe();
+        };
+    }, []);
+    useEffect(function () {
+        var sub = fetchAll({ limit: 500, offset: 0 }).subscribe({
+            next: function (sitesResponse) {
+                setSites((Array.isArray(sitesResponse) ? sitesResponse : []).filter(Boolean));
+                setSitesLoading(false);
+            },
+            error: function () {
+                setSitesLoading(false);
+            }
+        });
+        return function () { return sub.unsubscribe(); };
+    }, []);
+    var destOptions = useMemo(function () { return sites.filter(function (site) { return site.id !== activeSiteId; }); }, [sites, activeSiteId]);
+    var readyForPlan = Boolean(activeSiteId && sourcePaths.length > 0 && destSite);
+    var handlePathSelected = function (path) {
+        var normalized = path.trim();
+        if (!normalized) {
+            return;
+        }
+        var duplicate = sourcePaths.some(function (existing) { return existing === normalized || existing.replace(/\/$/, '') === normalized.replace(/\/$/, ''); });
+        if (duplicate) {
+            setAddPathError('That path is already in the list.');
+            return;
+        }
+        setSourcePaths(function (current) { return __spreadArray(__spreadArray([], current, true), [normalized], false); });
+        setAddPathError(null);
+    };
+    var openAddItemDialog = function () {
+        var callbackId = 'crossSiteCopyPathSelection';
+        var callbackAccept = 'accept';
+        dispatch(showPathSelectionDialog({
+            rootPath: '/site',
+            initialPath: '',
+            showCreateFolderOption: false,
+            stripXmlIndex: false,
+            onClosed: batchActions([
+                dispatchDOMEvent({ id: callbackId, action: 'close' }),
+                pathSelectionDialogClosed()
+            ]),
+            onOk: batchActions([
+                dispatchDOMEvent({ id: callbackId, action: callbackAccept }),
+                closePathSelectionDialog()
+            ])
+        }));
+        createCustomDocumentEventListener(callbackId, function (detail) {
+            if (detail.action === callbackAccept && detail.path) {
+                handlePathSelected(detail.path);
+            }
+        });
+    };
+    var removeSourcePath = function (path) {
+        setSourcePaths(function (current) { return current.filter(function (entry) { return entry !== path; }); });
+    };
+    var clearSourcePaths = function () {
+        setSourcePaths([]);
+        setAddPathError(null);
+    };
+    var copyableItems = ((_a = plan === null || plan === void 0 ? void 0 : plan.items) !== null && _a !== void 0 ? _a : []).filter(function (item) { return !item.folder && !isKeepFile(item.path); });
+    var planItemPaths = useMemo(function () { var _a; return ((_a = plan === null || plan === void 0 ? void 0 : plan.items) !== null && _a !== void 0 ? _a : []).filter(function (item) { return !item.folder; }).map(function (item) { return item.path; }); }, [plan]);
+    var resultItemPaths = useMemo(function () {
+        if (!copyResult) {
+            return [];
+        }
+        var paths = new Set();
+        copyResult.successes.forEach(function (entry) { return paths.add(entry.path); });
+        copyResult.failures.forEach(function (entry) { return paths.add(entry.path); });
+        copyResult.skipped.forEach(function (entry) { return paths.add(entry.path); });
+        return Array.from(paths);
+    }, [copyResult]);
+    var _r = useDetailedItemsByPath(activeSiteId, sourcePaths), sourceItemsByPath = _r.itemsByPath, sourceItemsLoading = _r.loading;
+    var _s = useDetailedItemsByPath(activeSiteId, planItemPaths), planItemsByPath = _s.itemsByPath, planItemsLoading = _s.loading;
+    var _t = useDetailedItemsByPath(activeSiteId, resultItemPaths), resultItemsByPath = _t.itemsByPath, resultItemsLoading = _t.loading;
+    var resultRows = useMemo(function () {
+        if (!copyResult) {
+            return [];
+        }
+        var rows = [];
+        copyResult.successes.forEach(function (entry) {
+            return rows.push({
+                path: entry.path,
+                status: 'success',
+                detail: entry.overwritten ? 'Overwritten' : 'Created'
+            });
+        });
+        copyResult.failures.forEach(function (entry) {
+            return rows.push({ path: entry.path, status: 'failure', detail: entry.message });
+        });
+        copyResult.skipped.forEach(function (entry) {
+            return rows.push({ path: entry.path, status: 'skipped', detail: entry.reason });
+        });
+        return rows;
+    }, [copyResult]);
+    var itemMenuItem = itemMenuPath ? sourceItemsByPath[itemMenuPath] : null;
+    var openItemMenu = function (event, path) {
+        setItemMenuAnchor(event.currentTarget);
+        setItemMenuPath(path);
+    };
+    var closeItemMenu = function () {
+        setItemMenuAnchor(null);
+        setItemMenuPath(null);
+    };
+    var handleItemView = function () {
+        if (!itemMenuItem || !activeSiteId) {
+            return;
+        }
+        dispatch(showEditDialog({
+            site: activeSiteId,
+            path: itemMenuItem.path,
+            authoringBase: env.authoringBase,
+            readonly: true
+        }));
+        closeItemMenu();
+    };
+    var handleItemHistory = function () {
+        if (!itemMenuItem) {
+            return;
+        }
+        dispatch(batchActions([
+            fetchItemVersions({ item: itemMenuItem, rootPath: getRootPath(itemMenuItem.path) }),
+            showHistoryDialog({})
+        ]));
+        closeItemMenu();
+    };
+    var handleItemDependencies = function () {
+        if (!itemMenuItem) {
+            return;
+        }
+        dispatch(showDependenciesDialog({ item: itemMenuItem, rootPath: getRootPath(itemMenuItem.path) }));
+        closeItemMenu();
+    };
+    useEffect(function () {
+        if (!readyForPlan) {
+            setPlan(null);
+            setPlanError(null);
+            setPlanLoading(false);
+            return;
+        }
+        setPlanError(null);
+        setPlanLoading(true);
+        setCopyResult(null);
+        var sub = callPlan(activeSiteId, {
+            sourcePaths: sourcePaths,
+            destinationSiteId: destSite.id,
+            copyDependencies: copyDependencies
+        }).subscribe({
+            next: function (result) {
+                setPlanLoading(false);
+                if (result.error) {
+                    setPlanError(result.error);
+                    setPlan(null);
+                    return;
+                }
+                setPlan(result);
+            },
+            error: function (error) {
+                setPlanLoading(false);
+                setPlanError(extractAjaxErrorMessage(error, 'Failed to build copy plan'));
+                setPlan(null);
+            }
+        });
+        return function () { return sub.unsubscribe(); };
+    }, [readyForPlan, activeSiteId, sourcePaths, destSite, copyDependencies]);
+    var overwriteCount = copyableItems.filter(function (item) { return item.existsOnDestination; }).length;
+    var newCount = copyableItems.length - overwriteCount;
+    var runCopy = function () {
+        var _a;
+        if (!activeSiteId || sourcePaths.length === 0 || !destSite || copyableItems.length === 0) {
+            return;
+        }
+        (_a = copySubRef.current) === null || _a === void 0 ? void 0 : _a.unsubscribe();
+        setCopying(true);
+        copySubRef.current = callCopy(activeSiteId, {
+            sourcePaths: sourcePaths,
+            destinationSiteId: destSite.id,
+            copyDependencies: copyDependencies
+        }).subscribe({
+            next: function (result) {
+                var _a;
+                if (!mountedRef.current) {
+                    return;
+                }
+                setCopying(false);
+                setCopyResult(result);
+                if (result.error) {
+                    dispatch(showSystemNotification({ message: result.error }));
+                    return;
+                }
+                if (result.successCount === 0) {
+                    dispatch(showSystemNotification({ message: 'Copy failed — no items were written.' }));
+                    return;
+                }
+                var destId = (_a = result.destinationSiteId) !== null && _a !== void 0 ? _a : destSite.id;
+                var msg = result.failureCount > 0
+                    ? "Copied ".concat(result.successCount, " item(s) to ").concat(destId, " (").concat(result.failureCount, " failed).")
+                    : "Copied ".concat(result.successCount, " item(s) to ").concat(destId, ". Open that project to view them.");
+                dispatch(showSystemNotification({ message: msg }));
+            },
+            error: function (error) {
+                if (!mountedRef.current) {
+                    return;
+                }
+                setCopying(false);
+                dispatch(showSystemNotification({ message: extractAjaxErrorMessage(error, 'Copy failed') }));
+            }
+        });
+    };
+    var reset = function () {
+        setSourcePaths([]);
+        setAddPathError(null);
+        setDestSite(null);
+        setCopyDependencies(true);
+        setPlan(null);
+        setPlanError(null);
+        setCopyResult(null);
+    };
+    var copiedDestinationSiteId = (_b = copyResult === null || copyResult === void 0 ? void 0 : copyResult.destinationSiteId) !== null && _b !== void 0 ? _b : destSite === null || destSite === void 0 ? void 0 : destSite.id;
+    var copiedDestinationLabel = useMemo(function () {
+        if (!copiedDestinationSiteId) {
+            return '';
+        }
+        var match = sites.find(function (site) { return site.id === copiedDestinationSiteId; });
+        return match ? "".concat(match.name, " (").concat(match.id, ")") : copiedDestinationSiteId;
+    }, [copiedDestinationSiteId, sites]);
+    var switchToDestination = function () {
+        if (!copiedDestinationSiteId) {
+            return;
+        }
+        dispatch(changeSite(copiedDestinationSiteId));
+    };
+    return (jsxs(Paper, { elevation: 0, sx: { height: '100%', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }, children: [jsxs(DialogBody, { sx: { flex: 1, overflow: 'auto', pt: 2 }, children: [jsxs(Typography, { variant: "body2", color: "text.secondary", sx: { mb: 3 }, children: ["Copy content from ", jsx("strong", { children: activeSiteId }), " into another project. Copied items appear in the destination project only."] }), jsxs(Stack$1, { spacing: 3, children: [jsxs(Box$1, { children: [jsxs(Stack$1, { direction: "row", alignItems: "center", justifyContent: "space-between", sx: { mb: 1 }, children: [jsx(Typography, { variant: "subtitle2", children: "1. Source content" }), jsxs(Stack$1, { direction: "row", spacing: 1, children: [jsx(Button$1, { size: "small", onClick: openAddItemDialog, children: "Add item" }), sourcePaths.length > 0 && (jsx(Button$1, { size: "small", onClick: clearSourcePaths, children: "Clear list" }))] })] }), jsx(Typography, { variant: "body2", color: "text.secondary", sx: { mb: 1.5 }, children: "Add pages, components, or folders to copy. Use Add item to browse the project and confirm a path." }), addPathError && (jsx(Typography, { variant: "caption", color: "error", sx: { mb: 1, display: 'block' }, children: addPathError })), sourcePaths.length > 0 ? (jsx(ItemListTable, { headerLabel: "Selected items", actionsColumn: true, sx: { mt: 2 }, children: sourcePaths.map(function (path) {
+                                            var item = sourceItemsByPath[path];
+                                            var itemLoading = sourceItemsLoading && !item;
+                                            return (jsxs(TableRow, { hover: true, children: [jsx(TableCell, { sx: { py: 1.25, maxWidth: 0, width: '100%' }, children: jsx(ContentItemRow, { item: item, path: path, loading: itemLoading }) }), jsxs(TableCell, { align: "right", sx: { whiteSpace: 'nowrap' }, children: [jsx(IconButton$1, { size: "small", "aria-label": "Item options", onClick: function (event) { return openItemMenu(event, path); }, disabled: !item, children: jsx(MoreVertIcon, { fontSize: "small" }) }), jsx(IconButton$1, { size: "small", "aria-label": "Remove", onClick: function () { return removeSourcePath(path); }, children: jsx(DeleteOutlineIcon, { fontSize: "small" }) })] })] }, path));
+                                        }) })) : (jsxs(Alert, { severity: "info", sx: { mt: 2 }, children: ["No source items yet. Click ", jsx("strong", { children: "Add item" }), " to browse and add paths to copy."] })), jsxs(Menu$1, { anchorEl: itemMenuAnchor, open: Boolean(itemMenuAnchor), onClose: closeItemMenu, children: [jsx(MenuItem$1, { onClick: handleItemView, children: "View" }), jsx(MenuItem$1, { onClick: handleItemHistory, children: "History" }), jsx(MenuItem$1, { onClick: handleItemDependencies, children: "Dependencies" })] })] }), jsxs(Box$1, { children: [jsx(Typography, { variant: "subtitle2", gutterBottom: true, children: "2. Destination" }), sitesLoading ? (jsx(CircularProgress, { size: 24 })) : (jsxs(Stack$1, { spacing: 1.5, children: [jsx(Autocomplete, { options: destOptions, getOptionLabel: function (option) { return "".concat(option.name, " (").concat(option.id, ")"); }, value: destSite, onChange: function (_, value) { return setDestSite(value); }, renderInput: function (params) { return jsx(TextField$1, __assign({}, params, { label: "Destination project", required: true, size: "small" })); } }), jsx(FormControlLabel, { control: jsx(Checkbox, { size: "small", checked: copyDependencies, onChange: function (e) { return setCopyDependencies(e.target.checked); } }), label: "Include dependencies (components, linked assets)" })] }))] }), jsx(Divider, {}), jsxs(Box$1, { children: [jsx(Typography, { variant: "subtitle2", gutterBottom: true, children: "3. Preview" }), !readyForPlan && (jsx(Typography, { variant: "body2", color: "text.secondary", children: "Add at least one source item and choose a destination project to preview what will be copied." })), readyForPlan && plan && !planLoading && !copyResult && sourcePaths.length > 1 && (jsxs(Typography, { variant: "body2", color: "text.secondary", sx: { mb: 1.5 }, children: ["Copying ", sourcePaths.length, " source selection(s) into ", jsx("strong", { children: destSite === null || destSite === void 0 ? void 0 : destSite.id }), "."] })), readyForPlan && planLoading && (jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', gap: 1, py: 2 }, children: [jsx(CircularProgress, { size: 20 }), jsx(Typography, { variant: "body2", color: "text.secondary", children: "Building copy plan\u2026" })] })), readyForPlan && planError && !planLoading && (jsx(Alert, { severity: "error", children: planError })), readyForPlan && plan && !planLoading && !copyResult && (jsxs(Fragment, { children: [jsxs(Stack$1, { direction: "row", spacing: 1, sx: { mb: 2, flexWrap: 'wrap' }, children: [jsx(Chip, { size: "small", label: "".concat(copyableItems.length, " file(s)"), color: "primary", variant: "outlined" }), newCount > 0 && jsx(Chip, { size: "small", label: "".concat(newCount, " new"), color: "success", variant: "outlined" }), overwriteCount > 0 && (jsx(Chip, { size: "small", label: "".concat(overwriteCount, " overwrite"), color: "warning", variant: "outlined" }))] }), overwriteCount > 0 && (jsxs(Alert, { severity: "warning", sx: { mb: 2 }, children: [overwriteCount, " item(s) already exist in ", jsx("strong", { children: destSite === null || destSite === void 0 ? void 0 : destSite.id }), " and will be replaced."] })), copyableItems.length === 0 ? (jsx(Alert, { severity: "info", children: "No copyable files found for this selection." })) : (jsx(Box$1, { sx: { mt: 0 }, children: jsx(ItemListTable, { headerLabel: "Items to copy", children: copyableItems.map(function (planItem) {
+                                                        var item = planItemsByPath[planItem.path];
+                                                        var itemLoading = planItemsLoading && !item;
+                                                        return (jsx(TableRow, { hover: true, children: jsx(TableCell, { sx: { py: 1.25, maxWidth: 0, width: '100%' }, children: jsx(ContentItemRow, { item: item, path: planItem.path, loading: itemLoading, trailing: jsx(PlanItemTrailing, { planItem: planItem }) }) }) }, planItem.path));
+                                                    }) }) }))] })), copyResult && (jsxs(Stack$1, { spacing: 2, children: [copyResult.successCount === 0 ? (jsx(Alert, { severity: "error", children: "Copy failed. No items were written." })) : copyResult.failureCount === 0 ? (jsxs(Alert, { severity: "success", children: ["Copied ", copyResult.successCount, " item(s) to ", jsx("strong", { children: copiedDestinationLabel }), "."] })) : (jsxs(Alert, { severity: "warning", children: ["Copied ", copyResult.successCount, " item(s) to ", jsx("strong", { children: copiedDestinationLabel }), ";", ' ', copyResult.failureCount, " failed."] })), resultRows.length > 0 && (jsx(ItemListTable, { headerLabel: "Copy results", children: resultRows.map(function (row) {
+                                                    var item = resultItemsByPath[row.path];
+                                                    var itemLoading = resultItemsLoading && !item;
+                                                    return (jsx(TableRow, { hover: true, children: jsx(TableCell, { sx: { py: 1.25, maxWidth: 0, width: '100%' }, children: jsx(ContentItemRow, { item: item, path: row.path, loading: itemLoading, leading: jsx(CopyStatusIcon, { status: row.status }), trailing: row.detail && row.status === 'failure' ? (jsx(Typography, { variant: "caption", color: "error", noWrap: true, title: row.detail, sx: { flexShrink: 1, minWidth: 0, maxWidth: 180, ml: 0.5 }, children: row.detail })) : row.detail ? (jsx(Typography, { variant: "caption", color: "text.secondary", sx: { flexShrink: 0, ml: 0.5 }, children: row.detail })) : undefined }) }) }, "".concat(row.status, "-").concat(row.path)));
+                                                }) }))] }))] })] })] }), jsx(DialogFooter$1, { sx: { borderTop: 1, borderColor: 'divider', gap: 1 }, children: copyResult ? (jsxs(Fragment, { children: [jsx(Button$1, { onClick: reset, children: "Copy another" }), copyResult.successCount > 0 && copiedDestinationSiteId && (jsxs(Button$1, { variant: "outlined", onClick: switchToDestination, children: ["Switch to ", copiedDestinationSiteId] })), jsx(Button$1, { variant: "contained", onClick: reset, children: "Done" })] })) : (jsxs(Fragment, { children: [jsx(Button$1, { disabled: copying || planLoading, onClick: reset, children: "Cancel" }), jsx(Button$1, { variant: "contained", onClick: runCopy, disabled: copying || planLoading || !plan || copyableItems.length === 0, children: copying ? jsx(CircularProgress, { size: 22, color: "inherit" }) : "Copy ".concat(copyableItems.length || '', " item(s)") })] })) })] }));
 }
 
 function objectValuesIfNumericKeys$1(obj) {
@@ -2551,12 +3144,12 @@ function AudienceTargetingFlyoutToolbarButton(props) {
     var fields = buildAudienceFields(rawFieldsFromProps(props, configuration));
     var _e = React.useState(null), anchorEl = _e[0], setAnchorEl = _e[1];
     var open = Boolean(anchorEl);
-    return (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsx(Tooltip$1, { title: tooltip, children: jsxRuntimeExports.jsx(IconButton, { size: "small", "aria-label": title, "aria-haspopup": "true", "aria-expanded": open ? 'true' : undefined, onClick: function (e) { return setAnchorEl(anchorEl ? null : e.currentTarget); }, children: jsxRuntimeExports.jsx(SystemIcon, { icon: icon }) }) }), jsxRuntimeExports.jsx(Popover, { open: open, anchorEl: anchorEl, onClose: function () { return setAnchorEl(null); }, anchorOrigin: { vertical: 'bottom', horizontal: 'right' }, transformOrigin: { vertical: 'top', horizontal: 'right' }, slotProps: {
+    return (jsxs(Fragment, { children: [jsx(Tooltip$1, { title: tooltip, children: jsx(IconButton, { size: "small", "aria-label": title, "aria-haspopup": "true", "aria-expanded": open ? 'true' : undefined, onClick: function (e) { return setAnchorEl(anchorEl ? null : e.currentTarget); }, children: jsx(SystemIcon, { icon: icon }) }) }), jsx(Popover, { open: open, anchorEl: anchorEl, onClose: function () { return setAnchorEl(null); }, anchorOrigin: { vertical: 'bottom', horizontal: 'right' }, transformOrigin: { vertical: 'top', horizontal: 'right' }, slotProps: {
                     paper: {
                         elevation: 8,
                         sx: { mt: 0.5, maxWidth: 'min(420px, calc(100vw - 32px))', maxHeight: 'min(480px, calc(100vh - 120px))' }
                     }
-                }, children: jsxRuntimeExports.jsx(Paper$1, { variant: "outlined", sx: { overflow: 'auto' }, children: jsxRuntimeExports.jsx(Box, { sx: { minWidth: 320, minHeight: 280, p: 1 }, children: fields ? (jsxRuntimeExports.jsx(PreviewAudiencesPanel, { fields: fields })) : (jsxRuntimeExports.jsx(Alert$1, { severity: "warning", children: jsxRuntimeExports.jsx(Typography$1, { variant: "body2", children: "No audience fields were found for this toolbar button. Add a fields block under this widget's configuration in ui.xml (same structure as the Experience Builder audience tool)." }) })) }) }) })] }));
+                }, children: jsx(Paper$1, { variant: "outlined", sx: { overflow: 'auto' }, children: jsx(Box, { sx: { minWidth: 320, minHeight: 280, p: 1 }, children: fields ? (jsx(PreviewAudiencesPanel, { fields: fields })) : (jsx(Alert$1, { severity: "warning", children: jsx(Typography$1, { variant: "body2", children: "No audience fields were found for this toolbar button. Add a fields block under this widget's configuration in ui.xml (same structure as the Experience Builder audience tool)." }) })) }) }) })] }));
 }
 
 function scalarXmlValue(v) {
@@ -2684,12 +3277,12 @@ function DeviceSimulatorFlyoutToolbarButton(props) {
     var devices = buildSimulatorDevices(rawDevicesFromProps(props, configuration), defaultDevices);
     var _e = React.useState(null), anchorEl = _e[0], setAnchorEl = _e[1];
     var open = Boolean(anchorEl);
-    return (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsx(Tooltip$1, { title: tooltip, children: jsxRuntimeExports.jsx(IconButton, { size: "small", "aria-label": title, "aria-haspopup": "true", "aria-expanded": open ? 'true' : undefined, onClick: function (e) { return setAnchorEl(anchorEl ? null : e.currentTarget); }, children: jsxRuntimeExports.jsx(SystemIcon, { icon: icon }) }) }), jsxRuntimeExports.jsx(Popover, { open: open, anchorEl: anchorEl, onClose: function () { return setAnchorEl(null); }, anchorOrigin: { vertical: 'bottom', horizontal: 'right' }, transformOrigin: { vertical: 'top', horizontal: 'right' }, slotProps: {
+    return (jsxs(Fragment, { children: [jsx(Tooltip$1, { title: tooltip, children: jsx(IconButton, { size: "small", "aria-label": title, "aria-haspopup": "true", "aria-expanded": open ? 'true' : undefined, onClick: function (e) { return setAnchorEl(anchorEl ? null : e.currentTarget); }, children: jsx(SystemIcon, { icon: icon }) }) }), jsx(Popover, { open: open, anchorEl: anchorEl, onClose: function () { return setAnchorEl(null); }, anchorOrigin: { vertical: 'bottom', horizontal: 'right' }, transformOrigin: { vertical: 'top', horizontal: 'right' }, slotProps: {
                     paper: {
                         elevation: 8,
                         sx: { mt: 0.5, maxWidth: 'min(420px, calc(100vw - 32px))', maxHeight: 'min(520px, calc(100vh - 120px))' }
                     }
-                }, children: jsxRuntimeExports.jsx(Paper$1, { variant: "outlined", sx: { overflow: 'auto' }, children: jsxRuntimeExports.jsx(Box, { sx: { minWidth: 320 }, children: jsxRuntimeExports.jsx(PreviewSimulatorPanel, { devices: devices }) }) }) })] }));
+                }, children: jsx(Paper$1, { variant: "outlined", sx: { overflow: 'auto' }, children: jsx(Box, { sx: { minWidth: 320 }, children: jsx(PreviewSimulatorPanel, { devices: devices }) }) }) })] }));
 }
 
 /*
@@ -2761,7 +3354,7 @@ function OpenCannedSearchPanelButton(props) {
             }));
         }
     };
-    return jsxRuntimeExports.jsx(ToolsPanelListItemButton, { icon: icon, title: title, onClick: onClick });
+    return jsx(ToolsPanelListItemButton, { icon: icon, title: title, onClick: onClick });
 }
 
 var DEFAULT_ICON = { id: '@mui/icons-material/SavedSearchRounded' };
@@ -2802,9 +3395,9 @@ function OpenCannedSearchToolbarButton(props) {
         }
     };
     var applyTooltip = function (children) {
-        return useIcon || p.tooltip ? jsxRuntimeExports.jsx(Tooltip$1, { title: tooltip, children: children }) : children;
+        return useIcon || p.tooltip ? jsx(Tooltip$1, { title: tooltip, children: children }) : children;
     };
-    return applyTooltip(useIcon ? (jsxRuntimeExports.jsx(IconButton, { size: buttonSize, onClick: onClick, "aria-label": title, children: jsxRuntimeExports.jsx(SystemIcon, { icon: icon }) })) : (jsxRuntimeExports.jsx(Button$1, { size: buttonSize, onClick: onClick, startIcon: useIconWithText ? jsxRuntimeExports.jsx(SystemIcon, { icon: icon }) : undefined, sx: (_a = {}, _a[".".concat(buttonClasses.startIcon)] = { mr: 0.5 }, _a), children: title })));
+    return applyTooltip(useIcon ? (jsx(IconButton, { size: buttonSize, onClick: onClick, "aria-label": title, children: jsx(SystemIcon, { icon: icon }) })) : (jsx(Button$1, { size: buttonSize, onClick: onClick, startIcon: useIconWithText ? jsx(SystemIcon, { icon: icon }) : undefined, sx: (_a = {}, _a[".".concat(buttonClasses.startIcon)] = { mr: 0.5 }, _a), children: title })));
 }
 
 function gt(e, t) {
@@ -4546,7 +5139,7 @@ function Ut({
   ]), useEffect(() => {
     const x = N.current;
     x && (x.mutableState.defaultLayout = n, x.mutableState.disableCursor = !!o);
-  }), /* @__PURE__ */ jsxRuntimeExports.jsx(lt.Provider, { value: G, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+  }), /* @__PURE__ */ jsx(lt.Provider, { value: G, children: /* @__PURE__ */ jsx(
     "div",
     {
       ...S,
@@ -4683,7 +5276,7 @@ function Yt({
     flexGrow: void 0,
     flexShrink: void 0,
     flexBasis: i
-  } : k = { flexGrow: 1 }, /* @__PURE__ */ jsxRuntimeExports.jsx(
+  } : k = { flexGrow: 1 }, /* @__PURE__ */ jsx(
     "div",
     {
       ...z,
@@ -4700,7 +5293,7 @@ function Yt({
         overflow: "visible",
         ...k
       },
-      children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+      children: /* @__PURE__ */ jsx(
         "div",
         {
           className: t,
@@ -4851,7 +5444,7 @@ function Qt({
       default:
         z ? G = "focus" : G = d;
     }
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+  return /* @__PURE__ */ jsx(
     "div",
     {
       ...a,
@@ -5390,19 +5983,19 @@ function OpenSearchSchemaPanel(_a) {
         setMenuAnchor(null);
         setMenuField(null);
     };
-    return (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsxs(Box$1, { sx: { px: 1.5, py: 1, borderBottom: 1, borderColor: 'divider' }, children: [jsxRuntimeExports.jsx(Typography, { variant: "subtitle2", children: "Schema (inferred)" }), jsxRuntimeExports.jsxs(Typography, { variant: "caption", color: "text.secondary", display: "block", sx: { mb: 1 }, children: ["Loads sample hits and walks ", jsxRuntimeExports.jsx(Typography, { component: "span", variant: "caption", fontFamily: "monospace", children: "_source" }), " to list fields. Use the menu to insert clauses into", ' ', jsxRuntimeExports.jsx(Typography, { component: "span", variant: "caption", fontFamily: "monospace", children: "bool.must" }), "."] }), jsxRuntimeExports.jsxs(Box$1, { sx: { display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center' }, children: [jsxRuntimeExports.jsx(TextField$1, { size: "small", type: "number", label: "Sample size", value: sampleSize, onChange: function (e) { return setSampleSize(Math.min(200, Math.max(1, Number(e.target.value) || 1))); }, sx: { width: 110 }, inputProps: { min: 1, max: 200 } }), jsxRuntimeExports.jsx(Button$1, { size: "small", variant: "outlined", startIcon: schemaLoading ? jsxRuntimeExports.jsx(CircularProgress, { color: "inherit", size: 16 }) : jsxRuntimeExports.jsx(RefreshRoundedIcon, {}), disabled: schemaLoading || !siteId, onClick: function () { return void refreshSchema(); }, children: schemaLoading ? 'Loading…' : 'Refresh schema' })] }), jsxRuntimeExports.jsx(TextField$1, { size: "small", fullWidth: true, sx: { mt: 1 }, label: "Filter paths", value: pathFilter, onChange: function (e) { return setPathFilter(e.target.value); }, placeholder: "e.g. localId or title", InputProps: {
-                            endAdornment: pathFilter ? (jsxRuntimeExports.jsx(InputAdornment, { position: "end", children: jsxRuntimeExports.jsx(Button$1, { size: "small", onClick: function () { return setPathFilter(''); }, children: "Clear" }) })) : undefined
-                        } })] }), sourceIsWildcard && (jsxRuntimeExports.jsxs(Alert, { severity: "info", sx: { mx: 1, mt: 1 }, children: ["Query uses ", jsxRuntimeExports.jsx(Typography, { component: "span", fontFamily: "monospace", children: "_source: true" }), ". Checkboxes are disabled until you set an explicit ", jsxRuntimeExports.jsx(Typography, { component: "span", fontFamily: "monospace", children: "_source" }), " array in JSON."] })), jsxRuntimeExports.jsxs(List, { dense: true, sx: { overflow: 'auto', py: 0, maxHeight: { xs: 200, md: 320 } }, children: [filteredInferred.length === 0 && !schemaLoading && (jsxRuntimeExports.jsx(ListItem, { children: jsxRuntimeExports.jsx(ListItemText, { primary: "No schema loaded", secondary: 'Click "Refresh schema" after documents are indexed.', secondaryTypographyProps: { variant: 'caption' } }) })), filteredInferred.map(function (row) { return (jsxRuntimeExports.jsx(ListItem, { secondaryAction: jsxRuntimeExports.jsx(Tooltip, { title: "Query builder", children: jsxRuntimeExports.jsx(IconButton$1, { edge: "end", size: "small", onClick: function (e) { return onMenuOpen(e, row.path); }, children: jsxRuntimeExports.jsx(MoreVertRoundedIcon, { fontSize: "small" }) }) }), sx: { alignItems: 'flex-start', pr: 7 }, children: jsxRuntimeExports.jsx(FormControlLabel, { sx: { mr: 0, alignItems: 'flex-start' }, control: jsxRuntimeExports.jsx(Checkbox, { size: "small", checked: sourceIsWildcard || selectedFields.has(row.path), disabled: sourceIsWildcard, onChange: function (_, c) { return toggleField(row.path, c); } }), label: jsxRuntimeExports.jsxs(Box$1, { children: [jsxRuntimeExports.jsx(Typography, { variant: "body2", fontFamily: "monospace", sx: { wordBreak: 'break-all' }, children: row.path }), jsxRuntimeExports.jsx(Box$1, { sx: { display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 0.5 }, children: row.types.map(function (t) { return (jsxRuntimeExports.jsx(Chip, { label: t, size: "small", variant: "outlined" }, t)); }) })] }) }) }, row.path)); })] }), jsxRuntimeExports.jsxs(Menu$1, { anchorEl: menuAnchor, open: Boolean(menuAnchor), onClose: function () { return setMenuAnchor(null); }, children: [jsxRuntimeExports.jsxs(MenuItem$1, { onClick: function () {
+    return (jsxs(Fragment, { children: [jsxs(Box$1, { sx: { px: 1.5, py: 1, borderBottom: 1, borderColor: 'divider' }, children: [jsx(Typography, { variant: "subtitle2", children: "Schema (inferred)" }), jsxs(Typography, { variant: "caption", color: "text.secondary", display: "block", sx: { mb: 1 }, children: ["Loads sample hits and walks ", jsx(Typography, { component: "span", variant: "caption", fontFamily: "monospace", children: "_source" }), " to list fields. Use the menu to insert clauses into", ' ', jsx(Typography, { component: "span", variant: "caption", fontFamily: "monospace", children: "bool.must" }), "."] }), jsxs(Box$1, { sx: { display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center' }, children: [jsx(TextField$1, { size: "small", type: "number", label: "Sample size", value: sampleSize, onChange: function (e) { return setSampleSize(Math.min(200, Math.max(1, Number(e.target.value) || 1))); }, sx: { width: 110 }, inputProps: { min: 1, max: 200 } }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: schemaLoading ? jsx(CircularProgress, { color: "inherit", size: 16 }) : jsx(RefreshRoundedIcon, {}), disabled: schemaLoading || !siteId, onClick: function () { return void refreshSchema(); }, children: schemaLoading ? 'Loading…' : 'Refresh schema' })] }), jsx(TextField$1, { size: "small", fullWidth: true, sx: { mt: 1 }, label: "Filter paths", value: pathFilter, onChange: function (e) { return setPathFilter(e.target.value); }, placeholder: "e.g. localId or title", InputProps: {
+                            endAdornment: pathFilter ? (jsx(InputAdornment, { position: "end", children: jsx(Button$1, { size: "small", onClick: function () { return setPathFilter(''); }, children: "Clear" }) })) : undefined
+                        } })] }), sourceIsWildcard && (jsxs(Alert, { severity: "info", sx: { mx: 1, mt: 1 }, children: ["Query uses ", jsx(Typography, { component: "span", fontFamily: "monospace", children: "_source: true" }), ". Checkboxes are disabled until you set an explicit ", jsx(Typography, { component: "span", fontFamily: "monospace", children: "_source" }), " array in JSON."] })), jsxs(List, { dense: true, sx: { overflow: 'auto', py: 0, maxHeight: { xs: 200, md: 320 } }, children: [filteredInferred.length === 0 && !schemaLoading && (jsx(ListItem, { children: jsx(ListItemText, { primary: "No schema loaded", secondary: 'Click "Refresh schema" after documents are indexed.', secondaryTypographyProps: { variant: 'caption' } }) })), filteredInferred.map(function (row) { return (jsx(ListItem, { secondaryAction: jsx(Tooltip, { title: "Query builder", children: jsx(IconButton$1, { edge: "end", size: "small", onClick: function (e) { return onMenuOpen(e, row.path); }, children: jsx(MoreVertRoundedIcon, { fontSize: "small" }) }) }), sx: { alignItems: 'flex-start', pr: 7 }, children: jsx(FormControlLabel, { sx: { mr: 0, alignItems: 'flex-start' }, control: jsx(Checkbox, { size: "small", checked: sourceIsWildcard || selectedFields.has(row.path), disabled: sourceIsWildcard, onChange: function (_, c) { return toggleField(row.path, c); } }), label: jsxs(Box$1, { children: [jsx(Typography, { variant: "body2", fontFamily: "monospace", sx: { wordBreak: 'break-all' }, children: row.path }), jsx(Box$1, { sx: { display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 0.5 }, children: row.types.map(function (t) { return (jsx(Chip, { label: t, size: "small", variant: "outlined" }, t)); }) })] }) }) }, row.path)); })] }), jsxs(Menu$1, { anchorEl: menuAnchor, open: Boolean(menuAnchor), onClose: function () { return setMenuAnchor(null); }, children: [jsxs(MenuItem$1, { onClick: function () {
                             if (menuField) {
                                 addFieldToSource(menuField);
                             }
-                        }, children: ["Add to ", jsxRuntimeExports.jsx(Typography, { component: "span", fontFamily: "monospace", children: "_source" })] }), jsxRuntimeExports.jsx(Divider, {}), menuField && (jsxRuntimeExports.jsx(MenuItem$1, { onClick: function () {
+                        }, children: ["Add to ", jsx(Typography, { component: "span", fontFamily: "monospace", children: "_source" })] }), jsx(Divider, {}), menuField && (jsx(MenuItem$1, { onClick: function () {
                             insertExists(menuField);
                             setMenuAnchor(null);
-                        }, children: "Insert exists" })), jsxRuntimeExports.jsx(MenuItem$1, { onClick: function () { return menuField && openClauseDialog('match', menuField); }, children: "Insert match\u2026" }), jsxRuntimeExports.jsx(MenuItem$1, { onClick: function () { return menuField && openClauseDialog('term', menuField); }, children: "Insert term\u2026" }), jsxRuntimeExports.jsx(MenuItem$1, { onClick: function () { return menuField && openClauseDialog('prefix', menuField); }, children: "Insert prefix\u2026" }), jsxRuntimeExports.jsx(MenuItem$1, { onClick: function () { return menuField && openClauseDialog('wildcard', menuField); }, children: "Insert wildcard\u2026" }), jsxRuntimeExports.jsx(MenuItem$1, { onClick: function () { return menuField && openClauseDialog('range', menuField); }, children: "Insert range\u2026" })] }), jsxRuntimeExports.jsxs(Dialog, { open: dialog.open, onClose: function () { return setDialog(function (d) { return (__assign(__assign({}, d), { open: false, mode: null })); }); }, fullWidth: true, maxWidth: "sm", children: [jsxRuntimeExports.jsxs(DialogTitle, { children: [dialog.mode === 'match' && 'Match', dialog.mode === 'term' && 'Term', dialog.mode === 'prefix' && 'Prefix', dialog.mode === 'wildcard' && 'Wildcard', dialog.mode === 'range' && 'Range', dialog.field && (jsxRuntimeExports.jsx(Typography, { component: "span", variant: "body2", fontFamily: "monospace", display: "block", sx: { mt: 1 }, children: dialog.field }))] }), jsxRuntimeExports.jsx(DialogContent, { children: dialog.mode === 'range' ? (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsx(TextField$1, { margin: "dense", fullWidth: true, label: "gte (optional)", value: dialog.gte, onChange: function (e) { return setDialog(function (d) { return (__assign(__assign({}, d), { gte: e.target.value })); }); }, placeholder: "2024-01-01 or now-1y" }), jsxRuntimeExports.jsx(TextField$1, { margin: "dense", fullWidth: true, label: "lte (optional)", value: dialog.lte, onChange: function (e) { return setDialog(function (d) { return (__assign(__assign({}, d), { lte: e.target.value })); }); }, placeholder: "now" })] })) : (jsxRuntimeExports.jsx(TextField$1, { autoFocus: true, margin: "dense", fullWidth: true, label: dialog.mode === 'wildcard' ? 'Pattern (* and ? allowed)' : 'Value', value: dialog.value, onChange: function (e) { return setDialog(function (d) { return (__assign(__assign({}, d), { value: e.target.value })); }); }, multiline: dialog.mode === 'match', minRows: dialog.mode === 'match' ? 3 : 1 })) }), jsxRuntimeExports.jsxs(DialogActions, { children: [jsxRuntimeExports.jsx(Button$1, { onClick: function () { return setDialog(function (d) { return (__assign(__assign({}, d), { open: false, mode: null })); }); }, children: "Cancel" }), jsxRuntimeExports.jsx(Button$1, { variant: "contained", onClick: confirmClauseDialog, children: "Insert clause" })] })] }), jsxRuntimeExports.jsx(Divider, { sx: { my: 1 } }), jsxRuntimeExports.jsxs(Box$1, { sx: { px: 1.5, py: 0.5 }, children: [jsxRuntimeExports.jsx(Typography, { variant: "subtitle2", children: "Common fields (shortcuts)" }), jsxRuntimeExports.jsxs(Typography, { variant: "caption", color: "text.secondary", children: ["Curated list \u2014 toggles ", jsxRuntimeExports.jsx(Typography, { component: "span", variant: "caption", fontFamily: "monospace", children: "_source" }), "."] })] }), jsxRuntimeExports.jsx(List, { dense: true, sx: { overflow: 'auto', py: 0, maxHeight: 220 }, children: CRAFTER_OPENSEARCH_FIELD_GROUPS.map(function (group) { return (jsxRuntimeExports.jsxs(React__default.Fragment, { children: [jsxRuntimeExports.jsx(ListItem, { secondaryAction: jsxRuntimeExports.jsx(IconButton$1, { edge: "end", size: "small", "aria-label": openGroups[group.title] ? 'Collapse' : 'Expand', onClick: function () { return setOpenGroups(function (s) {
+                        }, children: "Insert exists" })), jsx(MenuItem$1, { onClick: function () { return menuField && openClauseDialog('match', menuField); }, children: "Insert match\u2026" }), jsx(MenuItem$1, { onClick: function () { return menuField && openClauseDialog('term', menuField); }, children: "Insert term\u2026" }), jsx(MenuItem$1, { onClick: function () { return menuField && openClauseDialog('prefix', menuField); }, children: "Insert prefix\u2026" }), jsx(MenuItem$1, { onClick: function () { return menuField && openClauseDialog('wildcard', menuField); }, children: "Insert wildcard\u2026" }), jsx(MenuItem$1, { onClick: function () { return menuField && openClauseDialog('range', menuField); }, children: "Insert range\u2026" })] }), jsxs(Dialog, { open: dialog.open, onClose: function () { return setDialog(function (d) { return (__assign(__assign({}, d), { open: false, mode: null })); }); }, fullWidth: true, maxWidth: "sm", children: [jsxs(DialogTitle, { children: [dialog.mode === 'match' && 'Match', dialog.mode === 'term' && 'Term', dialog.mode === 'prefix' && 'Prefix', dialog.mode === 'wildcard' && 'Wildcard', dialog.mode === 'range' && 'Range', dialog.field && (jsx(Typography, { component: "span", variant: "body2", fontFamily: "monospace", display: "block", sx: { mt: 1 }, children: dialog.field }))] }), jsx(DialogContent, { children: dialog.mode === 'range' ? (jsxs(Fragment, { children: [jsx(TextField$1, { margin: "dense", fullWidth: true, label: "gte (optional)", value: dialog.gte, onChange: function (e) { return setDialog(function (d) { return (__assign(__assign({}, d), { gte: e.target.value })); }); }, placeholder: "2024-01-01 or now-1y" }), jsx(TextField$1, { margin: "dense", fullWidth: true, label: "lte (optional)", value: dialog.lte, onChange: function (e) { return setDialog(function (d) { return (__assign(__assign({}, d), { lte: e.target.value })); }); }, placeholder: "now" })] })) : (jsx(TextField$1, { autoFocus: true, margin: "dense", fullWidth: true, label: dialog.mode === 'wildcard' ? 'Pattern (* and ? allowed)' : 'Value', value: dialog.value, onChange: function (e) { return setDialog(function (d) { return (__assign(__assign({}, d), { value: e.target.value })); }); }, multiline: dialog.mode === 'match', minRows: dialog.mode === 'match' ? 3 : 1 })) }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: function () { return setDialog(function (d) { return (__assign(__assign({}, d), { open: false, mode: null })); }); }, children: "Cancel" }), jsx(Button$1, { variant: "contained", onClick: confirmClauseDialog, children: "Insert clause" })] })] }), jsx(Divider, { sx: { my: 1 } }), jsxs(Box$1, { sx: { px: 1.5, py: 0.5 }, children: [jsx(Typography, { variant: "subtitle2", children: "Common fields (shortcuts)" }), jsxs(Typography, { variant: "caption", color: "text.secondary", children: ["Curated list \u2014 toggles ", jsx(Typography, { component: "span", variant: "caption", fontFamily: "monospace", children: "_source" }), "."] })] }), jsx(List, { dense: true, sx: { overflow: 'auto', py: 0, maxHeight: 220 }, children: CRAFTER_OPENSEARCH_FIELD_GROUPS.map(function (group) { return (jsxs(React__default.Fragment, { children: [jsx(ListItem, { secondaryAction: jsx(IconButton$1, { edge: "end", size: "small", "aria-label": openGroups[group.title] ? 'Collapse' : 'Expand', onClick: function () { return setOpenGroups(function (s) {
                                     var _a;
                                     return (__assign(__assign({}, s), (_a = {}, _a[group.title] = !s[group.title], _a)));
-                                }); }, children: openGroups[group.title] ? jsxRuntimeExports.jsx(ExpandLessRoundedIcon, {}) : jsxRuntimeExports.jsx(ExpandMoreRounded, {}) }), sx: { py: 0.5 }, children: jsxRuntimeExports.jsx(ListItemText, { primary: group.title, primaryTypographyProps: { variant: 'subtitle2' } }) }), jsxRuntimeExports.jsx(Collapse, { in: openGroups[group.title], timeout: "auto", unmountOnExit: true, children: jsxRuntimeExports.jsx(List, { component: "div", dense: true, disablePadding: true, children: group.fields.map(function (field) { return (jsxRuntimeExports.jsx(ListItem, { sx: { pl: 2, py: 0 }, children: jsxRuntimeExports.jsx(FormControlLabel, { control: jsxRuntimeExports.jsx(Checkbox, { size: "small", checked: sourceIsWildcard || selectedFields.has(field), disabled: sourceIsWildcard, onChange: function (_, c) { return toggleField(field, c); } }), label: jsxRuntimeExports.jsx(Typography, { variant: "body2", fontFamily: "monospace", children: field }) }) }, field)); }) }) }), jsxRuntimeExports.jsx(Divider, { component: "li" })] }, group.title)); }) })] }));
+                                }); }, children: openGroups[group.title] ? jsx(ExpandLessRoundedIcon, {}) : jsx(ExpandMoreRounded, {}) }), sx: { py: 0.5 }, children: jsx(ListItemText, { primary: group.title, primaryTypographyProps: { variant: 'subtitle2' } }) }), jsx(Collapse, { in: openGroups[group.title], timeout: "auto", unmountOnExit: true, children: jsx(List, { component: "div", dense: true, disablePadding: true, children: group.fields.map(function (field) { return (jsx(ListItem, { sx: { pl: 2, py: 0 }, children: jsx(FormControlLabel, { control: jsx(Checkbox, { size: "small", checked: sourceIsWildcard || selectedFields.has(field), disabled: sourceIsWildcard, onChange: function (_, c) { return toggleField(field, c); } }), label: jsx(Typography, { variant: "body2", fontFamily: "monospace", children: field }) }) }, field)); }) }) }), jsx(Divider, { component: "li" })] }, group.title)); }) })] }));
 }
 
 function _extends() {
@@ -31196,7 +31789,7 @@ var ReactCodeMirror = /*#__PURE__*/forwardRef((props, ref) => {
     throw new Error("value must be typeof string but got " + typeof value);
   }
   var defaultClassNames = typeof theme === 'string' ? "cm-theme-" + theme : 'cm-theme';
-  return /*#__PURE__*/jsxRuntimeExports.jsx("div", _extends({
+  return /*#__PURE__*/jsx("div", _extends({
     ref: setEditorRef,
     className: "" + defaultClassNames + (className ? " " + className : '')
   }, other));
@@ -33332,7 +33925,7 @@ function OpenSearchJsonEditor(_a) {
         ];
     }, [readOnly, onModEnter]);
     var editable = Boolean(onChange) && !readOnly;
-    return (jsxRuntimeExports.jsx(Box$1, { sx: {
+    return (jsx(Box$1, { sx: {
             flex: 1,
             minHeight: 220,
             minWidth: 0,
@@ -33341,7 +33934,7 @@ function OpenSearchJsonEditor(_a) {
             borderColor: 'divider',
             '& .cm-editor': { height: '100%' },
             '& .cm-scroller': { overflow: 'auto' }
-        }, children: jsxRuntimeExports.jsx(Box$1, { sx: { position: 'absolute', inset: 0 }, children: jsxRuntimeExports.jsx(ReactCodeMirror, { value: value, height: "100%", theme: "none", extensions: extensions, editable: editable, readOnly: readOnly, onChange: editable ? onChange : undefined, basicSetup: false }) }) }));
+        }, children: jsx(Box$1, { sx: { position: 'absolute', inset: 0 }, children: jsx(ReactCodeMirror, { value: value, height: "100%", theme: "none", extensions: extensions, editable: editable, readOnly: readOnly, onChange: editable ? onChange : undefined, basicSetup: false }) }) }));
 }
 
 var DEFAULT_QUERY = "{\n  \"size\": 10,\n  \"query\": {\n    \"match_all\": {}\n  },\n  \"_source\": [\"localId\", \"internal-name\", \"content-type\"]\n}";
@@ -33854,9 +34447,9 @@ function parseFormDefinitionFields(xml) {
 function ResizeGrip(_a) {
     var vertical = _a.vertical;
     if (vertical) {
-        return (jsxRuntimeExports.jsx(Qt, { style: { height: 10, display: 'flex', alignItems: 'center', flexShrink: 0 }, children: jsxRuntimeExports.jsx(Box$1, { sx: { height: 4, alignSelf: 'stretch', mx: 2, borderRadius: 1, bgcolor: 'divider' } }) }));
+        return (jsx(Qt, { style: { height: 10, display: 'flex', alignItems: 'center', flexShrink: 0 }, children: jsx(Box$1, { sx: { height: 4, alignSelf: 'stretch', mx: 2, borderRadius: 1, bgcolor: 'divider' } }) }));
     }
-    return (jsxRuntimeExports.jsx(Qt, { style: { width: 10, display: 'flex', justifyContent: 'center', flexShrink: 0 }, children: jsxRuntimeExports.jsx(Box$1, { sx: { width: 4, alignSelf: 'stretch', my: 1.5, borderRadius: 1, bgcolor: 'divider' } }) }));
+    return (jsx(Qt, { style: { width: 10, display: 'flex', justifyContent: 'center', flexShrink: 0 }, children: jsx(Box$1, { sx: { width: 4, alignSelf: 'stretch', my: 1.5, borderRadius: 1, bgcolor: 'divider' } }) }));
 }
 function OpenSearchPlayground() {
     var _this = this;
@@ -34578,7 +35171,7 @@ function OpenSearchPlayground() {
             }
         });
     }, [isFullscreen]);
-    return (jsxRuntimeExports.jsxs(Box$1, { ref: fullscreenRef, sx: __assign({ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 480, p: 2, gap: 1.5, boxSizing: 'border-box', bgcolor: 'background.default' }, (isFullscreen && {
+    return (jsxs(Box$1, { ref: fullscreenRef, sx: __assign({ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 480, p: 2, gap: 1.5, boxSizing: 'border-box', bgcolor: 'background.default' }, (isFullscreen && {
             // CSS-level overlay so we still fill the viewport even when the browser Fullscreen API
             // is blocked (e.g. Studio's iframe without `allow="fullscreen"`).
             position: 'fixed',
@@ -34588,20 +35181,20 @@ function OpenSearchPlayground() {
             minHeight: '100vh',
             zIndex: function (theme) { return theme.zIndex.modal + 100; },
             overflow: 'auto'
-        })), children: [jsxRuntimeExports.jsxs(Box$1, { sx: { display: 'flex', alignItems: 'flex-start', gap: 1, flexWrap: 'wrap' }, children: [jsxRuntimeExports.jsx(SearchRoundedIcon, { color: "primary", sx: { mt: 0.5 } }), jsxRuntimeExports.jsx(Typography, { variant: "h5", component: "h1", children: "OpenSearch" }), jsxRuntimeExports.jsx(Typography, { variant: "body2", color: "text.secondary", sx: { flex: '1 1 200px', fontFamily: 'monospace' }, children: "POST /api/1/site/search/search.json?crafterSite=\u2026" }), jsxRuntimeExports.jsx(Tooltip, { title: isFullscreen ? 'Exit full screen' : 'Full screen', children: jsxRuntimeExports.jsx(IconButton$1, { size: "small", onClick: toggleFullscreen, "aria-label": isFullscreen ? 'Exit full screen' : 'Enter full screen', sx: { flexShrink: 0 }, children: isFullscreen ? jsxRuntimeExports.jsx(FullscreenExitRoundedIcon, {}) : jsxRuntimeExports.jsx(FullscreenRoundedIcon, {}) }) })] }), jsxRuntimeExports.jsxs(Box$1, { sx: { display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }, children: [jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "Active site", value: siteId !== null && siteId !== void 0 ? siteId : '', disabled: true, sx: { minWidth: 160 } }), jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "Extra indexes (optional)", placeholder: "e.g. other-alias (see multi-index docs)", value: extraIndexes, onChange: function (e) { return setExtraIndexes(e.target.value); }, sx: { flex: '1 1 220px', minWidth: 200 } }), jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "Load template", defaultValue: "", sx: { minWidth: 200 }, SelectProps: __assign(__assign({}, fullscreenSelectProps), { displayEmpty: true }), onChange: function (e) {
+        })), children: [jsxs(Box$1, { sx: { display: 'flex', alignItems: 'flex-start', gap: 1, flexWrap: 'wrap' }, children: [jsx(SearchRoundedIcon, { color: "primary", sx: { mt: 0.5 } }), jsx(Typography, { variant: "h5", component: "h1", children: "OpenSearch" }), jsx(Typography, { variant: "body2", color: "text.secondary", sx: { flex: '1 1 200px', fontFamily: 'monospace' }, children: "POST /api/1/site/search/search.json?crafterSite=\u2026" }), jsx(Tooltip, { title: isFullscreen ? 'Exit full screen' : 'Full screen', children: jsx(IconButton$1, { size: "small", onClick: toggleFullscreen, "aria-label": isFullscreen ? 'Exit full screen' : 'Enter full screen', sx: { flexShrink: 0 }, children: isFullscreen ? jsx(FullscreenExitRoundedIcon, {}) : jsx(FullscreenRoundedIcon, {}) }) })] }), jsxs(Box$1, { sx: { display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }, children: [jsx(TextField$1, { size: "small", label: "Active site", value: siteId !== null && siteId !== void 0 ? siteId : '', disabled: true, sx: { minWidth: 160 } }), jsx(TextField$1, { size: "small", label: "Extra indexes (optional)", placeholder: "e.g. other-alias (see multi-index docs)", value: extraIndexes, onChange: function (e) { return setExtraIndexes(e.target.value); }, sx: { flex: '1 1 220px', minWidth: 200 } }), jsxs(TextField$1, { select: true, size: "small", label: "Load template", defaultValue: "", sx: { minWidth: 200 }, SelectProps: __assign(__assign({}, fullscreenSelectProps), { displayEmpty: true }), onChange: function (e) {
                             var t = TEMPLATES.find(function (x) { return x.label === e.target.value; });
                             if (t) {
                                 setQuery(t.body);
                             }
                             setTemplateMenuKey(function (k) { return k + 1; });
-                        }, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "", children: jsxRuntimeExports.jsx("em", { children: "Choose\u2026" }) }), TEMPLATES.map(function (t) { return (jsxRuntimeExports.jsx(MenuItem$1, { value: t.label, children: t.label }, t.label)); })] }, templateMenuKey)] }), jsxRuntimeExports.jsx(Box$1, { sx: { flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', minWidth: 0 }, children: jsxRuntimeExports.jsxs(Ut, { id: "uigoodies-opensearch-panels", orientation: orientationVertical ? 'vertical' : 'horizontal', style: { flex: 1, minHeight: 0, minWidth: 0, width: '100%', display: 'flex' }, children: [jsxRuntimeExports.jsx(Yt, { id: "explorer", panelRef: explorerPanelRef, collapsible: true, collapsedSize: orientationVertical ? 52 : 44, minSize: orientationVertical ? '18%' : '14%', maxSize: orientationVertical ? '55%' : '42%', defaultSize: orientationVertical ? '30%' : '24%', onResize: syncExplorerCollapsed, children: jsxRuntimeExports.jsx(Paper, { variant: "outlined", sx: {
+                        }, children: [jsx(MenuItem$1, { value: "", children: jsx("em", { children: "Choose\u2026" }) }), TEMPLATES.map(function (t) { return (jsx(MenuItem$1, { value: t.label, children: t.label }, t.label)); })] }, templateMenuKey)] }), jsx(Box$1, { sx: { flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', minWidth: 0 }, children: jsxs(Ut, { id: "uigoodies-opensearch-panels", orientation: orientationVertical ? 'vertical' : 'horizontal', style: { flex: 1, minHeight: 0, minWidth: 0, width: '100%', display: 'flex' }, children: [jsx(Yt, { id: "explorer", panelRef: explorerPanelRef, collapsible: true, collapsedSize: orientationVertical ? 52 : 44, minSize: orientationVertical ? '18%' : '14%', maxSize: orientationVertical ? '55%' : '42%', defaultSize: orientationVertical ? '30%' : '24%', onResize: syncExplorerCollapsed, children: jsx(Paper, { variant: "outlined", sx: {
                                     height: '100%',
                                     display: 'flex',
                                     flexDirection: 'column',
                                     minHeight: 0,
                                     overflow: 'hidden',
                                     borderRadius: 1
-                                }, children: !explorerCollapsed ? (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsxs(Box$1, { sx: {
+                                }, children: !explorerCollapsed ? (jsxs(Fragment, { children: [jsxs(Box$1, { sx: {
                                                 px: 1,
                                                 py: 0.5,
                                                 borderBottom: 1,
@@ -34610,14 +35203,14 @@ function OpenSearchPlayground() {
                                                 alignItems: 'center',
                                                 gap: 0.5,
                                                 flexShrink: 0
-                                            }, children: [jsxRuntimeExports.jsxs(Tabs, { value: explorerTab, onChange: function (_, value) { return setExplorerTab(value); }, sx: { minHeight: 36, '& .MuiTab-root': { minHeight: 36, py: 0.5 } }, children: [jsxRuntimeExports.jsx(Tab, { label: "Explorer", value: "explorer" }), jsxRuntimeExports.jsx(Tab, { label: "Dictionary", value: "dictionary" })] }), jsxRuntimeExports.jsx(Tooltip, { title: "Collapse explorer", children: jsxRuntimeExports.jsx(IconButton$1, { size: "small", onClick: collapseExplorerPanel, "aria-label": "Collapse explorer", edge: "end", children: orientationVertical ? jsxRuntimeExports.jsx(KeyboardArrowUpRoundedIcon, {}) : jsxRuntimeExports.jsx(ChevronLeftRoundedIcon, {}) }) })] }), explorerTab === 'explorer' ? (jsxRuntimeExports.jsx(Box$1, { sx: { overflow: 'auto', flex: 1, minHeight: 0 }, children: jsxRuntimeExports.jsx(OpenSearchSchemaPanel, { siteId: siteId, extraIndexes: extraIndexes, query: query, setQuery: setQuery, openGroups: openGroups, setOpenGroups: setOpenGroups, selectedFields: selectedFields, toggleField: toggleField, onInferredFieldsChange: setInferredFields, sourceIsWildcard: sourceIsWildcard }) })) : (jsxRuntimeExports.jsx(Box$1, { sx: { overflow: 'auto', flex: 1, minHeight: 0, p: 1 }, children: dictionaryLoading ? (jsxRuntimeExports.jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', gap: 1, p: 1 }, children: [jsxRuntimeExports.jsx(CircularProgress, { size: 16 }), jsxRuntimeExports.jsx(Typography, { variant: "body2", color: "text.secondary", children: "Loading content types..." })] })) : dictionaryError ? (jsxRuntimeExports.jsx(Typography, { variant: "body2", color: "error", sx: { p: 1 }, children: dictionaryError })) : dictionaryItems.length === 0 ? (jsxRuntimeExports.jsx(Typography, { variant: "body2", color: "text.secondary", sx: { p: 1 }, children: "No content types found." })) : (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsxs(Box$1, { sx: { display: 'flex', gap: 1, mb: 1 }, children: [jsxRuntimeExports.jsx(TextField$1, { select: true, size: "small", label: "Content type", value: dictionarySelectedId, onChange: function (e) { return setDictionarySelectedId(e.target.value); }, sx: { flex: 1 }, SelectProps: fullscreenSelectProps, children: dictionaryItems.map(function (entry) { return (jsxRuntimeExports.jsx(MenuItem$1, { value: entry.id, children: entry.id }, entry.id)); }) }), jsxRuntimeExports.jsx(Button$1, { size: "small", variant: "outlined", onClick: function () { return setDictionaryReloadKey(function (k) { return k + 1; }); }, children: "Refresh" })] }), jsxRuntimeExports.jsx(Typography, { variant: "caption", color: "text.secondary", sx: { display: 'block', mb: 1 }, children: (_b = (_a = dictionaryItems.find(function (entry) { return entry.id === dictionarySelectedId; })) === null || _a === void 0 ? void 0 : _a.name) !== null && _b !== void 0 ? _b : '' }), dictionaryFieldsLoading ? (jsxRuntimeExports.jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', gap: 1, p: 1 }, children: [jsxRuntimeExports.jsx(CircularProgress, { size: 16 }), jsxRuntimeExports.jsx(Typography, { variant: "body2", color: "text.secondary", children: "Loading fields..." })] })) : dictionaryFieldsError ? (jsxRuntimeExports.jsx(Typography, { variant: "body2", color: "error", sx: { p: 1 }, children: dictionaryFieldsError })) : dictionaryFields.length === 0 ? (jsxRuntimeExports.jsx(Typography, { variant: "body2", color: "text.secondary", sx: { p: 1 }, children: "No fields found in this content type." })) : (dictionaryFields.map(function (field) { return (jsxRuntimeExports.jsxs(Box$1, { sx: {
+                                            }, children: [jsxs(Tabs, { value: explorerTab, onChange: function (_, value) { return setExplorerTab(value); }, sx: { minHeight: 36, '& .MuiTab-root': { minHeight: 36, py: 0.5 } }, children: [jsx(Tab, { label: "Explorer", value: "explorer" }), jsx(Tab, { label: "Dictionary", value: "dictionary" })] }), jsx(Tooltip, { title: "Collapse explorer", children: jsx(IconButton$1, { size: "small", onClick: collapseExplorerPanel, "aria-label": "Collapse explorer", edge: "end", children: orientationVertical ? jsx(KeyboardArrowUpRoundedIcon, {}) : jsx(ChevronLeftRoundedIcon, {}) }) })] }), explorerTab === 'explorer' ? (jsx(Box$1, { sx: { overflow: 'auto', flex: 1, minHeight: 0 }, children: jsx(OpenSearchSchemaPanel, { siteId: siteId, extraIndexes: extraIndexes, query: query, setQuery: setQuery, openGroups: openGroups, setOpenGroups: setOpenGroups, selectedFields: selectedFields, toggleField: toggleField, onInferredFieldsChange: setInferredFields, sourceIsWildcard: sourceIsWildcard }) })) : (jsx(Box$1, { sx: { overflow: 'auto', flex: 1, minHeight: 0, p: 1 }, children: dictionaryLoading ? (jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', gap: 1, p: 1 }, children: [jsx(CircularProgress, { size: 16 }), jsx(Typography, { variant: "body2", color: "text.secondary", children: "Loading content types..." })] })) : dictionaryError ? (jsx(Typography, { variant: "body2", color: "error", sx: { p: 1 }, children: dictionaryError })) : dictionaryItems.length === 0 ? (jsx(Typography, { variant: "body2", color: "text.secondary", sx: { p: 1 }, children: "No content types found." })) : (jsxs(Fragment, { children: [jsxs(Box$1, { sx: { display: 'flex', gap: 1, mb: 1 }, children: [jsx(TextField$1, { select: true, size: "small", label: "Content type", value: dictionarySelectedId, onChange: function (e) { return setDictionarySelectedId(e.target.value); }, sx: { flex: 1 }, SelectProps: fullscreenSelectProps, children: dictionaryItems.map(function (entry) { return (jsx(MenuItem$1, { value: entry.id, children: entry.id }, entry.id)); }) }), jsx(Button$1, { size: "small", variant: "outlined", onClick: function () { return setDictionaryReloadKey(function (k) { return k + 1; }); }, children: "Refresh" })] }), jsx(Typography, { variant: "caption", color: "text.secondary", sx: { display: 'block', mb: 1 }, children: (_b = (_a = dictionaryItems.find(function (entry) { return entry.id === dictionarySelectedId; })) === null || _a === void 0 ? void 0 : _a.name) !== null && _b !== void 0 ? _b : '' }), dictionaryFieldsLoading ? (jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', gap: 1, p: 1 }, children: [jsx(CircularProgress, { size: 16 }), jsx(Typography, { variant: "body2", color: "text.secondary", children: "Loading fields..." })] })) : dictionaryFieldsError ? (jsx(Typography, { variant: "body2", color: "error", sx: { p: 1 }, children: dictionaryFieldsError })) : dictionaryFields.length === 0 ? (jsx(Typography, { variant: "body2", color: "text.secondary", sx: { p: 1 }, children: "No fields found in this content type." })) : (dictionaryFields.map(function (field) { return (jsxs(Box$1, { sx: {
                                                             p: 1,
                                                             mb: 1,
                                                             border: 1,
                                                             borderColor: 'divider',
                                                             borderRadius: 1,
                                                             bgcolor: 'background.paper'
-                                                        }, children: [jsxRuntimeExports.jsx(Typography, { variant: "body2", fontFamily: "monospace", children: field.id }), jsxRuntimeExports.jsxs(Typography, { variant: "caption", color: "text.secondary", children: [field.type, field.required ? ' • required' : '', field.title ? " \u2022 ".concat(field.title) : ''] })] }, field.id)); }))] })) }))] })) : (jsxRuntimeExports.jsxs(Box$1, { sx: {
+                                                        }, children: [jsx(Typography, { variant: "body2", fontFamily: "monospace", children: field.id }), jsxs(Typography, { variant: "caption", color: "text.secondary", children: [field.type, field.required ? ' • required' : '', field.title ? " \u2022 ".concat(field.title) : ''] })] }, field.id)); }))] })) }))] })) : (jsxs(Box$1, { sx: {
                                         display: 'flex',
                                         flexDirection: orientationVertical ? 'row' : 'column',
                                         alignItems: 'center',
@@ -34626,13 +35219,13 @@ function OpenSearchPlayground() {
                                         py: orientationVertical ? 0 : 1,
                                         px: orientationVertical ? 1 : 0,
                                         gap: 1
-                                    }, children: [jsxRuntimeExports.jsx(Tooltip, { title: "Explorer", children: jsxRuntimeExports.jsx(IconButton$1, { size: "small", color: explorerTab === 'explorer' ? 'primary' : 'default', onClick: function () { return setExplorerTab('explorer'); }, "aria-label": "Explorer tab", children: jsxRuntimeExports.jsx(TravelExploreRoundedIcon, { fontSize: "small" }) }) }), jsxRuntimeExports.jsx(Tooltip, { title: "Dictionary", children: jsxRuntimeExports.jsx(IconButton$1, { size: "small", color: explorerTab === 'dictionary' ? 'primary' : 'default', onClick: function () { return setExplorerTab('dictionary'); }, "aria-label": "Dictionary tab", children: jsxRuntimeExports.jsx(MenuBookRoundedIcon, { fontSize: "small" }) }) }), jsxRuntimeExports.jsx(Tooltip, { title: "Expand explorer", children: jsxRuntimeExports.jsx(IconButton$1, { size: "small", onClick: expandExplorerPanel, "aria-label": "Expand explorer", children: orientationVertical ? jsxRuntimeExports.jsx(KeyboardArrowDownRoundedIcon, {}) : jsxRuntimeExports.jsx(ChevronRightRoundedIcon, {}) }) })] })) }) }), jsxRuntimeExports.jsx(ResizeGrip, { vertical: orientationVertical }), jsxRuntimeExports.jsx(Yt, { id: "request", defaultSize: orientationVertical ? '35%' : '38%', minSize: "20%", children: jsxRuntimeExports.jsxs(Paper, { variant: "outlined", sx: {
+                                    }, children: [jsx(Tooltip, { title: "Explorer", children: jsx(IconButton$1, { size: "small", color: explorerTab === 'explorer' ? 'primary' : 'default', onClick: function () { return setExplorerTab('explorer'); }, "aria-label": "Explorer tab", children: jsx(TravelExploreRoundedIcon, { fontSize: "small" }) }) }), jsx(Tooltip, { title: "Dictionary", children: jsx(IconButton$1, { size: "small", color: explorerTab === 'dictionary' ? 'primary' : 'default', onClick: function () { return setExplorerTab('dictionary'); }, "aria-label": "Dictionary tab", children: jsx(MenuBookRoundedIcon, { fontSize: "small" }) }) }), jsx(Tooltip, { title: "Expand explorer", children: jsx(IconButton$1, { size: "small", onClick: expandExplorerPanel, "aria-label": "Expand explorer", children: orientationVertical ? jsx(KeyboardArrowDownRoundedIcon, {}) : jsx(ChevronRightRoundedIcon, {}) }) })] })) }) }), jsx(ResizeGrip, { vertical: orientationVertical }), jsx(Yt, { id: "request", defaultSize: orientationVertical ? '35%' : '38%', minSize: "20%", children: jsxs(Paper, { variant: "outlined", sx: {
                                     height: '100%',
                                     minHeight: 0,
                                     display: 'flex',
                                     flexDirection: 'column',
                                     borderRadius: 1
-                                }, children: [jsxRuntimeExports.jsxs(Box$1, { sx: {
+                                }, children: [jsxs(Box$1, { sx: {
                                             px: 1.5,
                                             py: 1,
                                             borderBottom: 1,
@@ -34641,7 +35234,7 @@ function OpenSearchPlayground() {
                                             alignItems: 'center',
                                             gap: 1,
                                             flexWrap: 'wrap'
-                                        }, children: [jsxRuntimeExports.jsx(Typography, { variant: "subtitle2", sx: { flex: '1 1 auto' }, children: "Request body (OpenSearch DSL)" }), jsxRuntimeExports.jsx(Tooltip, { title: "Run query (\u2318/Ctrl+Enter in editor)", children: jsxRuntimeExports.jsx("span", { children: jsxRuntimeExports.jsx(Button$1, { size: "small", variant: "contained", color: "primary", startIcon: loading ? jsxRuntimeExports.jsx(CircularProgress, { size: 16, color: "inherit" }) : jsxRuntimeExports.jsx(PlayArrowRoundedIcon, {}), disabled: loading || !siteId, onClick: function () { return void runQuery(); }, children: "Run" }) }) }), jsxRuntimeExports.jsx(Tooltip, { title: "Prettify query JSON", children: jsxRuntimeExports.jsx(Button$1, { size: "small", variant: "outlined", startIcon: jsxRuntimeExports.jsx(AutoFixHighRoundedIcon, {}), onClick: onPrettify, children: "Prettify" }) }), jsxRuntimeExports.jsx(Tooltip, { title: "Copy query", children: jsxRuntimeExports.jsx(IconButton$1, { size: "small", onClick: onCopyQuery, "aria-label": "Copy query", children: jsxRuntimeExports.jsx(ContentCopyRoundedIcon, { fontSize: "small" }) }) })] }), jsxRuntimeExports.jsx(OpenSearchJsonEditor, { value: query, onChange: setQuery, onModEnter: function () { return void runQuery(); } }), jsxRuntimeExports.jsxs(Box$1, { sx: {
+                                        }, children: [jsx(Typography, { variant: "subtitle2", sx: { flex: '1 1 auto' }, children: "Request body (OpenSearch DSL)" }), jsx(Tooltip, { title: "Run query (\u2318/Ctrl+Enter in editor)", children: jsx("span", { children: jsx(Button$1, { size: "small", variant: "contained", color: "primary", startIcon: loading ? jsx(CircularProgress, { size: 16, color: "inherit" }) : jsx(PlayArrowRoundedIcon, {}), disabled: loading || !siteId, onClick: function () { return void runQuery(); }, children: "Run" }) }) }), jsx(Tooltip, { title: "Prettify query JSON", children: jsx(Button$1, { size: "small", variant: "outlined", startIcon: jsx(AutoFixHighRoundedIcon, {}), onClick: onPrettify, children: "Prettify" }) }), jsx(Tooltip, { title: "Copy query", children: jsx(IconButton$1, { size: "small", onClick: onCopyQuery, "aria-label": "Copy query", children: jsx(ContentCopyRoundedIcon, { fontSize: "small" }) }) })] }), jsx(OpenSearchJsonEditor, { value: query, onChange: setQuery, onModEnter: function () { return void runQuery(); } }), jsxs(Box$1, { sx: {
                                             px: 1.5,
                                             py: 1,
                                             borderTop: 1,
@@ -34650,7 +35243,7 @@ function OpenSearchPlayground() {
                                             display: 'flex',
                                             flexDirection: 'column',
                                             gap: 1
-                                        }, children: [jsxRuntimeExports.jsx(Typography, { variant: "caption", color: "text.secondary", children: "API method + options" }), jsxRuntimeExports.jsxs(Box$1, { sx: { display: 'flex', flexWrap: 'wrap', gap: 1 }, children: [jsxRuntimeExports.jsx(TextField$1, { select: true, size: "small", label: "Method", value: apiMethod, onChange: function (e) { return setApiMethod(e.target.value); }, sx: { width: 140 }, SelectProps: fullscreenSelectProps, children: jsxRuntimeExports.jsx(MenuItem$1, { value: "select", children: "select" }) }), jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "from", value: optionFrom, onChange: function (e) { return setOptionFrom(e.target.value); }, sx: { width: 110 } }), jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "size", value: optionSize, onChange: function (e) { return setOptionSize(e.target.value); }, sx: { width: 110 } }), jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "track_total_hits", value: optionTrackTotalHits, onChange: function (e) { return setOptionTrackTotalHits(e.target.value); }, sx: { width: 170 }, SelectProps: fullscreenSelectProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "true", children: "true" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "false", children: "false" })] }), jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "timeout", value: optionTimeout, onChange: function (e) { return setOptionTimeout(e.target.value); }, sx: { width: 110 } }), jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "terminate_after", value: optionTerminateAfter, onChange: function (e) { return setOptionTerminateAfter(e.target.value); }, sx: { width: 140 } }), jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "min_score", value: optionMinScore, onChange: function (e) { return setOptionMinScore(e.target.value); }, sx: { width: 110 } }), jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "preference", value: optionPreference, onChange: function (e) { return setOptionPreference(e.target.value); }, sx: { width: 170 } }), jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "routing", value: optionRouting, onChange: function (e) { return setOptionRouting(e.target.value); }, sx: { width: 140 } }), jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "search_type", value: optionSearchType, onChange: function (e) { return setOptionSearchType(e.target.value); }, sx: { width: 180 }, SelectProps: fullscreenSelectProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "query_then_fetch", children: "query_then_fetch" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "dfs_query_then_fetch", children: "dfs_query_then_fetch" })] }), jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "allow_no_indices", value: optionAllowNoIndices, onChange: function (e) { return setOptionAllowNoIndices(e.target.value); }, sx: { width: 160 }, SelectProps: fullscreenSelectProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "true", children: "true" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "false", children: "false" })] }), jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "allow_partial_results", value: optionAllowPartialResults, onChange: function (e) { return setOptionAllowPartialResults(e.target.value); }, sx: { width: 190 }, SelectProps: fullscreenSelectProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "true", children: "true" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "false", children: "false" })] }), jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "ignore_unavailable", value: optionIgnoreUnavailable, onChange: function (e) { return setOptionIgnoreUnavailable(e.target.value); }, sx: { width: 170 }, SelectProps: fullscreenSelectProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "true", children: "true" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "false", children: "false" })] }), jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "track_scores", value: optionTrackScores, onChange: function (e) { return setOptionTrackScores(e.target.value); }, sx: { width: 130 }, SelectProps: fullscreenSelectProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "true", children: "true" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "false", children: "false" })] }), jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "rest_total_hits_as_int", value: optionRestTotalHitsAsInt, onChange: function (e) { return setOptionRestTotalHitsAsInt(e.target.value); }, sx: { width: 190 }, SelectProps: fullscreenSelectProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "true", children: "true" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "false", children: "false" })] }), jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "typed_keys", value: optionTypedKeys, onChange: function (e) { return setOptionTypedKeys(e.target.value); }, sx: { width: 120 }, SelectProps: fullscreenSelectProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "true", children: "true" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "false", children: "false" })] }), jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "version", value: optionVersionParam, onChange: function (e) { return setOptionVersionParam(e.target.value); }, sx: { width: 110 }, SelectProps: fullscreenSelectProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "true", children: "true" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "false", children: "false" })] }), jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "seq_no_primary_term", value: optionSeqNoPrimaryTermParam, onChange: function (e) { return setOptionSeqNoPrimaryTermParam(e.target.value); }, sx: { width: 180 }, SelectProps: fullscreenSelectProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "true", children: "true" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "false", children: "false" })] }), jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "sort field", value: optionSortField, onChange: function (e) { return setOptionSortField(e.target.value); }, sx: { width: 170 } }), jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "sort order", value: optionSortOrder, onChange: function (e) { return setOptionSortOrder(e.target.value); }, sx: { width: 120 }, SelectProps: fullscreenSelectProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "desc", children: "desc" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "asc", children: "asc" })] }), jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "_source mode", value: optionSourceMode, onChange: function (e) { return setOptionSourceMode(e.target.value); }, sx: { width: 150 }, SelectProps: fullscreenSelectProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "default", children: "default" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "all", children: "all" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "custom", children: "custom" })] }), optionSourceMode === 'custom' ? (jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "_source fields (csv)", value: optionSourceFields, onChange: function (e) { return setOptionSourceFields(e.target.value); }, sx: { flex: '1 1 260px', minWidth: 220 } })) : null, jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "highlight", value: optionEnableHighlight, onChange: function (e) { return setOptionEnableHighlight(e.target.value); }, sx: { width: 120 }, SelectProps: fullscreenSelectProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "false", children: "off" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "true", children: "on" })] }), optionEnableHighlight === 'true' ? (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "highlight fields (csv)", value: optionHighlightFields, onChange: function (e) { return setOptionHighlightFields(e.target.value); }, sx: { flex: '2 1 240px', minWidth: 220 } }), jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "fragment size", value: optionHighlightFragmentSize, onChange: function (e) { return setOptionHighlightFragmentSize(e.target.value); }, sx: { width: 130 } }), jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "# fragments", value: optionHighlightNumFragments, onChange: function (e) { return setOptionHighlightNumFragments(e.target.value); }, sx: { width: 120 } })] })) : null, jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "faceting", value: optionEnableFacets, onChange: function (e) { return setOptionEnableFacets(e.target.value); }, sx: { width: 120 }, SelectProps: fullscreenSelectProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "false", children: "off" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "true", children: "on" })] }), optionEnableFacets === 'true' ? (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "facet field", value: optionFacetField, onChange: function (e) { return setOptionFacetField(e.target.value); }, sx: { width: 170 } }), jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "facet size", value: optionFacetSize, onChange: function (e) { return setOptionFacetSize(e.target.value); }, sx: { width: 120 } })] })) : null, jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "boosting", value: optionEnableBoosting, onChange: function (e) { return setOptionEnableBoosting(e.target.value); }, sx: { width: 120 }, SelectProps: fullscreenSelectProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "false", children: "off" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "true", children: "on" })] }), optionEnableBoosting === 'true' ? (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "query field boosts (csv)", value: optionQueryFieldBoosts, onChange: function (e) { return setOptionQueryFieldBoosts(e.target.value); }, sx: { flex: '2 1 240px', minWidth: 220 } }), jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "indices_boost (csv index=weight)", value: optionIndicesBoost, onChange: function (e) { return setOptionIndicesBoost(e.target.value); }, sx: { flex: '2 1 240px', minWidth: 220 } })] })) : null, jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "advanced query params JSON", value: optionAdvancedQueryParamsJson, onChange: function (e) { return setOptionAdvancedQueryParamsJson(e.target.value); }, sx: { flex: '2 1 320px', minWidth: 260 }, multiline: true, minRows: 2 }), jsxRuntimeExports.jsx(Button$1, { size: "small", variant: "outlined", onClick: applyApiOptions, children: "Apply options" })] })] }), jsxRuntimeExports.jsxs(Box$1, { sx: {
+                                        }, children: [jsx(Typography, { variant: "caption", color: "text.secondary", children: "API method + options" }), jsxs(Box$1, { sx: { display: 'flex', flexWrap: 'wrap', gap: 1 }, children: [jsx(TextField$1, { select: true, size: "small", label: "Method", value: apiMethod, onChange: function (e) { return setApiMethod(e.target.value); }, sx: { width: 140 }, SelectProps: fullscreenSelectProps, children: jsx(MenuItem$1, { value: "select", children: "select" }) }), jsx(TextField$1, { size: "small", label: "from", value: optionFrom, onChange: function (e) { return setOptionFrom(e.target.value); }, sx: { width: 110 } }), jsx(TextField$1, { size: "small", label: "size", value: optionSize, onChange: function (e) { return setOptionSize(e.target.value); }, sx: { width: 110 } }), jsxs(TextField$1, { select: true, size: "small", label: "track_total_hits", value: optionTrackTotalHits, onChange: function (e) { return setOptionTrackTotalHits(e.target.value); }, sx: { width: 170 }, SelectProps: fullscreenSelectProps, children: [jsx(MenuItem$1, { value: "true", children: "true" }), jsx(MenuItem$1, { value: "false", children: "false" })] }), jsx(TextField$1, { size: "small", label: "timeout", value: optionTimeout, onChange: function (e) { return setOptionTimeout(e.target.value); }, sx: { width: 110 } }), jsx(TextField$1, { size: "small", label: "terminate_after", value: optionTerminateAfter, onChange: function (e) { return setOptionTerminateAfter(e.target.value); }, sx: { width: 140 } }), jsx(TextField$1, { size: "small", label: "min_score", value: optionMinScore, onChange: function (e) { return setOptionMinScore(e.target.value); }, sx: { width: 110 } }), jsx(TextField$1, { size: "small", label: "preference", value: optionPreference, onChange: function (e) { return setOptionPreference(e.target.value); }, sx: { width: 170 } }), jsx(TextField$1, { size: "small", label: "routing", value: optionRouting, onChange: function (e) { return setOptionRouting(e.target.value); }, sx: { width: 140 } }), jsxs(TextField$1, { select: true, size: "small", label: "search_type", value: optionSearchType, onChange: function (e) { return setOptionSearchType(e.target.value); }, sx: { width: 180 }, SelectProps: fullscreenSelectProps, children: [jsx(MenuItem$1, { value: "query_then_fetch", children: "query_then_fetch" }), jsx(MenuItem$1, { value: "dfs_query_then_fetch", children: "dfs_query_then_fetch" })] }), jsxs(TextField$1, { select: true, size: "small", label: "allow_no_indices", value: optionAllowNoIndices, onChange: function (e) { return setOptionAllowNoIndices(e.target.value); }, sx: { width: 160 }, SelectProps: fullscreenSelectProps, children: [jsx(MenuItem$1, { value: "true", children: "true" }), jsx(MenuItem$1, { value: "false", children: "false" })] }), jsxs(TextField$1, { select: true, size: "small", label: "allow_partial_results", value: optionAllowPartialResults, onChange: function (e) { return setOptionAllowPartialResults(e.target.value); }, sx: { width: 190 }, SelectProps: fullscreenSelectProps, children: [jsx(MenuItem$1, { value: "true", children: "true" }), jsx(MenuItem$1, { value: "false", children: "false" })] }), jsxs(TextField$1, { select: true, size: "small", label: "ignore_unavailable", value: optionIgnoreUnavailable, onChange: function (e) { return setOptionIgnoreUnavailable(e.target.value); }, sx: { width: 170 }, SelectProps: fullscreenSelectProps, children: [jsx(MenuItem$1, { value: "true", children: "true" }), jsx(MenuItem$1, { value: "false", children: "false" })] }), jsxs(TextField$1, { select: true, size: "small", label: "track_scores", value: optionTrackScores, onChange: function (e) { return setOptionTrackScores(e.target.value); }, sx: { width: 130 }, SelectProps: fullscreenSelectProps, children: [jsx(MenuItem$1, { value: "true", children: "true" }), jsx(MenuItem$1, { value: "false", children: "false" })] }), jsxs(TextField$1, { select: true, size: "small", label: "rest_total_hits_as_int", value: optionRestTotalHitsAsInt, onChange: function (e) { return setOptionRestTotalHitsAsInt(e.target.value); }, sx: { width: 190 }, SelectProps: fullscreenSelectProps, children: [jsx(MenuItem$1, { value: "true", children: "true" }), jsx(MenuItem$1, { value: "false", children: "false" })] }), jsxs(TextField$1, { select: true, size: "small", label: "typed_keys", value: optionTypedKeys, onChange: function (e) { return setOptionTypedKeys(e.target.value); }, sx: { width: 120 }, SelectProps: fullscreenSelectProps, children: [jsx(MenuItem$1, { value: "true", children: "true" }), jsx(MenuItem$1, { value: "false", children: "false" })] }), jsxs(TextField$1, { select: true, size: "small", label: "version", value: optionVersionParam, onChange: function (e) { return setOptionVersionParam(e.target.value); }, sx: { width: 110 }, SelectProps: fullscreenSelectProps, children: [jsx(MenuItem$1, { value: "true", children: "true" }), jsx(MenuItem$1, { value: "false", children: "false" })] }), jsxs(TextField$1, { select: true, size: "small", label: "seq_no_primary_term", value: optionSeqNoPrimaryTermParam, onChange: function (e) { return setOptionSeqNoPrimaryTermParam(e.target.value); }, sx: { width: 180 }, SelectProps: fullscreenSelectProps, children: [jsx(MenuItem$1, { value: "true", children: "true" }), jsx(MenuItem$1, { value: "false", children: "false" })] }), jsx(TextField$1, { size: "small", label: "sort field", value: optionSortField, onChange: function (e) { return setOptionSortField(e.target.value); }, sx: { width: 170 } }), jsxs(TextField$1, { select: true, size: "small", label: "sort order", value: optionSortOrder, onChange: function (e) { return setOptionSortOrder(e.target.value); }, sx: { width: 120 }, SelectProps: fullscreenSelectProps, children: [jsx(MenuItem$1, { value: "desc", children: "desc" }), jsx(MenuItem$1, { value: "asc", children: "asc" })] }), jsxs(TextField$1, { select: true, size: "small", label: "_source mode", value: optionSourceMode, onChange: function (e) { return setOptionSourceMode(e.target.value); }, sx: { width: 150 }, SelectProps: fullscreenSelectProps, children: [jsx(MenuItem$1, { value: "default", children: "default" }), jsx(MenuItem$1, { value: "all", children: "all" }), jsx(MenuItem$1, { value: "custom", children: "custom" })] }), optionSourceMode === 'custom' ? (jsx(TextField$1, { size: "small", label: "_source fields (csv)", value: optionSourceFields, onChange: function (e) { return setOptionSourceFields(e.target.value); }, sx: { flex: '1 1 260px', minWidth: 220 } })) : null, jsxs(TextField$1, { select: true, size: "small", label: "highlight", value: optionEnableHighlight, onChange: function (e) { return setOptionEnableHighlight(e.target.value); }, sx: { width: 120 }, SelectProps: fullscreenSelectProps, children: [jsx(MenuItem$1, { value: "false", children: "off" }), jsx(MenuItem$1, { value: "true", children: "on" })] }), optionEnableHighlight === 'true' ? (jsxs(Fragment, { children: [jsx(TextField$1, { size: "small", label: "highlight fields (csv)", value: optionHighlightFields, onChange: function (e) { return setOptionHighlightFields(e.target.value); }, sx: { flex: '2 1 240px', minWidth: 220 } }), jsx(TextField$1, { size: "small", label: "fragment size", value: optionHighlightFragmentSize, onChange: function (e) { return setOptionHighlightFragmentSize(e.target.value); }, sx: { width: 130 } }), jsx(TextField$1, { size: "small", label: "# fragments", value: optionHighlightNumFragments, onChange: function (e) { return setOptionHighlightNumFragments(e.target.value); }, sx: { width: 120 } })] })) : null, jsxs(TextField$1, { select: true, size: "small", label: "faceting", value: optionEnableFacets, onChange: function (e) { return setOptionEnableFacets(e.target.value); }, sx: { width: 120 }, SelectProps: fullscreenSelectProps, children: [jsx(MenuItem$1, { value: "false", children: "off" }), jsx(MenuItem$1, { value: "true", children: "on" })] }), optionEnableFacets === 'true' ? (jsxs(Fragment, { children: [jsx(TextField$1, { size: "small", label: "facet field", value: optionFacetField, onChange: function (e) { return setOptionFacetField(e.target.value); }, sx: { width: 170 } }), jsx(TextField$1, { size: "small", label: "facet size", value: optionFacetSize, onChange: function (e) { return setOptionFacetSize(e.target.value); }, sx: { width: 120 } })] })) : null, jsxs(TextField$1, { select: true, size: "small", label: "boosting", value: optionEnableBoosting, onChange: function (e) { return setOptionEnableBoosting(e.target.value); }, sx: { width: 120 }, SelectProps: fullscreenSelectProps, children: [jsx(MenuItem$1, { value: "false", children: "off" }), jsx(MenuItem$1, { value: "true", children: "on" })] }), optionEnableBoosting === 'true' ? (jsxs(Fragment, { children: [jsx(TextField$1, { size: "small", label: "query field boosts (csv)", value: optionQueryFieldBoosts, onChange: function (e) { return setOptionQueryFieldBoosts(e.target.value); }, sx: { flex: '2 1 240px', minWidth: 220 } }), jsx(TextField$1, { size: "small", label: "indices_boost (csv index=weight)", value: optionIndicesBoost, onChange: function (e) { return setOptionIndicesBoost(e.target.value); }, sx: { flex: '2 1 240px', minWidth: 220 } })] })) : null, jsx(TextField$1, { size: "small", label: "advanced query params JSON", value: optionAdvancedQueryParamsJson, onChange: function (e) { return setOptionAdvancedQueryParamsJson(e.target.value); }, sx: { flex: '2 1 320px', minWidth: 260 }, multiline: true, minRows: 2 }), jsx(Button$1, { size: "small", variant: "outlined", onClick: applyApiOptions, children: "Apply options" })] })] }), jsxs(Box$1, { sx: {
                                             px: 1.5,
                                             py: 1,
                                             borderBottom: 1,
@@ -34658,9 +35251,9 @@ function OpenSearchPlayground() {
                                             display: 'flex',
                                             flexDirection: 'column',
                                             gap: 1
-                                        }, children: [jsxRuntimeExports.jsxs(Typography, { variant: "caption", color: "text.secondary", children: ["Quick insert (appends to", ' ', jsxRuntimeExports.jsx(Typography, { component: "span", fontFamily: "monospace", children: "bool.must" }), "). Load schema first for field autocomplete."] }), jsxRuntimeExports.jsxs(Box$1, { sx: { display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'flex-start' }, children: [jsxRuntimeExports.jsx(TextField$1, { size: "small", sx: { flex: '1 1 180px', minWidth: 160 }, label: "Field path", placeholder: "localId", value: builderField, onChange: function (e) { return setBuilderField(e.target.value); }, inputProps: { list: 'uigoodies-opensearch-field-paths' } }), jsxRuntimeExports.jsx("datalist", { id: "uigoodies-opensearch-field-paths", children: pathOptions.map(function (p) { return (jsxRuntimeExports.jsx("option", { value: p }, p)); }) }), jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "Clause", value: builderMode, onChange: function (e) {
+                                        }, children: [jsxs(Typography, { variant: "caption", color: "text.secondary", children: ["Quick insert (appends to", ' ', jsx(Typography, { component: "span", fontFamily: "monospace", children: "bool.must" }), "). Load schema first for field autocomplete."] }), jsxs(Box$1, { sx: { display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'flex-start' }, children: [jsx(TextField$1, { size: "small", sx: { flex: '1 1 180px', minWidth: 160 }, label: "Field path", placeholder: "localId", value: builderField, onChange: function (e) { return setBuilderField(e.target.value); }, inputProps: { list: 'uigoodies-opensearch-field-paths' } }), jsx("datalist", { id: "uigoodies-opensearch-field-paths", children: pathOptions.map(function (p) { return (jsx("option", { value: p }, p)); }) }), jsxs(TextField$1, { select: true, size: "small", label: "Clause", value: builderMode, onChange: function (e) {
                                                             return setBuilderMode(e.target.value);
-                                                        }, sx: { width: 130 }, SelectProps: fullscreenSelectProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "match", children: "match" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "term", children: "term" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "prefix", children: "prefix" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "wildcard", children: "wildcard" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "range", children: "range" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "exists", children: "exists" })] }), builderMode === 'range' ? (jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "gte", value: builderGte, onChange: function (e) { return setBuilderGte(e.target.value); }, sx: { width: 140 } }), jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "lte", value: builderLte, onChange: function (e) { return setBuilderLte(e.target.value); }, sx: { width: 140 } })] })) : builderMode === 'exists' ? null : (jsxRuntimeExports.jsx(TextField$1, { size: "small", label: builderMode === 'wildcard' ? 'Pattern' : 'Value', value: builderValue, onChange: function (e) { return setBuilderValue(e.target.value); }, sx: { flex: '2 1 200px', minWidth: 160 }, multiline: builderMode === 'match', minRows: builderMode === 'match' ? 2 : 1 })), jsxRuntimeExports.jsx(Button$1, { size: "small", variant: "outlined", onClick: insertFromBuilderBar, children: "Insert clause" })] })] }), jsxRuntimeExports.jsxs(Box$1, { sx: {
+                                                        }, sx: { width: 130 }, SelectProps: fullscreenSelectProps, children: [jsx(MenuItem$1, { value: "match", children: "match" }), jsx(MenuItem$1, { value: "term", children: "term" }), jsx(MenuItem$1, { value: "prefix", children: "prefix" }), jsx(MenuItem$1, { value: "wildcard", children: "wildcard" }), jsx(MenuItem$1, { value: "range", children: "range" }), jsx(MenuItem$1, { value: "exists", children: "exists" })] }), builderMode === 'range' ? (jsxs(Fragment, { children: [jsx(TextField$1, { size: "small", label: "gte", value: builderGte, onChange: function (e) { return setBuilderGte(e.target.value); }, sx: { width: 140 } }), jsx(TextField$1, { size: "small", label: "lte", value: builderLte, onChange: function (e) { return setBuilderLte(e.target.value); }, sx: { width: 140 } })] })) : builderMode === 'exists' ? null : (jsx(TextField$1, { size: "small", label: builderMode === 'wildcard' ? 'Pattern' : 'Value', value: builderValue, onChange: function (e) { return setBuilderValue(e.target.value); }, sx: { flex: '2 1 200px', minWidth: 160 }, multiline: builderMode === 'match', minRows: builderMode === 'match' ? 2 : 1 })), jsx(Button$1, { size: "small", variant: "outlined", onClick: insertFromBuilderBar, children: "Insert clause" })] })] }), jsxs(Box$1, { sx: {
                                             px: 1.5,
                                             py: 1,
                                             borderTop: 1,
@@ -34670,7 +35263,7 @@ function OpenSearchPlayground() {
                                             alignItems: 'center',
                                             gap: 1,
                                             flexWrap: 'wrap'
-                                        }, children: [jsxRuntimeExports.jsx(Typography, { variant: "caption", color: "text.secondary", children: "Export as" }), jsxRuntimeExports.jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }, children: [jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "Format", value: exportTarget, onChange: function (e) { return setExportTarget(e.target.value); }, sx: { width: 120 }, SelectProps: fullscreenSelectProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "curl", children: "Curl" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "groovy", children: "Groovy" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "csv", children: "CSV (download)" })] }), jsxRuntimeExports.jsx(Button$1, { size: "small", variant: "outlined", onClick: exportAsCode, disabled: !siteId, children: "Export" })] })] }), jsxRuntimeExports.jsxs(Box$1, { sx: {
+                                        }, children: [jsx(Typography, { variant: "caption", color: "text.secondary", children: "Export as" }), jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }, children: [jsxs(TextField$1, { select: true, size: "small", label: "Format", value: exportTarget, onChange: function (e) { return setExportTarget(e.target.value); }, sx: { width: 120 }, SelectProps: fullscreenSelectProps, children: [jsx(MenuItem$1, { value: "curl", children: "Curl" }), jsx(MenuItem$1, { value: "groovy", children: "Groovy" }), jsx(MenuItem$1, { value: "csv", children: "CSV (download)" })] }), jsx(Button$1, { size: "small", variant: "outlined", onClick: exportAsCode, disabled: !siteId, children: "Export" })] })] }), jsxs(Box$1, { sx: {
                                             px: 1.5,
                                             py: 1,
                                             borderTop: 1,
@@ -34680,14 +35273,14 @@ function OpenSearchPlayground() {
                                             alignItems: 'center',
                                             gap: 1,
                                             flexWrap: 'wrap'
-                                        }, children: [jsxRuntimeExports.jsx(Typography, { variant: "caption", color: "text.secondary", children: "Download index" }), jsxRuntimeExports.jsx(Tooltip, { title: "Page match_all (size=1000) through Crafter's search.json and download the merged hits as JSON. Capped by OpenSearch index.max_result_window (default 10000).", children: jsxRuntimeExports.jsx("span", { children: jsxRuntimeExports.jsx(Button$1, { size: "small", variant: "outlined", onClick: downloadIndexDump, disabled: !siteId || indexDumpRunning, startIcon: indexDumpRunning ? jsxRuntimeExports.jsx(CircularProgress, { size: 14 }) : undefined, children: indexDumpRunning ? 'Dumping…' : 'Download index' }) }) })] })] }) }), jsxRuntimeExports.jsx(ResizeGrip, { vertical: orientationVertical }), jsxRuntimeExports.jsx(Yt, { id: "response", defaultSize: orientationVertical ? '35%' : '38%', minSize: "20%", children: jsxRuntimeExports.jsxs(Paper, { variant: "outlined", sx: {
+                                        }, children: [jsx(Typography, { variant: "caption", color: "text.secondary", children: "Download index" }), jsx(Tooltip, { title: "Page match_all (size=1000) through Crafter's search.json and download the merged hits as JSON. Capped by OpenSearch index.max_result_window (default 10000).", children: jsx("span", { children: jsx(Button$1, { size: "small", variant: "outlined", onClick: downloadIndexDump, disabled: !siteId || indexDumpRunning, startIcon: indexDumpRunning ? jsx(CircularProgress, { size: 14 }) : undefined, children: indexDumpRunning ? 'Dumping…' : 'Download index' }) }) })] })] }) }), jsx(ResizeGrip, { vertical: orientationVertical }), jsx(Yt, { id: "response", defaultSize: orientationVertical ? '35%' : '38%', minSize: "20%", children: jsxs(Paper, { variant: "outlined", sx: {
                                     height: '100%',
                                     minHeight: 0,
                                     display: 'flex',
                                     flexDirection: 'column',
                                     borderRadius: 1,
                                     bgcolor: function (t) { return (t.palette.mode === 'dark' ? 'action.hover' : 'grey.50'); }
-                                }, children: [jsxRuntimeExports.jsxs(Box$1, { sx: {
+                                }, children: [jsxs(Box$1, { sx: {
                                             px: 1.5,
                                             py: 1,
                                             borderBottom: 1,
@@ -34698,7 +35291,7 @@ function OpenSearchPlayground() {
                                             gap: 1,
                                             flexShrink: 0,
                                             bgcolor: 'background.paper'
-                                        }, children: [jsxRuntimeExports.jsx(Typography, { variant: "subtitle2", color: "text.primary", children: "Response" }), jsxRuntimeExports.jsx(Tooltip, { title: "Copy response JSON", children: jsxRuntimeExports.jsx(IconButton$1, { size: "small", onClick: onCopyResponse, "aria-label": "Copy response", children: jsxRuntimeExports.jsx(ContentCopyRoundedIcon, { fontSize: "small" }) }) })] }), jsxRuntimeExports.jsx(OpenSearchJsonEditor, { readOnly: true, value: displayedResponse })] }) })] }, isMdUp ? 'opensearch-layout-wide' : 'opensearch-layout-stack') })] }));
+                                        }, children: [jsx(Typography, { variant: "subtitle2", color: "text.primary", children: "Response" }), jsx(Tooltip, { title: "Copy response JSON", children: jsx(IconButton$1, { size: "small", onClick: onCopyResponse, "aria-label": "Copy response", children: jsx(ContentCopyRoundedIcon, { fontSize: "small" }) }) })] }), jsx(OpenSearchJsonEditor, { readOnly: true, value: displayedResponse })] }) })] }, isMdUp ? 'opensearch-layout-wide' : 'opensearch-layout-stack') })] }));
 }
 
 var MAX_BUFFERED_ENTRIES = 5000;
@@ -35265,7 +35858,7 @@ function LogTail(props) {
             container: function () { return (isFullscreen ? fullscreenRef.current : document.body); }
         }
     }); }, [isFullscreen]);
-    return (jsxRuntimeExports.jsxs(Box$1, { ref: fullscreenRef, sx: __assign({ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 480, p: 2, gap: 1.5, boxSizing: 'border-box', bgcolor: 'background.default' }, (isFullscreen && {
+    return (jsxs(Box$1, { ref: fullscreenRef, sx: __assign({ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 480, p: 2, gap: 1.5, boxSizing: 'border-box', bgcolor: 'background.default' }, (isFullscreen && {
             position: 'fixed',
             inset: 0,
             width: '100vw',
@@ -35273,7 +35866,7 @@ function LogTail(props) {
             minHeight: '100vh',
             zIndex: function (theme) { return theme.zIndex.modal + 100; },
             overflow: 'auto'
-        })), children: [jsxRuntimeExports.jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }, children: [jsxRuntimeExports.jsx(TerminalRoundedIcon, { color: "primary" }), jsxRuntimeExports.jsx(Typography, { variant: "h5", component: "h1", sx: { flex: 1 }, children: "Log Tail" }), jsxRuntimeExports.jsx(Tooltip, { title: isFullscreen ? 'Exit full screen' : 'Full screen', children: jsxRuntimeExports.jsx(IconButton$1, { size: "small", onClick: toggleFullscreen, "aria-label": isFullscreen ? 'Exit full screen' : 'Enter full screen', sx: { flexShrink: 0 }, children: isFullscreen ? jsxRuntimeExports.jsx(FullscreenExitRoundedIcon, {}) : jsxRuntimeExports.jsx(FullscreenRoundedIcon, {}) }) })] }), jsxRuntimeExports.jsxs(Box$1, { sx: { display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }, children: [jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "Active site", value: siteId !== null && siteId !== void 0 ? siteId : '', disabled: true, sx: { minWidth: 160 } }), configuredFiles.length > 1 ? (jsxRuntimeExports.jsx(TextField$1, { select: true, size: "small", label: "Log file", value: selectedPath, onChange: function (e) { return setSelectedPath(e.target.value); }, sx: { minWidth: 220 }, SelectProps: selectMenuProps, children: configuredFiles.map(function (f) { return (jsxRuntimeExports.jsx(MenuItem$1, { value: f.path, children: f.label || f.path }, f.path)); }) })) : null, jsxRuntimeExports.jsx(Chip, { label: status === 'open'
+        })), children: [jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }, children: [jsx(TerminalRoundedIcon, { color: "primary" }), jsx(Typography, { variant: "h5", component: "h1", sx: { flex: 1 }, children: "Log Tail" }), jsx(Tooltip, { title: isFullscreen ? 'Exit full screen' : 'Full screen', children: jsx(IconButton$1, { size: "small", onClick: toggleFullscreen, "aria-label": isFullscreen ? 'Exit full screen' : 'Enter full screen', sx: { flexShrink: 0 }, children: isFullscreen ? jsx(FullscreenExitRoundedIcon, {}) : jsx(FullscreenRoundedIcon, {}) }) })] }), jsxs(Box$1, { sx: { display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }, children: [jsx(TextField$1, { size: "small", label: "Active site", value: siteId !== null && siteId !== void 0 ? siteId : '', disabled: true, sx: { minWidth: 160 } }), configuredFiles.length > 1 ? (jsx(TextField$1, { select: true, size: "small", label: "Log file", value: selectedPath, onChange: function (e) { return setSelectedPath(e.target.value); }, sx: { minWidth: 220 }, SelectProps: selectMenuProps, children: configuredFiles.map(function (f) { return (jsx(MenuItem$1, { value: f.path, children: f.label || f.path }, f.path)); }) })) : null, jsx(Chip, { label: status === 'open'
                             ? 'Streaming'
                             : status === 'connecting'
                                 ? 'Connecting…'
@@ -35287,7 +35880,7 @@ function LogTail(props) {
                                 ? 'info'
                                 : status === 'error'
                                     ? 'error'
-                                    : 'default', size: "small" }), (serverInfo === null || serverInfo === void 0 ? void 0 : serverInfo.active) != null && (jsxRuntimeExports.jsx(Chip, { label: "active connections: ".concat(serverInfo.active), size: "small", variant: "outlined" })), jsxRuntimeExports.jsx(Box$1, { sx: { flex: 1 } }), jsxRuntimeExports.jsx(TextField$1, { size: "small", label: "Filter", placeholder: "Search line text\u2026", value: filter, onChange: function (e) { return setFilter(e.target.value); }, sx: { minWidth: 200, flex: '0 1 280px' } }), jsxRuntimeExports.jsxs(TextField$1, { select: true, size: "small", label: "Level", value: levelFilter, onChange: function (e) { return setLevelFilter(e.target.value); }, sx: { width: 130 }, SelectProps: selectMenuProps, children: [jsxRuntimeExports.jsx(MenuItem$1, { value: "ALL", children: "All" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "ERROR", children: "Error" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "WARN", children: "Warn" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "INFO", children: "Info" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "DEBUG", children: "Debug" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "TRACE", children: "Trace" }), jsxRuntimeExports.jsx(MenuItem$1, { value: "OTHER", children: "Other" })] }), jsxRuntimeExports.jsx(Button$1, { size: "small", variant: autoScroll ? 'contained' : 'outlined', onClick: function () { return setAutoScroll(function (v) { return !v; }); }, children: autoScroll ? 'Auto-scroll: on' : 'Auto-scroll: off' }), status === 'open' || status === 'connecting' ? (jsxRuntimeExports.jsx(Tooltip, { title: "Close this panel\u2019s streaming request only. Other users keep streaming.", children: jsxRuntimeExports.jsx(Button$1, { size: "small", variant: "outlined", onClick: closeStream, startIcon: jsxRuntimeExports.jsx(StopRoundedIcon, {}), children: "Stop" }) })) : (jsxRuntimeExports.jsx(Tooltip, { title: "Open a streaming connection for the selected log file.", children: jsxRuntimeExports.jsx(Button$1, { size: "small", variant: "outlined", onClick: startStream, startIcon: jsxRuntimeExports.jsx(PlayArrowRoundedIcon, {}), children: "Start" }) })), jsxRuntimeExports.jsx(Tooltip, { title: "Remove all lines from this view only. Does not truncate log files on the server.", children: jsxRuntimeExports.jsx("span", { children: jsxRuntimeExports.jsx(Button$1, { size: "small", variant: "outlined", onClick: onClear, startIcon: jsxRuntimeExports.jsx(DeleteSweepRoundedIcon, {}), children: "Clear" }) }) }), jsxRuntimeExports.jsx(Tooltip, { title: "Server-wide: close every active log-tail stream for ALL users in this Studio. Frees server-side tail slots; log files on disk are unchanged.", children: jsxRuntimeExports.jsx("span", { children: jsxRuntimeExports.jsx(Button$1, { size: "small", variant: "outlined", color: "error", onClick: dropAllConnections, disabled: dropAllInFlight, startIcon: jsxRuntimeExports.jsx(PowerSettingsNewRoundedIcon, {}), children: dropAllInFlight ? 'Dropping…' : 'Drop all connections' }) }) })] }), status === 'error' && errorMessage && (jsxRuntimeExports.jsxs(Paper, { variant: "outlined", sx: {
+                                    : 'default', size: "small" }), (serverInfo === null || serverInfo === void 0 ? void 0 : serverInfo.active) != null && (jsx(Chip, { label: "active connections: ".concat(serverInfo.active), size: "small", variant: "outlined" })), jsx(Box$1, { sx: { flex: 1 } }), jsx(TextField$1, { size: "small", label: "Filter", placeholder: "Search line text\u2026", value: filter, onChange: function (e) { return setFilter(e.target.value); }, sx: { minWidth: 200, flex: '0 1 280px' } }), jsxs(TextField$1, { select: true, size: "small", label: "Level", value: levelFilter, onChange: function (e) { return setLevelFilter(e.target.value); }, sx: { width: 130 }, SelectProps: selectMenuProps, children: [jsx(MenuItem$1, { value: "ALL", children: "All" }), jsx(MenuItem$1, { value: "ERROR", children: "Error" }), jsx(MenuItem$1, { value: "WARN", children: "Warn" }), jsx(MenuItem$1, { value: "INFO", children: "Info" }), jsx(MenuItem$1, { value: "DEBUG", children: "Debug" }), jsx(MenuItem$1, { value: "TRACE", children: "Trace" }), jsx(MenuItem$1, { value: "OTHER", children: "Other" })] }), jsx(Button$1, { size: "small", variant: autoScroll ? 'contained' : 'outlined', onClick: function () { return setAutoScroll(function (v) { return !v; }); }, children: autoScroll ? 'Auto-scroll: on' : 'Auto-scroll: off' }), status === 'open' || status === 'connecting' ? (jsx(Tooltip, { title: "Close this panel\u2019s streaming request only. Other users keep streaming.", children: jsx(Button$1, { size: "small", variant: "outlined", onClick: closeStream, startIcon: jsx(StopRoundedIcon, {}), children: "Stop" }) })) : (jsx(Tooltip, { title: "Open a streaming connection for the selected log file.", children: jsx(Button$1, { size: "small", variant: "outlined", onClick: startStream, startIcon: jsx(PlayArrowRoundedIcon, {}), children: "Start" }) })), jsx(Tooltip, { title: "Remove all lines from this view only. Does not truncate log files on the server.", children: jsx("span", { children: jsx(Button$1, { size: "small", variant: "outlined", onClick: onClear, startIcon: jsx(DeleteSweepRoundedIcon, {}), children: "Clear" }) }) }), jsx(Tooltip, { title: "Server-wide: close every active log-tail stream for ALL users in this Studio. Frees server-side tail slots; log files on disk are unchanged.", children: jsx("span", { children: jsx(Button$1, { size: "small", variant: "outlined", color: "error", onClick: dropAllConnections, disabled: dropAllInFlight, startIcon: jsx(PowerSettingsNewRoundedIcon, {}), children: dropAllInFlight ? 'Dropping…' : 'Drop all connections' }) }) })] }), status === 'error' && errorMessage && (jsxs(Paper, { variant: "outlined", sx: {
                     p: 1.25,
                     bgcolor: 'rgba(244, 67, 54, 0.08)',
                     borderColor: 'rgba(244, 67, 54, 0.5)',
@@ -35296,7 +35889,7 @@ function LogTail(props) {
                     fontSize: 12.5,
                     whiteSpace: 'pre-wrap',
                     wordBreak: 'break-word'
-                }, children: [jsxRuntimeExports.jsx("strong", { children: "Log tail server error:" }), " ", errorMessage] })), jsxRuntimeExports.jsx(Paper, { variant: "outlined", ref: scrollRef, sx: {
+                }, children: [jsx("strong", { children: "Log tail server error:" }), " ", errorMessage] })), jsx(Paper, { variant: "outlined", ref: scrollRef, sx: {
                     flex: 1,
                     minHeight: 0,
                     overflow: 'auto',
@@ -35306,7 +35899,7 @@ function LogTail(props) {
                     fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
                     fontSize: 12.5,
                     lineHeight: 1.45
-                }, children: filtered.length > 0 ? (filtered.map(function (entry) { return (jsxRuntimeExports.jsx(LogEntryRow, { entry: entry, onToggle: toggleEntry }, entry.id)); })) : entries.length > 0 ? (jsxRuntimeExports.jsxs(Box$1, { sx: { p: 2, color: 'text.secondary' }, children: [jsxRuntimeExports.jsx(Typography, { variant: "body2", component: "p", sx: { mb: 1 }, children: "No log entries match the current filter or level." }), (filter.trim() || levelFilter !== 'ALL') && (jsxRuntimeExports.jsxs(Typography, { variant: "caption", component: "p", sx: { fontFamily: 'monospace' }, children: [filter.trim() ? "Filter: \"".concat(filter.trim(), "\"") : null, filter.trim() && levelFilter !== 'ALL' ? ' · ' : null, levelFilter !== 'ALL' ? "Level: ".concat(levelFilter) : null, ' — ', entries.length, " entr", entries.length === 1 ? 'y' : 'ies', " loaded"] }))] })) : (jsxRuntimeExports.jsx(Box$1, { sx: { p: 2, color: 'text.secondary' }, children: status === 'connecting'
+                }, children: filtered.length > 0 ? (filtered.map(function (entry) { return (jsx(LogEntryRow, { entry: entry, onToggle: toggleEntry }, entry.id)); })) : entries.length > 0 ? (jsxs(Box$1, { sx: { p: 2, color: 'text.secondary' }, children: [jsx(Typography, { variant: "body2", component: "p", sx: { mb: 1 }, children: "No log entries match the current filter or level." }), (filter.trim() || levelFilter !== 'ALL') && (jsxs(Typography, { variant: "caption", component: "p", sx: { fontFamily: 'monospace' }, children: [filter.trim() ? "Filter: \"".concat(filter.trim(), "\"") : null, filter.trim() && levelFilter !== 'ALL' ? ' · ' : null, levelFilter !== 'ALL' ? "Level: ".concat(levelFilter) : null, ' — ', entries.length, " entr", entries.length === 1 ? 'y' : 'ies', " loaded"] }))] })) : (jsx(Box$1, { sx: { p: 2, color: 'text.secondary' }, children: status === 'connecting'
                         ? 'Connecting to log stream…'
                         : status === 'error'
                             ? errorMessage !== null && errorMessage !== void 0 ? errorMessage : 'Connection error. Click Start to retry.'
@@ -35320,7 +35913,7 @@ function LogEntryRow(_a) {
     var isDark = theme.palette.mode === 'dark';
     var palette = (isDark ? LEVEL_COLORS_DARK : LEVEL_COLORS_LIGHT)[entry.level];
     var hasTrace = entry.trace.length > 0;
-    return (jsxRuntimeExports.jsxs(Box$1, { sx: {
+    return (jsxs(Box$1, { sx: {
             display: 'flex',
             alignItems: 'flex-start',
             gap: 1,
@@ -35332,7 +35925,7 @@ function LogEntryRow(_a) {
             color: palette.fg,
             whiteSpace: 'pre-wrap',
             wordBreak: 'break-word'
-        }, children: [jsxRuntimeExports.jsx(Box$1, { sx: {
+        }, children: [jsx(Box$1, { sx: {
                     width: 50,
                     flexShrink: 0,
                     fontSize: 10,
@@ -35343,7 +35936,7 @@ function LogEntryRow(_a) {
                     textAlign: 'center',
                     py: 0.25,
                     mt: 0.25
-                }, children: entry.level === 'OTHER' ? '·' : entry.level }), jsxRuntimeExports.jsxs(Box$1, { sx: { flex: 1, minWidth: 0 }, children: [jsxRuntimeExports.jsxs(Box$1, { sx: { display: 'flex', alignItems: 'flex-start', gap: 0.5 }, children: [hasTrace && (jsxRuntimeExports.jsx(IconButton$1, { size: "small", onClick: function () { return onToggle(entry.id); }, sx: { p: 0, color: 'inherit', mt: '-2px' }, "aria-label": entry.open ? 'Collapse stack trace' : 'Expand stack trace', children: entry.open ? (jsxRuntimeExports.jsx(KeyboardArrowDownRoundedIcon, { fontSize: "small" })) : (jsxRuntimeExports.jsx(KeyboardArrowRightRoundedIcon, { fontSize: "small" })) })), jsxRuntimeExports.jsx(Box$1, { sx: { flex: 1, minWidth: 0 }, children: entry.head }), hasTrace && (jsxRuntimeExports.jsx(Box$1, { onClick: function () { return onToggle(entry.id); }, sx: {
+                }, children: entry.level === 'OTHER' ? '·' : entry.level }), jsxs(Box$1, { sx: { flex: 1, minWidth: 0 }, children: [jsxs(Box$1, { sx: { display: 'flex', alignItems: 'flex-start', gap: 0.5 }, children: [hasTrace && (jsx(IconButton$1, { size: "small", onClick: function () { return onToggle(entry.id); }, sx: { p: 0, color: 'inherit', mt: '-2px' }, "aria-label": entry.open ? 'Collapse stack trace' : 'Expand stack trace', children: entry.open ? (jsx(KeyboardArrowDownRoundedIcon, { fontSize: "small" })) : (jsx(KeyboardArrowRightRoundedIcon, { fontSize: "small" })) })), jsx(Box$1, { sx: { flex: 1, minWidth: 0 }, children: entry.head }), hasTrace && (jsx(Box$1, { onClick: function () { return onToggle(entry.id); }, sx: {
                                     cursor: 'pointer',
                                     fontSize: 11,
                                     px: 0.75,
@@ -35354,14 +35947,14 @@ function LogEntryRow(_a) {
                                     color: isDark ? '#ffd6a8' : '#b45309',
                                     flexShrink: 0,
                                     ml: 1
-                                }, children: entry.open ? 'hide trace' : "".concat(entry.trace.length, " trace line").concat(entry.trace.length === 1 ? '' : 's') }))] }), hasTrace && entry.open && (jsxRuntimeExports.jsx(Box$1, { sx: {
+                                }, children: entry.open ? 'hide trace' : "".concat(entry.trace.length, " trace line").concat(entry.trace.length === 1 ? '' : 's') }))] }), hasTrace && entry.open && (jsx(Box$1, { sx: {
                             mt: 0.5,
                             pl: 2,
                             borderLeft: '2px solid',
                             borderColor: isDark ? 'rgba(255,214,168,0.4)' : 'rgba(234, 88, 12, 0.35)',
                             color: isDark ? '#c8c8c8' : 'text.secondary',
                             fontSize: 12
-                        }, children: entry.trace.map(function (line, i) { return (jsxRuntimeExports.jsx(Box$1, { children: line }, i)); }) }))] })] }));
+                        }, children: entry.trace.map(function (line, i) { return (jsx(Box$1, { children: line }, i)); }) }))] })] }));
 }
 
 var plugin = {
@@ -35383,6 +35976,7 @@ var plugin = {
         'org.rd.plugin.uigoodies.openBulkPublishToolbarButton': OpenBulkPublishToolbarButton,
         'org.rd.plugin.uigoodies.CopyCurrentPageUrl': CopyCurrentPageUrl,
         'org.rd.plugin.uigoodies.CrossSiteContentTypeCopy': CrossSiteContentTypeCopy,
+        'org.rd.plugin.uigoodies.CrossSiteContentCopy': CrossSiteContentCopy,
         'org.rd.plugin.uigoodies.AudienceTargetingFlyoutToolbarButton': AudienceTargetingFlyoutToolbarButton,
         'org.rd.plugin.uigoodies.DeviceSimulatorFlyoutToolbarButton': DeviceSimulatorFlyoutToolbarButton,
         'org.rd.plugin.uigoodies.openCannedSearchPanelButton': OpenCannedSearchPanelButton,
@@ -35392,4 +35986,4 @@ var plugin = {
     }
 };
 
-export { AudienceTargetingFlyoutToolbarButton, BulkPublishView, ComponentPreviewPathNavigator, ContentUpload, CopyCurrentPageUrl, CrossSiteContentTypeCopy, DeviceSimulatorFlyoutToolbarButton, EditOrViewCurrent, LogTail, OpenBulkPublishPanelButton, OpenBulkPublishToolbarButton, OpenCannedSearchPanelButton, OpenCannedSearchToolbarButton, OpenContentUploadPanelButton, OpenContentUploadToolbarButton, OpenSearchPlayground, PublishOrRequestPublish, PullPushRemoteButtons, ToolPanelAccordion, plugin as default };
+export { AudienceTargetingFlyoutToolbarButton, BulkPublishView, ComponentPreviewPathNavigator, ContentUpload, CopyCurrentPageUrl, CrossSiteContentCopy, CrossSiteContentTypeCopy, DeviceSimulatorFlyoutToolbarButton, EditOrViewCurrent, LogTail, OpenBulkPublishPanelButton, OpenBulkPublishToolbarButton, OpenCannedSearchPanelButton, OpenCannedSearchToolbarButton, OpenContentUploadPanelButton, OpenContentUploadToolbarButton, OpenSearchPlayground, PublishOrRequestPublish, PullPushRemoteButtons, ToolPanelAccordion, plugin as default };

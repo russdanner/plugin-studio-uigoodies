@@ -11,6 +11,8 @@ const extensions = ['.js', '.jsx', '.ts', '.tsx'];
 
 const globals = {
   react: 'craftercms.libs.React',
+  'react/jsx-runtime': 'craftercms.libs.reactJsxRuntime',
+  'react/jsx-dev-runtime': 'craftercms.libs.reactJsxRuntime',
   rxjs: 'craftercms.libs.rxjs',
   'rxjs/operators': 'craftercms.libs.rxjs',
   // jsx runtime part of Studio's runtime starting 4.1.2
