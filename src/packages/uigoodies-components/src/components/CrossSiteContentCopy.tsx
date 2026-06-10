@@ -57,6 +57,7 @@ import { createCustomDocumentEventListener } from '@craftercms/studio-ui/utils/d
 import { showSystemNotification } from '@craftercms/studio-ui/state/actions/system';
 import { changeSite } from '@craftercms/studio-ui/state/actions/sites';
 import { fetchItemVersions } from '@craftercms/studio-ui/state/actions/versions';
+import CrossSitePathSelectionDialog from './CrossSitePathSelectionDialog';
 import { postJSON } from '@craftercms/studio-ui/utils/ajax';
 import { getRootPath } from '@craftercms/studio-ui/utils/path';
 import { catchError, map } from 'rxjs/operators';
@@ -546,7 +547,9 @@ export function CrossSiteContentCopy() {
   const env = useEnv();
   const [sites, setSites] = useState<SiteOption[]>([]);
   const [sitesLoading, setSitesLoading] = useState(true);
+  const [sourceSite, setSourceSite] = useState<SiteOption | null>(null);
   const [sourcePaths, setSourcePaths] = useState<string[]>([]);
+  const [sourcePathPickerOpen, setSourcePathPickerOpen] = useState(false);
   const [itemMenuAnchor, setItemMenuAnchor] = useState<null | HTMLElement>(null);
   const [itemMenuPath, setItemMenuPath] = useState<string | null>(null);
   const [addPathError, setAddPathError] = useState<string | null>(null);
@@ -559,6 +562,7 @@ export function CrossSiteContentCopy() {
   const [copyResult, setCopyResult] = useState<CopyResult | null>(null);
   const mountedRef = useRef(true);
   const copySubRef = useRef<{ unsubscribe: () => void } | null>(null);
+  const skipSourceResetRef = useRef(false);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -581,12 +585,30 @@ export function CrossSiteContentCopy() {
     return () => sub.unsubscribe();
   }, []);
 
-  const destOptions = useMemo(
-    () => sites.filter((site) => site.id !== activeSiteId),
-    [sites, activeSiteId]
-  );
+  useEffect(() => {
+    if (activeSiteId && sites.length && !sourceSite) {
+      const current = sites.find((site) => site.id === activeSiteId);
+      if (current) {
+        setSourceSite(current);
+      }
+    }
+  }, [activeSiteId, sites, sourceSite]);
 
-  const readyForPlan = Boolean(activeSiteId && sourcePaths.length > 0 && destSite);
+  useEffect(() => {
+    if (skipSourceResetRef.current) {
+      skipSourceResetRef.current = false;
+      return;
+    }
+    setSourcePaths([]);
+    setAddPathError(null);
+    setPlan(null);
+    setPlanError(null);
+    setCopyResult(null);
+  }, [sourceSite?.id]);
+
+  const sourceSiteId = sourceSite?.id;
+  const sameSourceAndDestination = Boolean(sourceSiteId && destSite && sourceSiteId === destSite.id);
+  const readyForPlan = Boolean(sourceSiteId && sourcePaths.length > 0 && destSite && !sameSourceAndDestination);
 
   const handlePathSelected = (path: string) => {
     const normalized = path.trim();
@@ -604,7 +626,7 @@ export function CrossSiteContentCopy() {
     setAddPathError(null);
   };
 
-  const openAddItemDialog = () => {
+  const openActiveSitePathSelectionDialog = () => {
     const callbackId = 'crossSiteCopyPathSelection';
     const callbackAccept = 'accept';
 
@@ -630,6 +652,17 @@ export function CrossSiteContentCopy() {
         handlePathSelected(detail.path);
       }
     });
+  };
+
+  const openAddItemDialog = () => {
+    if (!sourceSite) {
+      return;
+    }
+    if (sourceSite.id === activeSiteId) {
+      openActiveSitePathSelectionDialog();
+      return;
+    }
+    setSourcePathPickerOpen(true);
   };
 
   const removeSourcePath = (path: string) => {
@@ -659,15 +692,15 @@ export function CrossSiteContentCopy() {
   }, [copyResult]);
 
   const { itemsByPath: sourceItemsByPath, loading: sourceItemsLoading } = useDetailedItemsByPath(
-    activeSiteId,
+    sourceSiteId,
     sourcePaths
   );
   const { itemsByPath: planItemsByPath, loading: planItemsLoading } = useDetailedItemsByPath(
-    activeSiteId,
+    sourceSiteId,
     planItemPaths
   );
   const { itemsByPath: resultItemsByPath, loading: resultItemsLoading } = useDetailedItemsByPath(
-    activeSiteId,
+    sourceSiteId,
     resultItemPaths
   );
 
@@ -709,12 +742,12 @@ export function CrossSiteContentCopy() {
   };
 
   const handleItemView = () => {
-    if (!itemMenuItem || !activeSiteId) {
+    if (!itemMenuItem || !sourceSiteId) {
       return;
     }
     dispatch(
       showEditDialog({
-        site: activeSiteId,
+        site: sourceSiteId,
         path: itemMenuItem.path,
         authoringBase: env.authoringBase,
         readonly: true
@@ -756,7 +789,7 @@ export function CrossSiteContentCopy() {
     setPlanLoading(true);
     setCopyResult(null);
 
-    const sub = callPlan(activeSiteId, {
+    const sub = callPlan(sourceSiteId!, {
       sourcePaths,
       destinationSiteId: destSite!.id,
       copyDependencies
@@ -778,18 +811,18 @@ export function CrossSiteContentCopy() {
     });
 
     return () => sub.unsubscribe();
-  }, [readyForPlan, activeSiteId, sourcePaths, destSite, copyDependencies]);
+  }, [readyForPlan, sourceSiteId, sourcePaths, destSite, copyDependencies]);
 
   const overwriteCount = copyableItems.filter((item) => item.existsOnDestination).length;
   const newCount = copyableItems.length - overwriteCount;
 
   const runCopy = () => {
-    if (!activeSiteId || sourcePaths.length === 0 || !destSite || copyableItems.length === 0) {
+    if (!sourceSiteId || sourcePaths.length === 0 || !destSite || copyableItems.length === 0) {
       return;
     }
     copySubRef.current?.unsubscribe();
     setCopying(true);
-    copySubRef.current = callCopy(activeSiteId, {
+    copySubRef.current = callCopy(sourceSiteId, {
       sourcePaths,
       destinationSiteId: destSite.id,
       copyDependencies
@@ -833,6 +866,13 @@ export function CrossSiteContentCopy() {
     setPlan(null);
     setPlanError(null);
     setCopyResult(null);
+    setSourcePathPickerOpen(false);
+    if (activeSiteId) {
+      const current = sites.find((site) => site.id === activeSiteId);
+      setSourceSite(current ?? null);
+    } else {
+      setSourceSite(null);
+    }
   };
 
   const copiedDestinationSiteId = copyResult?.destinationSiteId ?? destSite?.id;
@@ -856,16 +896,49 @@ export function CrossSiteContentCopy() {
     <Paper elevation={0} sx={{ height: '100%', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }}>
       <DialogBody sx={{ flex: 1, overflow: 'auto', pt: 2 }}>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-          Copy content from <strong>{activeSiteId}</strong> into another project. Copied items appear in the
-          destination project only.
+          Copy content from one project into another. Choose source and destination projects, then select items to
+          copy.
         </Typography>
 
         <Stack spacing={3}>
           <Box>
+            <Typography variant="subtitle2" gutterBottom>
+              1. Projects
+            </Typography>
+            {sitesLoading ? (
+              <CircularProgress size={24} />
+            ) : (
+              <Stack spacing={1.5}>
+                <Autocomplete
+                  options={sites}
+                  getOptionLabel={(option) => `${option.name} (${option.id})`}
+                  isOptionEqualToValue={(option, value) => option.id === value.id}
+                  value={sourceSite}
+                  onChange={(_, value) => setSourceSite(value)}
+                  renderInput={(params) => <TextField {...params} label="Source project" required size="small" />}
+                />
+                <Autocomplete
+                  options={sites}
+                  getOptionLabel={(option) => `${option.name} (${option.id})`}
+                  isOptionEqualToValue={(option, value) => option.id === value.id}
+                  value={destSite}
+                  onChange={(_, value) => setDestSite(value)}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Destination project" required size="small" />
+                  )}
+                />
+                {sameSourceAndDestination && (
+                  <Alert severity="warning">Source and destination must be different projects.</Alert>
+                )}
+              </Stack>
+            )}
+          </Box>
+
+          <Box>
             <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
-              <Typography variant="subtitle2">1. Source content</Typography>
+              <Typography variant="subtitle2">2. Source content</Typography>
               <Stack direction="row" spacing={1}>
-                <Button size="small" onClick={openAddItemDialog}>
+                <Button size="small" onClick={openAddItemDialog} disabled={!sourceSite}>
                   Add item
                 </Button>
                 {sourcePaths.length > 0 && (
@@ -876,7 +949,8 @@ export function CrossSiteContentCopy() {
               </Stack>
             </Stack>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
-              Add pages, components, or folders to copy. Use Add item to browse the project and confirm a path.
+              Add pages, components, or folders from <strong>{sourceSite?.id ?? 'the source project'}</strong>. Use
+              Add item to browse that project and confirm a path.
             </Typography>
             {addPathError && (
               <Typography variant="caption" color="error" sx={{ mb: 1, display: 'block' }}>
@@ -924,32 +998,16 @@ export function CrossSiteContentCopy() {
           </Box>
 
           <Box>
-            <Typography variant="subtitle2" gutterBottom>
-              2. Destination
-            </Typography>
-            {sitesLoading ? (
-              <CircularProgress size={24} />
-            ) : (
-              <Stack spacing={1.5}>
-                <Autocomplete
-                  options={destOptions}
-                  getOptionLabel={(option) => `${option.name} (${option.id})`}
-                  value={destSite}
-                  onChange={(_, value) => setDestSite(value)}
-                  renderInput={(params) => <TextField {...params} label="Destination project" required size="small" />}
+            <FormControlLabel
+              control={
+                <Checkbox
+                  size="small"
+                  checked={copyDependencies}
+                  onChange={(e) => setCopyDependencies(e.target.checked)}
                 />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      size="small"
-                      checked={copyDependencies}
-                      onChange={(e) => setCopyDependencies(e.target.checked)}
-                    />
-                  }
-                  label="Include dependencies (components, linked assets)"
-                />
-              </Stack>
-            )}
+              }
+              label="Include dependencies (components, linked assets)"
+            />
           </Box>
 
           <Divider />
@@ -961,7 +1019,8 @@ export function CrossSiteContentCopy() {
 
             {!readyForPlan && (
               <Typography variant="body2" color="text.secondary">
-                Add at least one source item and choose a destination project to preview what will be copied.
+                Choose source and destination projects, add at least one source item, and ensure they are different to
+                preview what will be copied.
               </Typography>
             )}
 
@@ -1119,6 +1178,17 @@ export function CrossSiteContentCopy() {
           </>
         )}
       </DialogFooter>
+
+      {sourceSite && (
+        <CrossSitePathSelectionDialog
+          open={sourcePathPickerOpen}
+          siteId={sourceSite.id}
+          siteLabel={`${sourceSite.name} (${sourceSite.id})`}
+          stripXmlIndex={false}
+          onClose={() => setSourcePathPickerOpen(false)}
+          onAccept={handlePathSelected}
+        />
+      )}
     </Paper>
   );
 }

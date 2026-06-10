@@ -129,11 +129,24 @@ final class CrossSiteContentCopySupport {
         }
     }
 
-    static LinkedHashSet<String> collectPrimaryPaths(def contentService, String site, String path) {
-        def paths = new LinkedHashSet<String>()
+    /** Depth passed to {@code getContentItemTree}: only direct children are returned per call. */
+    private static final int TREE_CHILDREN_DEPTH = 2
+
+    static boolean isFolderItem(ContentItemTO item) {
+        if (!item) {
+            return false
+        }
+        if (item.folder || item.isFolder()) {
+            return true
+        }
+        def uri = plainPath(item.uri)
+        return uri && !uri.contains('.')
+    }
+
+    static ContentItemTO loadTreeNode(def contentService, String site, String path) {
+        def candidates = new LinkedHashSet<String>()
         def trimmed = path?.trim()
         def normalized = normalizeFolderPath(trimmed)
-        def candidates = new LinkedHashSet<String>()
         if (trimmed) {
             candidates.add(trimmed)
         }
@@ -147,15 +160,68 @@ final class CrossSiteContentCopySupport {
                 return
             }
             try {
-                tree = contentService.getContentItemTree(site, candidate, -1)
+                tree = contentService.getContentItemTree(site, candidate, TREE_CHILDREN_DEPTH)
             } catch (Exception ignored) {
             }
         }
-        if (tree) {
-            walkTree(tree, paths)
-        } else if (normalized || trimmed) {
-            paths.add(plainPath(normalized ?: trimmed))
+        return tree
+    }
+
+    /**
+     * Collect all content paths under a folder selection. Uses breadth-first traversal because
+     * {@code getContentItemTree(site, path, -1)} only resolves shallow trees in Studio.
+     */
+    static LinkedHashSet<String> collectPrimaryPaths(def contentService, String site, String path) {
+        def paths = new LinkedHashSet<String>()
+        def normalized = normalizeFolderPath(path?.trim())
+        if (!normalized) {
+            return paths
         }
+
+        if (!pathExists(contentService, site, normalized)) {
+            paths.add(plainPath(normalized))
+            return plainPathSet(paths)
+        }
+
+        def root = loadTreeNode(contentService, site, normalized)
+        if (!root) {
+            paths.add(plainPath(normalized))
+            return plainPathSet(paths)
+        }
+
+        if (!isFolderItem(root) && !(root.children?.size() > 0)) {
+            paths.add(plainPath(root.uri ?: normalized))
+            return plainPathSet(paths)
+        }
+
+        def visited = new LinkedHashSet<String>()
+        def queue = new ArrayDeque<String>()
+        queue.add(plainPath(root.uri ?: normalized))
+
+        while (!queue.isEmpty()) {
+            def current = queue.poll()
+            if (!visited.add(current)) {
+                continue
+            }
+            paths.add(current)
+
+            def node = loadTreeNode(contentService, site, current)
+            if (!node?.children) {
+                continue
+            }
+
+            node.children.each { child ->
+                def childPath = plainPath(child?.uri)
+                if (!childPath || isKeepFile(childPath)) {
+                    return
+                }
+                paths.add(childPath)
+                if (isFolderItem(child)) {
+                    queue.add(normalizeFolderPath(childPath))
+                }
+            }
+        }
+
         return plainPathSet(paths)
     }
 

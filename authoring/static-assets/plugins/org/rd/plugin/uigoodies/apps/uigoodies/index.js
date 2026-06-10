@@ -1,6 +1,6 @@
 const { jsx, Fragment, jsxs } = craftercms.libs.reactJsxRuntime;
 const { useSelector, useDispatch } = craftercms.libs.ReactRedux;
-const { Tooltip, useTheme, accordionClasses, accordionSummaryClasses, Accordion, AccordionSummary, Typography, AccordionDetails, Button: Button$1, CircularProgress, alpha, buttonClasses, Backdrop, Alert, Paper, Box: Box$1, AlertTitle, Stepper, Step, StepLabel, Autocomplete, TextField: TextField$1, FormControlLabel, Checkbox, List, ListItem, Stack: Stack$1, TableRow, TableCell, IconButton: IconButton$1, Menu: Menu$1, MenuItem: MenuItem$1, Divider, Chip, Table, TableHead, TableBody, InputAdornment, ListItemText, Dialog, DialogTitle, DialogContent, DialogActions, Collapse, useMediaQuery, Tabs, Tab } = craftercms.libs.MaterialUI;
+const { Tooltip, useTheme, accordionClasses, accordionSummaryClasses, Accordion, AccordionSummary, Typography, AccordionDetails, Button: Button$1, CircularProgress, alpha, buttonClasses, Backdrop, Alert, Paper, Box: Box$1, AlertTitle, Stepper, Step, StepLabel, Autocomplete, TextField: TextField$1, FormControlLabel, Checkbox, List, ListItem, Dialog, FormControl, InputAdornment, IconButton: IconButton$1, FormHelperText, Stack: Stack$1, TableRow, TableCell, Menu: Menu$1, MenuItem: MenuItem$1, Divider, Chip, Table, TableHead, TableBody, ListItemText, DialogTitle, DialogContent, DialogActions, Collapse: Collapse$1, useMediaQuery, Tabs, Tab } = craftercms.libs.MaterialUI;
 const IconButton = craftercms.libs.MaterialUI.IconButton && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.IconButton, 'default') ? craftercms.libs.MaterialUI.IconButton['default'] : craftercms.libs.MaterialUI.IconButton;
 const Button = craftercms.libs.MaterialUI.Button && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Button, 'default') ? craftercms.libs.MaterialUI.Button['default'] : craftercms.libs.MaterialUI.Button;
 const SystemIcon = craftercms.components.SystemIcon && Object.prototype.hasOwnProperty.call(craftercms.components.SystemIcon, 'default') ? craftercms.components.SystemIcon['default'] : craftercms.components.SystemIcon;
@@ -8,13 +8,13 @@ const { isItemLockedForMe } = craftercms.utils.content;
 const React = craftercms.libs.React;
 const { useState, useRef, useEffect, useMemo, useCallback, createContext, useSyncExternalStore, useId, useImperativeHandle, useLayoutEffect, useContext, forwardRef } = craftercms.libs.React;
 const React__default = craftercms.libs.React && Object.prototype.hasOwnProperty.call(craftercms.libs.React, 'default') ? craftercms.libs.React['default'] : craftercms.libs.React;
-const { SystemIcon: SystemIcon$1, WidgetsGrid, DialogBody, DialogFooter: DialogFooter$1 } = craftercms.components;
+const { SystemIcon: SystemIcon$1, WidgetsGrid, DialogBody, DialogFooter: DialogFooter$1, DialogHeader } = craftercms.components;
 const ExpandMore = craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreOutlined') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreOutlined'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreOutlined')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreOutlined');
 const { createCustomDocumentEventListener } = craftercms.utils.dom;
 const TextField = craftercms.libs.MaterialUI.TextField && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.TextField, 'default') ? craftercms.libs.MaterialUI.TextField['default'] : craftercms.libs.MaterialUI.TextField;
 const Container = craftercms.libs.MaterialUI.Container && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Container, 'default') ? craftercms.libs.MaterialUI.Container['default'] : craftercms.libs.MaterialUI.Container;
 const Box = craftercms.libs.MaterialUI.Box && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Box, 'default') ? craftercms.libs.MaterialUI.Box['default'] : craftercms.libs.MaterialUI.Box;
-const { writeContent, fetchDetailedItems } = craftercms.services.content;
+const { writeContent, fetchChildrenByPath, checkPathExistence, fetchDetailedItems } = craftercms.services.content;
 const { DialogFooter, PathNavigator } = craftercms.components;
 const ToolsPanelListItemButton = craftercms.components.ToolsPanelListItemButton && Object.prototype.hasOwnProperty.call(craftercms.components.ToolsPanelListItemButton, 'default') ? craftercms.components.ToolsPanelListItemButton['default'] : craftercms.components.ToolsPanelListItemButton;
 const Tooltip$1 = craftercms.libs.MaterialUI.Tooltip && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Tooltip, 'default') ? craftercms.libs.MaterialUI.Tooltip['default'] : craftercms.libs.MaterialUI.Tooltip;
@@ -23,13 +23,13 @@ const DownloadIcon = craftercms.utils.constants.components.get('@mui/icons-mater
 const PublishIcon = craftercms.utils.constants.components.get('@mui/icons-material/PublishOutlined') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/PublishOutlined'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/PublishOutlined')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/PublishOutlined');
 const Snackbar = craftercms.libs.MaterialUI.Snackbar && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Snackbar, 'default') ? craftercms.libs.MaterialUI.Snackbar['default'] : craftercms.libs.MaterialUI.Snackbar;
 const { FormattedMessage } = craftercms.libs.ReactIntl;
-const { of, from, concatMap: concatMap$1, forkJoin } = craftercms.libs.rxjs;
-const { concatMap, expand, toArray, catchError, switchMap, map } = craftercms.libs.rxjs;
+const { of, from, concatMap: concatMap$1, forkJoin, Subject } = craftercms.libs.rxjs;
+const { concatMap, expand, toArray, catchError, switchMap, takeUntil, map } = craftercms.libs.rxjs;
 const { fetchUnpublished } = craftercms.services.dashboard;
 const { nou } = craftercms.utils.object;
 const { lookupItemByPath } = craftercms.utils.content;
 const { hasInitialPublish, fetchAll } = craftercms.services.sites;
-const { useTheme: useTheme$1 } = craftercms.libs.MaterialUI;
+const { useTheme: useTheme$1, useThemeProps: useThemeProps$2, styled, alpha: alpha$1 } = craftercms.libs.MaterialUI;
 const InfoOutlinedIcon = craftercms.utils.constants.components.get('@mui/icons-material/InfoOutlined') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/InfoOutlined'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/InfoOutlined')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/InfoOutlined');
 const Menu = craftercms.libs.MaterialUI.Menu && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Menu, 'default') ? craftercms.libs.MaterialUI.Menu['default'] : craftercms.libs.MaterialUI.Menu;
 const MenuItem = craftercms.libs.MaterialUI.MenuItem && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.MenuItem, 'default') ? craftercms.libs.MaterialUI.MenuItem['default'] : craftercms.libs.MaterialUI.MenuItem;
@@ -40,8 +40,15 @@ const { createSvgIcon } = craftercms.libs.MaterialUI;
 const ItemPublishingTargetIcon = craftercms.components.ItemPublishingTargetIcon && Object.prototype.hasOwnProperty.call(craftercms.components.ItemPublishingTargetIcon, 'default') ? craftercms.components.ItemPublishingTargetIcon['default'] : craftercms.components.ItemPublishingTargetIcon;
 const ItemStateIcon = craftercms.components.ItemStateIcon && Object.prototype.hasOwnProperty.call(craftercms.components.ItemStateIcon, 'default') ? craftercms.components.ItemStateIcon['default'] : craftercms.components.ItemStateIcon;
 const ItemTypeIcon = craftercms.components.ItemTypeIcon && Object.prototype.hasOwnProperty.call(craftercms.components.ItemTypeIcon, 'default') ? craftercms.components.ItemTypeIcon['default'] : craftercms.components.ItemTypeIcon;
+const CheckRounded = craftercms.utils.constants.components.get('@mui/icons-material/CheckRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/CheckRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/CheckRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/CheckRounded');
+const ErrorRounded = craftercms.utils.constants.components.get('@mui/icons-material/ErrorRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ErrorRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ErrorRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ErrorRounded');
+const KeyboardArrowLeftRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/KeyboardArrowLeftRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/KeyboardArrowLeftRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/KeyboardArrowLeftRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/KeyboardArrowLeftRounded');
+const ArrowRightRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/ArrowRightRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ArrowRightRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ArrowRightRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ArrowRightRounded');
+const ArrowDropDownRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/ArrowDropDownRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ArrowDropDownRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ArrowDropDownRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ArrowDropDownRounded');
+const { withoutIndex, getIndividualPaths, withoutFile, withIndex, getRootPath } = craftercms.utils.path;
+const Collapse = craftercms.libs.MaterialUI.Collapse && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Collapse, 'default') ? craftercms.libs.MaterialUI.Collapse['default'] : craftercms.libs.MaterialUI.Collapse;
+const Checkbox$1 = craftercms.libs.MaterialUI.Checkbox && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Checkbox, 'default') ? craftercms.libs.MaterialUI.Checkbox['default'] : craftercms.libs.MaterialUI.Checkbox;
 const { postJSON, getGlobalHeaders } = craftercms.utils.ajax;
-const { getRootPath } = craftercms.utils.path;
 const Popover = craftercms.libs.MaterialUI.Popover && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Popover, 'default') ? craftercms.libs.MaterialUI.Popover['default'] : craftercms.libs.MaterialUI.Popover;
 const Paper$1 = craftercms.libs.MaterialUI.Paper && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Paper, 'default') ? craftercms.libs.MaterialUI.Paper['default'] : craftercms.libs.MaterialUI.Paper;
 const Typography$1 = craftercms.libs.MaterialUI.Typography && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Typography, 'default') ? craftercms.libs.MaterialUI.Typography['default'] : craftercms.libs.MaterialUI.Typography;
@@ -133,7 +140,7 @@ function useEnv() {
 // src/utils/formatProdErrorMessage.ts
 
 // src/utils/isPlainObject.ts
-function isPlainObject$1(obj) {
+function isPlainObject$2(obj) {
   if (typeof obj !== "object" || obj === null)
     return false;
   let proto = obj;
@@ -145,7 +152,7 @@ function isPlainObject$1(obj) {
 
 // src/utils/isAction.ts
 function isAction(action) {
-  return isPlainObject$1(action) && "type" in action && typeof action.type === "string";
+  return isPlainObject$2(action) && "type" in action && typeof action.type === "string";
 }
 
 // src/utils/env.ts
@@ -171,11 +178,11 @@ var isDraft = (value) => !!value && !!value[DRAFT_STATE];
 function isDraftable(value) {
   if (!value)
     return false;
-  return isPlainObject(value) || isArray(value) || !!value[DRAFTABLE] || !!value[CONSTRUCTOR]?.[DRAFTABLE] || isMap(value) || isSet(value);
+  return isPlainObject$1(value) || isArray(value) || !!value[DRAFTABLE] || !!value[CONSTRUCTOR]?.[DRAFTABLE] || isMap(value) || isSet(value);
 }
 var objectCtorString = O$1[PROTOTYPE][CONSTRUCTOR].toString();
 var cachedCtorStrings = /* @__PURE__ */ new WeakMap();
-function isPlainObject(value) {
+function isPlainObject$1(value) {
   if (!value || !isObjectish(value))
     return false;
   const proto = getPrototypeOf(value);
@@ -248,7 +255,7 @@ function shallowCopy(base, strict) {
   }
   if (isArray(base))
     return Array[PROTOTYPE].slice.call(base);
-  const isPlain = isPlainObject(base);
+  const isPlain = isPlainObject$1(base);
   if (strict === true || strict === "class_only" && !isPlain) {
     const descriptors = O$1.getOwnPropertyDescriptors(base);
     delete descriptors[DRAFT_STATE];
@@ -2458,6 +2465,5312 @@ changeSite.type = 'CHANGE_SITE';
 
 const fetchItemVersions = /*#__PURE__*/ createAction('FETCH_ITEM_VERSIONS');
 
+function _extends() {
+  return _extends = Object.assign ? Object.assign.bind() : function (n) {
+    for (var e = 1; e < arguments.length; e++) {
+      var t = arguments[e];
+      for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]);
+    }
+    return n;
+  }, _extends.apply(null, arguments);
+}
+
+function getDefaultExportFromCjs (x) {
+	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
+}
+
+var propTypes = {exports: {}};
+
+/**
+ * Copyright (c) 2013-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+var ReactPropTypesSecret_1;
+var hasRequiredReactPropTypesSecret;
+
+function requireReactPropTypesSecret () {
+	if (hasRequiredReactPropTypesSecret) return ReactPropTypesSecret_1;
+	hasRequiredReactPropTypesSecret = 1;
+
+	var ReactPropTypesSecret = 'SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED';
+
+	ReactPropTypesSecret_1 = ReactPropTypesSecret;
+	return ReactPropTypesSecret_1;
+}
+
+/**
+ * Copyright (c) 2013-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+var factoryWithThrowingShims;
+var hasRequiredFactoryWithThrowingShims;
+
+function requireFactoryWithThrowingShims () {
+	if (hasRequiredFactoryWithThrowingShims) return factoryWithThrowingShims;
+	hasRequiredFactoryWithThrowingShims = 1;
+
+	var ReactPropTypesSecret = /*@__PURE__*/ requireReactPropTypesSecret();
+
+	function emptyFunction() {}
+	function emptyFunctionWithReset() {}
+	emptyFunctionWithReset.resetWarningCache = emptyFunction;
+
+	factoryWithThrowingShims = function() {
+	  function shim(props, propName, componentName, location, propFullName, secret) {
+	    if (secret === ReactPropTypesSecret) {
+	      // It is still safe when called from React.
+	      return;
+	    }
+	    var err = new Error(
+	      'Calling PropTypes validators directly is not supported by the `prop-types` package. ' +
+	      'Use PropTypes.checkPropTypes() to call them. ' +
+	      'Read more at http://fb.me/use-check-prop-types'
+	    );
+	    err.name = 'Invariant Violation';
+	    throw err;
+	  }	  shim.isRequired = shim;
+	  function getShim() {
+	    return shim;
+	  }	  // Important!
+	  // Keep this list in sync with production version in `./factoryWithTypeCheckers.js`.
+	  var ReactPropTypes = {
+	    array: shim,
+	    bigint: shim,
+	    bool: shim,
+	    func: shim,
+	    number: shim,
+	    object: shim,
+	    string: shim,
+	    symbol: shim,
+
+	    any: shim,
+	    arrayOf: getShim,
+	    element: shim,
+	    elementType: shim,
+	    instanceOf: getShim,
+	    node: shim,
+	    objectOf: getShim,
+	    oneOf: getShim,
+	    oneOfType: getShim,
+	    shape: getShim,
+	    exact: getShim,
+
+	    checkPropTypes: emptyFunctionWithReset,
+	    resetWarningCache: emptyFunction
+	  };
+
+	  ReactPropTypes.PropTypes = ReactPropTypes;
+
+	  return ReactPropTypes;
+	};
+	return factoryWithThrowingShims;
+}
+
+/**
+ * Copyright (c) 2013-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+var hasRequiredPropTypes;
+
+function requirePropTypes () {
+	if (hasRequiredPropTypes) return propTypes.exports;
+	hasRequiredPropTypes = 1;
+	{
+	  // By explicitly using `prop-types` you are opting into new production behavior.
+	  // http://fb.me/prop-types-in-prod
+	  propTypes.exports = /*@__PURE__*/ requireFactoryWithThrowingShims()();
+	}
+	return propTypes.exports;
+}
+
+var propTypesExports = /*@__PURE__*/ requirePropTypes();
+var PropTypes = /*@__PURE__*/getDefaultExportFromCjs(propTypesExports);
+
+/* eslint no-restricted-syntax: 0, prefer-template: 0, guard-for-in: 0
+   ---
+   These rules are preventing the performance optimizations below.
+ */
+
+/**
+ * Compose classes from multiple sources.
+ *
+ * @example
+ * ```tsx
+ * const slots = {
+ *  root: ['root', 'primary'],
+ *  label: ['label'],
+ * };
+ *
+ * const getUtilityClass = (slot) => `MuiButton-${slot}`;
+ *
+ * const classes = {
+ *   root: 'my-root-class',
+ * };
+ *
+ * const output = composeClasses(slots, getUtilityClass, classes);
+ * // {
+ * //   root: 'MuiButton-root MuiButton-primary my-root-class',
+ * //   label: 'MuiButton-label',
+ * // }
+ * ```
+ *
+ * @param slots a list of classes for each possible slot
+ * @param getUtilityClass a function to resolve the class based on the slot name
+ * @param classes the input classes from props
+ * @returns the resolved classes for all slots
+ */
+function composeClasses(slots, getUtilityClass, classes = undefined) {
+  const output = {};
+  for (const slotName in slots) {
+    const slot = slots[slotName];
+    let buffer = '';
+    let start = true;
+    for (let i = 0; i < slot.length; i += 1) {
+      const value = slot[i];
+      if (value) {
+        buffer += (start === true ? '' : ' ') + getUtilityClass(value);
+        start = false;
+        if (classes && classes[value]) {
+          buffer += ' ' + classes[value];
+        }
+      }
+    }
+    output[slotName] = buffer;
+  }
+  return output;
+}
+
+/**
+ * Merges refs into a single memoized callback ref or `null`.
+ *
+ * ```tsx
+ * const rootRef = React.useRef<Instance>(null);
+ * const refFork = useForkRef(rootRef, props.ref);
+ *
+ * return (
+ *   <Root {...props} ref={refFork} />
+ * );
+ * ```
+ *
+ * @param {Array<React.Ref<Instance> | undefined>} refs The ref array.
+ * @returns {React.RefCallback<Instance> | null} The new ref callback.
+ */
+function useForkRef(...refs) {
+  const cleanupRef = React.useRef(undefined);
+  const refEffect = React.useCallback(instance => {
+    const cleanups = refs.map(ref => {
+      if (ref == null) {
+        return null;
+      }
+      if (typeof ref === 'function') {
+        const refCallback = ref;
+        const refCleanup = refCallback(instance);
+        return typeof refCleanup === 'function' ? refCleanup : () => {
+          refCallback(null);
+        };
+      }
+      ref.current = instance;
+      return () => {
+        ref.current = null;
+      };
+    });
+    return () => {
+      cleanups.forEach(refCleanup => refCleanup?.());
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, refs);
+  return React.useMemo(() => {
+    if (refs.every(ref => ref == null)) {
+      return null;
+    }
+    return value => {
+      if (cleanupRef.current) {
+        cleanupRef.current();
+        cleanupRef.current = undefined;
+      }
+      if (value != null) {
+        cleanupRef.current = refEffect(value);
+      }
+    };
+    // TODO: uncomment once we enable eslint-plugin-react-compiler // eslint-disable-next-line react-compiler/react-compiler -- intentionally ignoring that the dependency array must be an array literal
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, refs);
+}
+
+/**
+ * Determines if a given element is a DOM element name (i.e. not a React component).
+ */
+function isHostComponent(element) {
+  return typeof element === 'string';
+}
+
+/**
+ * Type of the ownerState based on the type of an element it applies to.
+ * This resolves to the provided OwnerState for React components and `undefined` for host components.
+ * Falls back to `OwnerState | undefined` when the exact type can't be determined in development time.
+ */
+
+/**
+ * Appends the ownerState object to the props, merging with the existing one if necessary.
+ *
+ * @param elementType Type of the element that owns the `existingProps`. If the element is a DOM node or undefined, `ownerState` is not applied.
+ * @param otherProps Props of the element.
+ * @param ownerState
+ */
+function appendOwnerState(elementType, otherProps, ownerState) {
+  if (elementType === undefined || isHostComponent(elementType)) {
+    return otherProps;
+  }
+  return {
+    ...otherProps,
+    ownerState: {
+      ...otherProps.ownerState,
+      ...ownerState
+    }
+  };
+}
+
+function r(e){var t,f,n="";if("string"==typeof e||"number"==typeof e)n+=e;else if("object"==typeof e)if(Array.isArray(e)){var o=e.length;for(t=0;t<o;t++)e[t]&&(f=r(e[t]))&&(n&&(n+=" "),n+=f);}else for(f in e)e[f]&&(n&&(n+=" "),n+=f);return n}function clsx(){for(var e,t,f=0,n="",o=arguments.length;f<o;f++)(e=arguments[f])&&(t=r(e))&&(n&&(n+=" "),n+=t);return n}
+
+/**
+ * Extracts event handlers from a given object.
+ * A prop is considered an event handler if it is a function and its name starts with `on`.
+ *
+ * @param object An object to extract event handlers from.
+ * @param excludeKeys An array of keys to exclude from the returned object.
+ */
+function extractEventHandlers(object, excludeKeys = []) {
+  if (object === undefined) {
+    return {};
+  }
+  const result = {};
+  Object.keys(object).filter(prop => prop.match(/^on[A-Z]/) && typeof object[prop] === 'function' && !excludeKeys.includes(prop)).forEach(prop => {
+    result[prop] = object[prop];
+  });
+  return result;
+}
+
+/**
+ * Removes event handlers from the given object.
+ * A field is considered an event handler if it is a function with a name beginning with `on`.
+ *
+ * @param object Object to remove event handlers from.
+ * @returns Object with event handlers removed.
+ */
+function omitEventHandlers(object) {
+  if (object === undefined) {
+    return {};
+  }
+  const result = {};
+  Object.keys(object).filter(prop => !(prop.match(/^on[A-Z]/) && typeof object[prop] === 'function')).forEach(prop => {
+    result[prop] = object[prop];
+  });
+  return result;
+}
+
+/**
+ * Merges the slot component internal props (usually coming from a hook)
+ * with the externally provided ones.
+ *
+ * The merge order is (the latter overrides the former):
+ * 1. The internal props (specified as a getter function to work with get*Props hook result)
+ * 2. Additional props (specified internally on a Base UI component)
+ * 3. External props specified on the owner component. These should only be used on a root slot.
+ * 4. External props specified in the `slotProps.*` prop.
+ * 5. The `className` prop - combined from all the above.
+ * @param parameters
+ * @returns
+ */
+function mergeSlotProps(parameters) {
+  const {
+    getSlotProps,
+    additionalProps,
+    externalSlotProps,
+    externalForwardedProps,
+    className
+  } = parameters;
+  if (!getSlotProps) {
+    // The simpler case - getSlotProps is not defined, so no internal event handlers are defined,
+    // so we can simply merge all the props without having to worry about extracting event handlers.
+    const joinedClasses = clsx(additionalProps?.className, className, externalForwardedProps?.className, externalSlotProps?.className);
+    const mergedStyle = {
+      ...additionalProps?.style,
+      ...externalForwardedProps?.style,
+      ...externalSlotProps?.style
+    };
+    const props = {
+      ...additionalProps,
+      ...externalForwardedProps,
+      ...externalSlotProps
+    };
+    if (joinedClasses.length > 0) {
+      props.className = joinedClasses;
+    }
+    if (Object.keys(mergedStyle).length > 0) {
+      props.style = mergedStyle;
+    }
+    return {
+      props,
+      internalRef: undefined
+    };
+  }
+
+  // In this case, getSlotProps is responsible for calling the external event handlers.
+  // We don't need to include them in the merged props because of this.
+
+  const eventHandlers = extractEventHandlers({
+    ...externalForwardedProps,
+    ...externalSlotProps
+  });
+  const componentsPropsWithoutEventHandlers = omitEventHandlers(externalSlotProps);
+  const otherPropsWithoutEventHandlers = omitEventHandlers(externalForwardedProps);
+  const internalSlotProps = getSlotProps(eventHandlers);
+
+  // The order of classes is important here.
+  // Emotion (that we use in libraries consuming Base UI) depends on this order
+  // to properly override style. It requires the most important classes to be last
+  // (see https://github.com/mui/material-ui/pull/33205) for the related discussion.
+  const joinedClasses = clsx(internalSlotProps?.className, additionalProps?.className, className, externalForwardedProps?.className, externalSlotProps?.className);
+  const mergedStyle = {
+    ...internalSlotProps?.style,
+    ...additionalProps?.style,
+    ...externalForwardedProps?.style,
+    ...externalSlotProps?.style
+  };
+  const props = {
+    ...internalSlotProps,
+    ...additionalProps,
+    ...otherPropsWithoutEventHandlers,
+    ...componentsPropsWithoutEventHandlers
+  };
+  if (joinedClasses.length > 0) {
+    props.className = joinedClasses;
+  }
+  if (Object.keys(mergedStyle).length > 0) {
+    props.style = mergedStyle;
+  }
+  return {
+    props,
+    internalRef: internalSlotProps.ref
+  };
+}
+
+/**
+ * If `componentProps` is a function, calls it with the provided `ownerState`.
+ * Otherwise, just returns `componentProps`.
+ */
+function resolveComponentProps(componentProps, ownerState, slotState) {
+  if (typeof componentProps === 'function') {
+    return componentProps(ownerState, slotState);
+  }
+  return componentProps;
+}
+
+/**
+ * @ignore - do not document.
+ * Builds the props to be passed into the slot of an unstyled component.
+ * It merges the internal props of the component with the ones supplied by the user, allowing to customize the behavior.
+ * If the slot component is not a host component, it also merges in the `ownerState`.
+ *
+ * @param parameters.getSlotProps - A function that returns the props to be passed to the slot component.
+ */
+function useSlotProps(parameters) {
+  const {
+    elementType,
+    externalSlotProps,
+    ownerState,
+    skipResolvingSlotProps = false,
+    ...other
+  } = parameters;
+  const resolvedComponentsProps = skipResolvingSlotProps ? {} : resolveComponentProps(externalSlotProps, ownerState);
+  const {
+    props: mergedProps,
+    internalRef
+  } = mergeSlotProps({
+    ...other,
+    externalSlotProps: resolvedComponentsProps
+  });
+  const ref = useForkRef(internalRef, resolvedComponentsProps?.ref, parameters.additionalProps?.ref);
+  const props = appendOwnerState(elementType, {
+    ...mergedProps,
+    ref
+  }, ownerState);
+  return props;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function createUseThemeProps(name) {
+  return useThemeProps$2;
+}
+
+const defaultGenerator = componentName => componentName;
+const createClassNameGenerator = () => {
+  let generate = defaultGenerator;
+  return {
+    configure(generator) {
+      generate = generator;
+    },
+    generate(componentName) {
+      return generate(componentName);
+    },
+    reset() {
+      generate = defaultGenerator;
+    }
+  };
+};
+const ClassNameGenerator = createClassNameGenerator();
+
+const globalStateClasses = {
+  active: 'active',
+  checked: 'checked',
+  completed: 'completed',
+  disabled: 'disabled',
+  error: 'error',
+  expanded: 'expanded',
+  focused: 'focused',
+  focusVisible: 'focusVisible',
+  open: 'open',
+  readOnly: 'readOnly',
+  required: 'required',
+  selected: 'selected'
+};
+function generateUtilityClass(componentName, slot, globalStatePrefix = 'Mui') {
+  const globalStateClass = globalStateClasses[slot];
+  return globalStateClass ? `${globalStatePrefix}-${globalStateClass}` : `${ClassNameGenerator.generate(componentName)}-${slot}`;
+}
+
+function generateUtilityClasses(componentName, slots, globalStatePrefix = 'Mui') {
+  const result = {};
+  slots.forEach(slot => {
+    result[slot] = generateUtilityClass(componentName, slot, globalStatePrefix);
+  });
+  return result;
+}
+
+function getSimpleTreeViewUtilityClass(slot) {
+  return generateUtilityClass('MuiSimpleTreeView', slot);
+}
+generateUtilityClasses('MuiSimpleTreeView', ['root']);
+
+/**
+ * Implements the same behavior as `useControlled` but for several models.
+ * The controlled models are never stored in the state, and the state is only updated if the model is not controlled.
+ */
+const useTreeViewModels = (plugins, props) => {
+  const modelsRef = React.useRef({});
+  const [modelsState, setModelsState] = React.useState(() => {
+    const initialState = {};
+    plugins.forEach(plugin => {
+      if (plugin.models) {
+        Object.entries(plugin.models).forEach(([modelName, modelInitializer]) => {
+          modelsRef.current[modelName] = {
+            isControlled: props[modelName] !== undefined,
+            getDefaultValue: modelInitializer.getDefaultValue
+          };
+          initialState[modelName] = modelInitializer.getDefaultValue(props);
+        });
+      }
+    });
+    return initialState;
+  });
+  const models = Object.fromEntries(Object.entries(modelsRef.current).map(([modelName, model]) => {
+    const value = props[modelName] ?? modelsState[modelName];
+    return [modelName, {
+      value,
+      setControlledValue: newValue => {
+        if (!model.isControlled) {
+          setModelsState(prevState => _extends({}, prevState, {
+            [modelName]: newValue
+          }));
+        }
+      }
+    }];
+  }));
+  /* eslint-enable react-hooks/rules-of-hooks, react-hooks/exhaustive-deps */
+
+  return models;
+};
+
+// Used https://gist.github.com/mudge/5830382 as a starting point.
+// See https://github.com/browserify/events/blob/master/events.js for
+// the Node.js (https://nodejs.org/api/events.html) polyfill used by webpack.
+class EventManager {
+  constructor() {
+    this.maxListeners = 20;
+    this.warnOnce = false;
+    this.events = {};
+  }
+  on(eventName, listener, options = {}) {
+    let collection = this.events[eventName];
+    if (!collection) {
+      collection = {
+        highPriority: new Map(),
+        regular: new Map()
+      };
+      this.events[eventName] = collection;
+    }
+    if (options.isFirst) {
+      collection.highPriority.set(listener, true);
+    } else {
+      collection.regular.set(listener, true);
+    }
+  }
+  removeListener(eventName, listener) {
+    if (this.events[eventName]) {
+      this.events[eventName].regular.delete(listener);
+      this.events[eventName].highPriority.delete(listener);
+    }
+  }
+  removeAllListeners() {
+    this.events = {};
+  }
+  emit(eventName, ...args) {
+    const collection = this.events[eventName];
+    if (!collection) {
+      return;
+    }
+    const highPriorityListeners = Array.from(collection.highPriority.keys());
+    const regularListeners = Array.from(collection.regular.keys());
+    for (let i = highPriorityListeners.length - 1; i >= 0; i -= 1) {
+      const listener = highPriorityListeners[i];
+      if (collection.highPriority.has(listener)) {
+        listener.apply(this, args);
+      }
+    }
+    for (let i = 0; i < regularListeners.length; i += 1) {
+      const listener = regularListeners[i];
+      if (collection.regular.has(listener)) {
+        listener.apply(this, args);
+      }
+    }
+  }
+  once(eventName, listener) {
+    // eslint-disable-next-line consistent-this
+    const that = this;
+    this.on(eventName, function oneTimeListener(...args) {
+      that.removeListener(eventName, oneTimeListener);
+      listener.apply(that, args);
+    });
+  }
+}
+
+const isSyntheticEvent = event => {
+  return event.isPropagationStopped !== undefined;
+};
+const useTreeViewInstanceEvents = () => {
+  const [eventManager] = React.useState(() => new EventManager());
+  const publishEvent = React.useCallback((...args) => {
+    const [name, params, event = {}] = args;
+    event.defaultMuiPrevented = false;
+    if (isSyntheticEvent(event) && event.isPropagationStopped()) {
+      return;
+    }
+    eventManager.emit(name, params, event);
+  }, [eventManager]);
+  const subscribeEvent = React.useCallback((event, handler) => {
+    eventManager.on(event, handler);
+    return () => {
+      eventManager.removeListener(event, handler);
+    };
+  }, [eventManager]);
+  return {
+    instance: {
+      $$publishEvent: publishEvent,
+      $$subscribeEvent: subscribeEvent
+    }
+  };
+};
+useTreeViewInstanceEvents.params = {};
+
+const useTreeViewOptionalPlugins = ({
+  plugins
+}) => {
+  const pluginSet = new Set(plugins);
+  const getAvailablePlugins = () => pluginSet;
+  return {
+    instance: {
+      getAvailablePlugins
+    }
+  };
+};
+useTreeViewOptionalPlugins.params = {};
+
+let globalTreeViewDefaultId = 0;
+const createTreeViewDefaultId = () => {
+  globalTreeViewDefaultId += 1;
+  return `mui-tree-view-${globalTreeViewDefaultId}`;
+};
+
+/**
+ * Generate the id attribute (i.e.: the `id` attribute passed to the DOM element) of a Tree Item.
+ * If the user explicitly defined an id attribute, it will be returned.
+ * Otherwise, the method creates a unique id for the item based on the Tree View id attribute and the item `itemId`
+ * @param {object} params The parameters to determine the id attribute of the item.
+ * @param {TreeViewItemId} params.itemId The id of the item to get the id attribute of.
+ * @param {string | undefined} params.idAttribute The id attribute of the item if explicitly defined by the user.
+ * @param {string} params.treeId The id attribute of the Tree View.
+ * @returns {string} The id attribute of the item.
+ */
+const generateTreeItemIdAttribute = ({
+  id,
+  treeId = '',
+  itemId
+}) => {
+  if (id != null) {
+    return id;
+  }
+  return `${treeId}-${itemId}`;
+};
+
+const useTreeViewId = ({
+  params,
+  state,
+  setState
+}) => {
+  React.useEffect(() => {
+    setState(prevState => {
+      if (prevState.id.treeId === params.id && prevState.id.treeId !== undefined) {
+        return prevState;
+      }
+      return _extends({}, prevState, {
+        id: _extends({}, prevState.id, {
+          treeId: params.id ?? createTreeViewDefaultId()
+        })
+      });
+    });
+  }, [setState, params.id]);
+  const treeId = params.id ?? state.id.treeId;
+  return {
+    getRootProps: () => ({
+      id: treeId
+    }),
+    contextValue: {
+      treeId
+    }
+  };
+};
+useTreeViewId.params = {
+  id: true
+};
+useTreeViewId.getInitialState = ({
+  id
+}) => ({
+  id: {
+    treeId: id ?? undefined
+  }
+});
+
+/**
+ * Internal plugins that create the tools used by the other plugins.
+ * These plugins are used by the Tree View components.
+ */
+const TREE_VIEW_CORE_PLUGINS = [useTreeViewInstanceEvents, useTreeViewOptionalPlugins, useTreeViewId];
+
+function _objectWithoutPropertiesLoose(r, e) {
+  if (null == r) return {};
+  var t = {};
+  for (var n in r) if ({}.hasOwnProperty.call(r, n)) {
+    if (-1 !== e.indexOf(n)) continue;
+    t[n] = r[n];
+  }
+  return t;
+}
+
+const _excluded$4 = ["slots", "slotProps", "apiRef", "experimentalFeatures"];
+const extractPluginParamsFromProps = _ref => {
+  let {
+      props: {
+        slots,
+        slotProps,
+        apiRef,
+        experimentalFeatures: inExperimentalFeatures
+      },
+      plugins
+    } = _ref,
+    props = _objectWithoutPropertiesLoose(_ref.props, _excluded$4);
+  const paramsLookup = {};
+  plugins.forEach(plugin => {
+    Object.assign(paramsLookup, plugin.params);
+  });
+  const pluginParams = {};
+  const forwardedProps = {};
+  Object.keys(props).forEach(propName => {
+    const prop = props[propName];
+    if (paramsLookup[propName]) {
+      pluginParams[propName] = prop;
+    } else {
+      forwardedProps[propName] = prop;
+    }
+  });
+  const experimentalFeatures = inExperimentalFeatures ?? {};
+  const defaultizedPluginParams = plugins.reduce((acc, plugin) => {
+    if (plugin.getDefaultizedParams) {
+      return plugin.getDefaultizedParams({
+        params: acc,
+        experimentalFeatures
+      });
+    }
+    return acc;
+  }, pluginParams);
+  return {
+    apiRef,
+    forwardedProps,
+    pluginParams: defaultizedPluginParams,
+    slots: slots ?? {},
+    slotProps: slotProps ?? {},
+    experimentalFeatures
+  };
+};
+
+const useTreeViewBuildContext = ({
+  plugins,
+  instance,
+  publicAPI,
+  rootRef
+}) => {
+  const runItemPlugins = itemPluginProps => {
+    let finalRootRef = null;
+    let finalContentRef = null;
+    const pluginPropEnhancers = [];
+    const pluginPropEnhancersNames = {};
+    plugins.forEach(plugin => {
+      if (!plugin.itemPlugin) {
+        return;
+      }
+      const itemPluginResponse = plugin.itemPlugin({
+        props: itemPluginProps,
+        rootRef: finalRootRef,
+        contentRef: finalContentRef
+      });
+      if (itemPluginResponse?.rootRef) {
+        finalRootRef = itemPluginResponse.rootRef;
+      }
+      if (itemPluginResponse?.contentRef) {
+        finalContentRef = itemPluginResponse.contentRef;
+      }
+      if (itemPluginResponse?.propsEnhancers) {
+        pluginPropEnhancers.push(itemPluginResponse.propsEnhancers);
+
+        // Prepare a list of all the slots which are enhanced by at least one plugin
+        Object.keys(itemPluginResponse.propsEnhancers).forEach(propsEnhancerName => {
+          pluginPropEnhancersNames[propsEnhancerName] = true;
+        });
+      }
+    });
+    const resolvePropsEnhancer = currentSlotName => currentSlotParams => {
+      const enhancedProps = {};
+      pluginPropEnhancers.forEach(propsEnhancersForCurrentPlugin => {
+        const propsEnhancerForCurrentPluginAndSlot = propsEnhancersForCurrentPlugin[currentSlotName];
+        if (propsEnhancerForCurrentPluginAndSlot != null) {
+          Object.assign(enhancedProps, propsEnhancerForCurrentPluginAndSlot(currentSlotParams));
+        }
+      });
+      return enhancedProps;
+    };
+    const propsEnhancers = Object.fromEntries(Object.keys(pluginPropEnhancersNames).map(propEnhancerName => [propEnhancerName, resolvePropsEnhancer(propEnhancerName)]));
+    return {
+      contentRef: finalContentRef,
+      rootRef: finalRootRef,
+      propsEnhancers
+    };
+  };
+  const wrapItem = ({
+    itemId,
+    children
+  }) => {
+    let finalChildren = children;
+    // The wrappers are reversed to ensure that the first wrapper is the outermost one.
+    for (let i = plugins.length - 1; i >= 0; i -= 1) {
+      const plugin = plugins[i];
+      if (plugin.wrapItem) {
+        finalChildren = plugin.wrapItem({
+          itemId,
+          children: finalChildren,
+          instance
+        });
+      }
+    }
+    return finalChildren;
+  };
+  const wrapRoot = ({
+    children
+  }) => {
+    let finalChildren = children;
+    // The wrappers are reversed to ensure that the first wrapper is the outermost one.
+    for (let i = plugins.length - 1; i >= 0; i -= 1) {
+      const plugin = plugins[i];
+      if (plugin.wrapRoot) {
+        finalChildren = plugin.wrapRoot({
+          children: finalChildren,
+          instance
+        });
+      }
+    }
+    return finalChildren;
+  };
+  return {
+    runItemPlugins,
+    wrapItem,
+    wrapRoot,
+    instance,
+    rootRef,
+    publicAPI
+  };
+};
+
+function useTreeViewApiInitialization(inputApiRef) {
+  const fallbackPublicApiRef = React.useRef({});
+  if (inputApiRef) {
+    if (inputApiRef.current == null) {
+      inputApiRef.current = {};
+    }
+    return inputApiRef.current;
+  }
+  return fallbackPublicApiRef.current;
+}
+const useTreeView = ({
+  plugins: inPlugins,
+  rootRef,
+  props
+}) => {
+  const plugins = [...TREE_VIEW_CORE_PLUGINS, ...inPlugins];
+  const {
+    pluginParams,
+    forwardedProps,
+    apiRef,
+    experimentalFeatures,
+    slots,
+    slotProps
+  } = extractPluginParamsFromProps({
+    plugins,
+    props
+  });
+  const models = useTreeViewModels(plugins, pluginParams);
+  const instanceRef = React.useRef({});
+  const instance = instanceRef.current;
+  const publicAPI = useTreeViewApiInitialization(apiRef);
+  const innerRootRef = React.useRef(null);
+  const handleRootRef = useForkRef(innerRootRef, rootRef);
+  const contextValue = useTreeViewBuildContext({
+    plugins,
+    instance,
+    publicAPI,
+    rootRef: innerRootRef
+  });
+  const [state, setState] = React.useState(() => {
+    const temp = {};
+    plugins.forEach(plugin => {
+      if (plugin.getInitialState) {
+        Object.assign(temp, plugin.getInitialState(pluginParams));
+      }
+    });
+    return temp;
+  });
+  const rootPropsGetters = [];
+  const runPlugin = plugin => {
+    const pluginResponse = plugin({
+      instance,
+      params: pluginParams,
+      slots,
+      slotProps,
+      experimentalFeatures,
+      state,
+      setState,
+      rootRef: innerRootRef,
+      models,
+      plugins
+    });
+    if (pluginResponse.getRootProps) {
+      rootPropsGetters.push(pluginResponse.getRootProps);
+    }
+    if (pluginResponse.publicAPI) {
+      Object.assign(publicAPI, pluginResponse.publicAPI);
+    }
+    if (pluginResponse.instance) {
+      Object.assign(instance, pluginResponse.instance);
+    }
+    if (pluginResponse.contextValue) {
+      Object.assign(contextValue, pluginResponse.contextValue);
+    }
+  };
+  plugins.forEach(runPlugin);
+  const getRootProps = (otherHandlers = {}) => {
+    const rootProps = _extends({
+      role: 'tree'
+    }, forwardedProps, otherHandlers, {
+      ref: handleRootRef
+    });
+    rootPropsGetters.forEach(rootPropsGetter => {
+      Object.assign(rootProps, rootPropsGetter(otherHandlers));
+    });
+    return rootProps;
+  };
+  return {
+    getRootProps,
+    rootRef: handleRootRef,
+    contextValue,
+    instance
+  };
+};
+
+/**
+ * @ignore - internal component.
+ */
+const TreeViewContext = /*#__PURE__*/React.createContext(null);
+
+/**
+ * Sets up the contexts for the underlying TreeItem components.
+ *
+ * @ignore - do not document.
+ */
+function TreeViewProvider(props) {
+  const {
+    value,
+    children
+  } = props;
+  return /*#__PURE__*/jsx(TreeViewContext.Provider, {
+    value: value,
+    children: value.wrapRoot({
+      children,
+      instance: value.instance
+    })
+  });
+}
+
+const useTreeViewContext = () => {
+  const context = React.useContext(TreeViewContext);
+  if (context == null) {
+    throw new Error(['MUI X: Could not find the Tree View context.', 'It looks like you rendered your component outside of a SimpleTreeView or RichTreeView parent component.', 'This can also happen if you are bundling multiple versions of the Tree View.'].join('\n'));
+  }
+  return context;
+};
+
+const publishTreeViewEvent = (instance, eventName, params) => {
+  instance.$$publishEvent(eventName, params);
+};
+
+const TREE_VIEW_ROOT_PARENT_ID = '__TREE_VIEW_ROOT_PARENT_ID__';
+const buildSiblingIndexes = siblings => {
+  const siblingsIndexLookup = {};
+  siblings.forEach((childId, index) => {
+    siblingsIndexLookup[childId] = index;
+  });
+  return siblingsIndexLookup;
+};
+
+const TreeViewItemDepthContext = /*#__PURE__*/React.createContext(() => -1);
+
+const _excluded$3 = ["children"];
+const updateItemsState = ({
+  items,
+  isItemDisabled,
+  getItemLabel,
+  getItemId
+}) => {
+  const itemMetaMap = {};
+  const itemMap = {};
+  const itemOrderedChildrenIds = {
+    [TREE_VIEW_ROOT_PARENT_ID]: []
+  };
+  const processItem = (item, depth, parentId) => {
+    const id = getItemId ? getItemId(item) : item.id;
+    if (id == null) {
+      throw new Error(['MUI X: The Tree View component requires all items to have a unique `id` property.', 'Alternatively, you can use the `getItemId` prop to specify a custom id for each item.', 'An item was provided without id in the `items` prop:', JSON.stringify(item)].join('\n'));
+    }
+    if (itemMetaMap[id] != null) {
+      throw new Error(['MUI X: The Tree View component requires all items to have a unique `id` property.', 'Alternatively, you can use the `getItemId` prop to specify a custom id for each item.', `Two items were provided with the same id in the \`items\` prop: "${id}"`].join('\n'));
+    }
+    const label = getItemLabel ? getItemLabel(item) : item.label;
+    if (label == null) {
+      throw new Error(['MUI X: The Tree View component requires all items to have a `label` property.', 'Alternatively, you can use the `getItemLabel` prop to specify a custom label for each item.', 'An item was provided without label in the `items` prop:', JSON.stringify(item)].join('\n'));
+    }
+    itemMetaMap[id] = {
+      id,
+      label,
+      parentId,
+      idAttribute: undefined,
+      expandable: !!item.children?.length,
+      disabled: isItemDisabled ? isItemDisabled(item) : false,
+      depth
+    };
+    itemMap[id] = item;
+    const parentIdWithDefault = parentId ?? TREE_VIEW_ROOT_PARENT_ID;
+    if (!itemOrderedChildrenIds[parentIdWithDefault]) {
+      itemOrderedChildrenIds[parentIdWithDefault] = [];
+    }
+    itemOrderedChildrenIds[parentIdWithDefault].push(id);
+    item.children?.forEach(child => processItem(child, depth + 1, id));
+  };
+  items.forEach(item => processItem(item, 0, null));
+  const itemChildrenIndexes = {};
+  Object.keys(itemOrderedChildrenIds).forEach(parentId => {
+    itemChildrenIndexes[parentId] = buildSiblingIndexes(itemOrderedChildrenIds[parentId]);
+  });
+  return {
+    itemMetaMap,
+    itemMap,
+    itemOrderedChildrenIds,
+    itemChildrenIndexes
+  };
+};
+const useTreeViewItems = ({
+  instance,
+  params,
+  state,
+  setState,
+  experimentalFeatures
+}) => {
+  const getItemMeta = React.useCallback(itemId => state.items.itemMetaMap[itemId], [state.items.itemMetaMap]);
+  const getItem = React.useCallback(itemId => state.items.itemMap[itemId], [state.items.itemMap]);
+  const getItemTree = React.useCallback(() => {
+    const getItemFromItemId = id => {
+      const _state$items$itemMap$ = state.items.itemMap[id],
+        item = _objectWithoutPropertiesLoose(_state$items$itemMap$, _excluded$3);
+      const newChildren = state.items.itemOrderedChildrenIds[id];
+      if (newChildren) {
+        item.children = newChildren.map(getItemFromItemId);
+      }
+      return item;
+    };
+    return state.items.itemOrderedChildrenIds[TREE_VIEW_ROOT_PARENT_ID].map(getItemFromItemId);
+  }, [state.items.itemMap, state.items.itemOrderedChildrenIds]);
+  const isItemDisabled = React.useCallback(itemId => {
+    if (itemId == null) {
+      return false;
+    }
+    let itemMeta = instance.getItemMeta(itemId);
+
+    // This can be called before the item has been added to the item map.
+    if (!itemMeta) {
+      return false;
+    }
+    if (itemMeta.disabled) {
+      return true;
+    }
+    while (itemMeta.parentId != null) {
+      itemMeta = instance.getItemMeta(itemMeta.parentId);
+      if (itemMeta.disabled) {
+        return true;
+      }
+    }
+    return false;
+  }, [instance]);
+  const getItemIndex = React.useCallback(itemId => {
+    const parentId = instance.getItemMeta(itemId).parentId ?? TREE_VIEW_ROOT_PARENT_ID;
+    return state.items.itemChildrenIndexes[parentId][itemId];
+  }, [instance, state.items.itemChildrenIndexes]);
+  const getItemOrderedChildrenIds = React.useCallback(itemId => state.items.itemOrderedChildrenIds[itemId ?? TREE_VIEW_ROOT_PARENT_ID] ?? [], [state.items.itemOrderedChildrenIds]);
+  const getItemDOMElement = itemId => {
+    const itemMeta = instance.getItemMeta(itemId);
+    if (itemMeta == null) {
+      return null;
+    }
+    return document.getElementById(generateTreeItemIdAttribute({
+      treeId: state.id.treeId,
+      itemId,
+      id: itemMeta.idAttribute
+    }));
+  };
+  const isItemNavigable = itemId => {
+    if (params.disabledItemsFocusable) {
+      return true;
+    }
+    return !instance.isItemDisabled(itemId);
+  };
+  const areItemUpdatesPreventedRef = React.useRef(false);
+  const preventItemUpdates = React.useCallback(() => {
+    areItemUpdatesPreventedRef.current = true;
+  }, []);
+  const areItemUpdatesPrevented = React.useCallback(() => areItemUpdatesPreventedRef.current, []);
+  React.useEffect(() => {
+    if (instance.areItemUpdatesPrevented()) {
+      return;
+    }
+    setState(prevState => {
+      const newState = updateItemsState({
+        items: params.items,
+        isItemDisabled: params.isItemDisabled,
+        getItemId: params.getItemId,
+        getItemLabel: params.getItemLabel
+      });
+      Object.values(prevState.items.itemMetaMap).forEach(item => {
+        if (!newState.itemMetaMap[item.id]) {
+          publishTreeViewEvent(instance, 'removeItem', {
+            id: item.id
+          });
+        }
+      });
+      return _extends({}, prevState, {
+        items: newState
+      });
+    });
+  }, [instance, setState, params.items, params.isItemDisabled, params.getItemId, params.getItemLabel]);
+  const getItemsToRender = () => {
+    const getPropsFromItemId = id => {
+      const item = state.items.itemMetaMap[id];
+      return {
+        label: item.label,
+        itemId: item.id,
+        id: item.idAttribute,
+        children: state.items.itemOrderedChildrenIds[id]?.map(getPropsFromItemId)
+      };
+    };
+    return state.items.itemOrderedChildrenIds[TREE_VIEW_ROOT_PARENT_ID].map(getPropsFromItemId);
+  };
+  return {
+    getRootProps: () => ({
+      style: {
+        '--TreeView-itemChildrenIndentation': typeof params.itemChildrenIndentation === 'number' ? `${params.itemChildrenIndentation}px` : params.itemChildrenIndentation
+      }
+    }),
+    publicAPI: {
+      getItem,
+      getItemDOMElement,
+      getItemTree,
+      getItemOrderedChildrenIds
+    },
+    instance: {
+      getItemMeta,
+      getItem,
+      getItemTree,
+      getItemsToRender,
+      getItemIndex,
+      getItemDOMElement,
+      getItemOrderedChildrenIds,
+      isItemDisabled,
+      isItemNavigable,
+      preventItemUpdates,
+      areItemUpdatesPrevented
+    },
+    contextValue: {
+      items: {
+        onItemClick: params.onItemClick,
+        disabledItemsFocusable: params.disabledItemsFocusable,
+        indentationAtItemLevel: experimentalFeatures.indentationAtItemLevel ?? false
+      }
+    }
+  };
+};
+useTreeViewItems.getInitialState = params => ({
+  items: updateItemsState({
+    items: params.items,
+    isItemDisabled: params.isItemDisabled,
+    getItemId: params.getItemId,
+    getItemLabel: params.getItemLabel
+  })
+});
+useTreeViewItems.getDefaultizedParams = ({
+  params
+}) => _extends({}, params, {
+  disabledItemsFocusable: params.disabledItemsFocusable ?? false,
+  itemChildrenIndentation: params.itemChildrenIndentation ?? '12px'
+});
+useTreeViewItems.wrapRoot = ({
+  children,
+  instance
+}) => {
+  return /*#__PURE__*/jsx(TreeViewItemDepthContext.Provider, {
+    value: itemId => instance.getItemMeta(itemId)?.depth ?? 0,
+    children: children
+  });
+};
+useTreeViewItems.params = {
+  disabledItemsFocusable: true,
+  items: true,
+  isItemDisabled: true,
+  getItemLabel: true,
+  getItemId: true,
+  onItemClick: true,
+  itemChildrenIndentation: true
+};
+
+/**
+ * A version of `React.useLayoutEffect` that does not show a warning when server-side rendering.
+ * This is useful for effects that are only needed for client-side rendering but not for SSR.
+ *
+ * Before you use this hook, make sure to read https://gist.github.com/gaearon/e7d97cdf38a2907924ea12e4ebdf3c85
+ * and confirm it doesn't apply to your use-case.
+ */
+const useEnhancedEffect = typeof window !== 'undefined' ? React.useLayoutEffect : React.useEffect;
+
+/**
+ * Inspired by https://github.com/facebook/react/issues/14099#issuecomment-440013892
+ * See RFC in https://github.com/reactjs/rfcs/pull/220
+ */
+
+function useEventCallback(fn) {
+  const ref = React.useRef(fn);
+  useEnhancedEffect(() => {
+    ref.current = fn;
+  });
+  return React.useRef((...args) =>
+  // @ts-expect-error hide `this`
+  (0, ref.current)(...args)).current;
+}
+
+const useTreeViewExpansion = ({
+  instance,
+  params,
+  models
+}) => {
+  const expandedItemsMap = React.useMemo(() => {
+    const temp = new Map();
+    models.expandedItems.value.forEach(id => {
+      temp.set(id, true);
+    });
+    return temp;
+  }, [models.expandedItems.value]);
+  const setExpandedItems = (event, value) => {
+    params.onExpandedItemsChange?.(event, value);
+    models.expandedItems.setControlledValue(value);
+  };
+  const isItemExpanded = React.useCallback(itemId => expandedItemsMap.has(itemId), [expandedItemsMap]);
+  const isItemExpandable = React.useCallback(itemId => !!instance.getItemMeta(itemId)?.expandable, [instance]);
+  const toggleItemExpansion = useEventCallback((event, itemId) => {
+    const isExpandedBefore = instance.isItemExpanded(itemId);
+    instance.setItemExpansion(event, itemId, !isExpandedBefore);
+  });
+  const setItemExpansion = useEventCallback((event, itemId, isExpanded) => {
+    const isExpandedBefore = instance.isItemExpanded(itemId);
+    if (isExpandedBefore === isExpanded) {
+      return;
+    }
+    let newExpanded;
+    if (isExpanded) {
+      newExpanded = [itemId].concat(models.expandedItems.value);
+    } else {
+      newExpanded = models.expandedItems.value.filter(id => id !== itemId);
+    }
+    if (params.onItemExpansionToggle) {
+      params.onItemExpansionToggle(event, itemId, isExpanded);
+    }
+    setExpandedItems(event, newExpanded);
+  });
+  const expandAllSiblings = (event, itemId) => {
+    const itemMeta = instance.getItemMeta(itemId);
+    const siblings = instance.getItemOrderedChildrenIds(itemMeta.parentId);
+    const diff = siblings.filter(child => instance.isItemExpandable(child) && !instance.isItemExpanded(child));
+    const newExpanded = models.expandedItems.value.concat(diff);
+    if (diff.length > 0) {
+      if (params.onItemExpansionToggle) {
+        diff.forEach(newlyExpandedItemId => {
+          params.onItemExpansionToggle(event, newlyExpandedItemId, true);
+        });
+      }
+      setExpandedItems(event, newExpanded);
+    }
+  };
+  const expansionTrigger = React.useMemo(() => {
+    if (params.expansionTrigger) {
+      return params.expansionTrigger;
+    }
+    if (instance.isTreeViewEditable) {
+      return 'iconContainer';
+    }
+    return 'content';
+  }, [params.expansionTrigger, instance.isTreeViewEditable]);
+  return {
+    publicAPI: {
+      setItemExpansion
+    },
+    instance: {
+      isItemExpanded,
+      isItemExpandable,
+      setItemExpansion,
+      toggleItemExpansion,
+      expandAllSiblings
+    },
+    contextValue: {
+      expansion: {
+        expansionTrigger
+      }
+    }
+  };
+};
+useTreeViewExpansion.models = {
+  expandedItems: {
+    getDefaultValue: params => params.defaultExpandedItems
+  }
+};
+const DEFAULT_EXPANDED_ITEMS = [];
+useTreeViewExpansion.getDefaultizedParams = ({
+  params
+}) => _extends({}, params, {
+  defaultExpandedItems: params.defaultExpandedItems ?? DEFAULT_EXPANDED_ITEMS
+});
+useTreeViewExpansion.params = {
+  expandedItems: true,
+  defaultExpandedItems: true,
+  onExpandedItemsChange: true,
+  onItemExpansionToggle: true,
+  expansionTrigger: true
+};
+
+const getLastNavigableItemInArray = (instance, items) => {
+  // Equivalent to Array.prototype.findLastIndex
+  let itemIndex = items.length - 1;
+  while (itemIndex >= 0 && !instance.isItemNavigable(items[itemIndex])) {
+    itemIndex -= 1;
+  }
+  if (itemIndex === -1) {
+    return undefined;
+  }
+  return items[itemIndex];
+};
+const getPreviousNavigableItem = (instance, itemId) => {
+  const itemMeta = instance.getItemMeta(itemId);
+  const siblings = instance.getItemOrderedChildrenIds(itemMeta.parentId);
+  const itemIndex = instance.getItemIndex(itemId);
+
+  // TODO: What should we do if the parent is not navigable?
+  if (itemIndex === 0) {
+    return itemMeta.parentId;
+  }
+
+  // Finds the previous navigable sibling.
+  let previousNavigableSiblingIndex = itemIndex - 1;
+  while (!instance.isItemNavigable(siblings[previousNavigableSiblingIndex]) && previousNavigableSiblingIndex >= 0) {
+    previousNavigableSiblingIndex -= 1;
+  }
+  if (previousNavigableSiblingIndex === -1) {
+    // If we are at depth 0, then it means all the items above the current item are not navigable.
+    if (itemMeta.parentId == null) {
+      return null;
+    }
+
+    // Otherwise, we can try to go up a level and find the previous navigable item.
+    return getPreviousNavigableItem(instance, itemMeta.parentId);
+  }
+
+  // Finds the last navigable ancestor of the previous navigable sibling.
+  let currentItemId = siblings[previousNavigableSiblingIndex];
+  let lastNavigableChild = getLastNavigableItemInArray(instance, instance.getItemOrderedChildrenIds(currentItemId));
+  while (instance.isItemExpanded(currentItemId) && lastNavigableChild != null) {
+    currentItemId = lastNavigableChild;
+    lastNavigableChild = instance.getItemOrderedChildrenIds(currentItemId).find(instance.isItemNavigable);
+  }
+  return currentItemId;
+};
+const getNextNavigableItem = (instance, itemId) => {
+  // If the item is expanded and has some navigable children, return the first of them.
+  if (instance.isItemExpanded(itemId)) {
+    const firstNavigableChild = instance.getItemOrderedChildrenIds(itemId).find(instance.isItemNavigable);
+    if (firstNavigableChild != null) {
+      return firstNavigableChild;
+    }
+  }
+  let itemMeta = instance.getItemMeta(itemId);
+  while (itemMeta != null) {
+    // Try to find the first navigable sibling after the current item.
+    const siblings = instance.getItemOrderedChildrenIds(itemMeta.parentId);
+    const currentItemIndex = instance.getItemIndex(itemMeta.id);
+    if (currentItemIndex < siblings.length - 1) {
+      let nextItemIndex = currentItemIndex + 1;
+      while (!instance.isItemNavigable(siblings[nextItemIndex]) && nextItemIndex < siblings.length - 1) {
+        nextItemIndex += 1;
+      }
+      if (instance.isItemNavigable(siblings[nextItemIndex])) {
+        return siblings[nextItemIndex];
+      }
+    }
+
+    // If the sibling does not exist, go up a level to the parent and try again.
+    itemMeta = instance.getItemMeta(itemMeta.parentId);
+  }
+  return null;
+};
+const getLastNavigableItem = instance => {
+  let itemId = null;
+  while (itemId == null || instance.isItemExpanded(itemId)) {
+    const children = instance.getItemOrderedChildrenIds(itemId);
+    const lastNavigableChild = getLastNavigableItemInArray(instance, children);
+
+    // The item has no navigable children.
+    if (lastNavigableChild == null) {
+      return itemId;
+    }
+    itemId = lastNavigableChild;
+  }
+  return itemId;
+};
+const getFirstNavigableItem = instance => instance.getItemOrderedChildrenIds(null).find(instance.isItemNavigable);
+
+/**
+ * This is used to determine the start and end of a selection range so
+ * we can get the items between the two border items.
+ *
+ * It finds the items' common ancestor using
+ * a naive implementation of a lowest common ancestor algorithm
+ * (https://en.wikipedia.org/wiki/Lowest_common_ancestor).
+ * Then compares the ancestor's 2 children that are ancestors of itemA and ItemB
+ * so we can compare their indexes to work out which item comes first in a depth first search.
+ * (https://en.wikipedia.org/wiki/Depth-first_search)
+ *
+ * Another way to put it is which item is shallower in a trémaux tree
+ * https://en.wikipedia.org/wiki/Tr%C3%A9maux_tree
+ */
+const findOrderInTremauxTree = (instance, itemAId, itemBId) => {
+  if (itemAId === itemBId) {
+    return [itemAId, itemBId];
+  }
+  const itemMetaA = instance.getItemMeta(itemAId);
+  const itemMetaB = instance.getItemMeta(itemBId);
+  if (itemMetaA.parentId === itemMetaB.id || itemMetaB.parentId === itemMetaA.id) {
+    return itemMetaB.parentId === itemMetaA.id ? [itemMetaA.id, itemMetaB.id] : [itemMetaB.id, itemMetaA.id];
+  }
+  const aFamily = [itemMetaA.id];
+  const bFamily = [itemMetaB.id];
+  let aAncestor = itemMetaA.parentId;
+  let bAncestor = itemMetaB.parentId;
+  let aAncestorIsCommon = bFamily.indexOf(aAncestor) !== -1;
+  let bAncestorIsCommon = aFamily.indexOf(bAncestor) !== -1;
+  let continueA = true;
+  let continueB = true;
+  while (!bAncestorIsCommon && !aAncestorIsCommon) {
+    if (continueA) {
+      aFamily.push(aAncestor);
+      aAncestorIsCommon = bFamily.indexOf(aAncestor) !== -1;
+      continueA = aAncestor !== null;
+      if (!aAncestorIsCommon && continueA) {
+        aAncestor = instance.getItemMeta(aAncestor).parentId;
+      }
+    }
+    if (continueB && !aAncestorIsCommon) {
+      bFamily.push(bAncestor);
+      bAncestorIsCommon = aFamily.indexOf(bAncestor) !== -1;
+      continueB = bAncestor !== null;
+      if (!bAncestorIsCommon && continueB) {
+        bAncestor = instance.getItemMeta(bAncestor).parentId;
+      }
+    }
+  }
+  const commonAncestor = aAncestorIsCommon ? aAncestor : bAncestor;
+  const ancestorFamily = instance.getItemOrderedChildrenIds(commonAncestor);
+  const aSide = aFamily[aFamily.indexOf(commonAncestor) - 1];
+  const bSide = bFamily[bFamily.indexOf(commonAncestor) - 1];
+  return ancestorFamily.indexOf(aSide) < ancestorFamily.indexOf(bSide) ? [itemAId, itemBId] : [itemBId, itemAId];
+};
+const getNonDisabledItemsInRange = (instance, itemAId, itemBId) => {
+  const getNextItem = itemId => {
+    // If the item is expanded and has some children, return the first of them.
+    if (instance.isItemExpandable(itemId) && instance.isItemExpanded(itemId)) {
+      return instance.getItemOrderedChildrenIds(itemId)[0];
+    }
+    let itemMeta = instance.getItemMeta(itemId);
+    while (itemMeta != null) {
+      // Try to find the first navigable sibling after the current item.
+      const siblings = instance.getItemOrderedChildrenIds(itemMeta.parentId);
+      const currentItemIndex = instance.getItemIndex(itemMeta.id);
+      if (currentItemIndex < siblings.length - 1) {
+        return siblings[currentItemIndex + 1];
+      }
+
+      // If the item is the last of its siblings, go up a level to the parent and try again.
+      itemMeta = instance.getItemMeta(itemMeta.parentId);
+    }
+    throw new Error('Invalid range');
+  };
+  const [first, last] = findOrderInTremauxTree(instance, itemAId, itemBId);
+  const items = [first];
+  let current = first;
+  while (current !== last) {
+    current = getNextItem(current);
+    if (!instance.isItemDisabled(current)) {
+      items.push(current);
+    }
+  }
+  return items;
+};
+const getAllNavigableItems = instance => {
+  let item = getFirstNavigableItem(instance);
+  const navigableItems = [];
+  while (item != null) {
+    navigableItems.push(item);
+    item = getNextNavigableItem(instance, item);
+  }
+  return navigableItems;
+};
+
+/**
+ * Checks if the target is in a descendant of this item.
+ * This can prevent from firing some logic on the ancestors on the interacted item when the event handler is on the root.
+ * @param {HTMLElement} target The target to check
+ * @param {HTMLElement | null} itemRoot The root of the item to check if the event target is in its descendants
+ * @returns {boolean} Whether the target is in a descendant of this item
+ */
+const isTargetInDescendants = (target, itemRoot) => {
+  return itemRoot !== target.closest('*[role="treeitem"]');
+};
+
+/**
+ * Transform the `selectedItems` model to be an array if it was a string or null.
+ * @param {string[] | string | null} model The raw model.
+ * @returns {string[]} The converted model.
+ */
+const convertSelectedItemsToArray = model => {
+  if (Array.isArray(model)) {
+    return model;
+  }
+  if (model != null) {
+    return [model];
+  }
+  return [];
+};
+const getLookupFromArray = array => {
+  const lookup = {};
+  array.forEach(itemId => {
+    lookup[itemId] = true;
+  });
+  return lookup;
+};
+
+const useTreeViewSelection = ({
+  instance,
+  params,
+  models
+}) => {
+  const lastSelectedItem = React.useRef(null);
+  const lastSelectedRange = React.useRef({});
+  const selectedItemsMap = React.useMemo(() => {
+    const temp = new Map();
+    if (Array.isArray(models.selectedItems.value)) {
+      models.selectedItems.value.forEach(id => {
+        temp.set(id, true);
+      });
+    } else if (models.selectedItems.value != null) {
+      temp.set(models.selectedItems.value, true);
+    }
+    return temp;
+  }, [models.selectedItems.value]);
+  const setSelectedItems = (event, newSelectedItems) => {
+    if (params.onItemSelectionToggle) {
+      if (params.multiSelect) {
+        const addedItems = newSelectedItems.filter(itemId => !instance.isItemSelected(itemId));
+        const removedItems = models.selectedItems.value.filter(itemId => !newSelectedItems.includes(itemId));
+        addedItems.forEach(itemId => {
+          params.onItemSelectionToggle(event, itemId, true);
+        });
+        removedItems.forEach(itemId => {
+          params.onItemSelectionToggle(event, itemId, false);
+        });
+      } else if (newSelectedItems !== models.selectedItems.value) {
+        if (models.selectedItems.value != null) {
+          params.onItemSelectionToggle(event, models.selectedItems.value, false);
+        }
+        if (newSelectedItems != null) {
+          params.onItemSelectionToggle(event, newSelectedItems, true);
+        }
+      }
+    }
+    if (params.onSelectedItemsChange) {
+      params.onSelectedItemsChange(event, newSelectedItems);
+    }
+    models.selectedItems.setControlledValue(newSelectedItems);
+  };
+  const isItemSelected = itemId => selectedItemsMap.has(itemId);
+  const selectItem = ({
+    event,
+    itemId,
+    keepExistingSelection = false,
+    shouldBeSelected
+  }) => {
+    if (params.disableSelection) {
+      return;
+    }
+    let newSelected;
+    if (keepExistingSelection) {
+      const cleanSelectedItems = convertSelectedItemsToArray(models.selectedItems.value);
+      const isSelectedBefore = instance.isItemSelected(itemId);
+      if (isSelectedBefore && (shouldBeSelected === false || shouldBeSelected == null)) {
+        newSelected = cleanSelectedItems.filter(id => id !== itemId);
+      } else if (!isSelectedBefore && (shouldBeSelected === true || shouldBeSelected == null)) {
+        newSelected = [itemId].concat(cleanSelectedItems);
+      } else {
+        newSelected = cleanSelectedItems;
+      }
+    } else {
+      // eslint-disable-next-line no-lonely-if
+      if (shouldBeSelected === false || shouldBeSelected == null && instance.isItemSelected(itemId)) {
+        newSelected = params.multiSelect ? [] : null;
+      } else {
+        newSelected = params.multiSelect ? [itemId] : itemId;
+      }
+    }
+    setSelectedItems(event, newSelected);
+    lastSelectedItem.current = itemId;
+    lastSelectedRange.current = {};
+  };
+  const selectRange = (event, [start, end]) => {
+    if (params.disableSelection || !params.multiSelect) {
+      return;
+    }
+    let newSelectedItems = convertSelectedItemsToArray(models.selectedItems.value).slice();
+
+    // If the last selection was a range selection,
+    // remove the items that were part of the last range from the model
+    if (Object.keys(lastSelectedRange.current).length > 0) {
+      newSelectedItems = newSelectedItems.filter(id => !lastSelectedRange.current[id]);
+    }
+
+    // Add to the model the items that are part of the new range and not already part of the model.
+    const selectedItemsLookup = getLookupFromArray(newSelectedItems);
+    const range = getNonDisabledItemsInRange(instance, start, end);
+    const itemsToAddToModel = range.filter(id => !selectedItemsLookup[id]);
+    newSelectedItems = newSelectedItems.concat(itemsToAddToModel);
+    setSelectedItems(event, newSelectedItems);
+    lastSelectedRange.current = getLookupFromArray(range);
+  };
+  const expandSelectionRange = (event, itemId) => {
+    if (lastSelectedItem.current != null) {
+      const [start, end] = findOrderInTremauxTree(instance, itemId, lastSelectedItem.current);
+      selectRange(event, [start, end]);
+    }
+  };
+  const selectRangeFromStartToItem = (event, itemId) => {
+    selectRange(event, [getFirstNavigableItem(instance), itemId]);
+  };
+  const selectRangeFromItemToEnd = (event, itemId) => {
+    selectRange(event, [itemId, getLastNavigableItem(instance)]);
+  };
+  const selectAllNavigableItems = event => {
+    if (params.disableSelection || !params.multiSelect) {
+      return;
+    }
+    const navigableItems = getAllNavigableItems(instance);
+    setSelectedItems(event, navigableItems);
+    lastSelectedRange.current = getLookupFromArray(navigableItems);
+  };
+  const selectItemFromArrowNavigation = (event, currentItem, nextItem) => {
+    if (params.disableSelection || !params.multiSelect) {
+      return;
+    }
+    let newSelectedItems = convertSelectedItemsToArray(models.selectedItems.value).slice();
+    if (Object.keys(lastSelectedRange.current).length === 0) {
+      newSelectedItems.push(nextItem);
+      lastSelectedRange.current = {
+        [currentItem]: true,
+        [nextItem]: true
+      };
+    } else {
+      if (!lastSelectedRange.current[currentItem]) {
+        lastSelectedRange.current = {};
+      }
+      if (lastSelectedRange.current[nextItem]) {
+        newSelectedItems = newSelectedItems.filter(id => id !== currentItem);
+        delete lastSelectedRange.current[currentItem];
+      } else {
+        newSelectedItems.push(nextItem);
+        lastSelectedRange.current[nextItem] = true;
+      }
+    }
+    setSelectedItems(event, newSelectedItems);
+  };
+  return {
+    getRootProps: () => ({
+      'aria-multiselectable': params.multiSelect
+    }),
+    publicAPI: {
+      selectItem
+    },
+    instance: {
+      isItemSelected,
+      selectItem,
+      selectAllNavigableItems,
+      expandSelectionRange,
+      selectRangeFromStartToItem,
+      selectRangeFromItemToEnd,
+      selectItemFromArrowNavigation
+    },
+    contextValue: {
+      selection: {
+        multiSelect: params.multiSelect,
+        checkboxSelection: params.checkboxSelection,
+        disableSelection: params.disableSelection
+      }
+    }
+  };
+};
+useTreeViewSelection.models = {
+  selectedItems: {
+    getDefaultValue: params => params.defaultSelectedItems
+  }
+};
+const DEFAULT_SELECTED_ITEMS = [];
+useTreeViewSelection.getDefaultizedParams = ({
+  params
+}) => _extends({}, params, {
+  disableSelection: params.disableSelection ?? false,
+  multiSelect: params.multiSelect ?? false,
+  checkboxSelection: params.checkboxSelection ?? false,
+  defaultSelectedItems: params.defaultSelectedItems ?? (params.multiSelect ? DEFAULT_SELECTED_ITEMS : null)
+});
+useTreeViewSelection.params = {
+  disableSelection: true,
+  multiSelect: true,
+  checkboxSelection: true,
+  defaultSelectedItems: true,
+  selectedItems: true,
+  onSelectedItemsChange: true,
+  onItemSelectionToggle: true
+};
+
+function ownerDocument(node) {
+  return node && node.ownerDocument || document;
+}
+
+// If no effect ran after this amount of time, we assume that the render was not committed by React
+const CLEANUP_TIMER_LOOP_MILLIS = 1000;
+class TimerBasedCleanupTracking {
+  constructor(timeout = CLEANUP_TIMER_LOOP_MILLIS) {
+    this.timeouts = new Map();
+    this.cleanupTimeout = CLEANUP_TIMER_LOOP_MILLIS;
+    this.cleanupTimeout = timeout;
+  }
+  register(object, unsubscribe, unregisterToken) {
+    if (!this.timeouts) {
+      this.timeouts = new Map();
+    }
+    const timeout = setTimeout(() => {
+      if (typeof unsubscribe === 'function') {
+        unsubscribe();
+      }
+      this.timeouts.delete(unregisterToken.cleanupToken);
+    }, this.cleanupTimeout);
+    this.timeouts.set(unregisterToken.cleanupToken, timeout);
+  }
+  unregister(unregisterToken) {
+    const timeout = this.timeouts.get(unregisterToken.cleanupToken);
+    if (timeout) {
+      this.timeouts.delete(unregisterToken.cleanupToken);
+      clearTimeout(timeout);
+    }
+  }
+  reset() {
+    if (this.timeouts) {
+      this.timeouts.forEach((value, key) => {
+        this.unregister({
+          cleanupToken: key
+        });
+      });
+      this.timeouts = undefined;
+    }
+  }
+}
+
+class FinalizationRegistryBasedCleanupTracking {
+  constructor() {
+    this.registry = new FinalizationRegistry(unsubscribe => {
+      if (typeof unsubscribe === 'function') {
+        unsubscribe();
+      }
+    });
+  }
+  register(object, unsubscribe, unregisterToken) {
+    this.registry.register(object, unsubscribe, unregisterToken);
+  }
+  unregister(unregisterToken) {
+    this.registry.unregister(unregisterToken);
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  reset() {}
+}
+
+// We use class to make it easier to detect in heap snapshots by name
+class ObjectToBeRetainedByReact {}
+
+// Based on https://github.com/Bnaya/use-dispose-uncommitted/blob/main/src/finalization-registry-based-impl.ts
+// Check https://github.com/facebook/react/issues/15317 to get more information
+function createUseInstanceEventHandler(registryContainer) {
+  let cleanupTokensCounter = 0;
+  return function useInstanceEventHandler(instance, eventName, handler) {
+    if (registryContainer.registry === null) {
+      registryContainer.registry = typeof FinalizationRegistry !== 'undefined' ? new FinalizationRegistryBasedCleanupTracking() : new TimerBasedCleanupTracking();
+    }
+    const [objectRetainedByReact] = React.useState(new ObjectToBeRetainedByReact());
+    const subscription = React.useRef(null);
+    const handlerRef = React.useRef(undefined);
+    handlerRef.current = handler;
+    const cleanupTokenRef = React.useRef(null);
+    if (!subscription.current && handlerRef.current) {
+      const enhancedHandler = (params, event) => {
+        if (!event.defaultMuiPrevented) {
+          handlerRef.current?.(params, event);
+        }
+      };
+      subscription.current = instance.$$subscribeEvent(eventName, enhancedHandler);
+      cleanupTokensCounter += 1;
+      cleanupTokenRef.current = {
+        cleanupToken: cleanupTokensCounter
+      };
+      registryContainer.registry.register(objectRetainedByReact,
+      // The callback below will be called once this reference stops being retained
+      () => {
+        subscription.current?.();
+        subscription.current = null;
+        cleanupTokenRef.current = null;
+      }, cleanupTokenRef.current);
+    } else if (!handlerRef.current && subscription.current) {
+      subscription.current();
+      subscription.current = null;
+      if (cleanupTokenRef.current) {
+        registryContainer.registry.unregister(cleanupTokenRef.current);
+        cleanupTokenRef.current = null;
+      }
+    }
+    React.useEffect(() => {
+      if (!subscription.current && handlerRef.current) {
+        const enhancedHandler = (params, event) => {
+          if (!event.defaultMuiPrevented) {
+            handlerRef.current?.(params, event);
+          }
+        };
+        subscription.current = instance.$$subscribeEvent(eventName, enhancedHandler);
+      }
+      if (cleanupTokenRef.current && registryContainer.registry) {
+        // If the effect was called, it means that this render was committed
+        // so we can trust the cleanup function to remove the listener.
+        registryContainer.registry.unregister(cleanupTokenRef.current);
+        cleanupTokenRef.current = null;
+      }
+      return () => {
+        subscription.current?.();
+        subscription.current = null;
+      };
+    }, [instance, eventName]);
+  };
+}
+const registryContainer = {
+  registry: null
+};
+const useInstanceEventHandler = createUseInstanceEventHandler(registryContainer);
+
+// https://www.abeautifulsite.net/posts/finding-the-active-element-in-a-shadow-root/
+const getActiveElement = (root = document) => {
+  const activeEl = root.activeElement;
+  if (!activeEl) {
+    return null;
+  }
+  if (activeEl.shadowRoot) {
+    return getActiveElement(activeEl.shadowRoot);
+  }
+  return activeEl;
+};
+
+// TODO, eventually replaces this function with CSS.escape, once available in jsdom, either added manually or built in
+// https://github.com/jsdom/jsdom/issues/1550#issuecomment-236734471
+function escapeOperandAttributeSelector(operand) {
+  return operand.replace(/["\\]/g, '\\$&');
+}
+
+const useDefaultFocusableItemId = (instance, selectedItems) => {
+  let tabbableItemId = convertSelectedItemsToArray(selectedItems).find(itemId => {
+    if (!instance.isItemNavigable(itemId)) {
+      return false;
+    }
+    const itemMeta = instance.getItemMeta(itemId);
+    return itemMeta && (itemMeta.parentId == null || instance.isItemExpanded(itemMeta.parentId));
+  });
+  if (tabbableItemId == null) {
+    tabbableItemId = getFirstNavigableItem(instance);
+  }
+  return tabbableItemId;
+};
+const useTreeViewFocus = ({
+  instance,
+  params,
+  state,
+  setState,
+  models,
+  rootRef
+}) => {
+  const defaultFocusableItemId = useDefaultFocusableItemId(instance, models.selectedItems.value);
+  const setFocusedItemId = useEventCallback(itemId => {
+    const cleanItemId = typeof itemId === 'function' ? itemId(state.focusedItemId) : itemId;
+    if (state.focusedItemId !== cleanItemId) {
+      setState(prevState => _extends({}, prevState, {
+        focusedItemId: cleanItemId
+      }));
+    }
+  });
+  const isTreeViewFocused = React.useCallback(() => !!rootRef.current && rootRef.current.contains(getActiveElement(ownerDocument(rootRef.current))), [rootRef]);
+  const isItemFocused = React.useCallback(itemId => state.focusedItemId === itemId && isTreeViewFocused(), [state.focusedItemId, isTreeViewFocused]);
+  const isItemVisible = itemId => {
+    const itemMeta = instance.getItemMeta(itemId);
+    return itemMeta && (itemMeta.parentId == null || instance.isItemExpanded(itemMeta.parentId));
+  };
+  const innerFocusItem = (event, itemId) => {
+    const itemElement = instance.getItemDOMElement(itemId);
+    if (itemElement) {
+      itemElement.focus();
+    }
+    setFocusedItemId(itemId);
+    if (params.onItemFocus) {
+      params.onItemFocus(event, itemId);
+    }
+  };
+  const focusItem = useEventCallback((event, itemId) => {
+    // If we receive an itemId, and it is visible, the focus will be set to it
+    if (isItemVisible(itemId)) {
+      innerFocusItem(event, itemId);
+    }
+  });
+  const removeFocusedItem = useEventCallback(() => {
+    if (state.focusedItemId == null) {
+      return;
+    }
+    const itemMeta = instance.getItemMeta(state.focusedItemId);
+    if (itemMeta) {
+      const itemElement = instance.getItemDOMElement(state.focusedItemId);
+      if (itemElement) {
+        itemElement.blur();
+      }
+    }
+    setFocusedItemId(null);
+  });
+  const canItemBeTabbed = itemId => itemId === defaultFocusableItemId;
+  useInstanceEventHandler(instance, 'removeItem', ({
+    id
+  }) => {
+    if (state.focusedItemId === id) {
+      innerFocusItem(null, defaultFocusableItemId);
+    }
+  });
+  const createRootHandleFocus = otherHandlers => event => {
+    otherHandlers.onFocus?.(event);
+    if (event.defaultMuiPrevented) {
+      return;
+    }
+
+    // if the event bubbled (which is React specific) we don't want to steal focus
+    if (event.target === event.currentTarget) {
+      innerFocusItem(event, defaultFocusableItemId);
+    }
+  };
+  return {
+    getRootProps: otherHandlers => ({
+      onFocus: createRootHandleFocus(otherHandlers)
+    }),
+    publicAPI: {
+      focusItem
+    },
+    instance: {
+      isItemFocused,
+      canItemBeTabbed,
+      focusItem,
+      removeFocusedItem
+    }
+  };
+};
+useTreeViewFocus.getInitialState = () => ({
+  focusedItemId: null
+});
+useTreeViewFocus.params = {
+  onItemFocus: true
+};
+
+const RtlContext = /*#__PURE__*/React.createContext();
+const useRtl = () => {
+  const value = React.useContext(RtlContext);
+  return value ?? false;
+};
+
+const hasPlugin = (instance, plugin) => {
+  const plugins = instance.getAvailablePlugins();
+  return plugins.has(plugin);
+};
+
+const useTreeViewLabelItemPlugin = ({
+  props
+}) => {
+  const {
+    instance
+  } = useTreeViewContext();
+  const {
+    label,
+    itemId
+  } = props;
+  const [labelInputValue, setLabelInputValue] = React.useState(label);
+  const isItemBeingEdited = instance.isItemBeingEdited(itemId);
+  React.useEffect(() => {
+    if (!isItemBeingEdited) {
+      setLabelInputValue(label);
+    }
+  }, [isItemBeingEdited, label]);
+  return {
+    propsEnhancers: {
+      labelInput: ({
+        externalEventHandlers,
+        interactions
+      }) => {
+        const editable = instance.isItemEditable(itemId);
+        if (!editable) {
+          return {};
+        }
+        const handleKeydown = event => {
+          externalEventHandlers.onKeyDown?.(event);
+          if (event.defaultMuiPrevented) {
+            return;
+          }
+          const target = event.target;
+          if (event.key === 'Enter' && target.value) {
+            interactions.handleSaveItemLabel(event, target.value);
+          } else if (event.key === 'Escape') {
+            interactions.handleCancelItemLabelEditing(event);
+          }
+        };
+        const handleBlur = event => {
+          externalEventHandlers.onBlur?.(event);
+          if (event.defaultMuiPrevented) {
+            return;
+          }
+          if (event.target.value) {
+            interactions.handleSaveItemLabel(event, event.target.value);
+          }
+        };
+        const handleInputChange = event => {
+          externalEventHandlers.onChange?.(event);
+          setLabelInputValue(event.target.value);
+        };
+        return {
+          value: labelInputValue ?? '',
+          'data-element': 'labelInput',
+          onChange: handleInputChange,
+          onKeyDown: handleKeydown,
+          onBlur: handleBlur,
+          autoFocus: true,
+          type: 'text'
+        };
+      }
+    }
+  };
+};
+
+const useTreeViewLabel = ({
+  instance,
+  state,
+  setState,
+  params
+}) => {
+  const editedItemRef = React.useRef(state.editedItemId);
+  const isItemBeingEditedRef = itemId => editedItemRef.current === itemId;
+  const setEditedItemId = editedItemId => {
+    setState(prevState => _extends({}, prevState, {
+      editedItemId
+    }));
+    editedItemRef.current = editedItemId;
+  };
+  const isItemBeingEdited = itemId => itemId === state.editedItemId;
+  const isTreeViewEditable = Boolean(params.isItemEditable);
+  const isItemEditable = itemId => {
+    if (itemId == null || !isTreeViewEditable) {
+      return false;
+    }
+    const item = instance.getItem(itemId);
+    if (!item) {
+      return false;
+    }
+    return typeof params.isItemEditable === 'function' ? params.isItemEditable(item) : Boolean(params.isItemEditable);
+  };
+  const updateItemLabel = (itemId, label) => {
+    if (!label) {
+      throw new Error(['MUI X: The Tree View component requires all items to have a `label` property.', 'The label of an item cannot be empty.', itemId].join('\n'));
+    }
+    setState(prevState => {
+      const item = prevState.items.itemMetaMap[itemId];
+      if (item.label !== label) {
+        return _extends({}, prevState, {
+          items: _extends({}, prevState.items, {
+            itemMetaMap: _extends({}, prevState.items.itemMetaMap, {
+              [itemId]: _extends({}, item, {
+                label
+              })
+            })
+          })
+        });
+      }
+      return prevState;
+    });
+    if (params.onItemLabelChange) {
+      params.onItemLabelChange(itemId, label);
+    }
+  };
+  return {
+    instance: {
+      setEditedItemId,
+      isItemBeingEdited,
+      updateItemLabel,
+      isItemEditable,
+      isTreeViewEditable,
+      isItemBeingEditedRef
+    },
+    publicAPI: {
+      updateItemLabel
+    }
+  };
+};
+useTreeViewLabel.itemPlugin = useTreeViewLabelItemPlugin;
+useTreeViewLabel.getDefaultizedParams = ({
+  params,
+  experimentalFeatures
+}) => {
+  const canUseFeature = experimentalFeatures?.labelEditing;
+  return _extends({}, params, {
+    isItemEditable: canUseFeature ? params.isItemEditable ?? false : false
+  });
+};
+useTreeViewLabel.getInitialState = () => ({
+  editedItemId: null
+});
+useTreeViewLabel.params = {
+  onItemLabelChange: true,
+  isItemEditable: true
+};
+
+function isPrintableKey(string) {
+  return !!string && string.length === 1 && !!string.match(/\S/);
+}
+const useTreeViewKeyboardNavigation = ({
+  instance,
+  params,
+  state
+}) => {
+  const isRtl = useRtl();
+  const firstCharMap = React.useRef({});
+  const updateFirstCharMap = useEventCallback(callback => {
+    firstCharMap.current = callback(firstCharMap.current);
+  });
+  React.useEffect(() => {
+    if (instance.areItemUpdatesPrevented()) {
+      return;
+    }
+    const newFirstCharMap = {};
+    const processItem = item => {
+      newFirstCharMap[item.id] = item.label.substring(0, 1).toLowerCase();
+    };
+    Object.values(state.items.itemMetaMap).forEach(processItem);
+    firstCharMap.current = newFirstCharMap;
+  }, [state.items.itemMetaMap, params.getItemId, instance]);
+  const getFirstMatchingItem = (itemId, query) => {
+    const cleanQuery = query.toLowerCase();
+    const getNextItem = itemIdToCheck => {
+      const nextItemId = getNextNavigableItem(instance, itemIdToCheck);
+      // We reached the end of the tree, check from the beginning
+      if (nextItemId === null) {
+        return getFirstNavigableItem(instance);
+      }
+      return nextItemId;
+    };
+    let matchingItemId = null;
+    let currentItemId = getNextItem(itemId);
+    const checkedItems = {};
+    // The "!checkedItems[currentItemId]" condition avoids an infinite loop when there is no matching item.
+    while (matchingItemId == null && !checkedItems[currentItemId]) {
+      if (firstCharMap.current[currentItemId] === cleanQuery) {
+        matchingItemId = currentItemId;
+      } else {
+        checkedItems[currentItemId] = true;
+        currentItemId = getNextItem(currentItemId);
+      }
+    }
+    return matchingItemId;
+  };
+  const canToggleItemSelection = itemId => !params.disableSelection && !instance.isItemDisabled(itemId);
+  const canToggleItemExpansion = itemId => {
+    return !instance.isItemDisabled(itemId) && instance.isItemExpandable(itemId);
+  };
+
+  // ARIA specification: https://www.w3.org/WAI/ARIA/apg/patterns/treeview/#keyboardinteraction
+  const handleItemKeyDown = (event, itemId) => {
+    if (event.defaultMuiPrevented) {
+      return;
+    }
+    if (event.altKey || isTargetInDescendants(event.target, event.currentTarget)) {
+      return;
+    }
+    const ctrlPressed = event.ctrlKey || event.metaKey;
+    const key = event.key;
+
+    // eslint-disable-next-line default-case
+    switch (true) {
+      // Select the item when pressing "Space"
+      case key === ' ' && canToggleItemSelection(itemId):
+        {
+          event.preventDefault();
+          if (params.multiSelect && event.shiftKey) {
+            instance.expandSelectionRange(event, itemId);
+          } else {
+            instance.selectItem({
+              event,
+              itemId,
+              keepExistingSelection: params.multiSelect,
+              shouldBeSelected: params.multiSelect ? undefined : true
+            });
+          }
+          break;
+        }
+
+      // If the focused item has children, we expand it.
+      // If the focused item has no children, we select it.
+      case key === 'Enter':
+        {
+          if (hasPlugin(instance, useTreeViewLabel) && instance.isItemEditable(itemId) && !instance.isItemBeingEdited(itemId)) {
+            instance.setEditedItemId(itemId);
+          } else if (canToggleItemExpansion(itemId)) {
+            instance.toggleItemExpansion(event, itemId);
+            event.preventDefault();
+          } else if (canToggleItemSelection(itemId)) {
+            if (params.multiSelect) {
+              event.preventDefault();
+              instance.selectItem({
+                event,
+                itemId,
+                keepExistingSelection: true
+              });
+            } else if (!instance.isItemSelected(itemId)) {
+              instance.selectItem({
+                event,
+                itemId
+              });
+              event.preventDefault();
+            }
+          }
+          break;
+        }
+
+      // Focus the next focusable item
+      case key === 'ArrowDown':
+        {
+          const nextItem = getNextNavigableItem(instance, itemId);
+          if (nextItem) {
+            event.preventDefault();
+            instance.focusItem(event, nextItem);
+
+            // Multi select behavior when pressing Shift + ArrowDown
+            // Toggles the selection state of the next item
+            if (params.multiSelect && event.shiftKey && canToggleItemSelection(nextItem)) {
+              instance.selectItemFromArrowNavigation(event, itemId, nextItem);
+            }
+          }
+          break;
+        }
+
+      // Focuses the previous focusable item
+      case key === 'ArrowUp':
+        {
+          const previousItem = getPreviousNavigableItem(instance, itemId);
+          if (previousItem) {
+            event.preventDefault();
+            instance.focusItem(event, previousItem);
+
+            // Multi select behavior when pressing Shift + ArrowUp
+            // Toggles the selection state of the previous item
+            if (params.multiSelect && event.shiftKey && canToggleItemSelection(previousItem)) {
+              instance.selectItemFromArrowNavigation(event, itemId, previousItem);
+            }
+          }
+          break;
+        }
+
+      // If the focused item is expanded, we move the focus to its first child
+      // If the focused item is collapsed and has children, we expand it
+      case key === 'ArrowRight' && !isRtl || key === 'ArrowLeft' && isRtl:
+        {
+          if (ctrlPressed) {
+            return;
+          }
+          if (instance.isItemExpanded(itemId)) {
+            const nextItemId = getNextNavigableItem(instance, itemId);
+            if (nextItemId) {
+              instance.focusItem(event, nextItemId);
+              event.preventDefault();
+            }
+          } else if (canToggleItemExpansion(itemId)) {
+            instance.toggleItemExpansion(event, itemId);
+            event.preventDefault();
+          }
+          break;
+        }
+
+      // If the focused item is expanded, we collapse it
+      // If the focused item is collapsed and has a parent, we move the focus to this parent
+      case key === 'ArrowLeft' && !isRtl || key === 'ArrowRight' && isRtl:
+        {
+          if (ctrlPressed) {
+            return;
+          }
+          if (canToggleItemExpansion(itemId) && instance.isItemExpanded(itemId)) {
+            instance.toggleItemExpansion(event, itemId);
+            event.preventDefault();
+          } else {
+            const parent = instance.getItemMeta(itemId).parentId;
+            if (parent) {
+              instance.focusItem(event, parent);
+              event.preventDefault();
+            }
+          }
+          break;
+        }
+
+      // Focuses the first item in the tree
+      case key === 'Home':
+        {
+          // Multi select behavior when pressing Ctrl + Shift + Home
+          // Selects the focused item and all items up to the first item.
+          if (canToggleItemSelection(itemId) && params.multiSelect && ctrlPressed && event.shiftKey) {
+            instance.selectRangeFromStartToItem(event, itemId);
+          } else {
+            instance.focusItem(event, getFirstNavigableItem(instance));
+          }
+          event.preventDefault();
+          break;
+        }
+
+      // Focuses the last item in the tree
+      case key === 'End':
+        {
+          // Multi select behavior when pressing Ctrl + Shirt + End
+          // Selects the focused item and all the items down to the last item.
+          if (canToggleItemSelection(itemId) && params.multiSelect && ctrlPressed && event.shiftKey) {
+            instance.selectRangeFromItemToEnd(event, itemId);
+          } else {
+            instance.focusItem(event, getLastNavigableItem(instance));
+          }
+          event.preventDefault();
+          break;
+        }
+
+      // Expand all siblings that are at the same level as the focused item
+      case key === '*':
+        {
+          instance.expandAllSiblings(event, itemId);
+          event.preventDefault();
+          break;
+        }
+
+      // Multi select behavior when pressing Ctrl + a
+      // Selects all the items
+      case String.fromCharCode(event.keyCode) === 'A' && ctrlPressed && params.multiSelect && !params.disableSelection:
+        {
+          instance.selectAllNavigableItems(event);
+          event.preventDefault();
+          break;
+        }
+
+      // Type-ahead
+      // TODO: Support typing multiple characters
+      case !ctrlPressed && !event.shiftKey && isPrintableKey(key):
+        {
+          const matchingItem = getFirstMatchingItem(itemId, key);
+          if (matchingItem != null) {
+            instance.focusItem(event, matchingItem);
+            event.preventDefault();
+          }
+          break;
+        }
+    }
+  };
+  return {
+    instance: {
+      updateFirstCharMap,
+      handleItemKeyDown
+    }
+  };
+};
+useTreeViewKeyboardNavigation.params = {};
+
+const useTreeViewIcons = ({
+  slots,
+  slotProps
+}) => {
+  return {
+    contextValue: {
+      icons: {
+        slots: {
+          collapseIcon: slots.collapseIcon,
+          expandIcon: slots.expandIcon,
+          endIcon: slots.endIcon
+        },
+        slotProps: {
+          collapseIcon: slotProps.collapseIcon,
+          expandIcon: slotProps.expandIcon,
+          endIcon: slotProps.endIcon
+        }
+      }
+    }
+  };
+};
+useTreeViewIcons.params = {};
+
+const TreeViewChildrenItemContext = /*#__PURE__*/React.createContext(null);
+function TreeViewChildrenItemProvider(props) {
+  const {
+    children,
+    itemId = null
+  } = props;
+  const {
+    instance,
+    treeId,
+    rootRef
+  } = useTreeViewContext();
+  const childrenIdAttrToIdRef = React.useRef(new Map());
+  React.useEffect(() => {
+    if (!rootRef.current) {
+      return;
+    }
+    let idAttr = null;
+    if (itemId == null) {
+      idAttr = rootRef.current.id;
+    } else {
+      // Undefined during 1st render
+      const itemMeta = instance.getItemMeta(itemId);
+      if (itemMeta !== undefined) {
+        idAttr = generateTreeItemIdAttribute({
+          itemId,
+          treeId,
+          id: itemMeta.idAttribute
+        });
+      }
+    }
+    if (idAttr == null) {
+      return;
+    }
+    const previousChildrenIds = instance.getItemOrderedChildrenIds(itemId ?? null) ?? [];
+    const escapedIdAttr = escapeOperandAttributeSelector(idAttr);
+    const childrenElements = rootRef.current.querySelectorAll(`${itemId == null ? '' : `*[id="${escapedIdAttr}"] `}[role="treeitem"]:not(*[id="${escapedIdAttr}"] [role="treeitem"] [role="treeitem"])`);
+    const childrenIds = Array.from(childrenElements).map(child => childrenIdAttrToIdRef.current.get(child.id));
+    const hasChanged = childrenIds.length !== previousChildrenIds.length || childrenIds.some((childId, index) => childId !== previousChildrenIds[index]);
+    if (hasChanged) {
+      instance.setJSXItemsOrderedChildrenIds(itemId ?? null, childrenIds);
+    }
+  });
+  const value = React.useMemo(() => ({
+    registerChild: (childIdAttribute, childItemId) => childrenIdAttrToIdRef.current.set(childIdAttribute, childItemId),
+    unregisterChild: childIdAttribute => childrenIdAttrToIdRef.current.delete(childIdAttribute),
+    parentId: itemId
+  }), [itemId]);
+  return /*#__PURE__*/jsx(TreeViewChildrenItemContext.Provider, {
+    value: value,
+    children: children
+  });
+}
+
+const useTreeViewJSXItems = ({
+  instance,
+  setState
+}) => {
+  instance.preventItemUpdates();
+  const insertJSXItem = useEventCallback(item => {
+    setState(prevState => {
+      if (prevState.items.itemMetaMap[item.id] != null) {
+        throw new Error(['MUI X: The Tree View component requires all items to have a unique `id` property.', 'Alternatively, you can use the `getItemId` prop to specify a custom id for each item.', `Two items were provided with the same id in the \`items\` prop: "${item.id}"`].join('\n'));
+      }
+      return _extends({}, prevState, {
+        items: _extends({}, prevState.items, {
+          itemMetaMap: _extends({}, prevState.items.itemMetaMap, {
+            [item.id]: item
+          }),
+          // For Simple Tree View, we don't have a proper `item` object, so we create a very basic one.
+          itemMap: _extends({}, prevState.items.itemMap, {
+            [item.id]: {
+              id: item.id,
+              label: item.label
+            }
+          })
+        })
+      });
+    });
+    return () => {
+      setState(prevState => {
+        const newItemMetaMap = _extends({}, prevState.items.itemMetaMap);
+        const newItemMap = _extends({}, prevState.items.itemMap);
+        delete newItemMetaMap[item.id];
+        delete newItemMap[item.id];
+        return _extends({}, prevState, {
+          items: _extends({}, prevState.items, {
+            itemMetaMap: newItemMetaMap,
+            itemMap: newItemMap
+          })
+        });
+      });
+      publishTreeViewEvent(instance, 'removeItem', {
+        id: item.id
+      });
+    };
+  });
+  const setJSXItemsOrderedChildrenIds = (parentId, orderedChildrenIds) => {
+    const parentIdWithDefault = parentId ?? TREE_VIEW_ROOT_PARENT_ID;
+    setState(prevState => _extends({}, prevState, {
+      items: _extends({}, prevState.items, {
+        itemOrderedChildrenIds: _extends({}, prevState.items.itemOrderedChildrenIds, {
+          [parentIdWithDefault]: orderedChildrenIds
+        }),
+        itemChildrenIndexes: _extends({}, prevState.items.itemChildrenIndexes, {
+          [parentIdWithDefault]: buildSiblingIndexes(orderedChildrenIds)
+        })
+      })
+    }));
+  };
+  const mapFirstCharFromJSX = useEventCallback((itemId, firstChar) => {
+    instance.updateFirstCharMap(firstCharMap => {
+      firstCharMap[itemId] = firstChar;
+      return firstCharMap;
+    });
+    return () => {
+      instance.updateFirstCharMap(firstCharMap => {
+        const newMap = _extends({}, firstCharMap);
+        delete newMap[itemId];
+        return newMap;
+      });
+    };
+  });
+  return {
+    instance: {
+      insertJSXItem,
+      setJSXItemsOrderedChildrenIds,
+      mapFirstCharFromJSX
+    }
+  };
+};
+const isItemExpandable = reactChildren => {
+  if (Array.isArray(reactChildren)) {
+    return reactChildren.length > 0 && reactChildren.some(isItemExpandable);
+  }
+  return Boolean(reactChildren);
+};
+const useTreeViewJSXItemsItemPlugin = ({
+  props,
+  rootRef,
+  contentRef
+}) => {
+  const {
+    instance,
+    treeId
+  } = useTreeViewContext();
+  const {
+    children,
+    disabled = false,
+    label,
+    itemId,
+    id
+  } = props;
+  const parentContext = React.useContext(TreeViewChildrenItemContext);
+  if (parentContext == null) {
+    throw new Error(['MUI X: Could not find the Tree View Children Item context.', 'It looks like you rendered your component outside of a SimpleTreeView parent component.', 'This can also happen if you are bundling multiple versions of the Tree View.'].join('\n'));
+  }
+  const {
+    registerChild,
+    unregisterChild,
+    parentId
+  } = parentContext;
+  const expandable = isItemExpandable(children);
+  const pluginContentRef = React.useRef(null);
+  const handleContentRef = useForkRef(pluginContentRef, contentRef);
+
+  // Prevent any flashing
+  useEnhancedEffect(() => {
+    const idAttribute = generateTreeItemIdAttribute({
+      itemId,
+      treeId,
+      id
+    });
+    registerChild(idAttribute, itemId);
+    return () => {
+      unregisterChild(idAttribute);
+    };
+  }, [registerChild, unregisterChild, itemId, id, treeId]);
+  React.useEffect(() => {
+    return instance.insertJSXItem({
+      id: itemId,
+      idAttribute: id,
+      parentId,
+      expandable,
+      disabled
+    });
+  }, [instance, parentId, itemId, expandable, disabled, id]);
+  React.useEffect(() => {
+    if (label) {
+      return instance.mapFirstCharFromJSX(itemId, (pluginContentRef.current?.textContent ?? '').substring(0, 1).toLowerCase());
+    }
+    return undefined;
+  }, [instance, itemId, label]);
+  return {
+    contentRef: handleContentRef,
+    rootRef
+  };
+};
+useTreeViewJSXItems.itemPlugin = useTreeViewJSXItemsItemPlugin;
+useTreeViewJSXItems.wrapItem = ({
+  children,
+  itemId
+}) => {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const depthContext = React.useContext(TreeViewItemDepthContext);
+  return /*#__PURE__*/jsx(TreeViewChildrenItemProvider, {
+    itemId: itemId,
+    children: /*#__PURE__*/jsx(TreeViewItemDepthContext.Provider, {
+      value: depthContext + 1,
+      children: children
+    })
+  });
+};
+useTreeViewJSXItems.wrapRoot = ({
+  children
+}) => /*#__PURE__*/jsx(TreeViewChildrenItemProvider, {
+  children: /*#__PURE__*/jsx(TreeViewItemDepthContext.Provider, {
+    value: 0,
+    children: children
+  })
+});
+useTreeViewJSXItems.params = {};
+
+const SIMPLE_TREE_VIEW_PLUGINS = [useTreeViewItems, useTreeViewExpansion, useTreeViewSelection, useTreeViewFocus, useTreeViewKeyboardNavigation, useTreeViewIcons, useTreeViewJSXItems];
+
+// We can't infer this type from the plugin, otherwise we would lose the generics.
+
+const useThemeProps$1 = createUseThemeProps();
+const useUtilityClasses$1 = ownerState => {
+  const {
+    classes
+  } = ownerState;
+  const slots = {
+    root: ['root']
+  };
+  return composeClasses(slots, getSimpleTreeViewUtilityClass, classes);
+};
+const SimpleTreeViewRoot = styled('ul', {
+  name: 'MuiSimpleTreeView',
+  slot: 'Root',
+  overridesResolver: (props, styles) => styles.root
+})({
+  padding: 0,
+  margin: 0,
+  listStyle: 'none',
+  outline: 0,
+  position: 'relative'
+});
+const EMPTY_ITEMS = [];
+
+/**
+ *
+ * Demos:
+ *
+ * - [Tree View](https://mui.com/x/react-tree-view/)
+ *
+ * API:
+ *
+ * - [SimpleTreeView API](https://mui.com/x/api/tree-view/simple-tree-view/)
+ */
+const SimpleTreeView = /*#__PURE__*/React.forwardRef(function SimpleTreeView(inProps, ref) {
+  const props = useThemeProps$1({
+    props: inProps,
+    name: 'MuiSimpleTreeView'
+  });
+  const ownerState = props;
+  const {
+    getRootProps,
+    contextValue
+  } = useTreeView({
+    plugins: SIMPLE_TREE_VIEW_PLUGINS,
+    rootRef: ref,
+    props: _extends({}, props, {
+      items: EMPTY_ITEMS
+    })
+  });
+  const {
+    slots,
+    slotProps
+  } = props;
+  const classes = useUtilityClasses$1(props);
+  const Root = slots?.root ?? SimpleTreeViewRoot;
+  const rootProps = useSlotProps({
+    elementType: Root,
+    externalSlotProps: slotProps?.root,
+    className: classes.root,
+    getSlotProps: getRootProps,
+    ownerState
+  });
+  return /*#__PURE__*/jsx(TreeViewProvider, {
+    value: contextValue,
+    children: /*#__PURE__*/jsx(Root, _extends({}, rootProps))
+  });
+});
+
+var reactIs = {exports: {}};
+
+var reactIs_production = {};
+
+/**
+ * @license React
+ * react-is.production.js
+ *
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+var hasRequiredReactIs_production;
+
+function requireReactIs_production () {
+	if (hasRequiredReactIs_production) return reactIs_production;
+	hasRequiredReactIs_production = 1;
+	var REACT_ELEMENT_TYPE = Symbol.for("react.transitional.element"),
+	  REACT_PORTAL_TYPE = Symbol.for("react.portal"),
+	  REACT_FRAGMENT_TYPE = Symbol.for("react.fragment"),
+	  REACT_STRICT_MODE_TYPE = Symbol.for("react.strict_mode"),
+	  REACT_PROFILER_TYPE = Symbol.for("react.profiler"),
+	  REACT_CONSUMER_TYPE = Symbol.for("react.consumer"),
+	  REACT_CONTEXT_TYPE = Symbol.for("react.context"),
+	  REACT_FORWARD_REF_TYPE = Symbol.for("react.forward_ref"),
+	  REACT_SUSPENSE_TYPE = Symbol.for("react.suspense"),
+	  REACT_SUSPENSE_LIST_TYPE = Symbol.for("react.suspense_list"),
+	  REACT_MEMO_TYPE = Symbol.for("react.memo"),
+	  REACT_LAZY_TYPE = Symbol.for("react.lazy"),
+	  REACT_VIEW_TRANSITION_TYPE = Symbol.for("react.view_transition"),
+	  REACT_CLIENT_REFERENCE = Symbol.for("react.client.reference");
+	function typeOf(object) {
+	  if ("object" === typeof object && null !== object) {
+	    var $$typeof = object.$$typeof;
+	    switch ($$typeof) {
+	      case REACT_ELEMENT_TYPE:
+	        switch (((object = object.type), object)) {
+	          case REACT_FRAGMENT_TYPE:
+	          case REACT_PROFILER_TYPE:
+	          case REACT_STRICT_MODE_TYPE:
+	          case REACT_SUSPENSE_TYPE:
+	          case REACT_SUSPENSE_LIST_TYPE:
+	          case REACT_VIEW_TRANSITION_TYPE:
+	            return object;
+	          default:
+	            switch (((object = object && object.$$typeof), object)) {
+	              case REACT_CONTEXT_TYPE:
+	              case REACT_FORWARD_REF_TYPE:
+	              case REACT_LAZY_TYPE:
+	              case REACT_MEMO_TYPE:
+	                return object;
+	              case REACT_CONSUMER_TYPE:
+	                return object;
+	              default:
+	                return $$typeof;
+	            }
+	        }
+	      case REACT_PORTAL_TYPE:
+	        return $$typeof;
+	    }
+	  }
+	}
+	reactIs_production.ContextConsumer = REACT_CONSUMER_TYPE;
+	reactIs_production.ContextProvider = REACT_CONTEXT_TYPE;
+	reactIs_production.Element = REACT_ELEMENT_TYPE;
+	reactIs_production.ForwardRef = REACT_FORWARD_REF_TYPE;
+	reactIs_production.Fragment = REACT_FRAGMENT_TYPE;
+	reactIs_production.Lazy = REACT_LAZY_TYPE;
+	reactIs_production.Memo = REACT_MEMO_TYPE;
+	reactIs_production.Portal = REACT_PORTAL_TYPE;
+	reactIs_production.Profiler = REACT_PROFILER_TYPE;
+	reactIs_production.StrictMode = REACT_STRICT_MODE_TYPE;
+	reactIs_production.Suspense = REACT_SUSPENSE_TYPE;
+	reactIs_production.SuspenseList = REACT_SUSPENSE_LIST_TYPE;
+	reactIs_production.isContextConsumer = function (object) {
+	  return typeOf(object) === REACT_CONSUMER_TYPE;
+	};
+	reactIs_production.isContextProvider = function (object) {
+	  return typeOf(object) === REACT_CONTEXT_TYPE;
+	};
+	reactIs_production.isElement = function (object) {
+	  return (
+	    "object" === typeof object &&
+	    null !== object &&
+	    object.$$typeof === REACT_ELEMENT_TYPE
+	  );
+	};
+	reactIs_production.isForwardRef = function (object) {
+	  return typeOf(object) === REACT_FORWARD_REF_TYPE;
+	};
+	reactIs_production.isFragment = function (object) {
+	  return typeOf(object) === REACT_FRAGMENT_TYPE;
+	};
+	reactIs_production.isLazy = function (object) {
+	  return typeOf(object) === REACT_LAZY_TYPE;
+	};
+	reactIs_production.isMemo = function (object) {
+	  return typeOf(object) === REACT_MEMO_TYPE;
+	};
+	reactIs_production.isPortal = function (object) {
+	  return typeOf(object) === REACT_PORTAL_TYPE;
+	};
+	reactIs_production.isProfiler = function (object) {
+	  return typeOf(object) === REACT_PROFILER_TYPE;
+	};
+	reactIs_production.isStrictMode = function (object) {
+	  return typeOf(object) === REACT_STRICT_MODE_TYPE;
+	};
+	reactIs_production.isSuspense = function (object) {
+	  return typeOf(object) === REACT_SUSPENSE_TYPE;
+	};
+	reactIs_production.isSuspenseList = function (object) {
+	  return typeOf(object) === REACT_SUSPENSE_LIST_TYPE;
+	};
+	reactIs_production.isValidElementType = function (type) {
+	  return "string" === typeof type ||
+	    "function" === typeof type ||
+	    type === REACT_FRAGMENT_TYPE ||
+	    type === REACT_PROFILER_TYPE ||
+	    type === REACT_STRICT_MODE_TYPE ||
+	    type === REACT_SUSPENSE_TYPE ||
+	    type === REACT_SUSPENSE_LIST_TYPE ||
+	    ("object" === typeof type &&
+	      null !== type &&
+	      (type.$$typeof === REACT_LAZY_TYPE ||
+	        type.$$typeof === REACT_MEMO_TYPE ||
+	        type.$$typeof === REACT_CONTEXT_TYPE ||
+	        type.$$typeof === REACT_CONSUMER_TYPE ||
+	        type.$$typeof === REACT_FORWARD_REF_TYPE ||
+	        type.$$typeof === REACT_CLIENT_REFERENCE ||
+	        void 0 !== type.getModuleId))
+	    ? true
+	    : false;
+	};
+	reactIs_production.typeOf = typeOf;
+	return reactIs_production;
+}
+
+var hasRequiredReactIs;
+
+function requireReactIs () {
+	if (hasRequiredReactIs) return reactIs.exports;
+	hasRequiredReactIs = 1;
+
+	{
+	  reactIs.exports = /*@__PURE__*/ requireReactIs_production();
+	}
+	return reactIs.exports;
+}
+
+var reactIsExports = /*@__PURE__*/ requireReactIs();
+
+// https://github.com/sindresorhus/is-plain-obj/blob/main/index.js
+function isPlainObject(item) {
+  if (typeof item !== 'object' || item === null) {
+    return false;
+  }
+  const prototype = Object.getPrototypeOf(item);
+  return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in item) && !(Symbol.iterator in item);
+}
+function deepClone(source) {
+  if (/*#__PURE__*/React.isValidElement(source) || reactIsExports.isValidElementType(source) || !isPlainObject(source)) {
+    return source;
+  }
+  const output = {};
+  Object.keys(source).forEach(key => {
+    output[key] = deepClone(source[key]);
+  });
+  return output;
+}
+
+/**
+ * Merge objects deeply.
+ * It will shallow copy React elements.
+ *
+ * If `options.clone` is set to `false` the source object will be merged directly into the target object.
+ *
+ * @example
+ * ```ts
+ * deepmerge({ a: { b: 1 }, d: 2 }, { a: { c: 2 }, d: 4 });
+ * // => { a: { b: 1, c: 2 }, d: 4 }
+ * ````
+ *
+ * @param target The target object.
+ * @param source The source object.
+ * @param options The merge options.
+ * @param options.clone Set to `false` to merge the source object directly into the target object.
+ * @returns The merged object.
+ */
+function deepmerge(target, source, options = {
+  clone: true
+}) {
+  const output = options.clone ? {
+    ...target
+  } : target;
+  if (isPlainObject(target) && isPlainObject(source)) {
+    Object.keys(source).forEach(key => {
+      if (/*#__PURE__*/React.isValidElement(source[key]) || reactIsExports.isValidElementType(source[key])) {
+        output[key] = source[key];
+      } else if (isPlainObject(source[key]) &&
+      // Avoid prototype pollution
+      Object.prototype.hasOwnProperty.call(target, key) && isPlainObject(target[key])) {
+        // Since `output` is a clone of `target` and we have narrowed `target` in this block we can cast to the same type.
+        output[key] = deepmerge(target[key], source[key], options);
+      } else if (options.clone) {
+        output[key] = isPlainObject(source[key]) ? deepClone(source[key]) : source[key];
+      } else {
+        output[key] = source[key];
+      }
+    });
+  }
+  return output;
+}
+
+/**
+ * WARNING: Don't import this directly. It's imported by the code generated by
+ * `@mui/interal-babel-plugin-minify-errors`. Make sure to always use string literals in `Error`
+ * constructors to ensure the plugin works as expected. Supported patterns include:
+ *   throw new Error('My message');
+ *   throw new Error(`My message: ${foo}`);
+ *   throw new Error(`My message: ${foo}` + 'another string');
+ *   ...
+ * @param {number} code
+ */
+function formatMuiErrorMessage(code, ...args) {
+  const url = new URL(`https://mui.com/production-error/?code=${code}`);
+  args.forEach(arg => url.searchParams.append('args[]', arg));
+  return `Minified MUI error #${code}; visit ${url} for the full message.`;
+}
+
+// It should to be noted that this function isn't equivalent to `text-transform: capitalize`.
+//
+// A strict capitalization should uppercase the first letter of each word in the sentence.
+// We only handle the first word.
+function capitalize(string) {
+  if (typeof string !== 'string') {
+    throw new Error(formatMuiErrorMessage(7));
+  }
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+// Sorted ASC by size. That's important.
+// It can't be configured as it's used statically for propTypes.
+const sortBreakpointsValues = values => {
+  const breakpointsAsArray = Object.keys(values).map(key => ({
+    key,
+    val: values[key]
+  })) || [];
+  // Sort in ascending order
+  breakpointsAsArray.sort((breakpoint1, breakpoint2) => breakpoint1.val - breakpoint2.val);
+  return breakpointsAsArray.reduce((acc, obj) => {
+    return {
+      ...acc,
+      [obj.key]: obj.val
+    };
+  }, {});
+};
+
+// Keep in mind that @media is inclusive by the CSS specification.
+function createBreakpoints(breakpoints) {
+  const {
+    // The breakpoint **start** at this value.
+    // For instance with the first breakpoint xs: [xs, sm).
+    values = {
+      xs: 0,
+      // phone
+      sm: 600,
+      // tablet
+      md: 900,
+      // small laptop
+      lg: 1200,
+      // desktop
+      xl: 1536 // large screen
+    },
+    unit = 'px',
+    step = 5,
+    ...other
+  } = breakpoints;
+  const sortedValues = sortBreakpointsValues(values);
+  const keys = Object.keys(sortedValues);
+  function up(key) {
+    const value = typeof values[key] === 'number' ? values[key] : key;
+    return `@media (min-width:${value}${unit})`;
+  }
+  function down(key) {
+    const value = typeof values[key] === 'number' ? values[key] : key;
+    return `@media (max-width:${value - step / 100}${unit})`;
+  }
+  function between(start, end) {
+    const endIndex = keys.indexOf(end);
+    return `@media (min-width:${typeof values[start] === 'number' ? values[start] : start}${unit}) and ` + `(max-width:${(endIndex !== -1 && typeof values[keys[endIndex]] === 'number' ? values[keys[endIndex]] : end) - step / 100}${unit})`;
+  }
+  function only(key) {
+    if (keys.indexOf(key) + 1 < keys.length) {
+      return between(key, keys[keys.indexOf(key) + 1]);
+    }
+    return up(key);
+  }
+  function not(key) {
+    // handle first and last key separately, for better readability
+    const keyIndex = keys.indexOf(key);
+    if (keyIndex === 0) {
+      return up(keys[1]);
+    }
+    if (keyIndex === keys.length - 1) {
+      return down(keys[keyIndex]);
+    }
+    return between(key, keys[keys.indexOf(key) + 1]).replace('@media', '@media not all and');
+  }
+  return {
+    keys,
+    values: sortedValues,
+    up,
+    down,
+    between,
+    only,
+    not,
+    unit,
+    ...other
+  };
+}
+
+/**
+ * For using in `sx` prop to sort the breakpoint from low to high.
+ * Note: this function does not work and will not support multiple units.
+ *       e.g. input: { '@container (min-width:300px)': '1rem', '@container (min-width:40rem)': '2rem' }
+ *            output: { '@container (min-width:40rem)': '2rem', '@container (min-width:300px)': '1rem' } // since 40 < 300 even though 40rem > 300px
+ */
+function sortContainerQueries(theme, css) {
+  if (!theme.containerQueries) {
+    return css;
+  }
+  const sorted = Object.keys(css).filter(key => key.startsWith('@container')).sort((a, b) => {
+    const regex = /min-width:\s*([0-9.]+)/;
+    return +(a.match(regex)?.[1] || 0) - +(b.match(regex)?.[1] || 0);
+  });
+  if (!sorted.length) {
+    return css;
+  }
+  return sorted.reduce((acc, key) => {
+    const value = css[key];
+    delete acc[key];
+    acc[key] = value;
+    return acc;
+  }, {
+    ...css
+  });
+}
+function isCqShorthand(breakpointKeys, value) {
+  return value === '@' || value.startsWith('@') && (breakpointKeys.some(key => value.startsWith(`@${key}`)) || !!value.match(/^@\d/));
+}
+function getContainerQuery(theme, shorthand) {
+  const matches = shorthand.match(/^@([^/]+)?\/?(.+)?$/);
+  if (!matches) {
+    return null;
+  }
+  const [, containerQuery, containerName] = matches;
+  const value = Number.isNaN(+containerQuery) ? containerQuery || 0 : +containerQuery;
+  return theme.containerQueries(containerName).up(value);
+}
+function cssContainerQueries(themeInput) {
+  const toContainerQuery = (mediaQuery, name) => mediaQuery.replace('@media', name ? `@container ${name}` : '@container');
+  function attachCq(node, name) {
+    node.up = (...args) => toContainerQuery(themeInput.breakpoints.up(...args), name);
+    node.down = (...args) => toContainerQuery(themeInput.breakpoints.down(...args), name);
+    node.between = (...args) => toContainerQuery(themeInput.breakpoints.between(...args), name);
+    node.only = (...args) => toContainerQuery(themeInput.breakpoints.only(...args), name);
+    node.not = (...args) => {
+      const result = toContainerQuery(themeInput.breakpoints.not(...args), name);
+      if (result.includes('not all and')) {
+        // `@container` does not work with `not all and`, so need to invert the logic
+        return result.replace('not all and ', '').replace('min-width:', 'width<').replace('max-width:', 'width>').replace('and', 'or');
+      }
+      return result;
+    };
+  }
+  const node = {};
+  const containerQueries = name => {
+    attachCq(node, name);
+    return node;
+  };
+  attachCq(containerQueries);
+  return {
+    ...themeInput,
+    containerQueries
+  };
+}
+
+const shape = {
+  borderRadius: 4
+};
+
+function merge(acc, item) {
+  if (!item) {
+    return acc;
+  }
+  return deepmerge(acc, item, {
+    clone: false // No need to clone deep, it's way faster.
+  });
+}
+
+// The breakpoint **start** at this value.
+// For instance with the first breakpoint xs: [xs, sm[.
+const values = {
+  xs: 0,
+  // phone
+  sm: 600,
+  // tablet
+  md: 900,
+  // small laptop
+  lg: 1200,
+  // desktop
+  xl: 1536 // large screen
+};
+const defaultBreakpoints = {
+  // Sorted ASC by size. That's important.
+  // It can't be configured as it's used statically for propTypes.
+  keys: ['xs', 'sm', 'md', 'lg', 'xl'],
+  up: key => `@media (min-width:${values[key]}px)`
+};
+const defaultContainerQueries = {
+  containerQueries: containerName => ({
+    up: key => {
+      let result = typeof key === 'number' ? key : values[key] || key;
+      if (typeof result === 'number') {
+        result = `${result}px`;
+      }
+      return containerName ? `@container ${containerName} (min-width:${result})` : `@container (min-width:${result})`;
+    }
+  })
+};
+function handleBreakpoints(props, propValue, styleFromPropValue) {
+  const theme = props.theme || {};
+  if (Array.isArray(propValue)) {
+    const themeBreakpoints = theme.breakpoints || defaultBreakpoints;
+    return propValue.reduce((acc, item, index) => {
+      acc[themeBreakpoints.up(themeBreakpoints.keys[index])] = styleFromPropValue(propValue[index]);
+      return acc;
+    }, {});
+  }
+  if (typeof propValue === 'object') {
+    const themeBreakpoints = theme.breakpoints || defaultBreakpoints;
+    return Object.keys(propValue).reduce((acc, breakpoint) => {
+      if (isCqShorthand(themeBreakpoints.keys, breakpoint)) {
+        const containerKey = getContainerQuery(theme.containerQueries ? theme : defaultContainerQueries, breakpoint);
+        if (containerKey) {
+          acc[containerKey] = styleFromPropValue(propValue[breakpoint], breakpoint);
+        }
+      }
+      // key is breakpoint
+      else if (Object.keys(themeBreakpoints.values || values).includes(breakpoint)) {
+        const mediaKey = themeBreakpoints.up(breakpoint);
+        acc[mediaKey] = styleFromPropValue(propValue[breakpoint], breakpoint);
+      } else {
+        const cssKey = breakpoint;
+        acc[cssKey] = propValue[cssKey];
+      }
+      return acc;
+    }, {});
+  }
+  const output = styleFromPropValue(propValue);
+  return output;
+}
+function createEmptyBreakpointObject(breakpointsInput = {}) {
+  const breakpointsInOrder = breakpointsInput.keys?.reduce((acc, key) => {
+    const breakpointStyleKey = breakpointsInput.up(key);
+    acc[breakpointStyleKey] = {};
+    return acc;
+  }, {});
+  return breakpointsInOrder || {};
+}
+function removeUnusedBreakpoints(breakpointKeys, style) {
+  return breakpointKeys.reduce((acc, key) => {
+    const breakpointOutput = acc[key];
+    const isBreakpointUnused = !breakpointOutput || Object.keys(breakpointOutput).length === 0;
+    if (isBreakpointUnused) {
+      delete acc[key];
+    }
+    return acc;
+  }, style);
+}
+
+function getPath(obj, path, checkVars = true) {
+  if (!path || typeof path !== 'string') {
+    return null;
+  }
+
+  // Check if CSS variables are used
+  if (obj && obj.vars && checkVars) {
+    const val = `vars.${path}`.split('.').reduce((acc, item) => acc && acc[item] ? acc[item] : null, obj);
+    if (val != null) {
+      return val;
+    }
+  }
+  return path.split('.').reduce((acc, item) => {
+    if (acc && acc[item] != null) {
+      return acc[item];
+    }
+    return null;
+  }, obj);
+}
+function getStyleValue(themeMapping, transform, propValueFinal, userValue = propValueFinal) {
+  let value;
+  if (typeof themeMapping === 'function') {
+    value = themeMapping(propValueFinal);
+  } else if (Array.isArray(themeMapping)) {
+    value = themeMapping[propValueFinal] || userValue;
+  } else {
+    value = getPath(themeMapping, propValueFinal) || userValue;
+  }
+  if (transform) {
+    value = transform(value, userValue, themeMapping);
+  }
+  return value;
+}
+function style$1(options) {
+  const {
+    prop,
+    cssProperty = options.prop,
+    themeKey,
+    transform
+  } = options;
+
+  // false positive
+  // eslint-disable-next-line react/function-component-definition
+  const fn = props => {
+    if (props[prop] == null) {
+      return null;
+    }
+    const propValue = props[prop];
+    const theme = props.theme;
+    const themeMapping = getPath(theme, themeKey) || {};
+    const styleFromPropValue = propValueFinal => {
+      let value = getStyleValue(themeMapping, transform, propValueFinal);
+      if (propValueFinal === value && typeof propValueFinal === 'string') {
+        // Haven't found value
+        value = getStyleValue(themeMapping, transform, `${prop}${propValueFinal === 'default' ? '' : capitalize(propValueFinal)}`, propValueFinal);
+      }
+      if (cssProperty === false) {
+        return value;
+      }
+      return {
+        [cssProperty]: value
+      };
+    };
+    return handleBreakpoints(props, propValue, styleFromPropValue);
+  };
+  fn.propTypes = {};
+  fn.filterProps = [prop];
+  return fn;
+}
+
+function memoize(fn) {
+  const cache = {};
+  return arg => {
+    if (cache[arg] === undefined) {
+      cache[arg] = fn(arg);
+    }
+    return cache[arg];
+  };
+}
+
+const properties = {
+  m: 'margin',
+  p: 'padding'
+};
+const directions = {
+  t: 'Top',
+  r: 'Right',
+  b: 'Bottom',
+  l: 'Left',
+  x: ['Left', 'Right'],
+  y: ['Top', 'Bottom']
+};
+const aliases = {
+  marginX: 'mx',
+  marginY: 'my',
+  paddingX: 'px',
+  paddingY: 'py'
+};
+
+// memoize() impact:
+// From 300,000 ops/sec
+// To 350,000 ops/sec
+const getCssProperties = memoize(prop => {
+  // It's not a shorthand notation.
+  if (prop.length > 2) {
+    if (aliases[prop]) {
+      prop = aliases[prop];
+    } else {
+      return [prop];
+    }
+  }
+  const [a, b] = prop.split('');
+  const property = properties[a];
+  const direction = directions[b] || '';
+  return Array.isArray(direction) ? direction.map(dir => property + dir) : [property + direction];
+});
+const marginKeys = ['m', 'mt', 'mr', 'mb', 'ml', 'mx', 'my', 'margin', 'marginTop', 'marginRight', 'marginBottom', 'marginLeft', 'marginX', 'marginY', 'marginInline', 'marginInlineStart', 'marginInlineEnd', 'marginBlock', 'marginBlockStart', 'marginBlockEnd'];
+const paddingKeys = ['p', 'pt', 'pr', 'pb', 'pl', 'px', 'py', 'padding', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft', 'paddingX', 'paddingY', 'paddingInline', 'paddingInlineStart', 'paddingInlineEnd', 'paddingBlock', 'paddingBlockStart', 'paddingBlockEnd'];
+[...marginKeys, ...paddingKeys];
+function createUnaryUnit(theme, themeKey, defaultValue, propName) {
+  const themeSpacing = getPath(theme, themeKey, true) ?? defaultValue;
+  if (typeof themeSpacing === 'number' || typeof themeSpacing === 'string') {
+    return val => {
+      if (typeof val === 'string') {
+        return val;
+      }
+      if (typeof themeSpacing === 'string') {
+        if (themeSpacing.startsWith('var(') && val === 0) {
+          return 0;
+        }
+        if (themeSpacing.startsWith('var(') && val === 1) {
+          return themeSpacing;
+        }
+        return `calc(${val} * ${themeSpacing})`;
+      }
+      return themeSpacing * val;
+    };
+  }
+  if (Array.isArray(themeSpacing)) {
+    return val => {
+      if (typeof val === 'string') {
+        return val;
+      }
+      const abs = Math.abs(val);
+      const transformed = themeSpacing[abs];
+      if (val >= 0) {
+        return transformed;
+      }
+      if (typeof transformed === 'number') {
+        return -transformed;
+      }
+      if (typeof transformed === 'string' && transformed.startsWith('var(')) {
+        return `calc(-1 * ${transformed})`;
+      }
+      return `-${transformed}`;
+    };
+  }
+  if (typeof themeSpacing === 'function') {
+    return themeSpacing;
+  }
+  return () => undefined;
+}
+function createUnarySpacing(theme) {
+  return createUnaryUnit(theme, 'spacing', 8);
+}
+function getValue(transformer, propValue) {
+  if (typeof propValue === 'string' || propValue == null) {
+    return propValue;
+  }
+  return transformer(propValue);
+}
+function getStyleFromPropValue(cssProperties, transformer) {
+  return propValue => cssProperties.reduce((acc, cssProperty) => {
+    acc[cssProperty] = getValue(transformer, propValue);
+    return acc;
+  }, {});
+}
+function resolveCssProperty(props, keys, prop, transformer) {
+  // Using a hash computation over an array iteration could be faster, but with only 28 items,
+  // it's doesn't worth the bundle size.
+  if (!keys.includes(prop)) {
+    return null;
+  }
+  const cssProperties = getCssProperties(prop);
+  const styleFromPropValue = getStyleFromPropValue(cssProperties, transformer);
+  const propValue = props[prop];
+  return handleBreakpoints(props, propValue, styleFromPropValue);
+}
+function style(props, keys) {
+  const transformer = createUnarySpacing(props.theme);
+  return Object.keys(props).map(prop => resolveCssProperty(props, keys, prop, transformer)).reduce(merge, {});
+}
+function margin(props) {
+  return style(props, marginKeys);
+}
+margin.propTypes = {};
+margin.filterProps = marginKeys;
+function padding(props) {
+  return style(props, paddingKeys);
+}
+padding.propTypes = {};
+padding.filterProps = paddingKeys;
+
+// The different signatures imply different meaning for their arguments that can't be expressed structurally.
+// We express the difference with variable names.
+
+function createSpacing(spacingInput = 8,
+// Material Design layouts are visually balanced. Most measurements align to an 8dp grid, which aligns both spacing and the overall layout.
+// Smaller components, such as icons, can align to a 4dp grid.
+// https://m2.material.io/design/layout/understanding-layout.html
+transform = createUnarySpacing({
+  spacing: spacingInput
+})) {
+  // Already transformed.
+  if (spacingInput.mui) {
+    return spacingInput;
+  }
+  const spacing = (...argsInput) => {
+    const args = argsInput.length === 0 ? [1] : argsInput;
+    return args.map(argument => {
+      const output = transform(argument);
+      return typeof output === 'number' ? `${output}px` : output;
+    }).join(' ');
+  };
+  spacing.mui = true;
+  return spacing;
+}
+
+function compose(...styles) {
+  const handlers = styles.reduce((acc, style) => {
+    style.filterProps.forEach(prop => {
+      acc[prop] = style;
+    });
+    return acc;
+  }, {});
+
+  // false positive
+  // eslint-disable-next-line react/function-component-definition
+  const fn = props => {
+    return Object.keys(props).reduce((acc, prop) => {
+      if (handlers[prop]) {
+        return merge(acc, handlers[prop](props));
+      }
+      return acc;
+    }, {});
+  };
+  fn.propTypes = {};
+  fn.filterProps = styles.reduce((acc, style) => acc.concat(style.filterProps), []);
+  return fn;
+}
+
+function borderTransform(value) {
+  if (typeof value !== 'number') {
+    return value;
+  }
+  return `${value}px solid`;
+}
+function createBorderStyle(prop, transform) {
+  return style$1({
+    prop,
+    themeKey: 'borders',
+    transform
+  });
+}
+const border = createBorderStyle('border', borderTransform);
+const borderTop = createBorderStyle('borderTop', borderTransform);
+const borderRight = createBorderStyle('borderRight', borderTransform);
+const borderBottom = createBorderStyle('borderBottom', borderTransform);
+const borderLeft = createBorderStyle('borderLeft', borderTransform);
+const borderColor = createBorderStyle('borderColor');
+const borderTopColor = createBorderStyle('borderTopColor');
+const borderRightColor = createBorderStyle('borderRightColor');
+const borderBottomColor = createBorderStyle('borderBottomColor');
+const borderLeftColor = createBorderStyle('borderLeftColor');
+const outline = createBorderStyle('outline', borderTransform);
+const outlineColor = createBorderStyle('outlineColor');
+
+// false positive
+// eslint-disable-next-line react/function-component-definition
+const borderRadius = props => {
+  if (props.borderRadius !== undefined && props.borderRadius !== null) {
+    const transformer = createUnaryUnit(props.theme, 'shape.borderRadius', 4);
+    const styleFromPropValue = propValue => ({
+      borderRadius: getValue(transformer, propValue)
+    });
+    return handleBreakpoints(props, props.borderRadius, styleFromPropValue);
+  }
+  return null;
+};
+borderRadius.propTypes = {};
+borderRadius.filterProps = ['borderRadius'];
+compose(border, borderTop, borderRight, borderBottom, borderLeft, borderColor, borderTopColor, borderRightColor, borderBottomColor, borderLeftColor, borderRadius, outline, outlineColor);
+
+// false positive
+// eslint-disable-next-line react/function-component-definition
+const gap = props => {
+  if (props.gap !== undefined && props.gap !== null) {
+    const transformer = createUnaryUnit(props.theme, 'spacing', 8);
+    const styleFromPropValue = propValue => ({
+      gap: getValue(transformer, propValue)
+    });
+    return handleBreakpoints(props, props.gap, styleFromPropValue);
+  }
+  return null;
+};
+gap.propTypes = {};
+gap.filterProps = ['gap'];
+
+// false positive
+// eslint-disable-next-line react/function-component-definition
+const columnGap = props => {
+  if (props.columnGap !== undefined && props.columnGap !== null) {
+    const transformer = createUnaryUnit(props.theme, 'spacing', 8);
+    const styleFromPropValue = propValue => ({
+      columnGap: getValue(transformer, propValue)
+    });
+    return handleBreakpoints(props, props.columnGap, styleFromPropValue);
+  }
+  return null;
+};
+columnGap.propTypes = {};
+columnGap.filterProps = ['columnGap'];
+
+// false positive
+// eslint-disable-next-line react/function-component-definition
+const rowGap = props => {
+  if (props.rowGap !== undefined && props.rowGap !== null) {
+    const transformer = createUnaryUnit(props.theme, 'spacing', 8);
+    const styleFromPropValue = propValue => ({
+      rowGap: getValue(transformer, propValue)
+    });
+    return handleBreakpoints(props, props.rowGap, styleFromPropValue);
+  }
+  return null;
+};
+rowGap.propTypes = {};
+rowGap.filterProps = ['rowGap'];
+const gridColumn = style$1({
+  prop: 'gridColumn'
+});
+const gridRow = style$1({
+  prop: 'gridRow'
+});
+const gridAutoFlow = style$1({
+  prop: 'gridAutoFlow'
+});
+const gridAutoColumns = style$1({
+  prop: 'gridAutoColumns'
+});
+const gridAutoRows = style$1({
+  prop: 'gridAutoRows'
+});
+const gridTemplateColumns = style$1({
+  prop: 'gridTemplateColumns'
+});
+const gridTemplateRows = style$1({
+  prop: 'gridTemplateRows'
+});
+const gridTemplateAreas = style$1({
+  prop: 'gridTemplateAreas'
+});
+const gridArea = style$1({
+  prop: 'gridArea'
+});
+compose(gap, columnGap, rowGap, gridColumn, gridRow, gridAutoFlow, gridAutoColumns, gridAutoRows, gridTemplateColumns, gridTemplateRows, gridTemplateAreas, gridArea);
+
+function paletteTransform(value, userValue) {
+  if (userValue === 'grey') {
+    return userValue;
+  }
+  return value;
+}
+const color = style$1({
+  prop: 'color',
+  themeKey: 'palette',
+  transform: paletteTransform
+});
+const bgcolor = style$1({
+  prop: 'bgcolor',
+  cssProperty: 'backgroundColor',
+  themeKey: 'palette',
+  transform: paletteTransform
+});
+const backgroundColor = style$1({
+  prop: 'backgroundColor',
+  themeKey: 'palette',
+  transform: paletteTransform
+});
+compose(color, bgcolor, backgroundColor);
+
+function sizingTransform(value) {
+  return value <= 1 && value !== 0 ? `${value * 100}%` : value;
+}
+const width = style$1({
+  prop: 'width',
+  transform: sizingTransform
+});
+const maxWidth = props => {
+  if (props.maxWidth !== undefined && props.maxWidth !== null) {
+    const styleFromPropValue = propValue => {
+      const breakpoint = props.theme?.breakpoints?.values?.[propValue] || values[propValue];
+      if (!breakpoint) {
+        return {
+          maxWidth: sizingTransform(propValue)
+        };
+      }
+      if (props.theme?.breakpoints?.unit !== 'px') {
+        return {
+          maxWidth: `${breakpoint}${props.theme.breakpoints.unit}`
+        };
+      }
+      return {
+        maxWidth: breakpoint
+      };
+    };
+    return handleBreakpoints(props, props.maxWidth, styleFromPropValue);
+  }
+  return null;
+};
+maxWidth.filterProps = ['maxWidth'];
+const minWidth = style$1({
+  prop: 'minWidth',
+  transform: sizingTransform
+});
+const height = style$1({
+  prop: 'height',
+  transform: sizingTransform
+});
+const maxHeight = style$1({
+  prop: 'maxHeight',
+  transform: sizingTransform
+});
+const minHeight = style$1({
+  prop: 'minHeight',
+  transform: sizingTransform
+});
+style$1({
+  prop: 'size',
+  cssProperty: 'width',
+  transform: sizingTransform
+});
+style$1({
+  prop: 'size',
+  cssProperty: 'height',
+  transform: sizingTransform
+});
+const boxSizing = style$1({
+  prop: 'boxSizing'
+});
+compose(width, maxWidth, minWidth, height, maxHeight, minHeight, boxSizing);
+
+const defaultSxConfig = {
+  // borders
+  border: {
+    themeKey: 'borders',
+    transform: borderTransform
+  },
+  borderTop: {
+    themeKey: 'borders',
+    transform: borderTransform
+  },
+  borderRight: {
+    themeKey: 'borders',
+    transform: borderTransform
+  },
+  borderBottom: {
+    themeKey: 'borders',
+    transform: borderTransform
+  },
+  borderLeft: {
+    themeKey: 'borders',
+    transform: borderTransform
+  },
+  borderColor: {
+    themeKey: 'palette'
+  },
+  borderTopColor: {
+    themeKey: 'palette'
+  },
+  borderRightColor: {
+    themeKey: 'palette'
+  },
+  borderBottomColor: {
+    themeKey: 'palette'
+  },
+  borderLeftColor: {
+    themeKey: 'palette'
+  },
+  outline: {
+    themeKey: 'borders',
+    transform: borderTransform
+  },
+  outlineColor: {
+    themeKey: 'palette'
+  },
+  borderRadius: {
+    themeKey: 'shape.borderRadius',
+    style: borderRadius
+  },
+  // palette
+  color: {
+    themeKey: 'palette',
+    transform: paletteTransform
+  },
+  bgcolor: {
+    themeKey: 'palette',
+    cssProperty: 'backgroundColor',
+    transform: paletteTransform
+  },
+  backgroundColor: {
+    themeKey: 'palette',
+    transform: paletteTransform
+  },
+  // spacing
+  p: {
+    style: padding
+  },
+  pt: {
+    style: padding
+  },
+  pr: {
+    style: padding
+  },
+  pb: {
+    style: padding
+  },
+  pl: {
+    style: padding
+  },
+  px: {
+    style: padding
+  },
+  py: {
+    style: padding
+  },
+  padding: {
+    style: padding
+  },
+  paddingTop: {
+    style: padding
+  },
+  paddingRight: {
+    style: padding
+  },
+  paddingBottom: {
+    style: padding
+  },
+  paddingLeft: {
+    style: padding
+  },
+  paddingX: {
+    style: padding
+  },
+  paddingY: {
+    style: padding
+  },
+  paddingInline: {
+    style: padding
+  },
+  paddingInlineStart: {
+    style: padding
+  },
+  paddingInlineEnd: {
+    style: padding
+  },
+  paddingBlock: {
+    style: padding
+  },
+  paddingBlockStart: {
+    style: padding
+  },
+  paddingBlockEnd: {
+    style: padding
+  },
+  m: {
+    style: margin
+  },
+  mt: {
+    style: margin
+  },
+  mr: {
+    style: margin
+  },
+  mb: {
+    style: margin
+  },
+  ml: {
+    style: margin
+  },
+  mx: {
+    style: margin
+  },
+  my: {
+    style: margin
+  },
+  margin: {
+    style: margin
+  },
+  marginTop: {
+    style: margin
+  },
+  marginRight: {
+    style: margin
+  },
+  marginBottom: {
+    style: margin
+  },
+  marginLeft: {
+    style: margin
+  },
+  marginX: {
+    style: margin
+  },
+  marginY: {
+    style: margin
+  },
+  marginInline: {
+    style: margin
+  },
+  marginInlineStart: {
+    style: margin
+  },
+  marginInlineEnd: {
+    style: margin
+  },
+  marginBlock: {
+    style: margin
+  },
+  marginBlockStart: {
+    style: margin
+  },
+  marginBlockEnd: {
+    style: margin
+  },
+  // display
+  displayPrint: {
+    cssProperty: false,
+    transform: value => ({
+      '@media print': {
+        display: value
+      }
+    })
+  },
+  display: {},
+  overflow: {},
+  textOverflow: {},
+  visibility: {},
+  whiteSpace: {},
+  // flexbox
+  flexBasis: {},
+  flexDirection: {},
+  flexWrap: {},
+  justifyContent: {},
+  alignItems: {},
+  alignContent: {},
+  order: {},
+  flex: {},
+  flexGrow: {},
+  flexShrink: {},
+  alignSelf: {},
+  justifyItems: {},
+  justifySelf: {},
+  // grid
+  gap: {
+    style: gap
+  },
+  rowGap: {
+    style: rowGap
+  },
+  columnGap: {
+    style: columnGap
+  },
+  gridColumn: {},
+  gridRow: {},
+  gridAutoFlow: {},
+  gridAutoColumns: {},
+  gridAutoRows: {},
+  gridTemplateColumns: {},
+  gridTemplateRows: {},
+  gridTemplateAreas: {},
+  gridArea: {},
+  // positions
+  position: {},
+  zIndex: {
+    themeKey: 'zIndex'
+  },
+  top: {},
+  right: {},
+  bottom: {},
+  left: {},
+  // shadows
+  boxShadow: {
+    themeKey: 'shadows'
+  },
+  // sizing
+  width: {
+    transform: sizingTransform
+  },
+  maxWidth: {
+    style: maxWidth
+  },
+  minWidth: {
+    transform: sizingTransform
+  },
+  height: {
+    transform: sizingTransform
+  },
+  maxHeight: {
+    transform: sizingTransform
+  },
+  minHeight: {
+    transform: sizingTransform
+  },
+  boxSizing: {},
+  // typography
+  font: {
+    themeKey: 'font'
+  },
+  fontFamily: {
+    themeKey: 'typography'
+  },
+  fontSize: {
+    themeKey: 'typography'
+  },
+  fontStyle: {
+    themeKey: 'typography'
+  },
+  fontWeight: {
+    themeKey: 'typography'
+  },
+  letterSpacing: {},
+  textTransform: {},
+  lineHeight: {},
+  textAlign: {},
+  typography: {
+    cssProperty: false,
+    themeKey: 'typography'
+  }
+};
+
+function objectsHaveSameKeys(...objects) {
+  const allKeys = objects.reduce((keys, object) => keys.concat(Object.keys(object)), []);
+  const union = new Set(allKeys);
+  return objects.every(object => union.size === Object.keys(object).length);
+}
+function callIfFn(maybeFn, arg) {
+  return typeof maybeFn === 'function' ? maybeFn(arg) : maybeFn;
+}
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
+function unstable_createStyleFunctionSx() {
+  function getThemeValue(prop, val, theme, config) {
+    const props = {
+      [prop]: val,
+      theme
+    };
+    const options = config[prop];
+    if (!options) {
+      return {
+        [prop]: val
+      };
+    }
+    const {
+      cssProperty = prop,
+      themeKey,
+      transform,
+      style
+    } = options;
+    if (val == null) {
+      return null;
+    }
+
+    // TODO v6: remove, see https://github.com/mui/material-ui/pull/38123
+    if (themeKey === 'typography' && val === 'inherit') {
+      return {
+        [prop]: val
+      };
+    }
+    const themeMapping = getPath(theme, themeKey) || {};
+    if (style) {
+      return style(props);
+    }
+    const styleFromPropValue = propValueFinal => {
+      let value = getStyleValue(themeMapping, transform, propValueFinal);
+      if (propValueFinal === value && typeof propValueFinal === 'string') {
+        // Haven't found value
+        value = getStyleValue(themeMapping, transform, `${prop}${propValueFinal === 'default' ? '' : capitalize(propValueFinal)}`, propValueFinal);
+      }
+      if (cssProperty === false) {
+        return value;
+      }
+      return {
+        [cssProperty]: value
+      };
+    };
+    return handleBreakpoints(props, val, styleFromPropValue);
+  }
+  function styleFunctionSx(props) {
+    const {
+      sx,
+      theme = {},
+      nested
+    } = props || {};
+    if (!sx) {
+      return null; // Emotion & styled-components will neglect null
+    }
+    const config = theme.unstable_sxConfig ?? defaultSxConfig;
+
+    /*
+     * Receive `sxInput` as object or callback
+     * and then recursively check keys & values to create media query object styles.
+     * (the result will be used in `styled`)
+     */
+    function traverse(sxInput) {
+      let sxObject = sxInput;
+      if (typeof sxInput === 'function') {
+        sxObject = sxInput(theme);
+      } else if (typeof sxInput !== 'object') {
+        // value
+        return sxInput;
+      }
+      if (!sxObject) {
+        return null;
+      }
+      const emptyBreakpoints = createEmptyBreakpointObject(theme.breakpoints);
+      const breakpointsKeys = Object.keys(emptyBreakpoints);
+      let css = emptyBreakpoints;
+      Object.keys(sxObject).forEach(styleKey => {
+        const value = callIfFn(sxObject[styleKey], theme);
+        if (value !== null && value !== undefined) {
+          if (typeof value === 'object') {
+            if (config[styleKey]) {
+              css = merge(css, getThemeValue(styleKey, value, theme, config));
+            } else {
+              const breakpointsValues = handleBreakpoints({
+                theme
+              }, value, x => ({
+                [styleKey]: x
+              }));
+              if (objectsHaveSameKeys(breakpointsValues, value)) {
+                css[styleKey] = styleFunctionSx({
+                  sx: value,
+                  theme,
+                  nested: true
+                });
+              } else {
+                css = merge(css, breakpointsValues);
+              }
+            }
+          } else {
+            css = merge(css, getThemeValue(styleKey, value, theme, config));
+          }
+        }
+      });
+      if (!nested && theme.modularCssLayers) {
+        return {
+          '@layer sx': sortContainerQueries(theme, removeUnusedBreakpoints(breakpointsKeys, css))
+        };
+      }
+      return sortContainerQueries(theme, removeUnusedBreakpoints(breakpointsKeys, css));
+    }
+    return Array.isArray(sx) ? sx.map(traverse) : traverse(sx);
+  }
+  return styleFunctionSx;
+}
+const styleFunctionSx = unstable_createStyleFunctionSx();
+styleFunctionSx.filterProps = ['sx'];
+
+/**
+ * A universal utility to style components with multiple color modes. Always use it from the theme object.
+ * It works with:
+ *  - [Basic theme](https://mui.com/material-ui/customization/dark-mode/)
+ *  - [CSS theme variables](https://mui.com/material-ui/customization/css-theme-variables/overview/)
+ *  - Zero-runtime engine
+ *
+ * Tips: Use an array over object spread and place `theme.applyStyles()` last.
+ *
+ * With the styled function:
+ * ✅ [{ background: '#e5e5e5' }, theme.applyStyles('dark', { background: '#1c1c1c' })]
+ * 🚫 { background: '#e5e5e5', ...theme.applyStyles('dark', { background: '#1c1c1c' })}
+ *
+ * With the sx prop:
+ * ✅ [{ background: '#e5e5e5' }, theme => theme.applyStyles('dark', { background: '#1c1c1c' })]
+ * 🚫 { background: '#e5e5e5', ...theme => theme.applyStyles('dark', { background: '#1c1c1c' })}
+ *
+ * @example
+ * 1. using with `styled`:
+ * ```jsx
+ *   const Component = styled('div')(({ theme }) => [
+ *     { background: '#e5e5e5' },
+ *     theme.applyStyles('dark', {
+ *       background: '#1c1c1c',
+ *       color: '#fff',
+ *     }),
+ *   ]);
+ * ```
+ *
+ * @example
+ * 2. using with `sx` prop:
+ * ```jsx
+ *   <Box sx={[
+ *     { background: '#e5e5e5' },
+ *     theme => theme.applyStyles('dark', {
+ *        background: '#1c1c1c',
+ *        color: '#fff',
+ *      }),
+ *     ]}
+ *   />
+ * ```
+ *
+ * @example
+ * 3. theming a component:
+ * ```jsx
+ *   extendTheme({
+ *     components: {
+ *       MuiButton: {
+ *         styleOverrides: {
+ *           root: ({ theme }) => [
+ *             { background: '#e5e5e5' },
+ *             theme.applyStyles('dark', {
+ *               background: '#1c1c1c',
+ *               color: '#fff',
+ *             }),
+ *           ],
+ *         },
+ *       }
+ *     }
+ *   })
+ *```
+ */
+function applyStyles(key, styles) {
+  // @ts-expect-error this is 'any' type
+  const theme = this;
+  if (theme.vars) {
+    if (!theme.colorSchemes?.[key] || typeof theme.getColorSchemeSelector !== 'function') {
+      return {};
+    }
+    // If CssVarsProvider is used as a provider, returns '*:where({selector}) &'
+    let selector = theme.getColorSchemeSelector(key);
+    if (selector === '&') {
+      return styles;
+    }
+    if (selector.includes('data-') || selector.includes('.')) {
+      // '*' is required as a workaround for Emotion issue (https://github.com/emotion-js/emotion/issues/2836)
+      selector = `*:where(${selector.replace(/\s*&$/, '')}) &`;
+    }
+    return {
+      [selector]: styles
+    };
+  }
+  if (theme.palette.mode === key) {
+    return styles;
+  }
+  return {};
+}
+
+function createTheme$1(options = {}, ...args) {
+  const {
+    breakpoints: breakpointsInput = {},
+    palette: paletteInput = {},
+    spacing: spacingInput,
+    shape: shapeInput = {},
+    ...other
+  } = options;
+  const breakpoints = createBreakpoints(breakpointsInput);
+  const spacing = createSpacing(spacingInput);
+  let muiTheme = deepmerge({
+    breakpoints,
+    direction: 'ltr',
+    components: {},
+    // Inject component definitions.
+    palette: {
+      mode: 'light',
+      ...paletteInput
+    },
+    spacing,
+    shape: {
+      ...shape,
+      ...shapeInput
+    }
+  }, other);
+  muiTheme = cssContainerQueries(muiTheme);
+  muiTheme.applyStyles = applyStyles;
+  muiTheme = args.reduce((acc, argument) => deepmerge(acc, argument), muiTheme);
+  muiTheme.unstable_sxConfig = {
+    ...defaultSxConfig,
+    ...other?.unstable_sxConfig
+  };
+  muiTheme.unstable_sx = function sx(props) {
+    return styleFunctionSx({
+      sx: props,
+      theme: this
+    });
+  };
+  return muiTheme;
+}
+
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable no-labels */
+/* eslint-disable no-lone-blocks */
+
+createTheme$1();
+
+// Update /system/styled/#api in case if this changes
+function shouldForwardProp(prop) {
+  return prop !== 'ownerState' && prop !== 'theme' && prop !== 'sx' && prop !== 'as';
+}
+
+function useTreeItemState(itemId) {
+  const {
+    instance,
+    items: {
+      onItemClick
+    },
+    selection: {
+      multiSelect,
+      checkboxSelection,
+      disableSelection
+    },
+    expansion: {
+      expansionTrigger
+    }
+  } = useTreeViewContext();
+  const expandable = instance.isItemExpandable(itemId);
+  const expanded = instance.isItemExpanded(itemId);
+  const focused = instance.isItemFocused(itemId);
+  const selected = instance.isItemSelected(itemId);
+  const disabled = instance.isItemDisabled(itemId);
+  const editing = instance?.isItemBeingEdited ? instance?.isItemBeingEdited(itemId) : false;
+  const editable = instance.isItemEditable ? instance.isItemEditable(itemId) : false;
+  const handleExpansion = event => {
+    if (!disabled) {
+      if (!focused) {
+        instance.focusItem(event, itemId);
+      }
+      const multiple = multiSelect && (event.shiftKey || event.ctrlKey || event.metaKey);
+
+      // If already expanded and trying to toggle selection don't close
+      if (expandable && !(multiple && instance.isItemExpanded(itemId))) {
+        instance.toggleItemExpansion(event, itemId);
+      }
+    }
+  };
+  const handleSelection = event => {
+    if (!disabled) {
+      if (!focused && !editing) {
+        instance.focusItem(event, itemId);
+      }
+      const multiple = multiSelect && (event.shiftKey || event.ctrlKey || event.metaKey);
+      if (multiple) {
+        if (event.shiftKey) {
+          instance.expandSelectionRange(event, itemId);
+        } else {
+          instance.selectItem({
+            event,
+            itemId,
+            keepExistingSelection: true
+          });
+        }
+      } else {
+        instance.selectItem({
+          event,
+          itemId,
+          shouldBeSelected: true
+        });
+      }
+    }
+  };
+  const handleCheckboxSelection = event => {
+    if (disableSelection || disabled) {
+      return;
+    }
+    const hasShift = event.nativeEvent.shiftKey;
+    if (multiSelect && hasShift) {
+      instance.expandSelectionRange(event, itemId);
+    } else {
+      instance.selectItem({
+        event,
+        itemId,
+        keepExistingSelection: multiSelect,
+        shouldBeSelected: event.target.checked
+      });
+    }
+  };
+  const preventSelection = event => {
+    if (event.shiftKey || event.ctrlKey || event.metaKey || disabled) {
+      // Prevent text selection
+      event.preventDefault();
+    }
+  };
+  const toggleItemEditing = () => {
+    if (!hasPlugin(instance, useTreeViewLabel)) {
+      return;
+    }
+    if (instance.isItemEditable(itemId)) {
+      if (instance.isItemBeingEdited(itemId)) {
+        instance.setEditedItemId(null);
+      } else {
+        instance.setEditedItemId(itemId);
+      }
+    }
+  };
+  const handleSaveItemLabel = (event, label) => {
+    if (!hasPlugin(instance, useTreeViewLabel)) {
+      return;
+    }
+
+    // As a side effect of `instance.focusItem` called here and in `handleCancelItemLabelEditing` the `labelInput` is blurred
+    // The `onBlur` event is triggered, which calls `handleSaveItemLabel` again.
+    // To avoid creating an unwanted behavior we need to check if the item is being edited before calling `updateItemLabel`
+    // using `instance.isItemBeingEditedRef` instead of `instance.isItemBeingEdited` since the state is not yet updated in this point
+    if (instance.isItemBeingEditedRef(itemId)) {
+      instance.updateItemLabel(itemId, label);
+      toggleItemEditing();
+      instance.focusItem(event, itemId);
+    }
+  };
+  const handleCancelItemLabelEditing = event => {
+    if (!hasPlugin(instance, useTreeViewLabel)) {
+      return;
+    }
+    if (instance.isItemBeingEditedRef(itemId)) {
+      toggleItemEditing();
+      instance.focusItem(event, itemId);
+    }
+  };
+  return {
+    disabled,
+    expanded,
+    selected,
+    focused,
+    editable,
+    editing,
+    disableSelection,
+    checkboxSelection,
+    handleExpansion,
+    handleSelection,
+    handleCheckboxSelection,
+    handleContentClick: onItemClick,
+    preventSelection,
+    expansionTrigger,
+    toggleItemEditing,
+    handleSaveItemLabel,
+    handleCancelItemLabelEditing
+  };
+}
+
+const TreeItem2DragAndDropOverlayRoot = styled('div', {
+  name: 'MuiTreeItem2DragAndDropOverlay',
+  slot: 'Root',
+  overridesResolver: (props, styles) => styles.root,
+  shouldForwardProp: prop => shouldForwardProp(prop) && prop !== 'action'
+})(({
+  theme
+}) => ({
+  position: 'absolute',
+  left: 0,
+  display: 'flex',
+  top: 0,
+  bottom: 0,
+  right: 0,
+  pointerEvents: 'none',
+  variants: [{
+    props: {
+      action: 'make-child'
+    },
+    style: {
+      marginLeft: 'calc(var(--TreeView-indentMultiplier) * var(--TreeView-itemDepth))',
+      borderRadius: theme.shape.borderRadius,
+      backgroundColor: theme.vars ? `rgba(${theme.vars.palette.primary.darkChannel} / ${theme.vars.palette.action.focusOpacity})` : alpha$1(theme.palette.primary.dark, theme.palette.action.focusOpacity)
+    }
+  }, {
+    props: {
+      action: 'reorder-above'
+    },
+    style: {
+      marginLeft: 'calc(var(--TreeView-indentMultiplier) * var(--TreeView-itemDepth))',
+      borderTop: `1px solid ${(theme.vars || theme).palette.action.active}`
+    }
+  }, {
+    props: {
+      action: 'reorder-below'
+    },
+    style: {
+      marginLeft: 'calc(var(--TreeView-indentMultiplier) * var(--TreeView-itemDepth))',
+      borderBottom: `1px solid ${(theme.vars || theme).palette.action.active}`
+    }
+  }, {
+    props: {
+      action: 'move-to-parent'
+    },
+    style: {
+      marginLeft: 'calc(var(--TreeView-indentMultiplier) * calc(var(--TreeView-itemDepth) - 1))',
+      borderBottom: `1px solid ${(theme.vars || theme).palette.action.active}`
+    }
+  }]
+}));
+function TreeItem2DragAndDropOverlay(props) {
+  if (props.action == null) {
+    return null;
+  }
+  return /*#__PURE__*/jsx(TreeItem2DragAndDropOverlayRoot, _extends({}, props));
+}
+
+/**
+ * @ignore - internal component.
+ */
+const TreeItem2LabelInput = styled('input', {
+  name: 'MuiTreeItem2',
+  slot: 'LabelInput',
+  overridesResolver: (props, styles) => styles.labelInput
+})(({
+  theme
+}) => _extends({}, theme.typography.body1, {
+  width: '100%',
+  backgroundColor: theme.palette.background.paper,
+  borderRadius: theme.shape.borderRadius,
+  border: 'none',
+  padding: '0 2px',
+  boxSizing: 'border-box',
+  '&:focus': {
+    outline: `1px solid ${theme.palette.primary.main}`
+  }
+}));
+
+const _excluded$2 = ["classes", "className", "displayIcon", "expansionIcon", "icon", "label", "itemId", "onClick", "onMouseDown", "dragAndDropOverlayProps", "labelInputProps"];
+/**
+ * @ignore - internal component.
+ */
+const TreeItemContent = /*#__PURE__*/React.forwardRef(function TreeItemContent(props, ref) {
+  const {
+      classes,
+      className,
+      displayIcon,
+      expansionIcon,
+      icon: iconProp,
+      label,
+      itemId,
+      onClick,
+      onMouseDown,
+      dragAndDropOverlayProps,
+      labelInputProps
+    } = props,
+    other = _objectWithoutPropertiesLoose(props, _excluded$2);
+  const {
+    disabled,
+    expanded,
+    selected,
+    focused,
+    editing,
+    editable,
+    disableSelection,
+    checkboxSelection,
+    handleExpansion,
+    handleSelection,
+    handleCheckboxSelection,
+    handleContentClick,
+    preventSelection,
+    expansionTrigger,
+    toggleItemEditing
+  } = useTreeItemState(itemId);
+  const icon = iconProp || expansionIcon || displayIcon;
+  const checkboxRef = React.useRef(null);
+  const handleMouseDown = event => {
+    preventSelection(event);
+    if (onMouseDown) {
+      onMouseDown(event);
+    }
+  };
+  const handleClick = event => {
+    handleContentClick?.(event, itemId);
+    if (checkboxRef.current?.contains(event.target)) {
+      return;
+    }
+    if (expansionTrigger === 'content') {
+      handleExpansion(event);
+    }
+    if (!checkboxSelection) {
+      handleSelection(event);
+    }
+    if (onClick) {
+      onClick(event);
+    }
+  };
+
+  // If we click on the expansion icon and expansionTrigger is "iconContainer", we expand or collapse the tree item.
+  const handleIconClick = expansionIcon != null && icon === expansionIcon && expansionTrigger === 'iconContainer' ? event => {
+    if (expansionIcon != null && icon === expansionIcon && expansionTrigger === 'iconContainer') {
+      handleExpansion(event);
+    }
+  } : undefined;
+  const handleLabelDoubleClick = event => {
+    if (event.defaultMuiPrevented) {
+      return;
+    }
+    toggleItemEditing();
+  };
+  return /*#__PURE__*/ /* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions -- Key event is handled by the TreeView */jsxs("div", _extends({}, other, {
+    className: clsx(classes.root, className, expanded && classes.expanded, selected && classes.selected, focused && classes.focused, disabled && classes.disabled, editing && classes.editing, editable && classes.editable),
+    onClick: handleClick,
+    onMouseDown: handleMouseDown,
+    ref: ref,
+    children: [/*#__PURE__*/jsx("div", {
+      className: classes.iconContainer,
+      onClick: handleIconClick,
+      children: icon
+    }), checkboxSelection && /*#__PURE__*/jsx(Checkbox$1, {
+      className: classes.checkbox,
+      checked: selected,
+      onChange: handleCheckboxSelection,
+      disabled: disabled || disableSelection,
+      ref: checkboxRef,
+      tabIndex: -1
+    }), editing ? /*#__PURE__*/jsx(TreeItem2LabelInput, _extends({}, labelInputProps, {
+      className: classes.labelInput
+    })) : /*#__PURE__*/jsx("div", _extends({
+      className: classes.label
+    }, editable && {
+      onDoubleClick: handleLabelDoubleClick
+    }, {
+      children: label
+    })), dragAndDropOverlayProps && /*#__PURE__*/jsx(TreeItem2DragAndDropOverlay, _extends({}, dragAndDropOverlayProps))]
+  }));
+});
+
+function getTreeItemUtilityClass(slot) {
+  return generateUtilityClass('MuiTreeItem', slot);
+}
+const treeItemClasses = generateUtilityClasses('MuiTreeItem', ['root', 'groupTransition', 'content', 'expanded', 'selected', 'focused', 'disabled', 'iconContainer', 'label', 'checkbox', 'labelInput', 'editable', 'editing', 'dragAndDropOverlay']);
+
+const TreeViewExpandIcon = createSvgIcon(/*#__PURE__*/jsx("path", {
+  d: "M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+}), 'TreeViewExpandIcon');
+const TreeViewCollapseIcon = createSvgIcon(/*#__PURE__*/jsx("path", {
+  d: "M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
+}), 'TreeViewCollapseIcon');
+
+function TreeItem2Provider(props) {
+  const {
+    children,
+    itemId
+  } = props;
+  const {
+    wrapItem,
+    instance
+  } = useTreeViewContext();
+  return wrapItem({
+    children,
+    itemId,
+    instance
+  });
+}
+TreeItem2Provider.propTypes = {
+  // ----------------------------- Warning --------------------------------
+  // | These PropTypes are generated from the TypeScript type definitions |
+  // | To update them edit the TypeScript types and run "pnpm proptypes"  |
+  // ----------------------------------------------------------------------
+  children: PropTypes.node,
+  itemId: PropTypes.string.isRequired
+};
+
+const _excluded$1 = ["children", "className", "slots", "slotProps", "ContentComponent", "ContentProps", "itemId", "id", "label", "onClick", "onMouseDown", "onFocus", "onBlur", "onKeyDown"],
+  _excluded2 = ["ownerState"],
+  _excluded3 = ["ownerState"],
+  _excluded4 = ["ownerState"];
+const useThemeProps = createUseThemeProps();
+const useUtilityClasses = ownerState => {
+  const {
+    classes
+  } = ownerState;
+  const slots = {
+    root: ['root'],
+    content: ['content'],
+    expanded: ['expanded'],
+    selected: ['selected'],
+    focused: ['focused'],
+    disabled: ['disabled'],
+    iconContainer: ['iconContainer'],
+    checkbox: ['checkbox'],
+    label: ['label'],
+    labelInput: ['labelInput'],
+    editing: ['editing'],
+    editable: ['editable'],
+    groupTransition: ['groupTransition']
+  };
+  return composeClasses(slots, getTreeItemUtilityClass, classes);
+};
+const TreeItemRoot = styled('li', {
+  name: 'MuiTreeItem',
+  slot: 'Root',
+  overridesResolver: (props, styles) => styles.root
+})({
+  listStyle: 'none',
+  margin: 0,
+  padding: 0,
+  outline: 0
+});
+const StyledTreeItemContent = styled(TreeItemContent, {
+  name: 'MuiTreeItem',
+  slot: 'Content',
+  overridesResolver: (props, styles) => {
+    return [styles.content, styles.iconContainer && {
+      [`& .${treeItemClasses.iconContainer}`]: styles.iconContainer
+    }, styles.label && {
+      [`& .${treeItemClasses.label}`]: styles.label
+    }];
+  },
+  shouldForwardProp: prop => shouldForwardProp(prop) && prop !== 'indentationAtItemLevel'
+})(({
+  theme
+}) => ({
+  padding: theme.spacing(0.5, 1),
+  borderRadius: theme.shape.borderRadius,
+  width: '100%',
+  boxSizing: 'border-box',
+  // prevent width + padding to overflow
+  position: 'relative',
+  display: 'flex',
+  alignItems: 'center',
+  gap: theme.spacing(1),
+  cursor: 'pointer',
+  WebkitTapHighlightColor: 'transparent',
+  '&:hover': {
+    backgroundColor: (theme.vars || theme).palette.action.hover,
+    // Reset on touch devices, it doesn't add specificity
+    '@media (hover: none)': {
+      backgroundColor: 'transparent'
+    }
+  },
+  [`&.${treeItemClasses.disabled}`]: {
+    opacity: (theme.vars || theme).palette.action.disabledOpacity,
+    backgroundColor: 'transparent'
+  },
+  [`&.${treeItemClasses.focused}`]: {
+    backgroundColor: (theme.vars || theme).palette.action.focus
+  },
+  [`&.${treeItemClasses.selected}`]: {
+    backgroundColor: theme.vars ? `rgba(${theme.vars.palette.primary.mainChannel} / ${theme.vars.palette.action.selectedOpacity})` : alpha$1(theme.palette.primary.main, theme.palette.action.selectedOpacity),
+    '&:hover': {
+      backgroundColor: theme.vars ? `rgba(${theme.vars.palette.primary.mainChannel} / calc(${theme.vars.palette.action.selectedOpacity} + ${theme.vars.palette.action.hoverOpacity}))` : alpha$1(theme.palette.primary.main, theme.palette.action.selectedOpacity + theme.palette.action.hoverOpacity),
+      // Reset on touch devices, it doesn't add specificity
+      '@media (hover: none)': {
+        backgroundColor: theme.vars ? `rgba(${theme.vars.palette.primary.mainChannel} / ${theme.vars.palette.action.selectedOpacity})` : alpha$1(theme.palette.primary.main, theme.palette.action.selectedOpacity)
+      }
+    },
+    [`&.${treeItemClasses.focused}`]: {
+      backgroundColor: theme.vars ? `rgba(${theme.vars.palette.primary.mainChannel} / calc(${theme.vars.palette.action.selectedOpacity} + ${theme.vars.palette.action.focusOpacity}))` : alpha$1(theme.palette.primary.main, theme.palette.action.selectedOpacity + theme.palette.action.focusOpacity)
+    }
+  },
+  [`& .${treeItemClasses.iconContainer}`]: {
+    width: 16,
+    display: 'flex',
+    flexShrink: 0,
+    justifyContent: 'center',
+    '& svg': {
+      fontSize: 18
+    }
+  },
+  [`& .${treeItemClasses.label}`]: _extends({
+    width: '100%',
+    boxSizing: 'border-box',
+    // prevent width + padding to overflow
+    // fixes overflow - see https://github.com/mui/material-ui/issues/27372
+    minWidth: 0,
+    position: 'relative'
+  }, theme.typography.body1),
+  [`& .${treeItemClasses.checkbox}`]: {
+    padding: 0
+  },
+  variants: [{
+    props: {
+      indentationAtItemLevel: true
+    },
+    style: {
+      paddingLeft: `calc(${theme.spacing(1)} + var(--TreeView-itemChildrenIndentation) * var(--TreeView-itemDepth))`
+    }
+  }]
+}));
+const TreeItemGroup = styled(Collapse, {
+  name: 'MuiTreeItem',
+  slot: 'GroupTransition',
+  overridesResolver: (props, styles) => styles.groupTransition,
+  shouldForwardProp: prop => shouldForwardProp(prop) && prop !== 'indentationAtItemLevel'
+})({
+  margin: 0,
+  padding: 0,
+  paddingLeft: 'var(--TreeView-itemChildrenIndentation)',
+  variants: [{
+    props: {
+      indentationAtItemLevel: true
+    },
+    style: {
+      paddingLeft: 0
+    }
+  }]
+});
+
+/**
+ *
+ * Demos:
+ *
+ * - [Tree View](https://mui.com/x/react-tree-view/)
+ *
+ * API:
+ *
+ * - [TreeItem API](https://mui.com/x/api/tree-view/tree-item/)
+ */
+const TreeItem = /*#__PURE__*/React.forwardRef(function TreeItem(inProps, inRef) {
+  const {
+    icons: contextIcons,
+    runItemPlugins,
+    items: {
+      disabledItemsFocusable,
+      indentationAtItemLevel
+    },
+    selection: {
+      disableSelection
+    },
+    treeId,
+    instance
+  } = useTreeViewContext();
+  const depthContext = React.useContext(TreeViewItemDepthContext);
+  const props = useThemeProps({
+    props: inProps,
+    name: 'MuiTreeItem'
+  });
+  const {
+      children,
+      className,
+      slots: inSlots,
+      slotProps: inSlotProps,
+      ContentComponent = TreeItemContent,
+      ContentProps,
+      itemId,
+      id,
+      label,
+      onClick,
+      onMouseDown,
+      onBlur,
+      onKeyDown
+    } = props,
+    other = _objectWithoutPropertiesLoose(props, _excluded$1);
+  const {
+    expanded,
+    focused,
+    selected,
+    disabled,
+    editing,
+    handleCancelItemLabelEditing,
+    handleSaveItemLabel
+  } = useTreeItemState(itemId);
+  const {
+    contentRef,
+    rootRef,
+    propsEnhancers
+  } = runItemPlugins(props);
+  const rootRefObject = React.useRef(null);
+  const contentRefObject = React.useRef(null);
+  const handleRootRef = useForkRef(inRef, rootRef, rootRefObject);
+  const handleContentRef = useForkRef(ContentProps?.ref, contentRef, contentRefObject);
+  const slots = {
+    expandIcon: inSlots?.expandIcon ?? contextIcons.slots.expandIcon ?? TreeViewExpandIcon,
+    collapseIcon: inSlots?.collapseIcon ?? contextIcons.slots.collapseIcon ?? TreeViewCollapseIcon,
+    endIcon: inSlots?.endIcon ?? contextIcons.slots.endIcon,
+    icon: inSlots?.icon,
+    groupTransition: inSlots?.groupTransition
+  };
+  const isExpandable = reactChildren => {
+    if (Array.isArray(reactChildren)) {
+      return reactChildren.length > 0 && reactChildren.some(isExpandable);
+    }
+    return Boolean(reactChildren);
+  };
+  const expandable = isExpandable(children);
+  const ownerState = _extends({}, props, {
+    expanded,
+    focused,
+    selected,
+    disabled,
+    indentationAtItemLevel
+  });
+  const classes = useUtilityClasses(ownerState);
+  const GroupTransition = slots.groupTransition ?? undefined;
+  const groupTransitionProps = useSlotProps({
+    elementType: GroupTransition,
+    ownerState: {},
+    externalSlotProps: inSlotProps?.groupTransition,
+    additionalProps: _extends({
+      unmountOnExit: true,
+      in: expanded,
+      component: 'ul',
+      role: 'group'
+    }, indentationAtItemLevel ? {
+      indentationAtItemLevel: true
+    } : {}),
+    className: classes.groupTransition
+  });
+  const ExpansionIcon = expanded ? slots.collapseIcon : slots.expandIcon;
+  const _useSlotProps = useSlotProps({
+      elementType: ExpansionIcon,
+      ownerState: {},
+      externalSlotProps: tempOwnerState => {
+        if (expanded) {
+          return _extends({}, resolveComponentProps(contextIcons.slotProps.collapseIcon, tempOwnerState), resolveComponentProps(inSlotProps?.collapseIcon, tempOwnerState));
+        }
+        return _extends({}, resolveComponentProps(contextIcons.slotProps.expandIcon, tempOwnerState), resolveComponentProps(inSlotProps?.expandIcon, tempOwnerState));
+      }
+    }),
+    expansionIconProps = _objectWithoutPropertiesLoose(_useSlotProps, _excluded2);
+  const expansionIcon = expandable && !!ExpansionIcon ? /*#__PURE__*/jsx(ExpansionIcon, _extends({}, expansionIconProps)) : null;
+  const DisplayIcon = expandable ? undefined : slots.endIcon;
+  const _useSlotProps2 = useSlotProps({
+      elementType: DisplayIcon,
+      ownerState: {},
+      externalSlotProps: tempOwnerState => {
+        if (expandable) {
+          return {};
+        }
+        return _extends({}, resolveComponentProps(contextIcons.slotProps.endIcon, tempOwnerState), resolveComponentProps(inSlotProps?.endIcon, tempOwnerState));
+      }
+    }),
+    displayIconProps = _objectWithoutPropertiesLoose(_useSlotProps2, _excluded3);
+  const displayIcon = DisplayIcon ? /*#__PURE__*/jsx(DisplayIcon, _extends({}, displayIconProps)) : null;
+  const Icon = slots.icon;
+  const _useSlotProps3 = useSlotProps({
+      elementType: Icon,
+      ownerState: {},
+      externalSlotProps: inSlotProps?.icon
+    }),
+    iconProps = _objectWithoutPropertiesLoose(_useSlotProps3, _excluded4);
+  const icon = Icon ? /*#__PURE__*/jsx(Icon, _extends({}, iconProps)) : null;
+
+  // https://www.w3.org/WAI/ARIA/apg/patterns/treeview/
+  let ariaSelected;
+  if (selected) {
+    // - each selected node has aria-selected set to true.
+    ariaSelected = true;
+  } else if (disableSelection || disabled) {
+    // - if the tree contains nodes that are not selectable, aria-selected is not present on those nodes.
+    ariaSelected = undefined;
+  } else {
+    // - all nodes that are selectable but not selected have aria-selected set to false.
+    ariaSelected = false;
+  }
+  function handleFocus(event) {
+    const canBeFocused = !disabled || disabledItemsFocusable;
+    if (!focused && canBeFocused && event.currentTarget === event.target) {
+      instance.focusItem(event, itemId);
+    }
+  }
+  function handleBlur(event) {
+    onBlur?.(event);
+    if (editing ||
+    // we can exit the editing state by clicking outside the input (within the Tree Item) or by pressing Enter or Escape -> we don't want to remove the focused item from the state in these cases
+    // we can also exit the editing state by clicking on the root itself -> want to remove the focused item from the state in this case
+    event.relatedTarget && isTargetInDescendants(event.relatedTarget, rootRefObject.current) && (event.target && event.target?.dataset?.element === 'labelInput' && isTargetInDescendants(event.target, rootRefObject.current) || event.relatedTarget?.dataset?.element === 'labelInput')) {
+      return;
+    }
+    instance.removeFocusedItem();
+  }
+  const handleKeyDown = event => {
+    onKeyDown?.(event);
+    if (event.target?.dataset?.element === 'labelInput') {
+      return;
+    }
+    instance.handleItemKeyDown(event, itemId);
+  };
+  const idAttribute = generateTreeItemIdAttribute({
+    itemId,
+    treeId,
+    id
+  });
+  const tabIndex = instance.canItemBeTabbed(itemId) ? 0 : -1;
+  const sharedPropsEnhancerParams = {
+    rootRefObject,
+    contentRefObject,
+    interactions: {
+      handleSaveItemLabel,
+      handleCancelItemLabelEditing
+    }
+  };
+  const enhancedRootProps = propsEnhancers.root?.(_extends({}, sharedPropsEnhancerParams, {
+    externalEventHandlers: extractEventHandlers(other)
+  })) ?? {};
+  const enhancedContentProps = propsEnhancers.content?.(_extends({}, sharedPropsEnhancerParams, {
+    externalEventHandlers: extractEventHandlers(ContentProps)
+  })) ?? {};
+  const enhancedDragAndDropOverlayProps = propsEnhancers.dragAndDropOverlay?.(_extends({}, sharedPropsEnhancerParams, {
+    externalEventHandlers: {}
+  })) ?? {};
+  const enhancedLabelInputProps = propsEnhancers.labelInput?.(_extends({}, sharedPropsEnhancerParams, {
+    externalEventHandlers: {}
+  })) ?? {};
+  return /*#__PURE__*/jsx(TreeItem2Provider, {
+    itemId: itemId,
+    children: /*#__PURE__*/jsxs(TreeItemRoot, _extends({
+      className: clsx(classes.root, className),
+      role: "treeitem",
+      "aria-expanded": expandable ? expanded : undefined,
+      "aria-selected": ariaSelected,
+      "aria-disabled": disabled || undefined,
+      id: idAttribute,
+      tabIndex: tabIndex
+    }, other, {
+      ownerState: ownerState,
+      onFocus: handleFocus,
+      onBlur: handleBlur,
+      onKeyDown: handleKeyDown,
+      ref: handleRootRef,
+      style: indentationAtItemLevel ? _extends({}, other.style, {
+        '--TreeView-itemDepth': typeof depthContext === 'function' ? depthContext(itemId) : depthContext
+      }) : other.style
+    }, enhancedRootProps, {
+      children: [/*#__PURE__*/jsx(StyledTreeItemContent, _extends({
+        as: ContentComponent,
+        classes: {
+          root: classes.content,
+          expanded: classes.expanded,
+          selected: classes.selected,
+          focused: classes.focused,
+          disabled: classes.disabled,
+          editable: classes.editable,
+          editing: classes.editing,
+          iconContainer: classes.iconContainer,
+          label: classes.label,
+          labelInput: classes.labelInput,
+          checkbox: classes.checkbox
+        },
+        label: label,
+        itemId: itemId,
+        onClick: onClick,
+        onMouseDown: onMouseDown,
+        icon: icon,
+        expansionIcon: expansionIcon,
+        displayIcon: displayIcon,
+        ownerState: ownerState
+      }, ContentProps, enhancedContentProps, enhancedDragAndDropOverlayProps.action == null ? {} : {
+        dragAndDropOverlayProps: enhancedDragAndDropOverlayProps
+      }, enhancedLabelInputProps.value == null ? {} : {
+        labelInputProps: enhancedLabelInputProps
+      }, {
+        ref: handleContentRef
+      })), children && /*#__PURE__*/jsx(TreeItemGroup, _extends({
+        as: GroupTransition
+      }, groupTransitionProps, {
+        children: children
+      }))]
+    }))
+  });
+});
+
+/*
+ * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License version 3 as published by
+ * the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+function useObservable() {
+  return useMemo(() => {
+    const subject = new Subject();
+    return { subject, observable: subject.asObservable() };
+  }, []);
+}
+
+/*
+ * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License version 3 as published by
+ * the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+function useUnmount$() {
+  const { subject, observable } = useObservable();
+  useEffect(() => {
+    return () => {
+      subject.next();
+      subject.complete();
+    };
+  }, [subject]);
+  return observable;
+}
+
+var DEFAULT_ROOT = '/site';
+var TREE_FETCH_LIMIT = 100;
+var TREE_SYSTEM_TYPES = ['folder', 'page'];
+function parseChildrenResponse(response) {
+    var _a, _b;
+    var items = [];
+    for (var index = 0; index < response.length; index++) {
+        var item = response[index];
+        if (item === null || item === void 0 ? void 0 : item.path) {
+            items.push(item);
+        }
+    }
+    if ((_a = response.levelDescriptor) === null || _a === void 0 ? void 0 : _a.path) {
+        items.unshift(response.levelDescriptor);
+    }
+    return {
+        items: items,
+        total: (_b = response.total) !== null && _b !== void 0 ? _b : items.length
+    };
+}
+function getChildrenFetchPath(itemPath) {
+    if (itemPath.startsWith('/site/website') && itemPath.endsWith('/index.xml')) {
+        return withoutIndex(itemPath);
+    }
+    return itemPath;
+}
+function isWebsiteFolderPage(item) {
+    return item.systemType === 'page' && item.path.startsWith('/site/website') && item.path.endsWith('/index.xml');
+}
+/** Tree item ids for website folder pages use index.xml; folder paths from the path field do not. */
+function toTreeItemId(contentPath) {
+    var normalized = contentPath.replace(/\/$/, '');
+    if (normalized === '/site/website') {
+        return withIndex(normalized);
+    }
+    return contentPath;
+}
+function pathsMatchForSelection(selectedPath, itemPath) {
+    return selectedPath === itemPath || withoutIndex(selectedPath) === withoutIndex(itemPath);
+}
+function isBranchNode(item, children, isRoot) {
+    var _a;
+    if (isRoot === void 0) { isRoot = false; }
+    if (isRoot) {
+        return true;
+    }
+    if (children !== undefined) {
+        return children.length > 0;
+    }
+    if (item.systemType === 'folder') {
+        return true;
+    }
+    if (item.systemType === 'page') {
+        return ((_a = item.childrenCount) !== null && _a !== void 0 ? _a : 0) > 0 || isWebsiteFolderPage(item);
+    }
+    return false;
+}
+function rootItem(rootPath) {
+    var _a;
+    var name = (_a = rootPath.split('/').filter(Boolean).pop()) !== null && _a !== void 0 ? _a : rootPath;
+    return {
+        path: rootPath,
+        label: name,
+        systemType: 'folder'
+    };
+}
+function SourcePathSelectionInput(_a) {
+    var siteId = _a.siteId, rootPath = _a.rootPath, currentPath = _a.currentPath, onChange = _a.onChange, _b = _a.allowSwitchingRootPath, allowSwitchingRootPath = _b === void 0 ? false : _b, onChangeRoot = _a.onChangeRoot;
+    var unmount$ = useUnmount$();
+    var _c = useState(''), path = _c[0], setPath = _c[1];
+    var _d = useState(null), pathExists = _d[0], setPathExists = _d[1];
+    var _e = useState(false), isChecking = _e[0], setIsChecking = _e[1];
+    useEffect(function () {
+        var relative = withoutIndex(currentPath.startsWith(rootPath) ? currentPath.slice(rootPath.length) : currentPath);
+        setPath(relative);
+        setPathExists(null);
+        setIsChecking(false);
+    }, [rootPath, currentPath]);
+    var getFullPath = function () { return "".concat(rootPath).concat(path).trim(); };
+    var validatePath = function () {
+        setIsChecking(true);
+        var value = getFullPath();
+        value = withoutFile(value).replace(/\/$/, '');
+        var relative = value.slice(rootPath.length);
+        setPath(relative);
+        checkPathExistence(siteId, value)
+            .pipe(takeUntil(unmount$))
+            .subscribe({
+            next: function (exists) {
+                setIsChecking(false);
+                setPathExists(exists);
+                if (exists) {
+                    onChange(value);
+                }
+            },
+            error: function () {
+                setIsChecking(false);
+                setPathExists(false);
+            }
+        });
+    };
+    return (jsxs(FormControl, { sx: { mb: 1, width: '100%' }, children: [jsx(TextField$1, { fullWidth: true, value: path, onKeyDown: function (event) {
+                    if (event.key === 'Enter') {
+                        validatePath();
+                    }
+                }, onChange: function (event) {
+                    setPath(event.target.value);
+                    setPathExists(null);
+                }, error: pathExists === false, label: jsx(FormattedMessage, { id: "words.path", defaultMessage: "Path" }), InputProps: {
+                    startAdornment: rootPath ? (jsxs(InputAdornment, { position: "start", sx: { mr: 0 }, children: [allowSwitchingRootPath && onChangeRoot ? (jsx(Tooltip, { title: jsx(FormattedMessage, { id: "pathSelectionDialog.changeRootButtonLabel", defaultMessage: "Change root" }), children: jsx(IconButton$1, { sx: { mr: 0.5 }, onClick: onChangeRoot, size: "small", children: jsx(KeyboardArrowLeftRoundedIcon, {}) }) })) : null, rootPath] })) : undefined,
+                    endAdornment: isChecking ? (jsx(InputAdornment, { position: "end", children: jsx(CircularProgress, { size: 20 }) })) : pathExists === true ? (jsx(InputAdornment, { position: "end", children: jsx(CheckRounded, { color: "success" }) })) : pathExists === false ? (jsx(InputAdornment, { position: "end", children: jsx(ErrorRounded, { color: "error" }) })) : undefined
+                } }), jsx(FormHelperText, { error: pathExists === false, children: pathExists ? (jsx(FormattedMessage, { id: "pathSelectionInput.found", defaultMessage: "Path found" })) : pathExists === false ? (jsx(FormattedMessage, { id: "pathSelectionInput.invalidPath", defaultMessage: "The entered path doesn't exist" })) : (jsx(FormattedMessage, { id: "pathSelectionInput.description", defaultMessage: "Enter a path and press `enter` to validate" })) })] }));
+}
+function SiteTreeItem(_a) {
+    var item = _a.item, selectedPath = _a.selectedPath, expandedItems = _a.expandedItems, childrenByParent = _a.childrenByParent, loadingParents = _a.loadingParents, onPathSelected = _a.onPathSelected, _b = _a.isRoot, isRoot = _b === void 0 ? false : _b;
+    var children = childrenByParent[item.path];
+    var loading = Boolean(loadingParents[item.path]);
+    var isExpanded = expandedItems.includes(item.path);
+    var branch = isBranchNode(item, children, isRoot);
+    var isSelected = pathsMatchForSelection(selectedPath, item.path);
+    var treeChildren = null;
+    if (branch) {
+        if (loading || (isExpanded && children === undefined)) {
+            treeChildren = (jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', pl: 3, py: 0.5 }, children: [jsx(CircularProgress, { size: 14 }), jsx(Typography, { variant: "caption", color: "text.secondary", sx: { ml: 1 }, children: jsx(FormattedMessage, { id: "words.loading", defaultMessage: "Loading" }) })] }));
+        }
+        else if (children === null || children === void 0 ? void 0 : children.length) {
+            treeChildren = children.map(function (child) { return (jsx(SiteTreeItem, { item: child, selectedPath: selectedPath, expandedItems: expandedItems, childrenByParent: childrenByParent, loadingParents: loadingParents, onPathSelected: onPathSelected }, child.path)); });
+        }
+        else if (children === undefined) {
+            // Non-tree placeholder child so MUI shows the expand affordance before the first fetch.
+            treeChildren = jsx(Box$1, { sx: { display: 'none' }, "aria-hidden": true }, "".concat(item.path, "::placeholder"));
+        }
+    }
+    return (jsx(TreeItem, { itemId: item.path, slots: {
+            expandIcon: ArrowRightRoundedIcon,
+            collapseIcon: ArrowDropDownRoundedIcon
+        }, label: jsxs(Box$1, { role: "button", onClick: function (event) {
+                event.stopPropagation();
+                onPathSelected(item.path);
+            }, sx: {
+                display: 'flex',
+                alignItems: 'center',
+                minHeight: 28,
+                width: '100%',
+                borderRadius: 0.5,
+                px: 0.5,
+                bgcolor: isSelected ? 'action.selected' : 'transparent',
+                '&:hover': {
+                    bgcolor: isSelected ? 'action.selected' : 'action.hover'
+                }
+            }, children: [jsx(Box$1, { sx: { display: 'flex', alignItems: 'center', mr: 0.5, '& svg': { fontSize: '1.1rem' } }, children: jsx(ItemTypeIcon, { item: item }) }), jsx(Typography, { variant: "body2", noWrap: true, sx: { flex: 1, minWidth: 0 }, children: item.label || item.path })] }), children: branch ? treeChildren : undefined }));
+}
+function SourceSiteContentTree(_a) {
+    var siteId = _a.siteId, rootPath = _a.rootPath, selectedPath = _a.selectedPath, onPathSelected = _a.onPathSelected;
+    var _b = useState({}), childrenByParent = _b[0], setChildrenByParent = _b[1];
+    var _c = useState({}), loadingParents = _c[0], setLoadingParents = _c[1];
+    var _d = useState([rootPath]), expandedItems = _d[0], setExpandedItems = _d[1];
+    var childrenByParentRef = useRef(childrenByParent);
+    var loadingParentsRef = useRef(loadingParents);
+    childrenByParentRef.current = childrenByParent;
+    loadingParentsRef.current = loadingParents;
+    var loadChildren = useCallback(function (parentPath) {
+        if (childrenByParentRef.current[parentPath] !== undefined ||
+            loadingParentsRef.current[parentPath]) {
+            return;
+        }
+        setLoadingParents(function (current) {
+            var _a;
+            return (__assign(__assign({}, current), (_a = {}, _a[parentPath] = true, _a)));
+        });
+        var fetchPath = getChildrenFetchPath(parentPath);
+        fetchChildrenByPath(siteId, fetchPath, {
+            limit: TREE_FETCH_LIMIT,
+            sortStrategy: 'foldersFirst',
+            order: 'ASC',
+            systemTypes: TREE_SYSTEM_TYPES
+        }).subscribe({
+            next: function (response) {
+                setChildrenByParent(function (current) {
+                    var _a;
+                    return (__assign(__assign({}, current), (_a = {}, _a[parentPath] = parseChildrenResponse(response).items, _a)));
+                });
+                setLoadingParents(function (current) {
+                    var next = __assign({}, current);
+                    delete next[parentPath];
+                    return next;
+                });
+            },
+            error: function () {
+                setChildrenByParent(function (current) {
+                    var _a;
+                    return (__assign(__assign({}, current), (_a = {}, _a[parentPath] = [], _a)));
+                });
+                setLoadingParents(function (current) {
+                    var next = __assign({}, current);
+                    delete next[parentPath];
+                    return next;
+                });
+            }
+        });
+    }, [siteId]);
+    var expandPathAncestors = useCallback(function (path) {
+        if (!path || !path.startsWith(rootPath)) {
+            return;
+        }
+        var ancestors = getIndividualPaths(path, rootPath);
+        var expandedPaths = new Set();
+        var loadPaths = new Set();
+        ancestors.forEach(function (ancestorPath) {
+            expandedPaths.add(ancestorPath);
+            expandedPaths.add(toTreeItemId(ancestorPath));
+            loadPaths.add(toTreeItemId(ancestorPath));
+        });
+        loadPaths.add(toTreeItemId(path));
+        setExpandedItems(function (current) {
+            var merged = new Set(__spreadArray(__spreadArray([], current, true), Array.from(expandedPaths), true));
+            return Array.from(merged);
+        });
+        loadPaths.forEach(function (loadPath) {
+            loadChildren(loadPath);
+        });
+    }, [rootPath, loadChildren]);
+    useEffect(function () {
+        setChildrenByParent({});
+        setLoadingParents({});
+        setExpandedItems([rootPath]);
+        loadChildren(rootPath);
+    }, [siteId, rootPath, loadChildren]);
+    useEffect(function () {
+        if (selectedPath) {
+            expandPathAncestors(selectedPath);
+        }
+    }, [selectedPath, expandPathAncestors]);
+    var root = useMemo(function () { return rootItem(rootPath); }, [rootPath]);
+    var handleExpandedItemsChange = function (_event, itemIds) {
+        var newlyExpanded = itemIds.filter(function (id) { return !expandedItems.includes(id); });
+        newlyExpanded.forEach(function (path) { return loadChildren(toTreeItemId(path)); });
+        setExpandedItems(itemIds);
+    };
+    if (!rootPath) {
+        return null;
+    }
+    return (jsx(Box$1, { sx: {
+            mt: 1.5,
+            border: 1,
+            borderColor: 'divider',
+            borderRadius: 1,
+            overflow: 'auto',
+            maxHeight: '45vh',
+            py: 0.5
+        }, children: jsx(SimpleTreeView, { expandedItems: expandedItems, onExpandedItemsChange: handleExpandedItemsChange, disableSelection: true, sx: { flexGrow: 1 }, children: jsx(SiteTreeItem, { item: root, selectedPath: selectedPath, expandedItems: expandedItems, childrenByParent: childrenByParent, loadingParents: loadingParents, onPathSelected: onPathSelected, isRoot: true }) }) }));
+}
+function CrossSitePathSelectionDialog(_a) {
+    var open = _a.open, siteId = _a.siteId, siteLabel = _a.siteLabel, _b = _a.stripXmlIndex, stripXmlIndex = _b === void 0 ? false : _b, onClose = _a.onClose, onAccept = _a.onAccept;
+    var _c = useState(DEFAULT_ROOT), rootPath = _c[0], setRootPath = _c[1];
+    var _d = useState(DEFAULT_ROOT), currentPath = _d[0], setCurrentPath = _d[1];
+    useEffect(function () {
+        if (!open) {
+            return;
+        }
+        setRootPath(DEFAULT_ROOT);
+        setCurrentPath(DEFAULT_ROOT);
+    }, [open, siteId]);
+    var handleAccept = function () {
+        var path = (stripXmlIndex ? withoutIndex(currentPath) : currentPath).trim();
+        if (!path) {
+            return;
+        }
+        onAccept(path);
+        onClose();
+    };
+    return (jsxs(Dialog, { open: open, onClose: onClose, fullWidth: true, maxWidth: "sm", children: [jsx(DialogHeader, { title: jsxs(Fragment, { children: [jsx(FormattedMessage, { id: "pathSelectionDialog.title", defaultMessage: "Select Path" }), siteLabel ? " \u2014 ".concat(siteLabel) : ''] }), onCloseButtonClick: onClose }), jsx(DialogBody, { sx: { minHeight: '60vh' }, children: rootPath ? (jsxs(Fragment, { children: [jsx(SourcePathSelectionInput, { siteId: siteId, rootPath: rootPath, currentPath: currentPath, onChange: setCurrentPath, allowSwitchingRootPath: true, onChangeRoot: function () {
+                                setRootPath('');
+                                setCurrentPath('');
+                            } }), jsx(SourceSiteContentTree, { siteId: siteId, rootPath: rootPath, selectedPath: currentPath, onPathSelected: setCurrentPath })] })) : (jsxs(TextField$1, { select: true, fullWidth: true, label: "Root", value: "", onChange: function (event) {
+                        var path = event.target.value;
+                        setRootPath(path);
+                        setCurrentPath(path);
+                    }, SelectProps: { native: true }, children: [jsx("option", { value: "", disabled: true, children: "Choose root" }), jsx("option", { value: "/site", children: "/site" })] })) }), jsxs(DialogFooter$1, { children: [jsx(Button$1, { onClick: onClose, children: jsx(FormattedMessage, { id: "words.cancel", defaultMessage: "Cancel" }) }), jsx(Button$1, { variant: "contained", onClick: handleAccept, children: jsx(FormattedMessage, { id: "words.accept", defaultMessage: "Accept" }) })] })] }));
+}
+
 function isInWorkflow(stateMap) {
     return stateMap
         ? Boolean(stateMap.deleted ||
@@ -2749,25 +8062,28 @@ function ItemListTable(_a) {
     return (jsx(Paper, { variant: "outlined", sx: sx, children: jsxs(Table, { size: "small", children: [jsx(TableHead, { children: jsxs(TableRow, { children: [jsx(TableCell, { children: headerLabel }), actionsColumn && (jsx(TableCell, { align: "right", width: 88, children: "Actions" }))] }) }), jsx(TableBody, { children: children })] }) }));
 }
 function CrossSiteContentCopy() {
-    var _a, _b;
+    var _a, _b, _c;
     var dispatch = useDispatch();
     var activeSiteId = useActiveSiteId();
     var env = useEnv();
-    var _c = useState([]), sites = _c[0], setSites = _c[1];
-    var _d = useState(true), sitesLoading = _d[0], setSitesLoading = _d[1];
-    var _e = useState([]), sourcePaths = _e[0], setSourcePaths = _e[1];
-    var _f = useState(null), itemMenuAnchor = _f[0], setItemMenuAnchor = _f[1];
-    var _g = useState(null), itemMenuPath = _g[0], setItemMenuPath = _g[1];
-    var _h = useState(null), addPathError = _h[0], setAddPathError = _h[1];
-    var _j = useState(null), destSite = _j[0], setDestSite = _j[1];
-    var _k = useState(true), copyDependencies = _k[0], setCopyDependencies = _k[1];
-    var _l = useState(null), plan = _l[0], setPlan = _l[1];
-    var _m = useState(null), planError = _m[0], setPlanError = _m[1];
-    var _o = useState(false), planLoading = _o[0], setPlanLoading = _o[1];
-    var _p = useState(false), copying = _p[0], setCopying = _p[1];
-    var _q = useState(null), copyResult = _q[0], setCopyResult = _q[1];
+    var _d = useState([]), sites = _d[0], setSites = _d[1];
+    var _e = useState(true), sitesLoading = _e[0], setSitesLoading = _e[1];
+    var _f = useState(null), sourceSite = _f[0], setSourceSite = _f[1];
+    var _g = useState([]), sourcePaths = _g[0], setSourcePaths = _g[1];
+    var _h = useState(false), sourcePathPickerOpen = _h[0], setSourcePathPickerOpen = _h[1];
+    var _j = useState(null), itemMenuAnchor = _j[0], setItemMenuAnchor = _j[1];
+    var _k = useState(null), itemMenuPath = _k[0], setItemMenuPath = _k[1];
+    var _l = useState(null), addPathError = _l[0], setAddPathError = _l[1];
+    var _m = useState(null), destSite = _m[0], setDestSite = _m[1];
+    var _o = useState(true), copyDependencies = _o[0], setCopyDependencies = _o[1];
+    var _p = useState(null), plan = _p[0], setPlan = _p[1];
+    var _q = useState(null), planError = _q[0], setPlanError = _q[1];
+    var _r = useState(false), planLoading = _r[0], setPlanLoading = _r[1];
+    var _s = useState(false), copying = _s[0], setCopying = _s[1];
+    var _t = useState(null), copyResult = _t[0], setCopyResult = _t[1];
     var mountedRef = useRef(true);
     var copySubRef = useRef(null);
+    var skipSourceResetRef = useRef(false);
     useEffect(function () {
         mountedRef.current = true;
         return function () {
@@ -2788,8 +8104,28 @@ function CrossSiteContentCopy() {
         });
         return function () { return sub.unsubscribe(); };
     }, []);
-    var destOptions = useMemo(function () { return sites.filter(function (site) { return site.id !== activeSiteId; }); }, [sites, activeSiteId]);
-    var readyForPlan = Boolean(activeSiteId && sourcePaths.length > 0 && destSite);
+    useEffect(function () {
+        if (activeSiteId && sites.length && !sourceSite) {
+            var current = sites.find(function (site) { return site.id === activeSiteId; });
+            if (current) {
+                setSourceSite(current);
+            }
+        }
+    }, [activeSiteId, sites, sourceSite]);
+    useEffect(function () {
+        if (skipSourceResetRef.current) {
+            skipSourceResetRef.current = false;
+            return;
+        }
+        setSourcePaths([]);
+        setAddPathError(null);
+        setPlan(null);
+        setPlanError(null);
+        setCopyResult(null);
+    }, [sourceSite === null || sourceSite === void 0 ? void 0 : sourceSite.id]);
+    var sourceSiteId = sourceSite === null || sourceSite === void 0 ? void 0 : sourceSite.id;
+    var sameSourceAndDestination = Boolean(sourceSiteId && destSite && sourceSiteId === destSite.id);
+    var readyForPlan = Boolean(sourceSiteId && sourcePaths.length > 0 && destSite && !sameSourceAndDestination);
     var handlePathSelected = function (path) {
         var normalized = path.trim();
         if (!normalized) {
@@ -2803,7 +8139,7 @@ function CrossSiteContentCopy() {
         setSourcePaths(function (current) { return __spreadArray(__spreadArray([], current, true), [normalized], false); });
         setAddPathError(null);
     };
-    var openAddItemDialog = function () {
+    var openActiveSitePathSelectionDialog = function () {
         var callbackId = 'crossSiteCopyPathSelection';
         var callbackAccept = 'accept';
         dispatch(showPathSelectionDialog({
@@ -2826,6 +8162,16 @@ function CrossSiteContentCopy() {
             }
         });
     };
+    var openAddItemDialog = function () {
+        if (!sourceSite) {
+            return;
+        }
+        if (sourceSite.id === activeSiteId) {
+            openActiveSitePathSelectionDialog();
+            return;
+        }
+        setSourcePathPickerOpen(true);
+    };
     var removeSourcePath = function (path) {
         setSourcePaths(function (current) { return current.filter(function (entry) { return entry !== path; }); });
     };
@@ -2845,9 +8191,9 @@ function CrossSiteContentCopy() {
         copyResult.skipped.forEach(function (entry) { return paths.add(entry.path); });
         return Array.from(paths);
     }, [copyResult]);
-    var _r = useDetailedItemsByPath(activeSiteId, sourcePaths), sourceItemsByPath = _r.itemsByPath, sourceItemsLoading = _r.loading;
-    var _s = useDetailedItemsByPath(activeSiteId, planItemPaths), planItemsByPath = _s.itemsByPath, planItemsLoading = _s.loading;
-    var _t = useDetailedItemsByPath(activeSiteId, resultItemPaths), resultItemsByPath = _t.itemsByPath, resultItemsLoading = _t.loading;
+    var _u = useDetailedItemsByPath(sourceSiteId, sourcePaths), sourceItemsByPath = _u.itemsByPath, sourceItemsLoading = _u.loading;
+    var _v = useDetailedItemsByPath(sourceSiteId, planItemPaths), planItemsByPath = _v.itemsByPath, planItemsLoading = _v.loading;
+    var _w = useDetailedItemsByPath(sourceSiteId, resultItemPaths), resultItemsByPath = _w.itemsByPath, resultItemsLoading = _w.loading;
     var resultRows = useMemo(function () {
         if (!copyResult) {
             return [];
@@ -2878,11 +8224,11 @@ function CrossSiteContentCopy() {
         setItemMenuPath(null);
     };
     var handleItemView = function () {
-        if (!itemMenuItem || !activeSiteId) {
+        if (!itemMenuItem || !sourceSiteId) {
             return;
         }
         dispatch(showEditDialog({
-            site: activeSiteId,
+            site: sourceSiteId,
             path: itemMenuItem.path,
             authoringBase: env.authoringBase,
             readonly: true
@@ -2916,7 +8262,7 @@ function CrossSiteContentCopy() {
         setPlanError(null);
         setPlanLoading(true);
         setCopyResult(null);
-        var sub = callPlan(activeSiteId, {
+        var sub = callPlan(sourceSiteId, {
             sourcePaths: sourcePaths,
             destinationSiteId: destSite.id,
             copyDependencies: copyDependencies
@@ -2937,17 +8283,17 @@ function CrossSiteContentCopy() {
             }
         });
         return function () { return sub.unsubscribe(); };
-    }, [readyForPlan, activeSiteId, sourcePaths, destSite, copyDependencies]);
+    }, [readyForPlan, sourceSiteId, sourcePaths, destSite, copyDependencies]);
     var overwriteCount = copyableItems.filter(function (item) { return item.existsOnDestination; }).length;
     var newCount = copyableItems.length - overwriteCount;
     var runCopy = function () {
         var _a;
-        if (!activeSiteId || sourcePaths.length === 0 || !destSite || copyableItems.length === 0) {
+        if (!sourceSiteId || sourcePaths.length === 0 || !destSite || copyableItems.length === 0) {
             return;
         }
         (_a = copySubRef.current) === null || _a === void 0 ? void 0 : _a.unsubscribe();
         setCopying(true);
-        copySubRef.current = callCopy(activeSiteId, {
+        copySubRef.current = callCopy(sourceSiteId, {
             sourcePaths: sourcePaths,
             destinationSiteId: destSite.id,
             copyDependencies: copyDependencies
@@ -2990,6 +8336,14 @@ function CrossSiteContentCopy() {
         setPlan(null);
         setPlanError(null);
         setCopyResult(null);
+        setSourcePathPickerOpen(false);
+        if (activeSiteId) {
+            var current = sites.find(function (site) { return site.id === activeSiteId; });
+            setSourceSite(current !== null && current !== void 0 ? current : null);
+        }
+        else {
+            setSourceSite(null);
+        }
     };
     var copiedDestinationSiteId = (_b = copyResult === null || copyResult === void 0 ? void 0 : copyResult.destinationSiteId) !== null && _b !== void 0 ? _b : destSite === null || destSite === void 0 ? void 0 : destSite.id;
     var copiedDestinationLabel = useMemo(function () {
@@ -3005,11 +8359,11 @@ function CrossSiteContentCopy() {
         }
         dispatch(changeSite(copiedDestinationSiteId));
     };
-    return (jsxs(Paper, { elevation: 0, sx: { height: '100%', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }, children: [jsxs(DialogBody, { sx: { flex: 1, overflow: 'auto', pt: 2 }, children: [jsxs(Typography, { variant: "body2", color: "text.secondary", sx: { mb: 3 }, children: ["Copy content from ", jsx("strong", { children: activeSiteId }), " into another project. Copied items appear in the destination project only."] }), jsxs(Stack$1, { spacing: 3, children: [jsxs(Box$1, { children: [jsxs(Stack$1, { direction: "row", alignItems: "center", justifyContent: "space-between", sx: { mb: 1 }, children: [jsx(Typography, { variant: "subtitle2", children: "1. Source content" }), jsxs(Stack$1, { direction: "row", spacing: 1, children: [jsx(Button$1, { size: "small", onClick: openAddItemDialog, children: "Add item" }), sourcePaths.length > 0 && (jsx(Button$1, { size: "small", onClick: clearSourcePaths, children: "Clear list" }))] })] }), jsx(Typography, { variant: "body2", color: "text.secondary", sx: { mb: 1.5 }, children: "Add pages, components, or folders to copy. Use Add item to browse the project and confirm a path." }), addPathError && (jsx(Typography, { variant: "caption", color: "error", sx: { mb: 1, display: 'block' }, children: addPathError })), sourcePaths.length > 0 ? (jsx(ItemListTable, { headerLabel: "Selected items", actionsColumn: true, sx: { mt: 2 }, children: sourcePaths.map(function (path) {
+    return (jsxs(Paper, { elevation: 0, sx: { height: '100%', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }, children: [jsxs(DialogBody, { sx: { flex: 1, overflow: 'auto', pt: 2 }, children: [jsx(Typography, { variant: "body2", color: "text.secondary", sx: { mb: 3 }, children: "Copy content from one project into another. Choose source and destination projects, then select items to copy." }), jsxs(Stack$1, { spacing: 3, children: [jsxs(Box$1, { children: [jsx(Typography, { variant: "subtitle2", gutterBottom: true, children: "1. Projects" }), sitesLoading ? (jsx(CircularProgress, { size: 24 })) : (jsxs(Stack$1, { spacing: 1.5, children: [jsx(Autocomplete, { options: sites, getOptionLabel: function (option) { return "".concat(option.name, " (").concat(option.id, ")"); }, isOptionEqualToValue: function (option, value) { return option.id === value.id; }, value: sourceSite, onChange: function (_, value) { return setSourceSite(value); }, renderInput: function (params) { return jsx(TextField$1, __assign({}, params, { label: "Source project", required: true, size: "small" })); } }), jsx(Autocomplete, { options: sites, getOptionLabel: function (option) { return "".concat(option.name, " (").concat(option.id, ")"); }, isOptionEqualToValue: function (option, value) { return option.id === value.id; }, value: destSite, onChange: function (_, value) { return setDestSite(value); }, renderInput: function (params) { return (jsx(TextField$1, __assign({}, params, { label: "Destination project", required: true, size: "small" }))); } }), sameSourceAndDestination && (jsx(Alert, { severity: "warning", children: "Source and destination must be different projects." }))] }))] }), jsxs(Box$1, { children: [jsxs(Stack$1, { direction: "row", alignItems: "center", justifyContent: "space-between", sx: { mb: 1 }, children: [jsx(Typography, { variant: "subtitle2", children: "2. Source content" }), jsxs(Stack$1, { direction: "row", spacing: 1, children: [jsx(Button$1, { size: "small", onClick: openAddItemDialog, disabled: !sourceSite, children: "Add item" }), sourcePaths.length > 0 && (jsx(Button$1, { size: "small", onClick: clearSourcePaths, children: "Clear list" }))] })] }), jsxs(Typography, { variant: "body2", color: "text.secondary", sx: { mb: 1.5 }, children: ["Add pages, components, or folders from ", jsx("strong", { children: (_c = sourceSite === null || sourceSite === void 0 ? void 0 : sourceSite.id) !== null && _c !== void 0 ? _c : 'the source project' }), ". Use Add item to browse that project and confirm a path."] }), addPathError && (jsx(Typography, { variant: "caption", color: "error", sx: { mb: 1, display: 'block' }, children: addPathError })), sourcePaths.length > 0 ? (jsx(ItemListTable, { headerLabel: "Selected items", actionsColumn: true, sx: { mt: 2 }, children: sourcePaths.map(function (path) {
                                             var item = sourceItemsByPath[path];
                                             var itemLoading = sourceItemsLoading && !item;
                                             return (jsxs(TableRow, { hover: true, children: [jsx(TableCell, { sx: { py: 1.25, maxWidth: 0, width: '100%' }, children: jsx(ContentItemRow, { item: item, path: path, loading: itemLoading }) }), jsxs(TableCell, { align: "right", sx: { whiteSpace: 'nowrap' }, children: [jsx(IconButton$1, { size: "small", "aria-label": "Item options", onClick: function (event) { return openItemMenu(event, path); }, disabled: !item, children: jsx(MoreVertIcon, { fontSize: "small" }) }), jsx(IconButton$1, { size: "small", "aria-label": "Remove", onClick: function () { return removeSourcePath(path); }, children: jsx(DeleteOutlineIcon, { fontSize: "small" }) })] })] }, path));
-                                        }) })) : (jsxs(Alert, { severity: "info", sx: { mt: 2 }, children: ["No source items yet. Click ", jsx("strong", { children: "Add item" }), " to browse and add paths to copy."] })), jsxs(Menu$1, { anchorEl: itemMenuAnchor, open: Boolean(itemMenuAnchor), onClose: closeItemMenu, children: [jsx(MenuItem$1, { onClick: handleItemView, children: "View" }), jsx(MenuItem$1, { onClick: handleItemHistory, children: "History" }), jsx(MenuItem$1, { onClick: handleItemDependencies, children: "Dependencies" })] })] }), jsxs(Box$1, { children: [jsx(Typography, { variant: "subtitle2", gutterBottom: true, children: "2. Destination" }), sitesLoading ? (jsx(CircularProgress, { size: 24 })) : (jsxs(Stack$1, { spacing: 1.5, children: [jsx(Autocomplete, { options: destOptions, getOptionLabel: function (option) { return "".concat(option.name, " (").concat(option.id, ")"); }, value: destSite, onChange: function (_, value) { return setDestSite(value); }, renderInput: function (params) { return jsx(TextField$1, __assign({}, params, { label: "Destination project", required: true, size: "small" })); } }), jsx(FormControlLabel, { control: jsx(Checkbox, { size: "small", checked: copyDependencies, onChange: function (e) { return setCopyDependencies(e.target.checked); } }), label: "Include dependencies (components, linked assets)" })] }))] }), jsx(Divider, {}), jsxs(Box$1, { children: [jsx(Typography, { variant: "subtitle2", gutterBottom: true, children: "3. Preview" }), !readyForPlan && (jsx(Typography, { variant: "body2", color: "text.secondary", children: "Add at least one source item and choose a destination project to preview what will be copied." })), readyForPlan && plan && !planLoading && !copyResult && sourcePaths.length > 1 && (jsxs(Typography, { variant: "body2", color: "text.secondary", sx: { mb: 1.5 }, children: ["Copying ", sourcePaths.length, " source selection(s) into ", jsx("strong", { children: destSite === null || destSite === void 0 ? void 0 : destSite.id }), "."] })), readyForPlan && planLoading && (jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', gap: 1, py: 2 }, children: [jsx(CircularProgress, { size: 20 }), jsx(Typography, { variant: "body2", color: "text.secondary", children: "Building copy plan\u2026" })] })), readyForPlan && planError && !planLoading && (jsx(Alert, { severity: "error", children: planError })), readyForPlan && plan && !planLoading && !copyResult && (jsxs(Fragment, { children: [jsxs(Stack$1, { direction: "row", spacing: 1, sx: { mb: 2, flexWrap: 'wrap' }, children: [jsx(Chip, { size: "small", label: "".concat(copyableItems.length, " file(s)"), color: "primary", variant: "outlined" }), newCount > 0 && jsx(Chip, { size: "small", label: "".concat(newCount, " new"), color: "success", variant: "outlined" }), overwriteCount > 0 && (jsx(Chip, { size: "small", label: "".concat(overwriteCount, " overwrite"), color: "warning", variant: "outlined" }))] }), overwriteCount > 0 && (jsxs(Alert, { severity: "warning", sx: { mb: 2 }, children: [overwriteCount, " item(s) already exist in ", jsx("strong", { children: destSite === null || destSite === void 0 ? void 0 : destSite.id }), " and will be replaced."] })), copyableItems.length === 0 ? (jsx(Alert, { severity: "info", children: "No copyable files found for this selection." })) : (jsx(Box$1, { sx: { mt: 0 }, children: jsx(ItemListTable, { headerLabel: "Items to copy", children: copyableItems.map(function (planItem) {
+                                        }) })) : (jsxs(Alert, { severity: "info", sx: { mt: 2 }, children: ["No source items yet. Click ", jsx("strong", { children: "Add item" }), " to browse and add paths to copy."] })), jsxs(Menu$1, { anchorEl: itemMenuAnchor, open: Boolean(itemMenuAnchor), onClose: closeItemMenu, children: [jsx(MenuItem$1, { onClick: handleItemView, children: "View" }), jsx(MenuItem$1, { onClick: handleItemHistory, children: "History" }), jsx(MenuItem$1, { onClick: handleItemDependencies, children: "Dependencies" })] })] }), jsx(Box$1, { children: jsx(FormControlLabel, { control: jsx(Checkbox, { size: "small", checked: copyDependencies, onChange: function (e) { return setCopyDependencies(e.target.checked); } }), label: "Include dependencies (components, linked assets)" }) }), jsx(Divider, {}), jsxs(Box$1, { children: [jsx(Typography, { variant: "subtitle2", gutterBottom: true, children: "3. Preview" }), !readyForPlan && (jsx(Typography, { variant: "body2", color: "text.secondary", children: "Choose source and destination projects, add at least one source item, and ensure they are different to preview what will be copied." })), readyForPlan && plan && !planLoading && !copyResult && sourcePaths.length > 1 && (jsxs(Typography, { variant: "body2", color: "text.secondary", sx: { mb: 1.5 }, children: ["Copying ", sourcePaths.length, " source selection(s) into ", jsx("strong", { children: destSite === null || destSite === void 0 ? void 0 : destSite.id }), "."] })), readyForPlan && planLoading && (jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', gap: 1, py: 2 }, children: [jsx(CircularProgress, { size: 20 }), jsx(Typography, { variant: "body2", color: "text.secondary", children: "Building copy plan\u2026" })] })), readyForPlan && planError && !planLoading && (jsx(Alert, { severity: "error", children: planError })), readyForPlan && plan && !planLoading && !copyResult && (jsxs(Fragment, { children: [jsxs(Stack$1, { direction: "row", spacing: 1, sx: { mb: 2, flexWrap: 'wrap' }, children: [jsx(Chip, { size: "small", label: "".concat(copyableItems.length, " file(s)"), color: "primary", variant: "outlined" }), newCount > 0 && jsx(Chip, { size: "small", label: "".concat(newCount, " new"), color: "success", variant: "outlined" }), overwriteCount > 0 && (jsx(Chip, { size: "small", label: "".concat(overwriteCount, " overwrite"), color: "warning", variant: "outlined" }))] }), overwriteCount > 0 && (jsxs(Alert, { severity: "warning", sx: { mb: 2 }, children: [overwriteCount, " item(s) already exist in ", jsx("strong", { children: destSite === null || destSite === void 0 ? void 0 : destSite.id }), " and will be replaced."] })), copyableItems.length === 0 ? (jsx(Alert, { severity: "info", children: "No copyable files found for this selection." })) : (jsx(Box$1, { sx: { mt: 0 }, children: jsx(ItemListTable, { headerLabel: "Items to copy", children: copyableItems.map(function (planItem) {
                                                         var item = planItemsByPath[planItem.path];
                                                         var itemLoading = planItemsLoading && !item;
                                                         return (jsx(TableRow, { hover: true, children: jsx(TableCell, { sx: { py: 1.25, maxWidth: 0, width: '100%' }, children: jsx(ContentItemRow, { item: item, path: planItem.path, loading: itemLoading, trailing: jsx(PlanItemTrailing, { planItem: planItem }) }) }) }, planItem.path));
@@ -3017,7 +8371,7 @@ function CrossSiteContentCopy() {
                                                     var item = resultItemsByPath[row.path];
                                                     var itemLoading = resultItemsLoading && !item;
                                                     return (jsx(TableRow, { hover: true, children: jsx(TableCell, { sx: { py: 1.25, maxWidth: 0, width: '100%' }, children: jsx(ContentItemRow, { item: item, path: row.path, loading: itemLoading, leading: jsx(CopyStatusIcon, { status: row.status }), trailing: row.detail && row.status === 'failure' ? (jsx(Typography, { variant: "caption", color: "error", noWrap: true, title: row.detail, sx: { flexShrink: 1, minWidth: 0, maxWidth: 180, ml: 0.5 }, children: row.detail })) : row.detail ? (jsx(Typography, { variant: "caption", color: "text.secondary", sx: { flexShrink: 0, ml: 0.5 }, children: row.detail })) : undefined }) }) }, "".concat(row.status, "-").concat(row.path)));
-                                                }) }))] }))] })] })] }), jsx(DialogFooter$1, { sx: { borderTop: 1, borderColor: 'divider', gap: 1 }, children: copyResult ? (jsxs(Fragment, { children: [jsx(Button$1, { onClick: reset, children: "Copy another" }), copyResult.successCount > 0 && copiedDestinationSiteId && (jsxs(Button$1, { variant: "outlined", onClick: switchToDestination, children: ["Switch to ", copiedDestinationSiteId] })), jsx(Button$1, { variant: "contained", onClick: reset, children: "Done" })] })) : (jsxs(Fragment, { children: [jsx(Button$1, { disabled: copying || planLoading, onClick: reset, children: "Cancel" }), jsx(Button$1, { variant: "contained", onClick: runCopy, disabled: copying || planLoading || !plan || copyableItems.length === 0, children: copying ? jsx(CircularProgress, { size: 22, color: "inherit" }) : "Copy ".concat(copyableItems.length || '', " item(s)") })] })) })] }));
+                                                }) }))] }))] })] })] }), jsx(DialogFooter$1, { sx: { borderTop: 1, borderColor: 'divider', gap: 1 }, children: copyResult ? (jsxs(Fragment, { children: [jsx(Button$1, { onClick: reset, children: "Copy another" }), copyResult.successCount > 0 && copiedDestinationSiteId && (jsxs(Button$1, { variant: "outlined", onClick: switchToDestination, children: ["Switch to ", copiedDestinationSiteId] })), jsx(Button$1, { variant: "contained", onClick: reset, children: "Done" })] })) : (jsxs(Fragment, { children: [jsx(Button$1, { disabled: copying || planLoading, onClick: reset, children: "Cancel" }), jsx(Button$1, { variant: "contained", onClick: runCopy, disabled: copying || planLoading || !plan || copyableItems.length === 0, children: copying ? jsx(CircularProgress, { size: 22, color: "inherit" }) : "Copy ".concat(copyableItems.length || '', " item(s)") })] })) }), sourceSite && (jsx(CrossSitePathSelectionDialog, { open: sourcePathPickerOpen, siteId: sourceSite.id, siteLabel: "".concat(sourceSite.name, " (").concat(sourceSite.id, ")"), stripXmlIndex: false, onClose: function () { return setSourcePathPickerOpen(false); }, onAccept: handlePathSelected }))] }));
 }
 
 function objectValuesIfNumericKeys$1(obj) {
@@ -5995,27 +11349,7 @@ function OpenSearchSchemaPanel(_a) {
                         }, children: "Insert exists" })), jsx(MenuItem$1, { onClick: function () { return menuField && openClauseDialog('match', menuField); }, children: "Insert match\u2026" }), jsx(MenuItem$1, { onClick: function () { return menuField && openClauseDialog('term', menuField); }, children: "Insert term\u2026" }), jsx(MenuItem$1, { onClick: function () { return menuField && openClauseDialog('prefix', menuField); }, children: "Insert prefix\u2026" }), jsx(MenuItem$1, { onClick: function () { return menuField && openClauseDialog('wildcard', menuField); }, children: "Insert wildcard\u2026" }), jsx(MenuItem$1, { onClick: function () { return menuField && openClauseDialog('range', menuField); }, children: "Insert range\u2026" })] }), jsxs(Dialog, { open: dialog.open, onClose: function () { return setDialog(function (d) { return (__assign(__assign({}, d), { open: false, mode: null })); }); }, fullWidth: true, maxWidth: "sm", children: [jsxs(DialogTitle, { children: [dialog.mode === 'match' && 'Match', dialog.mode === 'term' && 'Term', dialog.mode === 'prefix' && 'Prefix', dialog.mode === 'wildcard' && 'Wildcard', dialog.mode === 'range' && 'Range', dialog.field && (jsx(Typography, { component: "span", variant: "body2", fontFamily: "monospace", display: "block", sx: { mt: 1 }, children: dialog.field }))] }), jsx(DialogContent, { children: dialog.mode === 'range' ? (jsxs(Fragment, { children: [jsx(TextField$1, { margin: "dense", fullWidth: true, label: "gte (optional)", value: dialog.gte, onChange: function (e) { return setDialog(function (d) { return (__assign(__assign({}, d), { gte: e.target.value })); }); }, placeholder: "2024-01-01 or now-1y" }), jsx(TextField$1, { margin: "dense", fullWidth: true, label: "lte (optional)", value: dialog.lte, onChange: function (e) { return setDialog(function (d) { return (__assign(__assign({}, d), { lte: e.target.value })); }); }, placeholder: "now" })] })) : (jsx(TextField$1, { autoFocus: true, margin: "dense", fullWidth: true, label: dialog.mode === 'wildcard' ? 'Pattern (* and ? allowed)' : 'Value', value: dialog.value, onChange: function (e) { return setDialog(function (d) { return (__assign(__assign({}, d), { value: e.target.value })); }); }, multiline: dialog.mode === 'match', minRows: dialog.mode === 'match' ? 3 : 1 })) }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: function () { return setDialog(function (d) { return (__assign(__assign({}, d), { open: false, mode: null })); }); }, children: "Cancel" }), jsx(Button$1, { variant: "contained", onClick: confirmClauseDialog, children: "Insert clause" })] })] }), jsx(Divider, { sx: { my: 1 } }), jsxs(Box$1, { sx: { px: 1.5, py: 0.5 }, children: [jsx(Typography, { variant: "subtitle2", children: "Common fields (shortcuts)" }), jsxs(Typography, { variant: "caption", color: "text.secondary", children: ["Curated list \u2014 toggles ", jsx(Typography, { component: "span", variant: "caption", fontFamily: "monospace", children: "_source" }), "."] })] }), jsx(List, { dense: true, sx: { overflow: 'auto', py: 0, maxHeight: 220 }, children: CRAFTER_OPENSEARCH_FIELD_GROUPS.map(function (group) { return (jsxs(React__default.Fragment, { children: [jsx(ListItem, { secondaryAction: jsx(IconButton$1, { edge: "end", size: "small", "aria-label": openGroups[group.title] ? 'Collapse' : 'Expand', onClick: function () { return setOpenGroups(function (s) {
                                     var _a;
                                     return (__assign(__assign({}, s), (_a = {}, _a[group.title] = !s[group.title], _a)));
-                                }); }, children: openGroups[group.title] ? jsx(ExpandLessRoundedIcon, {}) : jsx(ExpandMoreRounded, {}) }), sx: { py: 0.5 }, children: jsx(ListItemText, { primary: group.title, primaryTypographyProps: { variant: 'subtitle2' } }) }), jsx(Collapse, { in: openGroups[group.title], timeout: "auto", unmountOnExit: true, children: jsx(List, { component: "div", dense: true, disablePadding: true, children: group.fields.map(function (field) { return (jsx(ListItem, { sx: { pl: 2, py: 0 }, children: jsx(FormControlLabel, { control: jsx(Checkbox, { size: "small", checked: sourceIsWildcard || selectedFields.has(field), disabled: sourceIsWildcard, onChange: function (_, c) { return toggleField(field, c); } }), label: jsx(Typography, { variant: "body2", fontFamily: "monospace", children: field }) }) }, field)); }) }) }), jsx(Divider, { component: "li" })] }, group.title)); }) })] }));
-}
-
-function _extends() {
-  return _extends = Object.assign ? Object.assign.bind() : function (n) {
-    for (var e = 1; e < arguments.length; e++) {
-      var t = arguments[e];
-      for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]);
-    }
-    return n;
-  }, _extends.apply(null, arguments);
-}
-
-function _objectWithoutPropertiesLoose(r, e) {
-  if (null == r) return {};
-  var t = {};
-  for (var n in r) if ({}.hasOwnProperty.call(r, n)) {
-    if (-1 !== e.indexOf(n)) continue;
-    t[n] = r[n];
-  }
-  return t;
+                                }); }, children: openGroups[group.title] ? jsx(ExpandLessRoundedIcon, {}) : jsx(ExpandMoreRounded, {}) }), sx: { py: 0.5 }, children: jsx(ListItemText, { primary: group.title, primaryTypographyProps: { variant: 'subtitle2' } }) }), jsx(Collapse$1, { in: openGroups[group.title], timeout: "auto", unmountOnExit: true, children: jsx(List, { component: "div", dense: true, disablePadding: true, children: group.fields.map(function (field) { return (jsx(ListItem, { sx: { pl: 2, py: 0 }, children: jsx(FormControlLabel, { control: jsx(Checkbox, { size: "small", checked: sourceIsWildcard || selectedFields.has(field), disabled: sourceIsWildcard, onChange: function (_, c) { return toggleField(field, c); } }), label: jsx(Typography, { variant: "body2", fontFamily: "monospace", children: field }) }) }, field)); }) }) }), jsx(Divider, { component: "li" })] }, group.title)); }) })] }));
 }
 
 // These are filled with ranges (rangeFrom[i] up to but not including
