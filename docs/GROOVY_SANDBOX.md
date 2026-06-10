@@ -51,6 +51,19 @@ Commit the site sandbox change in Studio so the whitelist reloads.
 
 Marker line in the append file: `# Studio UI Goodies plugin (org.rd.plugin.uigoodies)`
 
+`./scripts/install-plugin.sh` merges this fragment automatically when the site whitelist file exists.
+
+## Remote install failures
+
+Symptoms on another server (500, HTML error page, or `Bad control character in string literal in JSON` in the browser) usually mean one of:
+
+1. **Stale install** — Groovy or JS on the server is older than your local repo. Re-run `./scripts/install-plugin.sh` after `yarn dist`, bump plugin patch version, and reload scripts.
+2. **Whitelist / bean restriction** — Enterprise or hardened Studio blocks methods or beans this plugin uses. Merge the whitelist append and allowed beans (above).
+3. **Wrong install path** — `marketplace/copy` `path` must be readable on the **Studio host**, not a dev-machine path from a README example.
+4. **Uncommitted site config** — Whitelist or plugin files copied but not committed in the site sandbox never load in Studio.
+
+REST responses sanitize path and error strings (`jsonSafeText`) so control characters in exception messages do not break JSON parsing in the UI.
+
 ## Scripts in this plugin
 
 | Script | Purpose |

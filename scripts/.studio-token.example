@@ -1,0 +1,3 @@
+# Copy to scripts/.studio-token (gitignored) or export CRAFTER_STUDIO_TOKEN.
+# Get a Bearer token from Studio DevTools after logging in.
+CRAFTER_STUDIO_TOKEN="paste-your-bearer-token-here"

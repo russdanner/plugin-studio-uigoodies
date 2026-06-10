@@ -17,34 +17,56 @@ place by doing a bit of programming and send us pull request :)
 
 ## Install based on this repository
 
-You can install this plugin by cloning this repository and using the Studio API.
+### Recommended: install script
 
-1. Create a Studio API token.
-2. Execute the following CURL command a terminal
+From this repo (on the **Studio server**, or with `path` pointing at a clone on that host):
+
+```bash
+cp scripts/.studio-token.example scripts/.studio-token   # paste a fresh Bearer token
+./scripts/install-plugin.sh YOUR-SITE-ID http://YOUR-STUDIO:8080
+```
+
+The script:
+
+1. Runs `yarn dist` in `src/packages/uigoodies-components` (fresh `index.js`)
+2. Calls `POST /studio/api/2/marketplace/copy` (commits into the site sandbox)
+3. Reloads Groovy plugin scripts
+4. Merges `uigoodies-plugin-whitelist.append` when the site has a Groovy whitelist file
+
+### Manual CURL install
+
+1. Build the UI: `cd src/packages/uigoodies-components && yarn install && yarn dist`
+2. Create a Studio API token.
+3. Run marketplace/copy — **`path` must exist on the Studio host**, not only on your laptop:
 
 ```bash
 curl --location --request POST 'http://SERVER_AND_PORT/studio/api/2/marketplace/copy' \
---header 'Authorization: Bearer YOUR_STUDIO_API_TOKEN' \
---header 'Content-Type: application/json' \
---data-raw '{
-  "siteId": "YOUR-SITE-ID",
-  "path": "THE_ABSOLUTEL_FILE_SYSTEM_PATH_TO_THIS_REPO",
-  "parameters": { }
-}
+  --header 'Authorization: Bearer YOUR_STUDIO_API_TOKEN' \
+  --header 'Content-Type: application/json' \
+  --data-raw '{
+    "siteId": "YOUR-SITE-ID",
+    "path": "/absolute/path/on/studio/server/plugin-studio-uigoodies",
+    "parameters": {}
+  }'
 ```
 
-Here is a real-life functioning example:
+4. Reload scripts: `GET /studio/api/2/plugin/script/reload?siteId=YOUR-SITE-ID&token=YOUR_TOKEN`
+5. Hard-refresh Studio (Ctrl+Shift+R).
 
-```bash
-curl --location --request POST 'http://localhost:8080/studio/api/2/marketplace/copy' \
---header 'Authorization: Bearer eyJhbGciOiJQQkVTMi1IUzUxMitBMjU2S1ciLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwiY3R5IjoiSldUIiwicDJjIjo2NTUzNiwicDJzIjoiQ0hmZDQ4SmlsT1I5bzVociJ9.Iq5RcXLbT85nTXKWFr054e0LZ-RaMpkVVdAo5UtqW17hgkJ_MNPIXPf_NcW9q-GuRsHpCjtwbhTjgHHLdLK8vbl8Kb3dKsS-.HdJcVASJ1_SnaafB5hiY2g.T0hOxNfhfDuhVPEF1lCgCCuuChpj_8tvpD48CXo8RoXOXqa-fgkyOV88dk0OaRDmKY2QLcPeiQAddGI_gsn_bJd0LM0lA_zVpDdiUkWvDYzO5tDefpG3z7tfC5DWIkHUtPQBlWLNkkIzNyv2xsSEQUGClPurP2Bue70Q8WG75YPZkhl6uw2FWKM_ida3kyCakOgt51TVKN3Fbn4MbtuzX6f5Rc0QPOs0i9E0ejejfL5U4sHu-0ULFTPmSrECxcSg_yjPRu2Z39IhPPJ44ehMClho4kWGtsLnMiP0380BkspNTEN1O8tUl1D3bZ5nznC_iat0EM651t-uFAGrVKrlsg.9P0gqUGEvr6XDFXm8Py_0hdfXKcdF7BR8T_2gqu7Jcw' \
---header 'Content-Type: application/json' \
---data-raw '{
-  "siteId": "ed3",
-  "path": "/Volumes/Projects/repositories/plugin-studio-uigoodies",
-  "parameters": { }
-}'
-```
+### Remote server checklist (works locally, fails elsewhere)
+
+| Check | Why it matters |
+|-------|----------------|
+| Plugin repo cloned **on the Studio server** | `marketplace/copy` reads `path` from Studio's filesystem |
+| `yarn dist` run before copy | Without it, sites get stale or missing `index.js` |
+| Bump `craftercms-plugin.yaml` version after changes | Marketplace may skip unchanged plugin artifacts |
+| Groovy script reload after install | Updated `.groovy` / class files are not live until reload |
+| `studio.scripting.sandbox.whitelist.enable: true` | Append `authoring/config/studio/extension/groovy/uigoodies-plugin-whitelist.append` to the site whitelist and commit |
+| `studio.scripting.restrictBeans: true` | Add `cstudioContentService,dependencyServiceInternal` to `studio.scripting.allowedBeans` |
+
+Do **not** rsync into `static-assets/` at the site root — marketplace maps plugin assets to `config/studio/static-assets/...`. Manual copies leave dirty git and wrong paths.
+
+See [docs/GROOVY_SANDBOX.md](docs/GROOVY_SANDBOX.md) for sandbox and bean-restriction details.
 
 ### Installation note for Project Tools auto-wiring
 

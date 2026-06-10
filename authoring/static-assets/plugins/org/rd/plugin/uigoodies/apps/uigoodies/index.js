@@ -7809,11 +7809,11 @@ function asPlainString(value) {
     }
     return String(value);
 }
-function pluginScriptUrl(scriptName, sourceSiteId) {
+function pluginScriptUrl(scriptName, studioSiteId) {
     return ('/studio/api/2/plugin/script/plugins/org/rd/plugin/uigoodies/' +
         scriptName +
         '?siteId=' +
-        encodeURIComponent(sourceSiteId));
+        encodeURIComponent(studioSiteId));
 }
 function isApiResponse(value) {
     if (!value || typeof value !== 'object') {
@@ -7837,6 +7837,87 @@ function isCopyResultPayload(value) {
 }
 function isApiErrorCode(code) {
     return typeof code === 'number' && code >= 1000;
+}
+function looksLikeStackTrace(text) {
+    return (text.includes('FilterChain.doFilter') ||
+        text.includes('UrlRewriteFilter') ||
+        text.includes('FilterChainProxy') ||
+        /\n\s+at org\./.test(text) ||
+        /\n\s+at java\./.test(text));
+}
+/** One-line message for authors. Stack traces belong in server logs only. */
+function sanitizeUserErrorMessage(text, fallback) {
+    var trimmed = text.trim();
+    if (!trimmed || looksLikeStackTrace(trimmed)) {
+        return fallback;
+    }
+    var firstLine = trimmed.split('\n')[0].trim();
+    if (!firstLine || looksLikeStackTrace(firstLine)) {
+        return fallback;
+    }
+    return firstLine.length > 300 ? "".concat(firstLine.slice(0, 300), "\u2026") : firstLine;
+}
+function formatStudioCode1000() {
+    return {
+        message: 'The copy plan could not be built. Your Studio administrator can find details in the authoring log.'
+    };
+}
+function extractPluginErrorDetails(value, fallback) {
+    var _a, _b;
+    var current = value;
+    for (var depth = 0; depth < 8; depth++) {
+        if (!current || typeof current !== 'object') {
+            break;
+        }
+        var obj = current;
+        if (typeof obj.error === 'string' && obj.error) {
+            return {
+                message: sanitizeUserErrorMessage(asPlainString(obj.error), fallback),
+                detail: typeof obj.detail === 'string' ? obj.detail : undefined
+            };
+        }
+        if (isApiResponse(obj) && isApiErrorCode(obj.code)) {
+            var nested = (_a = obj.response) !== null && _a !== void 0 ? _a : obj.result;
+            if (nested && typeof nested === 'object') {
+                var fromNested = extractPluginErrorDetails(nested, fallback);
+                if (fromNested) {
+                    return fromNested;
+                }
+            }
+            var msg = (_b = obj.message) === null || _b === void 0 ? void 0 : _b.trim();
+            if (msg && msg !== 'Internal system failure') {
+                return { message: sanitizeUserErrorMessage(msg, fallback) };
+            }
+            return formatStudioCode1000();
+        }
+        if (isAjaxResponse(obj)) {
+            current = obj.response;
+            continue;
+        }
+        if (obj.response != null && typeof obj.response === 'object') {
+            current = obj.response;
+            continue;
+        }
+        if (obj.result != null && typeof obj.result === 'object') {
+            current = obj.result;
+            continue;
+        }
+        break;
+    }
+    return null;
+}
+function pluginErrorFromPayload(payload, fallback) {
+    return {
+        message: payload.error ? sanitizeUserErrorMessage(asPlainString(payload.error), fallback) : fallback,
+        detail: payload.detail
+    };
+}
+function pluginErrorSummary(details) {
+    return details.message;
+}
+function PluginErrorAlert(_a) {
+    var details = _a.details;
+    return (jsx(Alert, { severity: "error", children: jsx(Typography, { variant: "body2", component: "div", children: details.message }) }));
 }
 function unwrapPluginResponse(response, payloadCheck) {
     if (payloadCheck === void 0) { payloadCheck = isPlanPayload; }
@@ -7868,13 +7949,27 @@ function unwrapPluginResponse(response, payloadCheck) {
     return (current !== null && current !== void 0 ? current : {});
 }
 function parsePlanResponse(response) {
-    var _a;
+    var fallback = 'The copy plan could not be built.';
+    var envelopeError = extractPluginErrorDetails(response, fallback);
+    if (envelopeError) {
+        return {
+            error: envelopeError.message,
+            detail: envelopeError.detail,
+            items: [],
+            sourcePaths: []
+        };
+    }
     var raw = unwrapPluginResponse(response, isPlanPayload);
     if (raw.error) {
-        return __assign(__assign({}, raw), { items: [] });
+        return __assign(__assign({}, raw), { error: sanitizeUserErrorMessage(asPlainString(raw.error), fallback), items: [] });
     }
     if (isApiResponse(raw) && isApiErrorCode(raw.code)) {
-        return { error: (_a = raw.message) !== null && _a !== void 0 ? _a : 'Failed to build copy plan', items: [] };
+        var studioError = formatStudioCode1000();
+        return {
+            error: studioError.message,
+            items: [],
+            sourcePaths: []
+        };
     }
     if (!raw.sourceSiteId && !Array.isArray(raw.items) && !raw.sourcePath && !raw.sourcePaths) {
         return { error: 'Invalid copy plan response from server', items: [], sourcePaths: [] };
@@ -7897,7 +7992,20 @@ function parsePlanResponse(response) {
                 : [], items: items });
 }
 function parseCopyResponse(response) {
-    var _a;
+    var fallback = 'The copy could not be completed.';
+    var envelopeError = extractPluginErrorDetails(response, fallback);
+    if (envelopeError) {
+        return {
+            successCount: 0,
+            failureCount: 0,
+            skippedCount: 0,
+            successes: [],
+            failures: [],
+            skipped: [],
+            error: envelopeError.message,
+            detail: envelopeError.detail
+        };
+    }
     var raw = unwrapPluginResponse(response, isCopyResultPayload);
     if (raw.error) {
         return {
@@ -7907,10 +8015,12 @@ function parseCopyResponse(response) {
             successes: [],
             failures: [],
             skipped: [],
-            error: raw.error
+            error: sanitizeUserErrorMessage(asPlainString(raw.error), fallback),
+            detail: raw.detail
         };
     }
     if (isApiResponse(raw) && isApiErrorCode(raw.code)) {
+        var studioError = formatStudioCode1000();
         return {
             successCount: 0,
             failureCount: 0,
@@ -7918,7 +8028,7 @@ function parseCopyResponse(response) {
             successes: [],
             failures: [],
             skipped: [],
-            error: (_a = raw.message) !== null && _a !== void 0 ? _a : 'Copy failed'
+            error: studioError.message
         };
     }
     var successes = (Array.isArray(raw.successes)
@@ -7958,47 +8068,34 @@ function parseCopyResponse(response) {
                 : []
     };
 }
-function extractAjaxErrorMessage(error, fallback) {
-    var _a, _b, _c;
+function extractAjaxErrorDetails(error, fallback) {
+    var _a;
+    var fromBody = (_a = extractPluginErrorDetails(error, fallback)) !== null && _a !== void 0 ? _a : extractPluginErrorDetails(error === null || error === void 0 ? void 0 : error.response, fallback);
+    if (fromBody) {
+        return fromBody;
+    }
     var e = error;
-    var nested = (_a = e === null || e === void 0 ? void 0 : e.response) === null || _a === void 0 ? void 0 : _a.response;
-    if (nested && typeof nested === 'object') {
-        if (typeof ((_b = nested.result) === null || _b === void 0 ? void 0 : _b.error) === 'string' && nested.result.error) {
-            return nested.result.error;
-        }
-        if (typeof nested.error === 'string' && nested.error) {
-            return nested.error;
-        }
-        if (typeof nested.message === 'string' && nested.message) {
-            return nested.message;
-        }
-    }
-    var ajaxBody = e === null || e === void 0 ? void 0 : e.response;
-    if (ajaxBody && typeof ajaxBody === 'object') {
-        if (typeof ((_c = ajaxBody.result) === null || _c === void 0 ? void 0 : _c.error) === 'string' && ajaxBody.result.error) {
-            return ajaxBody.result.error;
-        }
-        if (typeof ajaxBody.error === 'string' && ajaxBody.error) {
-            return ajaxBody.error;
-        }
-        if (typeof ajaxBody.message === 'string' && ajaxBody.message && ajaxBody.message !== 'OK') {
-            return ajaxBody.message;
-        }
-    }
-    if (typeof (e === null || e === void 0 ? void 0 : e.message) === 'string' && e.message) {
-        return e.message;
-    }
-    return fallback;
+    var statusSuffix = typeof e.status === 'number' ? " (HTTP ".concat(e.status, ")") : '';
+    var rawMessage = typeof e.message === 'string' && e.message ? "".concat(e.message).concat(statusSuffix) : fallback;
+    return { message: sanitizeUserErrorMessage(rawMessage, fallback) };
 }
-function callPlan(sourceSiteId, body) {
-    return postJSON(pluginScriptUrl('cross-site-content-copy-plan', sourceSiteId), body).pipe(map(function (response) { return parsePlanResponse(response); }), catchError(function (error) {
-        return of({ error: extractAjaxErrorMessage(error, 'Failed to build copy plan'), items: [] });
+function callPlan(studioSiteId, body) {
+    return postJSON(pluginScriptUrl('cross-site-content-copy-plan', studioSiteId), body).pipe(map(function (response) { return parsePlanResponse(response); }), catchError(function (error) {
+        var details = extractAjaxErrorDetails(error, 'Failed to build copy plan.');
+        return of({
+            error: details.message,
+            detail: details.detail,
+            items: [],
+            sourcePaths: []
+        });
     }));
 }
-function callCopy(sourceSiteId, body) {
-    return postJSON(pluginScriptUrl('cross-site-content-copy', sourceSiteId), body).pipe(map(function (response) { return parseCopyResponse(response); }), catchError(function (error) {
+function callCopy(studioSiteId, body) {
+    return postJSON(pluginScriptUrl('cross-site-content-copy', studioSiteId), body).pipe(map(function (response) { return parseCopyResponse(response); }), catchError(function (error) {
+        var details = extractAjaxErrorDetails(error, 'Copy failed.');
         return of({
-            error: extractAjaxErrorMessage(error, 'Copy failed'),
+            error: details.message,
+            detail: details.detail,
             successCount: 0,
             failureCount: 0,
             skippedCount: 0,
@@ -8125,7 +8222,7 @@ function CrossSiteContentCopy() {
     }, [sourceSite === null || sourceSite === void 0 ? void 0 : sourceSite.id]);
     var sourceSiteId = sourceSite === null || sourceSite === void 0 ? void 0 : sourceSite.id;
     var sameSourceAndDestination = Boolean(sourceSiteId && destSite && sourceSiteId === destSite.id);
-    var readyForPlan = Boolean(sourceSiteId && sourcePaths.length > 0 && destSite && !sameSourceAndDestination);
+    var readyForPlan = Boolean(activeSiteId && sourceSiteId && sourcePaths.length > 0 && destSite && !sameSourceAndDestination);
     var handlePathSelected = function (path) {
         var normalized = path.trim();
         if (!normalized) {
@@ -8262,7 +8359,8 @@ function CrossSiteContentCopy() {
         setPlanError(null);
         setPlanLoading(true);
         setCopyResult(null);
-        var sub = callPlan(sourceSiteId, {
+        var sub = callPlan(activeSiteId, {
+            sourceSiteId: sourceSiteId,
             sourcePaths: sourcePaths,
             destinationSiteId: destSite.id,
             copyDependencies: copyDependencies
@@ -8270,7 +8368,7 @@ function CrossSiteContentCopy() {
             next: function (result) {
                 setPlanLoading(false);
                 if (result.error) {
-                    setPlanError(result.error);
+                    setPlanError(pluginErrorFromPayload(result, 'The copy plan could not be built.'));
                     setPlan(null);
                     return;
                 }
@@ -8278,22 +8376,23 @@ function CrossSiteContentCopy() {
             },
             error: function (error) {
                 setPlanLoading(false);
-                setPlanError(extractAjaxErrorMessage(error, 'Failed to build copy plan'));
+                setPlanError(extractAjaxErrorDetails(error, 'Failed to build copy plan.'));
                 setPlan(null);
             }
         });
         return function () { return sub.unsubscribe(); };
-    }, [readyForPlan, sourceSiteId, sourcePaths, destSite, copyDependencies]);
+    }, [readyForPlan, activeSiteId, sourceSiteId, sourcePaths, destSite, copyDependencies]);
     var overwriteCount = copyableItems.filter(function (item) { return item.existsOnDestination; }).length;
     var newCount = copyableItems.length - overwriteCount;
     var runCopy = function () {
         var _a;
-        if (!sourceSiteId || sourcePaths.length === 0 || !destSite || copyableItems.length === 0) {
+        if (!activeSiteId || !sourceSiteId || sourcePaths.length === 0 || !destSite || copyableItems.length === 0) {
             return;
         }
         (_a = copySubRef.current) === null || _a === void 0 ? void 0 : _a.unsubscribe();
         setCopying(true);
-        copySubRef.current = callCopy(sourceSiteId, {
+        copySubRef.current = callCopy(activeSiteId, {
+            sourceSiteId: sourceSiteId,
             sourcePaths: sourcePaths,
             destinationSiteId: destSite.id,
             copyDependencies: copyDependencies
@@ -8306,7 +8405,7 @@ function CrossSiteContentCopy() {
                 setCopying(false);
                 setCopyResult(result);
                 if (result.error) {
-                    dispatch(showSystemNotification({ message: result.error }));
+                    dispatch(showSystemNotification({ message: pluginErrorSummary(pluginErrorFromPayload(result, 'Copy failed.')) }));
                     return;
                 }
                 if (result.successCount === 0) {
@@ -8324,7 +8423,9 @@ function CrossSiteContentCopy() {
                     return;
                 }
                 setCopying(false);
-                dispatch(showSystemNotification({ message: extractAjaxErrorMessage(error, 'Copy failed') }));
+                dispatch(showSystemNotification({
+                    message: pluginErrorSummary(extractAjaxErrorDetails(error, 'Copy failed.'))
+                }));
             }
         });
     };
@@ -8363,7 +8464,7 @@ function CrossSiteContentCopy() {
                                             var item = sourceItemsByPath[path];
                                             var itemLoading = sourceItemsLoading && !item;
                                             return (jsxs(TableRow, { hover: true, children: [jsx(TableCell, { sx: { py: 1.25, maxWidth: 0, width: '100%' }, children: jsx(ContentItemRow, { item: item, path: path, loading: itemLoading }) }), jsxs(TableCell, { align: "right", sx: { whiteSpace: 'nowrap' }, children: [jsx(IconButton$1, { size: "small", "aria-label": "Item options", onClick: function (event) { return openItemMenu(event, path); }, disabled: !item, children: jsx(MoreVertIcon, { fontSize: "small" }) }), jsx(IconButton$1, { size: "small", "aria-label": "Remove", onClick: function () { return removeSourcePath(path); }, children: jsx(DeleteOutlineIcon, { fontSize: "small" }) })] })] }, path));
-                                        }) })) : (jsxs(Alert, { severity: "info", sx: { mt: 2 }, children: ["No source items yet. Click ", jsx("strong", { children: "Add item" }), " to browse and add paths to copy."] })), jsxs(Menu$1, { anchorEl: itemMenuAnchor, open: Boolean(itemMenuAnchor), onClose: closeItemMenu, children: [jsx(MenuItem$1, { onClick: handleItemView, children: "View" }), jsx(MenuItem$1, { onClick: handleItemHistory, children: "History" }), jsx(MenuItem$1, { onClick: handleItemDependencies, children: "Dependencies" })] })] }), jsx(Box$1, { children: jsx(FormControlLabel, { control: jsx(Checkbox, { size: "small", checked: copyDependencies, onChange: function (e) { return setCopyDependencies(e.target.checked); } }), label: "Include dependencies (components, linked assets)" }) }), jsx(Divider, {}), jsxs(Box$1, { children: [jsx(Typography, { variant: "subtitle2", gutterBottom: true, children: "3. Preview" }), !readyForPlan && (jsx(Typography, { variant: "body2", color: "text.secondary", children: "Choose source and destination projects, add at least one source item, and ensure they are different to preview what will be copied." })), readyForPlan && plan && !planLoading && !copyResult && sourcePaths.length > 1 && (jsxs(Typography, { variant: "body2", color: "text.secondary", sx: { mb: 1.5 }, children: ["Copying ", sourcePaths.length, " source selection(s) into ", jsx("strong", { children: destSite === null || destSite === void 0 ? void 0 : destSite.id }), "."] })), readyForPlan && planLoading && (jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', gap: 1, py: 2 }, children: [jsx(CircularProgress, { size: 20 }), jsx(Typography, { variant: "body2", color: "text.secondary", children: "Building copy plan\u2026" })] })), readyForPlan && planError && !planLoading && (jsx(Alert, { severity: "error", children: planError })), readyForPlan && plan && !planLoading && !copyResult && (jsxs(Fragment, { children: [jsxs(Stack$1, { direction: "row", spacing: 1, sx: { mb: 2, flexWrap: 'wrap' }, children: [jsx(Chip, { size: "small", label: "".concat(copyableItems.length, " file(s)"), color: "primary", variant: "outlined" }), newCount > 0 && jsx(Chip, { size: "small", label: "".concat(newCount, " new"), color: "success", variant: "outlined" }), overwriteCount > 0 && (jsx(Chip, { size: "small", label: "".concat(overwriteCount, " overwrite"), color: "warning", variant: "outlined" }))] }), overwriteCount > 0 && (jsxs(Alert, { severity: "warning", sx: { mb: 2 }, children: [overwriteCount, " item(s) already exist in ", jsx("strong", { children: destSite === null || destSite === void 0 ? void 0 : destSite.id }), " and will be replaced."] })), copyableItems.length === 0 ? (jsx(Alert, { severity: "info", children: "No copyable files found for this selection." })) : (jsx(Box$1, { sx: { mt: 0 }, children: jsx(ItemListTable, { headerLabel: "Items to copy", children: copyableItems.map(function (planItem) {
+                                        }) })) : (jsxs(Alert, { severity: "info", sx: { mt: 2 }, children: ["No source items yet. Click ", jsx("strong", { children: "Add item" }), " to browse and add paths to copy."] })), jsxs(Menu$1, { anchorEl: itemMenuAnchor, open: Boolean(itemMenuAnchor), onClose: closeItemMenu, children: [jsx(MenuItem$1, { onClick: handleItemView, children: "View" }), jsx(MenuItem$1, { onClick: handleItemHistory, children: "History" }), jsx(MenuItem$1, { onClick: handleItemDependencies, children: "Dependencies" })] })] }), jsx(Box$1, { children: jsx(FormControlLabel, { control: jsx(Checkbox, { size: "small", checked: copyDependencies, onChange: function (e) { return setCopyDependencies(e.target.checked); } }), label: "Include dependencies (components, linked assets)" }) }), jsx(Divider, {}), jsxs(Box$1, { children: [jsx(Typography, { variant: "subtitle2", gutterBottom: true, children: "3. Preview" }), !readyForPlan && (jsx(Typography, { variant: "body2", color: "text.secondary", children: "Choose source and destination projects, add at least one source item, and ensure they are different to preview what will be copied." })), readyForPlan && plan && !planLoading && !copyResult && sourcePaths.length > 1 && (jsxs(Typography, { variant: "body2", color: "text.secondary", sx: { mb: 1.5 }, children: ["Copying ", sourcePaths.length, " source selection(s) into ", jsx("strong", { children: destSite === null || destSite === void 0 ? void 0 : destSite.id }), "."] })), readyForPlan && planLoading && (jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', gap: 1, py: 2 }, children: [jsx(CircularProgress, { size: 20 }), jsx(Typography, { variant: "body2", color: "text.secondary", children: "Building copy plan\u2026" })] })), readyForPlan && planError && !planLoading && jsx(PluginErrorAlert, { details: planError }), readyForPlan && plan && !planLoading && !copyResult && (jsxs(Fragment, { children: [jsxs(Stack$1, { direction: "row", spacing: 1, sx: { mb: 2, flexWrap: 'wrap' }, children: [jsx(Chip, { size: "small", label: "".concat(copyableItems.length, " file(s)"), color: "primary", variant: "outlined" }), newCount > 0 && jsx(Chip, { size: "small", label: "".concat(newCount, " new"), color: "success", variant: "outlined" }), overwriteCount > 0 && (jsx(Chip, { size: "small", label: "".concat(overwriteCount, " overwrite"), color: "warning", variant: "outlined" }))] }), overwriteCount > 0 && (jsxs(Alert, { severity: "warning", sx: { mb: 2 }, children: [overwriteCount, " item(s) already exist in ", jsx("strong", { children: destSite === null || destSite === void 0 ? void 0 : destSite.id }), " and will be replaced."] })), copyableItems.length === 0 ? (jsx(Alert, { severity: "info", children: "No copyable files found for this selection." })) : (jsx(Box$1, { sx: { mt: 0 }, children: jsx(ItemListTable, { headerLabel: "Items to copy", children: copyableItems.map(function (planItem) {
                                                         var item = planItemsByPath[planItem.path];
                                                         var itemLoading = planItemsLoading && !item;
                                                         return (jsx(TableRow, { hover: true, children: jsx(TableCell, { sx: { py: 1.25, maxWidth: 0, width: '100%' }, children: jsx(ContentItemRow, { item: item, path: planItem.path, loading: itemLoading, trailing: jsx(PlanItemTrailing, { planItem: planItem }) }) }) }, planItem.path));

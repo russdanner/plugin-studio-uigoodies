@@ -10,7 +10,7 @@ import java.io.InputStream
 
 /**
  * Shared cross-site copy helpers. Uses only Studio content/dependency beans and
- * sandbox-safe IO ({@link ByteArrayInputStream}, {@link InputStream#readAllBytes()}).
+ * sandbox-safe collections ({@link java.util.ArrayList}) plus IO APIs.
  */
 final class CrossSiteContentCopySupport {
 
@@ -18,10 +18,9 @@ final class CrossSiteContentCopySupport {
 
     private CrossSiteContentCopySupport() {}
 
-    /**
-     * Crafter JSON marshaling turns Groovy GStrings into objects ({@code values}, {@code strings},
-     * {@code bytes}, …) instead of plain strings. Always coerce paths before returning them in REST maps.
-     */
+    /** Maximum content paths expanded from folder selections (prevents runaway BFS / timeouts). */
+    static final int MAX_COLLECTED_PATHS = 10000
+
     static String plainPath(def value) {
         if (value == null) {
             return null
@@ -29,50 +28,128 @@ final class CrossSiteContentCopySupport {
         return value.toString()
     }
 
+    /** Strip control characters that break JSON serialization in Studio REST responses. */
+    static String jsonSafeText(def value) {
+        def text = plainPath(value)
+        if (!text) {
+            return text
+        }
+        return text.replaceAll(/[\u0000-\u001F\u007F]/, ' ').trim()
+    }
+
+    static Map errorMap(String message, String hint = null, String detail = null) {
+        def out = [error: jsonSafeText(message ?: 'Request failed')]
+        if (hint) {
+            out.hint = jsonSafeText(hint)
+        }
+        if (detail) {
+            out.detail = jsonSafeText(detail)
+        }
+        return out
+    }
+
+    static Map failureFromThrowable(Throwable t, String context) {
+        def type = t?.class?.simpleName ?: 'Error'
+        def msg = jsonSafeText(t?.message) ?: type
+        LOG.error('[uigoodies CrossSiteContentCopy] {} — {}: {}', context, type, msg, t)
+        def userMsg = msg && msg != type ? "${context}: ${msg}" : context
+        return errorMap(jsonSafeText(userMsg))
+    }
+
+    static void addUniquePath(List<String> paths, def rawPath) {
+        def path = plainPath(rawPath)?.trim()
+        if (path && !paths.contains(path)) {
+            paths.add(path)
+        }
+    }
+
+    static List<String> uniquePaths(Collection paths) {
+        def out = []
+        paths?.each { entry ->
+            addUniquePath(out, entry)
+        }
+        return out
+    }
+
+    static ContentItemTO safeGetContentItem(def contentService, String site, String path) {
+        if (!path?.trim()) {
+            return null
+        }
+        try {
+            return contentService.getContentItem(site, path)
+        } catch (Exception e) {
+            LOG.warn('Failed to load content item {} in site {}: {}', path, site, e.message)
+            return null
+        }
+    }
+
     static boolean isKeepFile(def path) {
         def p = plainPath(path)
         return p != null && p.endsWith('/.keep')
     }
 
-    static LinkedHashSet<String> plainPathSet(Collection paths) {
-        def out = new LinkedHashSet<String>()
-        paths?.each { entry ->
-            def path = plainPath(entry)?.trim()
-            if (path) {
-                out.add(path)
-            }
-        }
-        return out
-    }
-
     static Map readJsonBody(request) {
         def reader = request.getReader()
-        def body = reader.getText()
-        if (!body?.trim()) {
+        def text = ''
+        def line
+        while ((line = reader.readLine()) != null) {
+            text = text ? "${text}\n${line}" : line
+        }
+        if (!text?.trim()) {
             return [:]
         }
         try {
-            return new JsonSlurper().parseText(body)
+            return new JsonSlurper().parseText(text)
         } catch (Exception e) {
+            LOG.warn('Invalid JSON request body: {}', e.message)
             return null
         }
     }
 
-    static List<String> resolveSourcePaths(Map payload) {
-        def paths = new LinkedHashSet<String>()
-        if (payload?.sourcePaths instanceof Collection) {
-            payload.sourcePaths.each { entry ->
-                def normalized = entry?.toString()?.trim()
-                if (normalized) {
-                    paths.add(normalized)
+    static boolean isExplicitContentFile(String path) {
+        def p = plainPath(path)?.trim()
+        return p && p.endsWith('.xml') && !isKeepFile(p)
+    }
+
+    /** True when the destination site sandbox is reachable via content APIs. */
+    static boolean siteSandboxReachable(def contentService, String siteId) {
+        if (!siteId?.trim()) {
+            return false
+        }
+        def probes = [
+            '/site/website',
+            '/site/website/crafter-level-descriptor.level.xml'
+        ]
+        for (probe in probes) {
+            try {
+                if (contentService.contentExists(siteId, probe)) {
+                    return true
                 }
+            } catch (Exception ignored) {
+            }
+            try {
+                if (contentService.getContentItem(siteId, probe)) {
+                    return true
+                }
+            } catch (Exception ignored) {
             }
         }
-        def legacy = payload?.sourcePath?.toString()?.trim()
-        if (legacy) {
-            paths.add(legacy)
+        try {
+            return contentService.getContentItemTree(siteId, '/site/website', 1) != null
+        } catch (Exception ignored) {
+            return false
         }
-        return paths.toList()
+    }
+
+    static List<String> resolveSourcePaths(Map payload) {
+        def paths = []
+        if (payload?.sourcePaths instanceof Collection) {
+            payload.sourcePaths.each { entry ->
+                addUniquePath(paths, entry)
+            }
+        }
+        addUniquePath(paths, payload?.sourcePath)
+        return paths
     }
 
     static String normalizeFolderPath(String path) {
@@ -88,12 +165,12 @@ final class CrossSiteContentCopySupport {
         }
         def trimmed = rawPath.trim()
         def normalized = normalizeFolderPath(trimmed)
-        def variants = new LinkedHashSet<String>()
-        variants.add(trimmed)
+        def variants = []
+        addUniquePath(variants, trimmed)
         if (normalized) {
-            variants.add(normalized)
-            variants.add(normalized + '/')
-            variants.add(normalized + '/.keep')
+            addUniquePath(variants, normalized)
+            addUniquePath(variants, normalized + '/')
+            addUniquePath(variants, normalized + '/.keep')
         }
         for (variant in variants) {
             if (variant && contentService.contentExists(siteId, variant)) {
@@ -120,15 +197,6 @@ final class CrossSiteContentCopySupport {
         return false
     }
 
-    static void walkTree(ContentItemTO node, LinkedHashSet<String> paths) {
-        if (node?.uri) {
-            paths.add(plainPath(node.uri))
-        }
-        node?.children?.each { child ->
-            walkTree(child, paths)
-        }
-    }
-
     /** Depth passed to {@code getContentItemTree}: only direct children are returned per call. */
     private static final int TREE_CHILDREN_DEPTH = 2
 
@@ -136,7 +204,7 @@ final class CrossSiteContentCopySupport {
         if (!item) {
             return false
         }
-        if (item.folder || item.isFolder()) {
+        if (item.folder) {
             return true
         }
         def uri = plainPath(item.uri)
@@ -144,15 +212,13 @@ final class CrossSiteContentCopySupport {
     }
 
     static ContentItemTO loadTreeNode(def contentService, String site, String path) {
-        def candidates = new LinkedHashSet<String>()
+        def candidates = []
         def trimmed = path?.trim()
         def normalized = normalizeFolderPath(trimmed)
-        if (trimmed) {
-            candidates.add(trimmed)
-        }
+        addUniquePath(candidates, trimmed)
         if (normalized) {
-            candidates.add(normalized)
-            candidates.add(normalized + '/')
+            addUniquePath(candidates, normalized)
+            addUniquePath(candidates, normalized + '/')
         }
         ContentItemTO tree = null
         candidates.each { candidate ->
@@ -168,44 +234,63 @@ final class CrossSiteContentCopySupport {
     }
 
     /**
-     * Collect all content paths under a folder selection. Uses breadth-first traversal because
-     * {@code getContentItemTree(site, path, -1)} only resolves shallow trees in Studio.
+     * Collect content paths for a selection. Returns {@code [paths: List, error: String|null]}.
      */
-    static LinkedHashSet<String> collectPrimaryPaths(def contentService, String site, String path) {
-        def paths = new LinkedHashSet<String>()
-        def normalized = normalizeFolderPath(path?.trim())
+    static Map collectPrimaryPathsResult(def contentService, String site, String path) {
+        def paths = []
+        def trimmed = path?.trim()
+        def normalized = normalizeFolderPath(trimmed)
         if (!normalized) {
-            return paths
+            return [paths: paths, error: null]
+        }
+
+        if (isExplicitContentFile(trimmed)) {
+            addUniquePath(paths, trimmed)
+            return [paths: paths, error: null]
         }
 
         if (!pathExists(contentService, site, normalized)) {
-            paths.add(plainPath(normalized))
-            return plainPathSet(paths)
+            addUniquePath(paths, normalized)
+            return [paths: paths, error: null]
         }
 
         def root = loadTreeNode(contentService, site, normalized)
         if (!root) {
-            paths.add(plainPath(normalized))
-            return plainPathSet(paths)
+            addUniquePath(paths, normalized)
+            return [paths: paths, error: null]
         }
 
         if (!isFolderItem(root) && !(root.children?.size() > 0)) {
-            paths.add(plainPath(root.uri ?: normalized))
-            return plainPathSet(paths)
+            addUniquePath(paths, root.uri ?: normalized)
+            return [paths: paths, error: null]
         }
 
-        def visited = new LinkedHashSet<String>()
-        def queue = new ArrayDeque<String>()
+        def visited = []
+        def queue = []
         queue.add(plainPath(root.uri ?: normalized))
 
         while (!queue.isEmpty()) {
-            def current = queue.poll()
-            if (!visited.add(current)) {
+            if (paths.size() >= MAX_COLLECTED_PATHS) {
+                return [
+                    paths: paths,
+                    error: "Folder selection exceeds maximum of ${MAX_COLLECTED_PATHS} items. Select a smaller folder or fewer paths."
+                ]
+            }
+
+            def current = queue.remove(0)
+            if (visited.contains(current)) {
                 continue
             }
-            paths.add(current)
+            visited.add(current)
+            addUniquePath(paths, current)
 
-            def node = loadTreeNode(contentService, site, current)
+            ContentItemTO node
+            try {
+                node = loadTreeNode(contentService, site, current)
+            } catch (Exception e) {
+                LOG.warn('Failed to list children of {} in site {}: {}', current, site, e.message)
+                continue
+            }
             if (!node?.children) {
                 continue
             }
@@ -215,24 +300,24 @@ final class CrossSiteContentCopySupport {
                 if (!childPath || isKeepFile(childPath)) {
                     return
                 }
-                paths.add(childPath)
+                addUniquePath(paths, childPath)
                 if (isFolderItem(child)) {
                     queue.add(normalizeFolderPath(childPath))
                 }
             }
         }
 
-        return plainPathSet(paths)
+        return [paths: paths, error: null]
     }
 
-    static LinkedHashSet<String> collectDependencyPaths(def dependencyService, String site, Collection<String> seedPaths) {
-        def deps = new LinkedHashSet<String>()
+    static List<String> collectDependencyPaths(def dependencyService, String site, Collection<String> seedPaths) {
+        def deps = []
         seedPaths.each { seed ->
             try {
                 def itemDeps = dependencyService?.getItemSpecificDependencies(site, [seed] as List)
                 itemDeps?.each { dep ->
                     if (dep) {
-                        deps.add(dep.toString())
+                        addUniquePath(deps, jsonSafeText(dep))
                     }
                 }
             } catch (Exception e) {
@@ -242,39 +327,53 @@ final class CrossSiteContentCopySupport {
         return deps
     }
 
-    static LinkedHashSet<String> buildAllPaths(
+    static Map buildAllPathsResult(
         def contentService,
         def dependencyService,
         String sourceSiteId,
         Collection<String> sourcePaths,
         boolean copyDependencies
     ) {
-        def primaryPaths = new LinkedHashSet<String>()
-        sourcePaths.each { selection ->
-            primaryPaths.addAll(collectPrimaryPaths(contentService, sourceSiteId, selection))
+        def primaryPaths = []
+        for (selection in sourcePaths) {
+            def collected = collectPrimaryPathsResult(contentService, sourceSiteId, selection)
+            if (collected.error) {
+                return [paths: primaryPaths, error: collected.error]
+            }
+            collected.paths?.each { entry ->
+                addUniquePath(primaryPaths, entry)
+            }
         }
 
         def dependencyPaths = copyDependencies
             ? collectDependencyPaths(dependencyService, sourceSiteId, primaryPaths)
-            : [] as Set
+            : []
 
-        def allPaths = new LinkedHashSet<String>()
-        allPaths.addAll(primaryPaths)
+        def allPaths = []
+        primaryPaths.each { entry ->
+            addUniquePath(allPaths, entry)
+        }
         dependencyPaths.each { dep ->
-            if (!primaryPaths.contains(dep) && contentService.contentExists(sourceSiteId, dep)) {
-                allPaths.add(dep)
+            if (!primaryPaths.contains(dep)) {
+                try {
+                    if (contentService.contentExists(sourceSiteId, dep)) {
+                        addUniquePath(allPaths, dep)
+                    }
+                } catch (Exception e) {
+                    LOG.warn('Dependency path check failed for {} in site {}: {}', dep, sourceSiteId, e.message)
+                }
             }
         }
 
-        return withoutKeepFiles(allPaths)
+        return [paths: withoutKeepFiles(allPaths), error: null]
     }
 
-    static LinkedHashSet<String> withoutKeepFiles(Collection paths) {
-        def out = new LinkedHashSet<String>()
+    static List<String> withoutKeepFiles(Collection paths) {
+        def out = []
         paths?.each { entry ->
             def path = plainPath(entry)?.trim()
             if (path && !isKeepFile(path)) {
-                out.add(path)
+                addUniquePath(out, path)
             }
         }
         return out

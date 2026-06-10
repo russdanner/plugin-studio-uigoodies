@@ -24,8 +24,29 @@ method org.craftercms.studio.api.v1.to.ContentItemTO getChildren
 method org.craftercms.studio.api.v1.to.ContentItemTO getFolder
 method org.craftercms.studio.api.v1.to.ContentItemTO getContentType
 
+# Collections (cross-site copy folder walk)
+new java.util.LinkedHashSet
+new java.util.ArrayDeque
+method java.util.LinkedHashSet add java.lang.Object
+method java.util.ArrayDeque add java.lang.Object
+method java.util.ArrayDeque poll
+method java.util.ArrayDeque isEmpty
+method java.io.BufferedReader readLine
+method java.lang.Throwable getMessage
+method java.lang.Throwable getCause
+method java.lang.Throwable getStackTrace
+method java.lang.StackTraceElement getClassName
+method java.lang.StackTraceElement getMethodName
+method java.lang.StackTraceElement getFileName
+method java.lang.StackTraceElement getLineNumber
+
 # IO (cross-site copy)
 new java.io.ByteArrayInputStream byte[]
+new java.lang.StringBuilder
+method java.lang.StringBuilder append java.lang.String
+method java.lang.StringBuilder append char
+method java.lang.StringBuilder length
+method java.lang.StringBuilder toString
 method java.io.InputStream close
 method java.io.InputStream readAllBytes
 

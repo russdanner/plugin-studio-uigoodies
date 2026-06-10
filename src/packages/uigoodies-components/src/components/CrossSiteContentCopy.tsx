@@ -83,6 +83,8 @@ type CopyPlan = {
   overwriteCount: number;
   items: PlanItem[];
   error?: string;
+  hint?: string;
+  detail?: string;
 };
 
 type CopyResult = {
@@ -97,6 +99,13 @@ type CopyResult = {
   failures: Array<{ path: string; message: string }>;
   skipped: Array<{ path: string; reason: string }>;
   error?: string;
+  hint?: string;
+  detail?: string;
+};
+
+type PluginErrorDetails = {
+  message: string;
+  detail?: string;
 };
 
 function isInWorkflow(stateMap?: ItemStateMap): boolean {
@@ -148,12 +157,12 @@ function asPlainString(value: unknown): string {
   return String(value);
 }
 
-function pluginScriptUrl(scriptName: string, sourceSiteId: string): string {
+function pluginScriptUrl(scriptName: string, studioSiteId: string): string {
   return (
     '/studio/api/2/plugin/script/plugins/org/rd/plugin/uigoodies/' +
     scriptName +
     '?siteId=' +
-    encodeURIComponent(sourceSiteId)
+    encodeURIComponent(studioSiteId)
   );
 }
 
@@ -183,6 +192,109 @@ function isCopyResultPayload(value: Record<string, unknown>): boolean {
 
 function isApiErrorCode(code: unknown): boolean {
   return typeof code === 'number' && code >= 1000;
+}
+
+function looksLikeStackTrace(text: string): boolean {
+  return (
+    text.includes('FilterChain.doFilter') ||
+    text.includes('UrlRewriteFilter') ||
+    text.includes('FilterChainProxy') ||
+    /\n\s+at org\./.test(text) ||
+    /\n\s+at java\./.test(text)
+  );
+}
+
+/** One-line message for authors. Stack traces belong in server logs only. */
+function sanitizeUserErrorMessage(text: string, fallback: string): string {
+  const trimmed = text.trim();
+  if (!trimmed || looksLikeStackTrace(trimmed)) {
+    return fallback;
+  }
+  const firstLine = trimmed.split('\n')[0].trim();
+  if (!firstLine || looksLikeStackTrace(firstLine)) {
+    return fallback;
+  }
+  return firstLine.length > 300 ? `${firstLine.slice(0, 300)}…` : firstLine;
+}
+
+function formatStudioCode1000(): PluginErrorDetails {
+  return {
+    message: 'The copy plan could not be built. Your Studio administrator can find details in the authoring log.'
+  };
+}
+
+function extractPluginErrorDetails(value: unknown, fallback: string): PluginErrorDetails | null {
+  let current: unknown = value;
+
+  for (let depth = 0; depth < 8; depth++) {
+    if (!current || typeof current !== 'object') {
+      break;
+    }
+
+    const obj = current as Record<string, unknown>;
+
+    if (typeof obj.error === 'string' && obj.error) {
+      return {
+        message: sanitizeUserErrorMessage(asPlainString(obj.error), fallback),
+        detail: typeof obj.detail === 'string' ? obj.detail : undefined
+      };
+    }
+
+    if (isApiResponse(obj) && isApiErrorCode(obj.code)) {
+      const nested = obj.response ?? (obj as Record<string, unknown>).result;
+      if (nested && typeof nested === 'object') {
+        const fromNested = extractPluginErrorDetails(nested, fallback);
+        if (fromNested) {
+          return fromNested;
+        }
+      }
+      const msg = obj.message?.trim();
+      if (msg && msg !== 'Internal system failure') {
+        return { message: sanitizeUserErrorMessage(msg, fallback) };
+      }
+      return formatStudioCode1000();
+    }
+
+    if (isAjaxResponse(obj)) {
+      current = obj.response;
+      continue;
+    }
+    if (obj.response != null && typeof obj.response === 'object') {
+      current = obj.response;
+      continue;
+    }
+    if (obj.result != null && typeof obj.result === 'object') {
+      current = obj.result;
+      continue;
+    }
+    break;
+  }
+
+  return null;
+}
+
+function pluginErrorFromPayload(
+  payload: { error?: string; detail?: string },
+  fallback: string
+): PluginErrorDetails {
+  return {
+    message: payload.error ? sanitizeUserErrorMessage(asPlainString(payload.error), fallback) : fallback,
+    detail: payload.detail
+  };
+}
+
+function pluginErrorSummary(details: PluginErrorDetails): string {
+  return details.message;
+}
+
+function PluginErrorAlert({ details }: { details: PluginErrorDetails }) {
+  return (
+    <Alert severity="error">
+      <Typography variant="body2" component="div">
+        {details.message}
+      </Typography>
+    </Alert>
+  );
 }
 
 function unwrapPluginResponse<T extends Record<string, unknown>>(
@@ -224,12 +336,32 @@ function unwrapPluginResponse<T extends Record<string, unknown>>(
 }
 
 function parsePlanResponse(response: unknown): CopyPlan {
+  const fallback = 'The copy plan could not be built.';
+  const envelopeError = extractPluginErrorDetails(response, fallback);
+  if (envelopeError) {
+    return {
+      error: envelopeError.message,
+      detail: envelopeError.detail,
+      items: [],
+      sourcePaths: []
+    } as CopyPlan;
+  }
+
   const raw = unwrapPluginResponse<CopyPlan & { code?: number; message?: string }>(response, isPlanPayload);
   if (raw.error) {
-    return { ...raw, items: [] };
+    return {
+      ...raw,
+      error: sanitizeUserErrorMessage(asPlainString(raw.error), fallback),
+      items: []
+    };
   }
   if (isApiResponse(raw) && isApiErrorCode(raw.code)) {
-    return { error: raw.message ?? 'Failed to build copy plan', items: [] } as CopyPlan;
+    const studioError = formatStudioCode1000();
+    return {
+      error: studioError.message,
+      items: [],
+      sourcePaths: []
+    } as CopyPlan;
   }
   if (!raw.sourceSiteId && !Array.isArray(raw.items) && !raw.sourcePath && !raw.sourcePaths) {
     return { error: 'Invalid copy plan response from server', items: [], sourcePaths: [] } as CopyPlan;
@@ -259,6 +391,21 @@ function parsePlanResponse(response: unknown): CopyPlan {
 }
 
 function parseCopyResponse(response: unknown): CopyResult {
+  const fallback = 'The copy could not be completed.';
+  const envelopeError = extractPluginErrorDetails(response, fallback);
+  if (envelopeError) {
+    return {
+      successCount: 0,
+      failureCount: 0,
+      skippedCount: 0,
+      successes: [],
+      failures: [],
+      skipped: [],
+      error: envelopeError.message,
+      detail: envelopeError.detail
+    };
+  }
+
   const raw = unwrapPluginResponse<CopyResult & { code?: number; message?: string }>(response, isCopyResultPayload);
   if (raw.error) {
     return {
@@ -268,10 +415,12 @@ function parseCopyResponse(response: unknown): CopyResult {
       successes: [],
       failures: [],
       skipped: [],
-      error: raw.error
+      error: sanitizeUserErrorMessage(asPlainString(raw.error), fallback),
+      detail: raw.detail
     };
   }
   if (isApiResponse(raw) && isApiErrorCode(raw.code)) {
+    const studioError = formatStudioCode1000();
     return {
       successCount: 0,
       failureCount: 0,
@@ -279,7 +428,7 @@ function parseCopyResponse(response: unknown): CopyResult {
       successes: [],
       failures: [],
       skipped: [],
-      error: raw.message ?? 'Copy failed'
+      error: studioError.message
     };
   }
   const successes = (Array.isArray(raw.successes)
@@ -324,69 +473,50 @@ function parseCopyResponse(response: unknown): CopyResult {
   };
 }
 
-function extractAjaxErrorMessage(error: unknown, fallback: string): string {
-  const e = error as {
-    message?: string;
-    response?: {
-      response?: { message?: string; error?: string; result?: { error?: string; message?: string } };
-      message?: string;
-      error?: string;
-      result?: { error?: string; message?: string };
-    };
-  };
-  const nested = e?.response?.response;
-  if (nested && typeof nested === 'object') {
-    if (typeof nested.result?.error === 'string' && nested.result.error) {
-      return nested.result.error;
-    }
-    if (typeof nested.error === 'string' && nested.error) {
-      return nested.error;
-    }
-    if (typeof nested.message === 'string' && nested.message) {
-      return nested.message;
-    }
+function extractAjaxErrorDetails(error: unknown, fallback: string): PluginErrorDetails {
+  const fromBody =
+    extractPluginErrorDetails(error, fallback) ??
+    extractPluginErrorDetails((error as { response?: unknown })?.response, fallback);
+  if (fromBody) {
+    return fromBody;
   }
-  const ajaxBody = e?.response;
-  if (ajaxBody && typeof ajaxBody === 'object') {
-    if (typeof ajaxBody.result?.error === 'string' && ajaxBody.result.error) {
-      return ajaxBody.result.error;
-    }
-    if (typeof ajaxBody.error === 'string' && ajaxBody.error) {
-      return ajaxBody.error;
-    }
-    if (typeof ajaxBody.message === 'string' && ajaxBody.message && ajaxBody.message !== 'OK') {
-      return ajaxBody.message;
-    }
-  }
-  if (typeof e?.message === 'string' && e.message) {
-    return e.message;
-  }
-  return fallback;
+  const e = error as { message?: string; status?: number };
+  const statusSuffix = typeof e.status === 'number' ? ` (HTTP ${e.status})` : '';
+  const rawMessage = typeof e.message === 'string' && e.message ? `${e.message}${statusSuffix}` : fallback;
+  return { message: sanitizeUserErrorMessage(rawMessage, fallback) };
 }
 
-function callPlan(sourceSiteId: string, body: object): Observable<CopyPlan> {
-  return postJSON(pluginScriptUrl('cross-site-content-copy-plan', sourceSiteId), body).pipe(
+function callPlan(studioSiteId: string, body: object): Observable<CopyPlan> {
+  return postJSON(pluginScriptUrl('cross-site-content-copy-plan', studioSiteId), body).pipe(
     map((response) => parsePlanResponse(response)),
-    catchError((error) =>
-      of({ error: extractAjaxErrorMessage(error, 'Failed to build copy plan'), items: [] } as CopyPlan)
-    )
+    catchError((error) => {
+      const details = extractAjaxErrorDetails(error, 'Failed to build copy plan.');
+      return of({
+        error: details.message,
+        detail: details.detail,
+        items: [],
+        sourcePaths: []
+      } as CopyPlan);
+    })
   );
 }
 
-function callCopy(sourceSiteId: string, body: object): Observable<CopyResult> {
-  return postJSON(pluginScriptUrl('cross-site-content-copy', sourceSiteId), body).pipe(
+function callCopy(studioSiteId: string, body: object): Observable<CopyResult> {
+  return postJSON(pluginScriptUrl('cross-site-content-copy', studioSiteId), body).pipe(
     map((response) => parseCopyResponse(response)),
-    catchError((error) =>
-      of({
-        error: extractAjaxErrorMessage(error, 'Copy failed'),
+    catchError((error) => {
+      const details = extractAjaxErrorDetails(error, 'Copy failed.');
+      return of({
+        error: details.message,
+        detail: details.detail,
         successCount: 0,
         failureCount: 0,
         skippedCount: 0,
         successes: [],
         failures: [],
         skipped: []
-      } as CopyResult)
-    )
+      } as CopyResult);
+    })
   );
 }
 
@@ -556,7 +686,7 @@ export function CrossSiteContentCopy() {
   const [destSite, setDestSite] = useState<SiteOption | null>(null);
   const [copyDependencies, setCopyDependencies] = useState(true);
   const [plan, setPlan] = useState<CopyPlan | null>(null);
-  const [planError, setPlanError] = useState<string | null>(null);
+  const [planError, setPlanError] = useState<PluginErrorDetails | null>(null);
   const [planLoading, setPlanLoading] = useState(false);
   const [copying, setCopying] = useState(false);
   const [copyResult, setCopyResult] = useState<CopyResult | null>(null);
@@ -608,7 +738,9 @@ export function CrossSiteContentCopy() {
 
   const sourceSiteId = sourceSite?.id;
   const sameSourceAndDestination = Boolean(sourceSiteId && destSite && sourceSiteId === destSite.id);
-  const readyForPlan = Boolean(sourceSiteId && sourcePaths.length > 0 && destSite && !sameSourceAndDestination);
+  const readyForPlan = Boolean(
+    activeSiteId && sourceSiteId && sourcePaths.length > 0 && destSite && !sameSourceAndDestination
+  );
 
   const handlePathSelected = (path: string) => {
     const normalized = path.trim();
@@ -789,7 +921,8 @@ export function CrossSiteContentCopy() {
     setPlanLoading(true);
     setCopyResult(null);
 
-    const sub = callPlan(sourceSiteId!, {
+    const sub = callPlan(activeSiteId!, {
+      sourceSiteId: sourceSiteId!,
       sourcePaths,
       destinationSiteId: destSite!.id,
       copyDependencies
@@ -797,7 +930,7 @@ export function CrossSiteContentCopy() {
       next(result) {
         setPlanLoading(false);
         if (result.error) {
-          setPlanError(result.error);
+          setPlanError(pluginErrorFromPayload(result, 'The copy plan could not be built.'));
           setPlan(null);
           return;
         }
@@ -805,24 +938,25 @@ export function CrossSiteContentCopy() {
       },
       error(error) {
         setPlanLoading(false);
-        setPlanError(extractAjaxErrorMessage(error, 'Failed to build copy plan'));
+        setPlanError(extractAjaxErrorDetails(error, 'Failed to build copy plan.'));
         setPlan(null);
       }
     });
 
     return () => sub.unsubscribe();
-  }, [readyForPlan, sourceSiteId, sourcePaths, destSite, copyDependencies]);
+  }, [readyForPlan, activeSiteId, sourceSiteId, sourcePaths, destSite, copyDependencies]);
 
   const overwriteCount = copyableItems.filter((item) => item.existsOnDestination).length;
   const newCount = copyableItems.length - overwriteCount;
 
   const runCopy = () => {
-    if (!sourceSiteId || sourcePaths.length === 0 || !destSite || copyableItems.length === 0) {
+    if (!activeSiteId || !sourceSiteId || sourcePaths.length === 0 || !destSite || copyableItems.length === 0) {
       return;
     }
     copySubRef.current?.unsubscribe();
     setCopying(true);
-    copySubRef.current = callCopy(sourceSiteId, {
+    copySubRef.current = callCopy(activeSiteId, {
+      sourceSiteId,
       sourcePaths,
       destinationSiteId: destSite.id,
       copyDependencies
@@ -834,7 +968,7 @@ export function CrossSiteContentCopy() {
         setCopying(false);
         setCopyResult(result);
         if (result.error) {
-          dispatch(showSystemNotification({ message: result.error }));
+          dispatch(showSystemNotification({ message: pluginErrorSummary(pluginErrorFromPayload(result, 'Copy failed.')) }));
           return;
         }
         if (result.successCount === 0) {
@@ -853,7 +987,11 @@ export function CrossSiteContentCopy() {
           return;
         }
         setCopying(false);
-        dispatch(showSystemNotification({ message: extractAjaxErrorMessage(error, 'Copy failed') }));
+        dispatch(
+          showSystemNotification({
+            message: pluginErrorSummary(extractAjaxErrorDetails(error, 'Copy failed.'))
+          })
+        );
       }
     });
   };
@@ -1039,9 +1177,7 @@ export function CrossSiteContentCopy() {
               </Box>
             )}
 
-            {readyForPlan && planError && !planLoading && (
-              <Alert severity="error">{planError}</Alert>
-            )}
+            {readyForPlan && planError && !planLoading && <PluginErrorAlert details={planError} />}
 
             {readyForPlan && plan && !planLoading && !copyResult && (
               <>
