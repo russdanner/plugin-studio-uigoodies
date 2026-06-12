@@ -27,18 +27,44 @@ import ArrowRightRoundedIcon from '@mui/icons-material/ArrowRightRounded';
 import ArrowDropDownRoundedIcon from '@mui/icons-material/ArrowDropDownRounded';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
-import { DialogBody, DialogFooter, DialogHeader } from '@craftercms/studio-ui';
+import { BasePathSelector, DialogBody, DialogFooter, DialogHeader } from '@craftercms/studio-ui';
 import ItemTypeIcon from '@craftercms/studio-ui/components/ItemTypeIcon';
 import { SandboxItem } from '@craftercms/studio-ui/models/Item';
 import { GetChildrenResponse } from '@craftercms/studio-ui/models/GetChildrenResponse';
+import { SystemType } from '@craftercms/studio-ui/models/SystemType';
 import { checkPathExistence, fetchChildrenByPath } from '@craftercms/studio-ui/services/content';
-import { getIndividualPaths, withIndex, withoutFile, withoutIndex } from '@craftercms/studio-ui/utils/path';
+import { getIndividualPaths, getRootPath, withIndex, withoutFile, withoutIndex } from '@craftercms/studio-ui/utils/path';
 import { takeUntil } from 'rxjs/operators';
 import useUnmount$ from '@craftercms/studio-ui/hooks/useUnmount$';
 
 const DEFAULT_ROOT = '/site';
 const TREE_FETCH_LIMIT = 100;
-const TREE_SYSTEM_TYPES = ['folder', 'page'];
+
+/** Same roots as Studio's PathSelectionDialog BasePathSelector defaults. */
+const STUDIO_BASE_PATHS = [
+  { id: 'content', path: '/site' },
+  { id: 'assets', path: '/static-assets' },
+  { id: 'templates', path: '/templates' },
+  { id: 'scripts', path: '/scripts' }
+];
+
+function getTreeSystemTypes(rootPath: string): SystemType[] {
+  switch (getRootPath(rootPath || DEFAULT_ROOT)) {
+    case '/static-assets':
+      return ['folder', 'asset'];
+    case '/templates':
+      return ['folder', 'renderingTemplate'];
+    case '/scripts':
+      return ['folder', 'script'];
+    default:
+      return ['folder', 'page', 'component'];
+  }
+}
+
+function allowsFileSelection(rootPath: string): boolean {
+  const root = getRootPath(rootPath || '');
+  return root === '/static-assets' || root === '/templates' || root === '/scripts';
+}
 
 type ParsedChildrenResponse = {
   items: SandboxItem[];
@@ -115,6 +141,7 @@ type SourcePathSelectionInputProps = {
   siteId: string;
   rootPath: string;
   currentPath: string;
+  allowFiles?: boolean;
   onChange: (path: string) => void;
   allowSwitchingRootPath?: boolean;
   onChangeRoot?: () => void;
@@ -124,6 +151,7 @@ function SourcePathSelectionInput({
   siteId,
   rootPath,
   currentPath,
+  allowFiles = false,
   onChange,
   allowSwitchingRootPath = false,
   onChangeRoot
@@ -145,8 +173,11 @@ function SourcePathSelectionInput({
   const validatePath = () => {
     setIsChecking(true);
     let value = getFullPath();
-    value = withoutFile(value).replace(/\/$/, '');
-    const relative = value.slice(rootPath.length);
+    if (!allowFiles) {
+      value = withoutFile(value);
+    }
+    value = value.replace(/\/$/, '');
+    const relative = value.startsWith(rootPath) ? value.slice(rootPath.length) : value;
     setPath(relative);
 
     checkPathExistence(siteId, value)
@@ -344,6 +375,7 @@ function SourceSiteContentTree({ siteId, rootPath, selectedPath, onPathSelected 
   const [expandedItems, setExpandedItems] = useState<string[]>([rootPath]);
   const childrenByParentRef = useRef(childrenByParent);
   const loadingParentsRef = useRef(loadingParents);
+  const systemTypes = useMemo(() => getTreeSystemTypes(rootPath), [rootPath]);
 
   childrenByParentRef.current = childrenByParent;
   loadingParentsRef.current = loadingParents;
@@ -365,7 +397,7 @@ function SourceSiteContentTree({ siteId, rootPath, selectedPath, onPathSelected 
         limit: TREE_FETCH_LIMIT,
         sortStrategy: 'foldersFirst',
         order: 'ASC',
-        systemTypes: TREE_SYSTEM_TYPES
+        systemTypes
       }).subscribe({
         next(response) {
           setChildrenByParent((current) => ({
@@ -391,7 +423,7 @@ function SourceSiteContentTree({ siteId, rootPath, selectedPath, onPathSelected 
         }
       });
     },
-    [siteId]
+    [siteId, systemTypes]
   );
 
   const expandPathAncestors = useCallback(
@@ -536,6 +568,7 @@ export function CrossSitePathSelectionDialog({
               siteId={siteId}
               rootPath={rootPath}
               currentPath={currentPath}
+              allowFiles={allowsFileSelection(rootPath)}
               onChange={setCurrentPath}
               allowSwitchingRootPath
               onChangeRoot={() => {
@@ -551,23 +584,15 @@ export function CrossSitePathSelectionDialog({
             />
           </>
         ) : (
-          <TextField
-            select
-            fullWidth
-            label="Root"
+          <BasePathSelector
             value=""
+            basePaths={STUDIO_BASE_PATHS}
             onChange={(event) => {
               const path = event.target.value;
               setRootPath(path);
               setCurrentPath(path);
             }}
-            SelectProps={{ native: true }}
-          >
-            <option value="" disabled>
-              Choose root
-            </option>
-            <option value="/site">/site</option>
-          </TextField>
+          />
         )}
       </DialogBody>
       <DialogFooter>

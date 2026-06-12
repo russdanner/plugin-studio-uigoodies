@@ -44,16 +44,8 @@ import useEnv from '@craftercms/studio-ui/hooks/useEnv';
 import { DetailedItem, ItemStateMap } from '@craftercms/studio-ui/models/Item';
 import { fetchDetailedItems } from '@craftercms/studio-ui/services/content';
 import { fetchAll } from '@craftercms/studio-ui/services/sites';
-import {
-  closePathSelectionDialog,
-  pathSelectionDialogClosed,
-  showDependenciesDialog,
-  showEditDialog,
-  showHistoryDialog,
-  showPathSelectionDialog
-} from '@craftercms/studio-ui/state/actions/dialogs';
-import { batchActions, dispatchDOMEvent } from '@craftercms/studio-ui/state/actions/misc';
-import { createCustomDocumentEventListener } from '@craftercms/studio-ui/utils/dom';
+import { showDependenciesDialog, showEditDialog, showHistoryDialog } from '@craftercms/studio-ui/state/actions/dialogs';
+import { batchActions } from '@craftercms/studio-ui/state/actions/misc';
 import { showSystemNotification } from '@craftercms/studio-ui/state/actions/system';
 import { changeSite } from '@craftercms/studio-ui/state/actions/sites';
 import { fetchItemVersions } from '@craftercms/studio-ui/state/actions/versions';
@@ -758,40 +750,8 @@ export function CrossSiteContentCopy() {
     setAddPathError(null);
   };
 
-  const openActiveSitePathSelectionDialog = () => {
-    const callbackId = 'crossSiteCopyPathSelection';
-    const callbackAccept = 'accept';
-
-    dispatch(
-      showPathSelectionDialog({
-        rootPath: '/site',
-        initialPath: '',
-        showCreateFolderOption: false,
-        stripXmlIndex: false,
-        onClosed: batchActions([
-          dispatchDOMEvent({ id: callbackId, action: 'close' }),
-          pathSelectionDialogClosed()
-        ]),
-        onOk: batchActions([
-          dispatchDOMEvent({ id: callbackId, action: callbackAccept }),
-          closePathSelectionDialog()
-        ])
-      })
-    );
-
-    createCustomDocumentEventListener(callbackId, (detail) => {
-      if (detail.action === callbackAccept && detail.path) {
-        handlePathSelected(detail.path);
-      }
-    });
-  };
-
   const openAddItemDialog = () => {
     if (!sourceSite) {
-      return;
-    }
-    if (sourceSite.id === activeSiteId) {
-      openActiveSitePathSelectionDialog();
       return;
     }
     setSourcePathPickerOpen(true);
@@ -1087,8 +1047,9 @@ export function CrossSiteContentCopy() {
               </Stack>
             </Stack>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
-              Add pages, components, or folders from <strong>{sourceSite?.id ?? 'the source project'}</strong>. Use
-              Add item to browse that project and confirm a path.
+              Add content, static assets, templates, or scripts from{' '}
+              <strong>{sourceSite?.id ?? 'the source project'}</strong>. Use Add item to browse and select a folder or
+              file.
             </Typography>
             {addPathError && (
               <Typography variant="caption" color="error" sx={{ mb: 1, display: 'block' }}>

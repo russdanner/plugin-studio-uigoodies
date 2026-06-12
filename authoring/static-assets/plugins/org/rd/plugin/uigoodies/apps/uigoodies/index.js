@@ -8,7 +8,7 @@ const { isItemLockedForMe } = craftercms.utils.content;
 const React = craftercms.libs.React;
 const { useState, useRef, useEffect, useMemo, useCallback, createContext, useSyncExternalStore, useId, useImperativeHandle, useLayoutEffect, useContext, forwardRef } = craftercms.libs.React;
 const React__default = craftercms.libs.React && Object.prototype.hasOwnProperty.call(craftercms.libs.React, 'default') ? craftercms.libs.React['default'] : craftercms.libs.React;
-const { SystemIcon: SystemIcon$1, WidgetsGrid, DialogBody, DialogFooter: DialogFooter$1, DialogHeader } = craftercms.components;
+const { SystemIcon: SystemIcon$1, WidgetsGrid, DialogBody, DialogFooter: DialogFooter$1, DialogHeader, BasePathSelector } = craftercms.components;
 const ExpandMore = craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreOutlined') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreOutlined'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreOutlined')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreOutlined');
 const { createCustomDocumentEventListener } = craftercms.utils.dom;
 const TextField = craftercms.libs.MaterialUI.TextField && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.TextField, 'default') ? craftercms.libs.MaterialUI.TextField['default'] : craftercms.libs.MaterialUI.TextField;
@@ -45,7 +45,7 @@ const ErrorRounded = craftercms.utils.constants.components.get('@mui/icons-mater
 const KeyboardArrowLeftRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/KeyboardArrowLeftRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/KeyboardArrowLeftRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/KeyboardArrowLeftRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/KeyboardArrowLeftRounded');
 const ArrowRightRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/ArrowRightRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ArrowRightRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ArrowRightRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ArrowRightRounded');
 const ArrowDropDownRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/ArrowDropDownRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ArrowDropDownRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ArrowDropDownRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ArrowDropDownRounded');
-const { withoutIndex, getIndividualPaths, withoutFile, withIndex, getRootPath } = craftercms.utils.path;
+const { withoutIndex, getRootPath, getIndividualPaths, withoutFile, withIndex } = craftercms.utils.path;
 const Collapse = craftercms.libs.MaterialUI.Collapse && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Collapse, 'default') ? craftercms.libs.MaterialUI.Collapse['default'] : craftercms.libs.MaterialUI.Collapse;
 const Checkbox$1 = craftercms.libs.MaterialUI.Checkbox && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Checkbox, 'default') ? craftercms.libs.MaterialUI.Checkbox['default'] : craftercms.libs.MaterialUI.Checkbox;
 const { postJSON, getGlobalHeaders } = craftercms.utils.ajax;
@@ -7492,7 +7492,29 @@ function useUnmount$() {
 
 var DEFAULT_ROOT = '/site';
 var TREE_FETCH_LIMIT = 100;
-var TREE_SYSTEM_TYPES = ['folder', 'page'];
+/** Same roots as Studio's PathSelectionDialog BasePathSelector defaults. */
+var STUDIO_BASE_PATHS = [
+    { id: 'content', path: '/site' },
+    { id: 'assets', path: '/static-assets' },
+    { id: 'templates', path: '/templates' },
+    { id: 'scripts', path: '/scripts' }
+];
+function getTreeSystemTypes(rootPath) {
+    switch (getRootPath(rootPath || DEFAULT_ROOT)) {
+        case '/static-assets':
+            return ['folder', 'asset'];
+        case '/templates':
+            return ['folder', 'renderingTemplate'];
+        case '/scripts':
+            return ['folder', 'script'];
+        default:
+            return ['folder', 'page', 'component'];
+    }
+}
+function allowsFileSelection(rootPath) {
+    var root = getRootPath(rootPath || '');
+    return root === '/static-assets' || root === '/templates' || root === '/scripts';
+}
 function parseChildrenResponse(response) {
     var _a, _b;
     var items = [];
@@ -7557,11 +7579,11 @@ function rootItem(rootPath) {
     };
 }
 function SourcePathSelectionInput(_a) {
-    var siteId = _a.siteId, rootPath = _a.rootPath, currentPath = _a.currentPath, onChange = _a.onChange, _b = _a.allowSwitchingRootPath, allowSwitchingRootPath = _b === void 0 ? false : _b, onChangeRoot = _a.onChangeRoot;
+    var siteId = _a.siteId, rootPath = _a.rootPath, currentPath = _a.currentPath, _b = _a.allowFiles, allowFiles = _b === void 0 ? false : _b, onChange = _a.onChange, _c = _a.allowSwitchingRootPath, allowSwitchingRootPath = _c === void 0 ? false : _c, onChangeRoot = _a.onChangeRoot;
     var unmount$ = useUnmount$();
-    var _c = useState(''), path = _c[0], setPath = _c[1];
-    var _d = useState(null), pathExists = _d[0], setPathExists = _d[1];
-    var _e = useState(false), isChecking = _e[0], setIsChecking = _e[1];
+    var _d = useState(''), path = _d[0], setPath = _d[1];
+    var _e = useState(null), pathExists = _e[0], setPathExists = _e[1];
+    var _f = useState(false), isChecking = _f[0], setIsChecking = _f[1];
     useEffect(function () {
         var relative = withoutIndex(currentPath.startsWith(rootPath) ? currentPath.slice(rootPath.length) : currentPath);
         setPath(relative);
@@ -7572,8 +7594,11 @@ function SourcePathSelectionInput(_a) {
     var validatePath = function () {
         setIsChecking(true);
         var value = getFullPath();
-        value = withoutFile(value).replace(/\/$/, '');
-        var relative = value.slice(rootPath.length);
+        if (!allowFiles) {
+            value = withoutFile(value);
+        }
+        value = value.replace(/\/$/, '');
+        var relative = value.startsWith(rootPath) ? value.slice(rootPath.length) : value;
         setPath(relative);
         checkPathExistence(siteId, value)
             .pipe(takeUntil(unmount$))
@@ -7649,6 +7674,7 @@ function SourceSiteContentTree(_a) {
     var _d = useState([rootPath]), expandedItems = _d[0], setExpandedItems = _d[1];
     var childrenByParentRef = useRef(childrenByParent);
     var loadingParentsRef = useRef(loadingParents);
+    var systemTypes = useMemo(function () { return getTreeSystemTypes(rootPath); }, [rootPath]);
     childrenByParentRef.current = childrenByParent;
     loadingParentsRef.current = loadingParents;
     var loadChildren = useCallback(function (parentPath) {
@@ -7665,7 +7691,7 @@ function SourceSiteContentTree(_a) {
             limit: TREE_FETCH_LIMIT,
             sortStrategy: 'foldersFirst',
             order: 'ASC',
-            systemTypes: TREE_SYSTEM_TYPES
+            systemTypes: systemTypes
         }).subscribe({
             next: function (response) {
                 setChildrenByParent(function (current) {
@@ -7690,7 +7716,7 @@ function SourceSiteContentTree(_a) {
                 });
             }
         });
-    }, [siteId]);
+    }, [siteId, systemTypes]);
     var expandPathAncestors = useCallback(function (path) {
         if (!path || !path.startsWith(rootPath)) {
             return;
@@ -7761,14 +7787,14 @@ function CrossSitePathSelectionDialog(_a) {
         onAccept(path);
         onClose();
     };
-    return (jsxs(Dialog, { open: open, onClose: onClose, fullWidth: true, maxWidth: "sm", children: [jsx(DialogHeader, { title: jsxs(Fragment, { children: [jsx(FormattedMessage, { id: "pathSelectionDialog.title", defaultMessage: "Select Path" }), siteLabel ? " \u2014 ".concat(siteLabel) : ''] }), onCloseButtonClick: onClose }), jsx(DialogBody, { sx: { minHeight: '60vh' }, children: rootPath ? (jsxs(Fragment, { children: [jsx(SourcePathSelectionInput, { siteId: siteId, rootPath: rootPath, currentPath: currentPath, onChange: setCurrentPath, allowSwitchingRootPath: true, onChangeRoot: function () {
+    return (jsxs(Dialog, { open: open, onClose: onClose, fullWidth: true, maxWidth: "sm", children: [jsx(DialogHeader, { title: jsxs(Fragment, { children: [jsx(FormattedMessage, { id: "pathSelectionDialog.title", defaultMessage: "Select Path" }), siteLabel ? " \u2014 ".concat(siteLabel) : ''] }), onCloseButtonClick: onClose }), jsx(DialogBody, { sx: { minHeight: '60vh' }, children: rootPath ? (jsxs(Fragment, { children: [jsx(SourcePathSelectionInput, { siteId: siteId, rootPath: rootPath, currentPath: currentPath, allowFiles: allowsFileSelection(rootPath), onChange: setCurrentPath, allowSwitchingRootPath: true, onChangeRoot: function () {
                                 setRootPath('');
                                 setCurrentPath('');
-                            } }), jsx(SourceSiteContentTree, { siteId: siteId, rootPath: rootPath, selectedPath: currentPath, onPathSelected: setCurrentPath })] })) : (jsxs(TextField$1, { select: true, fullWidth: true, label: "Root", value: "", onChange: function (event) {
+                            } }), jsx(SourceSiteContentTree, { siteId: siteId, rootPath: rootPath, selectedPath: currentPath, onPathSelected: setCurrentPath })] })) : (jsx(BasePathSelector, { value: "", basePaths: STUDIO_BASE_PATHS, onChange: function (event) {
                         var path = event.target.value;
                         setRootPath(path);
                         setCurrentPath(path);
-                    }, SelectProps: { native: true }, children: [jsx("option", { value: "", disabled: true, children: "Choose root" }), jsx("option", { value: "/site", children: "/site" })] })) }), jsxs(DialogFooter$1, { children: [jsx(Button$1, { onClick: onClose, children: jsx(FormattedMessage, { id: "words.cancel", defaultMessage: "Cancel" }) }), jsx(Button$1, { variant: "contained", onClick: handleAccept, children: jsx(FormattedMessage, { id: "words.accept", defaultMessage: "Accept" }) })] })] }));
+                    } })) }), jsxs(DialogFooter$1, { children: [jsx(Button$1, { onClick: onClose, children: jsx(FormattedMessage, { id: "words.cancel", defaultMessage: "Cancel" }) }), jsx(Button$1, { variant: "contained", onClick: handleAccept, children: jsx(FormattedMessage, { id: "words.accept", defaultMessage: "Accept" }) })] })] }));
 }
 
 function isInWorkflow(stateMap) {
@@ -8236,35 +8262,8 @@ function CrossSiteContentCopy() {
         setSourcePaths(function (current) { return __spreadArray(__spreadArray([], current, true), [normalized], false); });
         setAddPathError(null);
     };
-    var openActiveSitePathSelectionDialog = function () {
-        var callbackId = 'crossSiteCopyPathSelection';
-        var callbackAccept = 'accept';
-        dispatch(showPathSelectionDialog({
-            rootPath: '/site',
-            initialPath: '',
-            showCreateFolderOption: false,
-            stripXmlIndex: false,
-            onClosed: batchActions([
-                dispatchDOMEvent({ id: callbackId, action: 'close' }),
-                pathSelectionDialogClosed()
-            ]),
-            onOk: batchActions([
-                dispatchDOMEvent({ id: callbackId, action: callbackAccept }),
-                closePathSelectionDialog()
-            ])
-        }));
-        createCustomDocumentEventListener(callbackId, function (detail) {
-            if (detail.action === callbackAccept && detail.path) {
-                handlePathSelected(detail.path);
-            }
-        });
-    };
     var openAddItemDialog = function () {
         if (!sourceSite) {
-            return;
-        }
-        if (sourceSite.id === activeSiteId) {
-            openActiveSitePathSelectionDialog();
             return;
         }
         setSourcePathPickerOpen(true);
@@ -8460,7 +8459,7 @@ function CrossSiteContentCopy() {
         }
         dispatch(changeSite(copiedDestinationSiteId));
     };
-    return (jsxs(Paper, { elevation: 0, sx: { height: '100%', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }, children: [jsxs(DialogBody, { sx: { flex: 1, overflow: 'auto', pt: 2 }, children: [jsx(Typography, { variant: "body2", color: "text.secondary", sx: { mb: 3 }, children: "Copy content from one project into another. Choose source and destination projects, then select items to copy." }), jsxs(Stack$1, { spacing: 3, children: [jsxs(Box$1, { children: [jsx(Typography, { variant: "subtitle2", gutterBottom: true, children: "1. Projects" }), sitesLoading ? (jsx(CircularProgress, { size: 24 })) : (jsxs(Stack$1, { spacing: 1.5, children: [jsx(Autocomplete, { options: sites, getOptionLabel: function (option) { return "".concat(option.name, " (").concat(option.id, ")"); }, isOptionEqualToValue: function (option, value) { return option.id === value.id; }, value: sourceSite, onChange: function (_, value) { return setSourceSite(value); }, renderInput: function (params) { return jsx(TextField$1, __assign({}, params, { label: "Source project", required: true, size: "small" })); } }), jsx(Autocomplete, { options: sites, getOptionLabel: function (option) { return "".concat(option.name, " (").concat(option.id, ")"); }, isOptionEqualToValue: function (option, value) { return option.id === value.id; }, value: destSite, onChange: function (_, value) { return setDestSite(value); }, renderInput: function (params) { return (jsx(TextField$1, __assign({}, params, { label: "Destination project", required: true, size: "small" }))); } }), sameSourceAndDestination && (jsx(Alert, { severity: "warning", children: "Source and destination must be different projects." }))] }))] }), jsxs(Box$1, { children: [jsxs(Stack$1, { direction: "row", alignItems: "center", justifyContent: "space-between", sx: { mb: 1 }, children: [jsx(Typography, { variant: "subtitle2", children: "2. Source content" }), jsxs(Stack$1, { direction: "row", spacing: 1, children: [jsx(Button$1, { size: "small", onClick: openAddItemDialog, disabled: !sourceSite, children: "Add item" }), sourcePaths.length > 0 && (jsx(Button$1, { size: "small", onClick: clearSourcePaths, children: "Clear list" }))] })] }), jsxs(Typography, { variant: "body2", color: "text.secondary", sx: { mb: 1.5 }, children: ["Add pages, components, or folders from ", jsx("strong", { children: (_c = sourceSite === null || sourceSite === void 0 ? void 0 : sourceSite.id) !== null && _c !== void 0 ? _c : 'the source project' }), ". Use Add item to browse that project and confirm a path."] }), addPathError && (jsx(Typography, { variant: "caption", color: "error", sx: { mb: 1, display: 'block' }, children: addPathError })), sourcePaths.length > 0 ? (jsx(ItemListTable, { headerLabel: "Selected items", actionsColumn: true, sx: { mt: 2 }, children: sourcePaths.map(function (path) {
+    return (jsxs(Paper, { elevation: 0, sx: { height: '100%', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }, children: [jsxs(DialogBody, { sx: { flex: 1, overflow: 'auto', pt: 2 }, children: [jsx(Typography, { variant: "body2", color: "text.secondary", sx: { mb: 3 }, children: "Copy content from one project into another. Choose source and destination projects, then select items to copy." }), jsxs(Stack$1, { spacing: 3, children: [jsxs(Box$1, { children: [jsx(Typography, { variant: "subtitle2", gutterBottom: true, children: "1. Projects" }), sitesLoading ? (jsx(CircularProgress, { size: 24 })) : (jsxs(Stack$1, { spacing: 1.5, children: [jsx(Autocomplete, { options: sites, getOptionLabel: function (option) { return "".concat(option.name, " (").concat(option.id, ")"); }, isOptionEqualToValue: function (option, value) { return option.id === value.id; }, value: sourceSite, onChange: function (_, value) { return setSourceSite(value); }, renderInput: function (params) { return jsx(TextField$1, __assign({}, params, { label: "Source project", required: true, size: "small" })); } }), jsx(Autocomplete, { options: sites, getOptionLabel: function (option) { return "".concat(option.name, " (").concat(option.id, ")"); }, isOptionEqualToValue: function (option, value) { return option.id === value.id; }, value: destSite, onChange: function (_, value) { return setDestSite(value); }, renderInput: function (params) { return (jsx(TextField$1, __assign({}, params, { label: "Destination project", required: true, size: "small" }))); } }), sameSourceAndDestination && (jsx(Alert, { severity: "warning", children: "Source and destination must be different projects." }))] }))] }), jsxs(Box$1, { children: [jsxs(Stack$1, { direction: "row", alignItems: "center", justifyContent: "space-between", sx: { mb: 1 }, children: [jsx(Typography, { variant: "subtitle2", children: "2. Source content" }), jsxs(Stack$1, { direction: "row", spacing: 1, children: [jsx(Button$1, { size: "small", onClick: openAddItemDialog, disabled: !sourceSite, children: "Add item" }), sourcePaths.length > 0 && (jsx(Button$1, { size: "small", onClick: clearSourcePaths, children: "Clear list" }))] })] }), jsxs(Typography, { variant: "body2", color: "text.secondary", sx: { mb: 1.5 }, children: ["Add content, static assets, templates, or scripts from", ' ', jsx("strong", { children: (_c = sourceSite === null || sourceSite === void 0 ? void 0 : sourceSite.id) !== null && _c !== void 0 ? _c : 'the source project' }), ". Use Add item to browse and select a folder or file."] }), addPathError && (jsx(Typography, { variant: "caption", color: "error", sx: { mb: 1, display: 'block' }, children: addPathError })), sourcePaths.length > 0 ? (jsx(ItemListTable, { headerLabel: "Selected items", actionsColumn: true, sx: { mt: 2 }, children: sourcePaths.map(function (path) {
                                             var item = sourceItemsByPath[path];
                                             var itemLoading = sourceItemsLoading && !item;
                                             return (jsxs(TableRow, { hover: true, children: [jsx(TableCell, { sx: { py: 1.25, maxWidth: 0, width: '100%' }, children: jsx(ContentItemRow, { item: item, path: path, loading: itemLoading }) }), jsxs(TableCell, { align: "right", sx: { whiteSpace: 'nowrap' }, children: [jsx(IconButton$1, { size: "small", "aria-label": "Item options", onClick: function (event) { return openItemMenu(event, path); }, disabled: !item, children: jsx(MoreVertIcon, { fontSize: "small" }) }), jsx(IconButton$1, { size: "small", "aria-label": "Remove", onClick: function () { return removeSourcePath(path); }, children: jsx(DeleteOutlineIcon, { fontSize: "small" }) })] })] }, path));
