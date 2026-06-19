@@ -19,6 +19,8 @@ import OpenCannedSearchPanelButton from './components/OpenCannedSearchPanelButto
 import OpenCannedSearchToolbarButton from './components/OpenCannedSearchToolbarButton';
 import OpenSearchPlayground from './components/OpenSearchPlayground';
 import LogTail from './components/LogTail';
+import ImageStudio from './components/ImageStudio/ImageStudio';
+import OpenImageStudioPanelButton from './components/OpenImageStudioPanelButton';
 
 const plugin: PluginDescriptor = {
   locales: undefined,
@@ -45,7 +47,9 @@ const plugin: PluginDescriptor = {
     'org.rd.plugin.uigoodies.openCannedSearchPanelButton': OpenCannedSearchPanelButton,
     'org.rd.plugin.uigoodies.openCannedSearchToolbarButton': OpenCannedSearchToolbarButton,
     'org.rd.plugin.uigoodies.OpenSearchPlayground': OpenSearchPlayground,
-    'org.rd.plugin.uigoodies.LogTail': LogTail
+    'org.rd.plugin.uigoodies.LogTail': LogTail,
+    'org.rd.plugin.uigoodies.ImageStudio': ImageStudio,
+    'org.rd.plugin.uigoodies.openImageStudioPanelButton': OpenImageStudioPanelButton
   }
 };
 
@@ -69,7 +73,9 @@ export {
   OpenCannedSearchPanelButton,
   OpenCannedSearchToolbarButton,
   OpenSearchPlayground,
-  LogTail
+  LogTail,
+  ImageStudio,
+  OpenImageStudioPanelButton
 };
 
 export default plugin;

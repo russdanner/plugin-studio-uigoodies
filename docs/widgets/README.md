@@ -26,5 +26,7 @@ Each file in this folder documents one **registered widget** (or embedded view u
 | `org.rd.plugin.uigoodies.ComponentPreviewPathNavigator` | Sidebar path navigator that opens component preview URLs. | [component-preview-path-navigator.md](component-preview-path-navigator.md) |
 | `org.rd.plugin.uigoodies.OpenSearchPlayground` | Project tool: Explorer + Dictionary tabs, expanded Search API options, OpenSearch DSL editor, and Engine `search.json`. | [open-search-playground.md](open-search-playground.md) |
 | `org.rd.plugin.uigoodies.LogTail` | Project tool: live SSE tail of Tomcat `catalina.out`, colorized levels, collapsible stack traces, fullscreen. Server streams only while the panel is open. | [log-tail.md](log-tail.md) |
+| `org.rd.plugin.uigoodies.openImageStudioPanelButton` | Sidebar button → Image Studio dialog (crop, focal point, adjust, save). | [open-image-studio-panel-button.md](open-image-studio-panel-button.md) |
+| `org.rd.plugin.uigoodies.ImageStudio` | Image editing UI embedded in Image Studio dialog. | [image-studio.md](image-studio.md) |
 
 Back to repository root: [../../README.md](../../README.md).

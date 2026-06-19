@@ -2150,6 +2150,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/pica@npm:^9.0.5":
+  version: 9.0.5
+  resolution: "@types/pica@npm:9.0.5"
+  checksum: dda45e147ed06d4f9b408af57558f419c4839c57ffa53eb3c9033120a6a5467df69aa07327f7516a64c7c083b4afcbcca4c42f7140c56c46b2ee438f0d6032b7
+  languageName: node
+  linkType: hard
+
 "@types/prop-types@npm:*, @types/prop-types@npm:^15.7.15":
   version: 15.7.15
   resolution: "@types/prop-types@npm:15.7.15"
@@ -3334,6 +3341,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"glur@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "glur@npm:2.0.0"
+  checksum: 8c55d148a64a4120252d40b43be1d2bc491c8473eb4bff82bb852a6ec5e85651402a71accdba19f781749276c27ddfa65f8932f00d550b34f2ba45140485d930
+  languageName: node
+  linkType: hard
+
 "goober@npm:^2.0.33":
   version: 2.1.18
   resolution: "goober@npm:2.1.18"
@@ -3864,6 +3878,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"multimath@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "multimath@npm:3.0.0"
+  dependencies:
+    glur: ^2.0.0
+  checksum: 2efa83c5ffa69134c6bf41d93d7df6f2fff9237ee5576d2be7fc7e74b4bd785e814cc0dff3346804453b2f2b343815fba634ea06366ac18853182e720508c5ed
+  languageName: node
+  linkType: hard
+
 "namespace-emitter@npm:^2.0.1":
   version: 2.0.1
   resolution: "namespace-emitter@npm:2.0.1"
@@ -3917,6 +3940,13 @@ __metadata:
   bin:
     nopt: bin/nopt.js
   checksum: 7a5d9ab0629eaec1944a95438cc4efa6418ed2834aa8eb21a1bea579a7d8ac3e30120131855376a96ef59ab0e23ad8e0bc94d3349770a95e5cb7119339f7c7fb
+  languageName: node
+  linkType: hard
+
+"normalize-wheel@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "normalize-wheel@npm:1.0.1"
+  checksum: 00b32efa040bad9438e732385a4ca27f8532fa2c8c06b54be43b9f75b2da6642bf41a0b4f81e542639dc8d682cde8b059b0a02ae0723fb8ebc3c8f036c8e51d8
   languageName: node
   linkType: hard
 
@@ -4039,6 +4069,16 @@ __metadata:
   version: 4.0.0
   resolution: "path-type@npm:4.0.0"
   checksum: 5b1e2daa247062061325b8fdbfd1fb56dde0a448fb1455453276ea18c60685bdad23a445dc148cf87bc216be1573357509b7d4060494a6fd768c7efad833ee45
+  languageName: node
+  linkType: hard
+
+"pica@npm:^10.0.1":
+  version: 10.0.1
+  resolution: "pica@npm:10.0.1"
+  dependencies:
+    glur: ^2.0.0
+    multimath: ^3.0.0
+  checksum: fc3cfcd207c44fce64eced33530dda0f89b058fbc6266af24c07ccc9b10b98eb48977a60322d4f3032d9a98561c34d9e13e5f845c9ab4ceab3220a3dc0af2cbb
   languageName: node
   linkType: hard
 
@@ -4186,6 +4226,18 @@ __metadata:
   peerDependencies:
     react: ^18.3.1
   checksum: 298954ecd8f78288dcaece05e88b570014d8f6dce5db6f66e6ee91448debeb59dcd31561dddb354eee47e6c1bb234669459060deb238ed0213497146e555a0b9
+  languageName: node
+  linkType: hard
+
+"react-easy-crop@npm:^6.0.2":
+  version: 6.0.2
+  resolution: "react-easy-crop@npm:6.0.2"
+  dependencies:
+    normalize-wheel: ^1.0.1
+  peerDependencies:
+    react: ">=16.4.0"
+    react-dom: ">=16.4.0"
+  checksum: 59fa9e82cc460a4995c205caae70d6f56f7cba69c8f38f752a16166e7a1bffb66d38dc5dc293da0d8036c675e5c40fc32975ec43b2c26c920595c0a8f2c160f9
   languageName: node
   linkType: hard
 
@@ -4912,13 +4964,16 @@ __metadata:
     "@rollup/plugin-replace": ^6.0.3
     "@rollup/plugin-typescript": ^12.3.0
     "@types/node": ^22.13.4
+    "@types/pica": ^9.0.5
     "@types/react": ^18.3.18
     "@types/react-dom": ^18.3.5
     "@uiw/codemirror-theme-vscode": ^4.25.9
     "@uiw/react-codemirror": ^4.25.9
+    pica: ^10.0.1
     query-string: ^9.1.1
     react: ^18.2.0
     react-dom: ^18.2.0
+    react-easy-crop: ^6.0.2
     react-intl: ^6.8.9
     react-redux: ^9.2.0
     react-resizable-panels: ^4.11.0

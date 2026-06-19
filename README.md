@@ -76,6 +76,7 @@ This plugin now includes auto-wiring in `craftercms-plugin.yaml` to add Project 
 - **Cross Site Copy** (URL: `uigoodies-cross-site-content-copy`) — copy content items (and optional dependencies) to another project
 - **OpenSearch playground** (URL: `uigoodies-opensearch-playground`) — raw OpenSearch DSL against Engine `search.json` for the active site
 - **Tomcat Log** (URL: `uigoodies-log-tail`) — live SSE tail of `catalina.out` via an Engine REST script; the server only streams while the panel is open
+- **Image Studio** (Tools Panel sidebar) — crop, focal point, adjustments, and image size requirements lookup
 
 If you are upgrading from a previous install, re-install/upgrade the plugin so the auto-wiring section is applied.
 If your project manages `config/studio/ui.xml` manually, merge the generated tool entry into

@@ -1,6 +1,6 @@
 const { jsx, Fragment, jsxs } = craftercms.libs.reactJsxRuntime;
 const { useSelector, useDispatch } = craftercms.libs.ReactRedux;
-const { Tooltip, useTheme, accordionClasses, accordionSummaryClasses, Accordion, AccordionSummary, Typography, AccordionDetails, Button: Button$1, CircularProgress, alpha, buttonClasses, Backdrop, Alert, Paper, Box: Box$1, AlertTitle, Stepper, Step, StepLabel, Autocomplete, TextField: TextField$1, FormControlLabel, Checkbox, List, ListItem, Dialog, FormControl, InputAdornment, IconButton: IconButton$1, FormHelperText, Stack: Stack$1, TableRow, TableCell, Menu: Menu$1, MenuItem: MenuItem$1, Divider, Chip, Table, TableHead, TableBody, ListItemText, DialogTitle, DialogContent, DialogActions, Collapse: Collapse$1, useMediaQuery, Tabs, Tab } = craftercms.libs.MaterialUI;
+const { Tooltip, useTheme, accordionClasses, accordionSummaryClasses, Accordion, AccordionSummary, Typography, AccordionDetails, Button: Button$1, CircularProgress, alpha, buttonClasses, Backdrop, Alert, Paper, Box: Box$1, AlertTitle, Stepper, Step, StepLabel, Autocomplete, TextField: TextField$1, FormControlLabel, Checkbox, List, ListItem, Dialog, FormControl, InputAdornment, IconButton: IconButton$1, FormHelperText, Stack: Stack$1, TableRow, TableCell, Menu: Menu$1, MenuItem: MenuItem$1, Divider, Chip, Table, TableHead, TableBody, ListItemText, DialogTitle, DialogContent, DialogActions, Collapse: Collapse$1, useMediaQuery, Tabs, Tab, ListItemButton, ToggleButtonGroup, ToggleButton, Slider, Switch, ButtonGroup, RadioGroup, Radio, InputLabel, Select } = craftercms.libs.MaterialUI;
 const IconButton = craftercms.libs.MaterialUI.IconButton && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.IconButton, 'default') ? craftercms.libs.MaterialUI.IconButton['default'] : craftercms.libs.MaterialUI.IconButton;
 const Button = craftercms.libs.MaterialUI.Button && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Button, 'default') ? craftercms.libs.MaterialUI.Button['default'] : craftercms.libs.MaterialUI.Button;
 const SystemIcon = craftercms.components.SystemIcon && Object.prototype.hasOwnProperty.call(craftercms.components.SystemIcon, 'default') ? craftercms.components.SystemIcon['default'] : craftercms.components.SystemIcon;
@@ -14,7 +14,7 @@ const { createCustomDocumentEventListener } = craftercms.utils.dom;
 const TextField = craftercms.libs.MaterialUI.TextField && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.TextField, 'default') ? craftercms.libs.MaterialUI.TextField['default'] : craftercms.libs.MaterialUI.TextField;
 const Container = craftercms.libs.MaterialUI.Container && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Container, 'default') ? craftercms.libs.MaterialUI.Container['default'] : craftercms.libs.MaterialUI.Container;
 const Box = craftercms.libs.MaterialUI.Box && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Box, 'default') ? craftercms.libs.MaterialUI.Box['default'] : craftercms.libs.MaterialUI.Box;
-const { writeContent, fetchChildrenByPath, checkPathExistence, fetchDetailedItems } = craftercms.services.content;
+const { writeContent, fetchChildrenByPath, checkPathExistence, fetchDetailedItems, fetchContentXML, uploadDataUrl } = craftercms.services.content;
 const { DialogFooter, PathNavigator } = craftercms.components;
 const ToolsPanelListItemButton = craftercms.components.ToolsPanelListItemButton && Object.prototype.hasOwnProperty.call(craftercms.components.ToolsPanelListItemButton, 'default') ? craftercms.components.ToolsPanelListItemButton['default'] : craftercms.components.ToolsPanelListItemButton;
 const Tooltip$1 = craftercms.libs.MaterialUI.Tooltip && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Tooltip, 'default') ? craftercms.libs.MaterialUI.Tooltip['default'] : craftercms.libs.MaterialUI.Tooltip;
@@ -24,7 +24,7 @@ const PublishIcon = craftercms.utils.constants.components.get('@mui/icons-materi
 const Snackbar = craftercms.libs.MaterialUI.Snackbar && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Snackbar, 'default') ? craftercms.libs.MaterialUI.Snackbar['default'] : craftercms.libs.MaterialUI.Snackbar;
 const { FormattedMessage } = craftercms.libs.ReactIntl;
 const { of, from, concatMap: concatMap$1, forkJoin, Subject } = craftercms.libs.rxjs;
-const { concatMap, expand, toArray, catchError, switchMap, takeUntil, map } = craftercms.libs.rxjs;
+const { concatMap, expand, toArray, catchError, switchMap, takeUntil, map, take } = craftercms.libs.rxjs;
 const { fetchUnpublished } = craftercms.services.dashboard;
 const { nou } = craftercms.utils.object;
 const { lookupItemByPath } = craftercms.utils.content;
@@ -76,6 +76,18 @@ const DeleteSweepRoundedIcon = craftercms.utils.constants.components.get('@mui/i
 const PowerSettingsNewRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/PowerSettingsNewRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/PowerSettingsNewRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/PowerSettingsNewRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/PowerSettingsNewRounded');
 const KeyboardArrowRightRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/KeyboardArrowRightRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/KeyboardArrowRightRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/KeyboardArrowRightRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/KeyboardArrowRightRounded');
 const TerminalRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/TerminalRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/TerminalRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/TerminalRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/TerminalRounded');
+const CropRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/CropRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/CropRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/CropRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/CropRounded');
+const CenterFocusStrongRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/CenterFocusStrongRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/CenterFocusStrongRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/CenterFocusStrongRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/CenterFocusStrongRounded');
+const TuneRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/TuneRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/TuneRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/TuneRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/TuneRounded');
+const PhotoSizeSelectLargeRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/PhotoSizeSelectLargeRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/PhotoSizeSelectLargeRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/PhotoSizeSelectLargeRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/PhotoSizeSelectLargeRounded');
+const SaveRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/SaveRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/SaveRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/SaveRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/SaveRounded');
+const FolderOpenRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/FolderOpenRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/FolderOpenRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/FolderOpenRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/FolderOpenRounded');
+const UploadFileRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/UploadFileRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/UploadFileRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/UploadFileRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/UploadFileRounded');
+const ImageSearchRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/ImageSearchRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ImageSearchRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ImageSearchRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ImageSearchRounded');
+const RotateLeftRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/RotateLeftRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/RotateLeftRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/RotateLeftRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/RotateLeftRounded');
+const RotateRightRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/RotateRightRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/RotateRightRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/RotateRightRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/RotateRightRounded');
+const FlipRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/FlipRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/FlipRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/FlipRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/FlipRounded');
+const RestartAltRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/RestartAltRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/RestartAltRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/RestartAltRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/RestartAltRounded');
 
 /*
  * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
@@ -1481,6 +1493,28 @@ var BULK_PUBLISH_DEFAULTS = {
     defaultPath: '/static-assets',
     icon: { id: '@mui/icons-material/AutoAwesomeMotionOutlined' }
 };
+var IMAGE_STUDIO_DEFAULTS = {
+    title: 'Image Studio',
+    defaultPath: '/static-assets/images',
+    icon: { id: '@mui/icons-material/PhotoLibraryRounded' }
+};
+function useOpenImageStudio(props) {
+    var dispatch = useDispatch();
+    return function () {
+        var _a, _b;
+        return dispatch(showWidgetDialog({
+            title: (_a = props.title) !== null && _a !== void 0 ? _a : IMAGE_STUDIO_DEFAULTS.title,
+            fullHeight: true,
+            fullWidth: true,
+            widget: {
+                id: 'org.rd.plugin.uigoodies.ImageStudio',
+                configuration: {
+                    defaultPath: (_b = props.defaultPath) !== null && _b !== void 0 ? _b : IMAGE_STUDIO_DEFAULTS.defaultPath
+                }
+            }
+        }));
+    };
+}
 function useOpenContentUpload(props) {
     var dispatch = useDispatch();
     return function () {
@@ -41391,6 +41425,3945 @@ function LogEntryRow(_a) {
                         }, children: entry.trace.map(function (line, i) { return (jsx(Box$1, { children: line }, i)); }) }))] })] }));
 }
 
+function isImageAsset(item) {
+    var _a;
+    return item.systemType === 'asset' && ((_a = item.mimeType) === null || _a === void 0 ? void 0 : _a.startsWith('image/'));
+}
+function ImageSourcePicker(_a) {
+    var _this = this;
+    var defaultPath = _a.defaultPath, onImageSelected = _a.onImageSelected, onError = _a.onError, loadRepoImage = _a.loadRepoImage;
+    var siteId = useActiveSiteId();
+    var _b = useState(defaultPath), browsePath = _b[0], setBrowsePath = _b[1];
+    var _c = useState([]), items = _c[0], setItems = _c[1];
+    var _d = useState(false), loading = _d[0], setLoading = _d[1];
+    var _e = useState(false), dragOver = _e[0], setDragOver = _e[1];
+    var fileInputRef = React__default.useRef(null);
+    var loadFolder = useCallback(function (path) { return __awaiter(_this, void 0, void 0, function () {
+        var response, list, i, item, e_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    if (!siteId) {
+                        return [2 /*return*/];
+                    }
+                    setLoading(true);
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 3, 4, 5]);
+                    return [4 /*yield*/, fetchChildrenByPath(siteId, path, { limit: 200 }).pipe(take(1)).toPromise()];
+                case 2:
+                    response = _a.sent();
+                    list = [];
+                    if (response) {
+                        for (i = 0; i < response.length; i++) {
+                            item = response[i];
+                            if (item === null || item === void 0 ? void 0 : item.path) {
+                                list.push(item);
+                            }
+                        }
+                    }
+                    setItems(list);
+                    setBrowsePath(path);
+                    return [3 /*break*/, 5];
+                case 3:
+                    e_1 = _a.sent();
+                    onError(e_1.message);
+                    return [3 /*break*/, 5];
+                case 4:
+                    setLoading(false);
+                    return [7 /*endfinally*/];
+                case 5: return [2 /*return*/];
+            }
+        });
+    }); }, [siteId, onError]);
+    useEffect(function () {
+        loadFolder(defaultPath);
+    }, [defaultPath, loadFolder]);
+    var folders = useMemo(function () { return items.filter(function (item) { return item.systemType === 'folder'; }); }, [items]);
+    var images = useMemo(function () { return items.filter(isImageAsset); }, [items]);
+    var handleLocalFile = function (file) { return __awaiter(_this, void 0, void 0, function () {
+        var dataUrl, e_2;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 2, , 3]);
+                    return [4 /*yield*/, new Promise(function (resolve, reject) {
+                            var reader = new FileReader();
+                            reader.onload = function () { return resolve(reader.result); };
+                            reader.onerror = reject;
+                            reader.readAsDataURL(file);
+                        })];
+                case 1:
+                    dataUrl = _a.sent();
+                    onImageSelected({ dataUrl: dataUrl, name: file.name });
+                    return [3 /*break*/, 3];
+                case 2:
+                    e_2 = _a.sent();
+                    onError(e_2.message);
+                    return [3 /*break*/, 3];
+                case 3: return [2 /*return*/];
+            }
+        });
+    }); };
+    var onDrop = function (e) {
+        var _a;
+        e.preventDefault();
+        setDragOver(false);
+        var file = (_a = e.dataTransfer.files) === null || _a === void 0 ? void 0 : _a[0];
+        if (file) {
+            handleLocalFile(file);
+        }
+    };
+    var openRepoImage = function (path, name) { return __awaiter(_this, void 0, void 0, function () {
+        var dataUrl, e_3;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    setLoading(true);
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 3, 4, 5]);
+                    return [4 /*yield*/, loadRepoImage(path)];
+                case 2:
+                    dataUrl = _a.sent();
+                    onImageSelected({ dataUrl: dataUrl, sourcePath: path, name: name });
+                    return [3 /*break*/, 5];
+                case 3:
+                    e_3 = _a.sent();
+                    onError(e_3.message);
+                    return [3 /*break*/, 5];
+                case 4:
+                    setLoading(false);
+                    return [7 /*endfinally*/];
+                case 5: return [2 /*return*/];
+            }
+        });
+    }); };
+    return (jsxs(Box$1, { sx: { display: 'flex', flexDirection: 'column', gap: 2, minWidth: 280 }, children: [jsxs(Paper, { variant: "outlined", onDragOver: function (e) {
+                    e.preventDefault();
+                    setDragOver(true);
+                }, onDragLeave: function () { return setDragOver(false); }, onDrop: onDrop, sx: {
+                    p: 2,
+                    textAlign: 'center',
+                    borderStyle: 'dashed',
+                    borderColor: dragOver ? 'primary.main' : 'divider',
+                    bgcolor: dragOver ? 'action.hover' : 'background.paper'
+                }, children: [jsx(UploadFileRoundedIcon, { color: "action", sx: { fontSize: 36, mb: 1 } }), jsx(Typography, { variant: "body2", gutterBottom: true, children: "Drag an image here, paste from clipboard, or upload" }), jsx(Box$1, { sx: { display: 'flex', gap: 1, justifyContent: 'center', mt: 1 }, children: jsx(Button$1, { size: "small", variant: "outlined", onClick: function () { var _a; return (_a = fileInputRef.current) === null || _a === void 0 ? void 0 : _a.click(); }, children: "Upload file" }) }), jsx("input", { ref: fileInputRef, type: "file", accept: "image/*", hidden: true, onChange: function (e) {
+                            var _a;
+                            var file = (_a = e.target.files) === null || _a === void 0 ? void 0 : _a[0];
+                            if (file) {
+                                handleLocalFile(file);
+                            }
+                            e.target.value = '';
+                        } })] }), jsxs(Box$1, { children: [jsxs(Typography, { variant: "subtitle2", sx: { display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }, children: [jsx(ImageSearchRoundedIcon, { fontSize: "small" }), "Browse repository"] }), jsx(TextField$1, { size: "small", fullWidth: true, label: "Folder", value: browsePath, onChange: function (e) { return setBrowsePath(e.target.value); }, onKeyDown: function (e) {
+                            if (e.key === 'Enter') {
+                                loadFolder(browsePath);
+                            }
+                        }, InputProps: {
+                            endAdornment: (jsx(IconButton$1, { size: "small", onClick: function () { return loadFolder(browsePath); }, title: "Open folder", children: jsx(FolderOpenRoundedIcon, { fontSize: "small" }) }))
+                        } }), loading ? (jsx(Box$1, { sx: { display: 'flex', justifyContent: 'center', py: 2 }, children: jsx(CircularProgress, { size: 24 }) })) : (jsxs(List, { dense: true, sx: { maxHeight: 220, overflow: 'auto', mt: 1 }, children: [folders.map(function (folder) { return (jsx(ListItemButton, { onClick: function () { return loadFolder(folder.path); }, children: jsx(ListItemText, { primary: folder.label || folder.path.split('/').pop(), secondary: "Folder" }) }, folder.path)); }), images.map(function (image) { return (jsx(ListItemButton, { onClick: function () { return openRepoImage(image.path, image.label || image.path); }, children: jsx(ListItemText, { primary: image.label || image.path.split('/').pop(), secondary: image.path }) }, image.path)); }), !folders.length && !images.length && (jsx(Typography, { variant: "body2", color: "text.secondary", sx: { p: 1 }, children: "No subfolders or images in this folder." }))] }))] })] }));
+}
+
+/**
+ * Copyright 2004-present Facebook. All Rights Reserved.
+ *
+ * @providesModule UserAgent_DEPRECATED
+ */
+
+var UserAgent_DEPRECATED_1;
+var hasRequiredUserAgent_DEPRECATED;
+
+function requireUserAgent_DEPRECATED () {
+	if (hasRequiredUserAgent_DEPRECATED) return UserAgent_DEPRECATED_1;
+	hasRequiredUserAgent_DEPRECATED = 1;
+	/**
+	 *  Provides entirely client-side User Agent and OS detection. You should prefer
+	 *  the non-deprecated UserAgent module when possible, which exposes our
+	 *  authoritative server-side PHP-based detection to the client.
+	 *
+	 *  Usage is straightforward:
+	 *
+	 *    if (UserAgent_DEPRECATED.ie()) {
+	 *      //  IE
+	 *    }
+	 *
+	 *  You can also do version checks:
+	 *
+	 *    if (UserAgent_DEPRECATED.ie() >= 7) {
+	 *      //  IE7 or better
+	 *    }
+	 *
+	 *  The browser functions will return NaN if the browser does not match, so
+	 *  you can also do version compares the other way:
+	 *
+	 *    if (UserAgent_DEPRECATED.ie() < 7) {
+	 *      //  IE6 or worse
+	 *    }
+	 *
+	 *  Note that the version is a float and may include a minor version number,
+	 *  so you should always use range operators to perform comparisons, not
+	 *  strict equality.
+	 *
+	 *  **Note:** You should **strongly** prefer capability detection to browser
+	 *  version detection where it's reasonable:
+	 *
+	 *    http://www.quirksmode.org/js/support.html
+	 *
+	 *  Further, we have a large number of mature wrapper functions and classes
+	 *  which abstract away many browser irregularities. Check the documentation,
+	 *  grep for things, or ask on javascript@lists.facebook.com before writing yet
+	 *  another copy of "event || window.event".
+	 *
+	 */
+
+	var _populated = false;
+
+	// Browsers
+	var _ie, _firefox, _opera, _webkit, _chrome;
+
+	// Actual IE browser for compatibility mode
+	var _ie_real_version;
+
+	// Platforms
+	var _osx, _windows, _linux, _android;
+
+	// Architectures
+	var _win64;
+
+	// Devices
+	var _iphone, _ipad, _native;
+
+	var _mobile;
+
+	function _populate() {
+	  if (_populated) {
+	    return;
+	  }
+
+	  _populated = true;
+
+	  // To work around buggy JS libraries that can't handle multi-digit
+	  // version numbers, Opera 10's user agent string claims it's Opera
+	  // 9, then later includes a Version/X.Y field:
+	  //
+	  // Opera/9.80 (foo) Presto/2.2.15 Version/10.10
+	  var uas = navigator.userAgent;
+	  var agent = /(?:MSIE.(\d+\.\d+))|(?:(?:Firefox|GranParadiso|Iceweasel).(\d+\.\d+))|(?:Opera(?:.+Version.|.)(\d+\.\d+))|(?:AppleWebKit.(\d+(?:\.\d+)?))|(?:Trident\/\d+\.\d+.*rv:(\d+\.\d+))/.exec(uas);
+	  var os    = /(Mac OS X)|(Windows)|(Linux)/.exec(uas);
+
+	  _iphone = /\b(iPhone|iP[ao]d)/.exec(uas);
+	  _ipad = /\b(iP[ao]d)/.exec(uas);
+	  _android = /Android/i.exec(uas);
+	  _native = /FBAN\/\w+;/i.exec(uas);
+	  _mobile = /Mobile/i.exec(uas);
+
+	  // Note that the IE team blog would have you believe you should be checking
+	  // for 'Win64; x64'.  But MSDN then reveals that you can actually be coming
+	  // from either x64 or ia64;  so ultimately, you should just check for Win64
+	  // as in indicator of whether you're in 64-bit IE.  32-bit IE on 64-bit
+	  // Windows will send 'WOW64' instead.
+	  _win64 = !!(/Win64/.exec(uas));
+
+	  if (agent) {
+	    _ie = agent[1] ? parseFloat(agent[1]) : (
+	          agent[5] ? parseFloat(agent[5]) : NaN);
+	    // IE compatibility mode
+	    if (_ie && document && document.documentMode) {
+	      _ie = document.documentMode;
+	    }
+	    // grab the "true" ie version from the trident token if available
+	    var trident = /(?:Trident\/(\d+.\d+))/.exec(uas);
+	    _ie_real_version = trident ? parseFloat(trident[1]) + 4 : _ie;
+
+	    _firefox = agent[2] ? parseFloat(agent[2]) : NaN;
+	    _opera   = agent[3] ? parseFloat(agent[3]) : NaN;
+	    _webkit  = agent[4] ? parseFloat(agent[4]) : NaN;
+	    if (_webkit) {
+	      // We do not add the regexp to the above test, because it will always
+	      // match 'safari' only since 'AppleWebKit' appears before 'Chrome' in
+	      // the userAgent string.
+	      agent = /(?:Chrome\/(\d+\.\d+))/.exec(uas);
+	      _chrome = agent && agent[1] ? parseFloat(agent[1]) : NaN;
+	    } else {
+	      _chrome = NaN;
+	    }
+	  } else {
+	    _ie = _firefox = _opera = _chrome = _webkit = NaN;
+	  }
+
+	  if (os) {
+	    if (os[1]) {
+	      // Detect OS X version.  If no version number matches, set _osx to true.
+	      // Version examples:  10, 10_6_1, 10.7
+	      // Parses version number as a float, taking only first two sets of
+	      // digits.  If only one set of digits is found, returns just the major
+	      // version number.
+	      var ver = /(?:Mac OS X (\d+(?:[._]\d+)?))/.exec(uas);
+
+	      _osx = ver ? parseFloat(ver[1].replace('_', '.')) : true;
+	    } else {
+	      _osx = false;
+	    }
+	    _windows = !!os[2];
+	    _linux   = !!os[3];
+	  } else {
+	    _osx = _windows = _linux = false;
+	  }
+	}
+
+	var UserAgent_DEPRECATED = {
+
+	  /**
+	   *  Check if the UA is Internet Explorer.
+	   *
+	   *
+	   *  @return float|NaN Version number (if match) or NaN.
+	   */
+	  ie: function() {
+	    return _populate() || _ie;
+	  },
+
+	  /**
+	   * Check if we're in Internet Explorer compatibility mode.
+	   *
+	   * @return bool true if in compatibility mode, false if
+	   * not compatibility mode or not ie
+	   */
+	  ieCompatibilityMode: function() {
+	    return _populate() || (_ie_real_version > _ie);
+	  },
+
+
+	  /**
+	   * Whether the browser is 64-bit IE.  Really, this is kind of weak sauce;  we
+	   * only need this because Skype can't handle 64-bit IE yet.  We need to remove
+	   * this when we don't need it -- tracked by #601957.
+	   */
+	  ie64: function() {
+	    return UserAgent_DEPRECATED.ie() && _win64;
+	  },
+
+	  /**
+	   *  Check if the UA is Firefox.
+	   *
+	   *
+	   *  @return float|NaN Version number (if match) or NaN.
+	   */
+	  firefox: function() {
+	    return _populate() || _firefox;
+	  },
+
+
+	  /**
+	   *  Check if the UA is Opera.
+	   *
+	   *
+	   *  @return float|NaN Version number (if match) or NaN.
+	   */
+	  opera: function() {
+	    return _populate() || _opera;
+	  },
+
+
+	  /**
+	   *  Check if the UA is WebKit.
+	   *
+	   *
+	   *  @return float|NaN Version number (if match) or NaN.
+	   */
+	  webkit: function() {
+	    return _populate() || _webkit;
+	  },
+
+	  /**
+	   *  For Push
+	   *  WILL BE REMOVED VERY SOON. Use UserAgent_DEPRECATED.webkit
+	   */
+	  safari: function() {
+	    return UserAgent_DEPRECATED.webkit();
+	  },
+
+	  /**
+	   *  Check if the UA is a Chrome browser.
+	   *
+	   *
+	   *  @return float|NaN Version number (if match) or NaN.
+	   */
+	  chrome : function() {
+	    return _populate() || _chrome;
+	  },
+
+
+	  /**
+	   *  Check if the user is running Windows.
+	   *
+	   *  @return bool `true' if the user's OS is Windows.
+	   */
+	  windows: function() {
+	    return _populate() || _windows;
+	  },
+
+
+	  /**
+	   *  Check if the user is running Mac OS X.
+	   *
+	   *  @return float|bool   Returns a float if a version number is detected,
+	   *                       otherwise true/false.
+	   */
+	  osx: function() {
+	    return _populate() || _osx;
+	  },
+
+	  /**
+	   * Check if the user is running Linux.
+	   *
+	   * @return bool `true' if the user's OS is some flavor of Linux.
+	   */
+	  linux: function() {
+	    return _populate() || _linux;
+	  },
+
+	  /**
+	   * Check if the user is running on an iPhone or iPod platform.
+	   *
+	   * @return bool `true' if the user is running some flavor of the
+	   *    iPhone OS.
+	   */
+	  iphone: function() {
+	    return _populate() || _iphone;
+	  },
+
+	  mobile: function() {
+	    return _populate() || (_iphone || _ipad || _android || _mobile);
+	  },
+
+	  nativeApp: function() {
+	    // webviews inside of the native apps
+	    return _populate() || _native;
+	  },
+
+	  android: function() {
+	    return _populate() || _android;
+	  },
+
+	  ipad: function() {
+	    return _populate() || _ipad;
+	  }
+	};
+
+	UserAgent_DEPRECATED_1 = UserAgent_DEPRECATED;
+	return UserAgent_DEPRECATED_1;
+}
+
+/**
+ * Copyright (c) 2015, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @providesModule ExecutionEnvironment
+ */
+
+var ExecutionEnvironment_1;
+var hasRequiredExecutionEnvironment;
+
+function requireExecutionEnvironment () {
+	if (hasRequiredExecutionEnvironment) return ExecutionEnvironment_1;
+	hasRequiredExecutionEnvironment = 1;
+
+	var canUseDOM = !!(
+	  typeof window !== 'undefined' &&
+	  window.document &&
+	  window.document.createElement
+	);
+
+	/**
+	 * Simple, lightweight module assisting with the detection and context of
+	 * Worker. Helps avoid circular dependencies and allows code to reason about
+	 * whether or not they are in a Worker, even if they never include the main
+	 * `ReactWorker` dependency.
+	 */
+	var ExecutionEnvironment = {
+
+	  canUseDOM: canUseDOM,
+
+	  canUseWorkers: typeof Worker !== 'undefined',
+
+	  canUseEventListeners:
+	    canUseDOM && !!(window.addEventListener || window.attachEvent),
+
+	  canUseViewport: canUseDOM && !!window.screen,
+
+	  isInWorker: !canUseDOM // For now, this is true - might change in the future.
+
+	};
+
+	ExecutionEnvironment_1 = ExecutionEnvironment;
+	return ExecutionEnvironment_1;
+}
+
+/**
+ * Copyright 2013-2015, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @providesModule isEventSupported
+ */
+
+var isEventSupported_1;
+var hasRequiredIsEventSupported;
+
+function requireIsEventSupported () {
+	if (hasRequiredIsEventSupported) return isEventSupported_1;
+	hasRequiredIsEventSupported = 1;
+
+	var ExecutionEnvironment = requireExecutionEnvironment();
+
+	var useHasFeature;
+	if (ExecutionEnvironment.canUseDOM) {
+	  useHasFeature =
+	    document.implementation &&
+	    document.implementation.hasFeature &&
+	    // always returns true in newer browsers as per the standard.
+	    // @see http://dom.spec.whatwg.org/#dom-domimplementation-hasfeature
+	    document.implementation.hasFeature('', '') !== true;
+	}
+
+	/**
+	 * Checks if an event is supported in the current execution environment.
+	 *
+	 * NOTE: This will not work correctly for non-generic events such as `change`,
+	 * `reset`, `load`, `error`, and `select`.
+	 *
+	 * Borrows from Modernizr.
+	 *
+	 * @param {string} eventNameSuffix Event name, e.g. "click".
+	 * @param {?boolean} capture Check if the capture phase is supported.
+	 * @return {boolean} True if the event is supported.
+	 * @internal
+	 * @license Modernizr 3.0.0pre (Custom Build) | MIT
+	 */
+	function isEventSupported(eventNameSuffix, capture) {
+	  if (!ExecutionEnvironment.canUseDOM ||
+	      capture && !('addEventListener' in document)) {
+	    return false;
+	  }
+
+	  var eventName = 'on' + eventNameSuffix;
+	  var isSupported = eventName in document;
+
+	  if (!isSupported) {
+	    var element = document.createElement('div');
+	    element.setAttribute(eventName, 'return;');
+	    isSupported = typeof element[eventName] === 'function';
+	  }
+
+	  if (!isSupported && useHasFeature && eventNameSuffix === 'wheel') {
+	    // This is the only way to test support for the `wheel` event in IE9+.
+	    isSupported = document.implementation.hasFeature('Events.wheel', '3.0');
+	  }
+
+	  return isSupported;
+	}
+
+	isEventSupported_1 = isEventSupported;
+	return isEventSupported_1;
+}
+
+/**
+ * Copyright (c) 2015, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @providesModule normalizeWheel
+ * @typechecks
+ */
+
+var normalizeWheel_1;
+var hasRequiredNormalizeWheel$1;
+
+function requireNormalizeWheel$1 () {
+	if (hasRequiredNormalizeWheel$1) return normalizeWheel_1;
+	hasRequiredNormalizeWheel$1 = 1;
+
+	var UserAgent_DEPRECATED = requireUserAgent_DEPRECATED();
+
+	var isEventSupported = requireIsEventSupported();
+
+
+	// Reasonable defaults
+	var PIXEL_STEP  = 10;
+	var LINE_HEIGHT = 40;
+	var PAGE_HEIGHT = 800;
+
+	/**
+	 * Mouse wheel (and 2-finger trackpad) support on the web sucks.  It is
+	 * complicated, thus this doc is long and (hopefully) detailed enough to answer
+	 * your questions.
+	 *
+	 * If you need to react to the mouse wheel in a predictable way, this code is
+	 * like your bestest friend. * hugs *
+	 *
+	 * As of today, there are 4 DOM event types you can listen to:
+	 *
+	 *   'wheel'                -- Chrome(31+), FF(17+), IE(9+)
+	 *   'mousewheel'           -- Chrome, IE(6+), Opera, Safari
+	 *   'MozMousePixelScroll'  -- FF(3.5 only!) (2010-2013) -- don't bother!
+	 *   'DOMMouseScroll'       -- FF(0.9.7+) since 2003
+	 *
+	 * So what to do?  The is the best:
+	 *
+	 *   normalizeWheel.getEventType();
+	 *
+	 * In your event callback, use this code to get sane interpretation of the
+	 * deltas.  This code will return an object with properties:
+	 *
+	 *   spinX   -- normalized spin speed (use for zoom) - x plane
+	 *   spinY   -- " - y plane
+	 *   pixelX  -- normalized distance (to pixels) - x plane
+	 *   pixelY  -- " - y plane
+	 *
+	 * Wheel values are provided by the browser assuming you are using the wheel to
+	 * scroll a web page by a number of lines or pixels (or pages).  Values can vary
+	 * significantly on different platforms and browsers, forgetting that you can
+	 * scroll at different speeds.  Some devices (like trackpads) emit more events
+	 * at smaller increments with fine granularity, and some emit massive jumps with
+	 * linear speed or acceleration.
+	 *
+	 * This code does its best to normalize the deltas for you:
+	 *
+	 *   - spin is trying to normalize how far the wheel was spun (or trackpad
+	 *     dragged).  This is super useful for zoom support where you want to
+	 *     throw away the chunky scroll steps on the PC and make those equal to
+	 *     the slow and smooth tiny steps on the Mac. Key data: This code tries to
+	 *     resolve a single slow step on a wheel to 1.
+	 *
+	 *   - pixel is normalizing the desired scroll delta in pixel units.  You'll
+	 *     get the crazy differences between browsers, but at least it'll be in
+	 *     pixels!
+	 *
+	 *   - positive value indicates scrolling DOWN/RIGHT, negative UP/LEFT.  This
+	 *     should translate to positive value zooming IN, negative zooming OUT.
+	 *     This matches the newer 'wheel' event.
+	 *
+	 * Why are there spinX, spinY (or pixels)?
+	 *
+	 *   - spinX is a 2-finger side drag on the trackpad, and a shift + wheel turn
+	 *     with a mouse.  It results in side-scrolling in the browser by default.
+	 *
+	 *   - spinY is what you expect -- it's the classic axis of a mouse wheel.
+	 *
+	 *   - I dropped spinZ/pixelZ.  It is supported by the DOM 3 'wheel' event and
+	 *     probably is by browsers in conjunction with fancy 3D controllers .. but
+	 *     you know.
+	 *
+	 * Implementation info:
+	 *
+	 * Examples of 'wheel' event if you scroll slowly (down) by one step with an
+	 * average mouse:
+	 *
+	 *   OS X + Chrome  (mouse)     -    4   pixel delta  (wheelDelta -120)
+	 *   OS X + Safari  (mouse)     -  N/A   pixel delta  (wheelDelta  -12)
+	 *   OS X + Firefox (mouse)     -    0.1 line  delta  (wheelDelta  N/A)
+	 *   Win8 + Chrome  (mouse)     -  100   pixel delta  (wheelDelta -120)
+	 *   Win8 + Firefox (mouse)     -    3   line  delta  (wheelDelta -120)
+	 *
+	 * On the trackpad:
+	 *
+	 *   OS X + Chrome  (trackpad)  -    2   pixel delta  (wheelDelta   -6)
+	 *   OS X + Firefox (trackpad)  -    1   pixel delta  (wheelDelta  N/A)
+	 *
+	 * On other/older browsers.. it's more complicated as there can be multiple and
+	 * also missing delta values.
+	 *
+	 * The 'wheel' event is more standard:
+	 *
+	 * http://www.w3.org/TR/DOM-Level-3-Events/#events-wheelevents
+	 *
+	 * The basics is that it includes a unit, deltaMode (pixels, lines, pages), and
+	 * deltaX, deltaY and deltaZ.  Some browsers provide other values to maintain
+	 * backward compatibility with older events.  Those other values help us
+	 * better normalize spin speed.  Example of what the browsers provide:
+	 *
+	 *                          | event.wheelDelta | event.detail
+	 *        ------------------+------------------+--------------
+	 *          Safari v5/OS X  |       -120       |       0
+	 *          Safari v5/Win7  |       -120       |       0
+	 *         Chrome v17/OS X  |       -120       |       0
+	 *         Chrome v17/Win7  |       -120       |       0
+	 *                IE9/Win7  |       -120       |   undefined
+	 *         Firefox v4/OS X  |     undefined    |       1
+	 *         Firefox v4/Win7  |     undefined    |       3
+	 *
+	 */
+	function normalizeWheel(/*object*/ event) /*object*/ {
+	  var sX = 0, sY = 0,       // spinX, spinY
+	      pX = 0, pY = 0;       // pixelX, pixelY
+
+	  // Legacy
+	  if ('detail'      in event) { sY = event.detail; }
+	  if ('wheelDelta'  in event) { sY = -event.wheelDelta / 120; }
+	  if ('wheelDeltaY' in event) { sY = -event.wheelDeltaY / 120; }
+	  if ('wheelDeltaX' in event) { sX = -event.wheelDeltaX / 120; }
+
+	  // side scrolling on FF with DOMMouseScroll
+	  if ( 'axis' in event && event.axis === event.HORIZONTAL_AXIS ) {
+	    sX = sY;
+	    sY = 0;
+	  }
+
+	  pX = sX * PIXEL_STEP;
+	  pY = sY * PIXEL_STEP;
+
+	  if ('deltaY' in event) { pY = event.deltaY; }
+	  if ('deltaX' in event) { pX = event.deltaX; }
+
+	  if ((pX || pY) && event.deltaMode) {
+	    if (event.deltaMode == 1) {          // delta in LINE units
+	      pX *= LINE_HEIGHT;
+	      pY *= LINE_HEIGHT;
+	    } else {                             // delta in PAGE units
+	      pX *= PAGE_HEIGHT;
+	      pY *= PAGE_HEIGHT;
+	    }
+	  }
+
+	  // Fall-back if spin cannot be determined
+	  if (pX && !sX) { sX = (pX < 1) ? -1 : 1; }
+	  if (pY && !sY) { sY = (pY < 1) ? -1 : 1; }
+
+	  return { spinX  : sX,
+	           spinY  : sY,
+	           pixelX : pX,
+	           pixelY : pY };
+	}
+
+
+	/**
+	 * The best combination if you prefer spinX + spinY normalization.  It favors
+	 * the older DOMMouseScroll for Firefox, as FF does not include wheelDelta with
+	 * 'wheel' event, making spin speed determination impossible.
+	 */
+	normalizeWheel.getEventType = function() /*string*/ {
+	  return (UserAgent_DEPRECATED.firefox())
+	           ? 'DOMMouseScroll'
+	           : (isEventSupported('wheel'))
+	               ? 'wheel'
+	               : 'mousewheel';
+	};
+
+	normalizeWheel_1 = normalizeWheel;
+	return normalizeWheel_1;
+}
+
+var normalizeWheel$1;
+var hasRequiredNormalizeWheel;
+
+function requireNormalizeWheel () {
+	if (hasRequiredNormalizeWheel) return normalizeWheel$1;
+	hasRequiredNormalizeWheel = 1;
+	normalizeWheel$1 = requireNormalizeWheel$1();
+	return normalizeWheel$1;
+}
+
+var normalizeWheelExports = requireNormalizeWheel();
+var normalizeWheel = /*@__PURE__*/getDefaultExportFromCjs(normalizeWheelExports);
+
+//#region \0@oxc-project+runtime@0.134.0/helpers/esm/typeof.js
+function _typeof$1(o) {
+	"@babel/helpers - typeof";
+	return _typeof$1 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(o) {
+		return typeof o;
+	} : function(o) {
+		return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o;
+	}, _typeof$1(o);
+}
+//#endregion
+//#region \0@oxc-project+runtime@0.134.0/helpers/esm/toPrimitive.js
+function toPrimitive$1(t, r) {
+	if ("object" != _typeof$1(t) || !t) return t;
+	var e = t[Symbol.toPrimitive];
+	if (void 0 !== e) {
+		var i = e.call(t, r);
+		if ("object" != _typeof$1(i)) return i;
+		throw new TypeError("@@toPrimitive must return a primitive value.");
+	}
+	return ("string" === r ? String : Number)(t);
+}
+//#endregion
+//#region \0@oxc-project+runtime@0.134.0/helpers/esm/toPropertyKey.js
+function toPropertyKey$1(t) {
+	var i = toPrimitive$1(t, "string");
+	return "symbol" == _typeof$1(i) ? i : i + "";
+}
+//#endregion
+//#region \0@oxc-project+runtime@0.134.0/helpers/esm/defineProperty.js
+function _defineProperty$1(e, r, t) {
+	return (r = toPropertyKey$1(r)) in e ? Object.defineProperty(e, r, {
+		value: t,
+		enumerable: true,
+		configurable: true,
+		writable: true
+	}) : e[r] = t, e;
+}
+//#endregion
+//#region \0@oxc-project+runtime@0.134.0/helpers/esm/objectSpread2.js
+function ownKeys$1(e, r) {
+	var t = Object.keys(e);
+	if (Object.getOwnPropertySymbols) {
+		var o = Object.getOwnPropertySymbols(e);
+		r && (o = o.filter(function(r) {
+			return Object.getOwnPropertyDescriptor(e, r).enumerable;
+		})), t.push.apply(t, o);
+	}
+	return t;
+}
+function _objectSpread2$1(e) {
+	for (var r = 1; r < arguments.length; r++) {
+		var t = null != arguments[r] ? arguments[r] : {};
+		r % 2 ? ownKeys$1(Object(t), true).forEach(function(r) {
+			_defineProperty$1(e, r, t[r]);
+		}) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$1(Object(t)).forEach(function(r) {
+			Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r));
+		});
+	}
+	return e;
+}
+//#endregion
+//#region src/helpers.ts
+/**
+* Compute the dimension of the crop area based on media size,
+* aspect ratio and optionally rotation
+*/
+function getCropSize(mediaWidth, mediaHeight, containerWidth, containerHeight, aspect, rotation = 0) {
+	const { width, height } = rotateSize$1(mediaWidth, mediaHeight, rotation);
+	const fittingWidth = Math.min(width, containerWidth);
+	const fittingHeight = Math.min(height, containerHeight);
+	if (fittingWidth > fittingHeight * aspect) return {
+		width: fittingHeight * aspect,
+		height: fittingHeight
+	};
+	return {
+		width: fittingWidth,
+		height: fittingWidth / aspect
+	};
+}
+/**
+* Compute media zoom.
+* We fit the media into the container with "max-width: 100%; max-height: 100%;"
+*/
+function getMediaZoom(mediaSize) {
+	return mediaSize.width > mediaSize.height ? mediaSize.width / mediaSize.naturalWidth : mediaSize.height / mediaSize.naturalHeight;
+}
+/**
+* Ensure a new media position stays in the crop area.
+*/
+function restrictPosition(position, mediaSize, cropSize, zoom, rotation = 0) {
+	const { width, height } = rotateSize$1(mediaSize.width, mediaSize.height, rotation);
+	return {
+		x: restrictPositionCoord(position.x, width, cropSize.width, zoom),
+		y: restrictPositionCoord(position.y, height, cropSize.height, zoom)
+	};
+}
+function restrictPositionCoord(position, mediaSize, cropSize, zoom) {
+	const maxPosition = Math.abs(mediaSize * zoom / 2 - cropSize / 2);
+	return clamp(position, -maxPosition, maxPosition);
+}
+function getDistanceBetweenPoints(pointA, pointB) {
+	return Math.sqrt(Math.pow(pointA.y - pointB.y, 2) + Math.pow(pointA.x - pointB.x, 2));
+}
+function getRotationBetweenPoints(pointA, pointB) {
+	return Math.atan2(pointB.y - pointA.y, pointB.x - pointA.x) * 180 / Math.PI;
+}
+/**
+* Compute the output cropped area of the media in percentages and pixels.
+* x/y are the top-left coordinates on the src media
+*/
+function computeCroppedArea(crop, mediaSize, cropSize, aspect, zoom, rotation = 0, restrictPosition = true) {
+	const limitAreaFn = restrictPosition ? limitArea : noOp;
+	const mediaBBoxSize = rotateSize$1(mediaSize.width, mediaSize.height, rotation);
+	const mediaNaturalBBoxSize = rotateSize$1(mediaSize.naturalWidth, mediaSize.naturalHeight, rotation);
+	const croppedAreaPercentages = {
+		x: limitAreaFn(100, ((mediaBBoxSize.width - cropSize.width / zoom) / 2 - crop.x / zoom) / mediaBBoxSize.width * 100),
+		y: limitAreaFn(100, ((mediaBBoxSize.height - cropSize.height / zoom) / 2 - crop.y / zoom) / mediaBBoxSize.height * 100),
+		width: limitAreaFn(100, cropSize.width / mediaBBoxSize.width * 100 / zoom),
+		height: limitAreaFn(100, cropSize.height / mediaBBoxSize.height * 100 / zoom)
+	};
+	const widthInPixels = Math.round(limitAreaFn(mediaNaturalBBoxSize.width, croppedAreaPercentages.width * mediaNaturalBBoxSize.width / 100));
+	const heightInPixels = Math.round(limitAreaFn(mediaNaturalBBoxSize.height, croppedAreaPercentages.height * mediaNaturalBBoxSize.height / 100));
+	const sizePixels = mediaNaturalBBoxSize.width >= mediaNaturalBBoxSize.height * aspect ? {
+		width: Math.round(heightInPixels * aspect),
+		height: heightInPixels
+	} : {
+		width: widthInPixels,
+		height: Math.round(widthInPixels / aspect)
+	};
+	return {
+		croppedAreaPercentages,
+		croppedAreaPixels: _objectSpread2$1(_objectSpread2$1({}, sizePixels), {}, {
+			x: Math.round(limitAreaFn(mediaNaturalBBoxSize.width - sizePixels.width, croppedAreaPercentages.x * mediaNaturalBBoxSize.width / 100)),
+			y: Math.round(limitAreaFn(mediaNaturalBBoxSize.height - sizePixels.height, croppedAreaPercentages.y * mediaNaturalBBoxSize.height / 100))
+		})
+	};
+}
+/**
+* Ensure the returned value is between 0 and max
+*/
+function limitArea(max, value) {
+	return Math.min(max, Math.max(0, value));
+}
+function noOp(_max, value) {
+	return value;
+}
+/**
+* Compute crop and zoom from the croppedAreaPercentages.
+*/
+function getInitialCropFromCroppedAreaPercentages(croppedAreaPercentages, mediaSize, rotation, cropSize, minZoom, maxZoom) {
+	const mediaBBoxSize = rotateSize$1(mediaSize.width, mediaSize.height, rotation);
+	const zoom = clamp(cropSize.width / mediaBBoxSize.width * (100 / croppedAreaPercentages.width), minZoom, maxZoom);
+	return {
+		crop: {
+			x: zoom * mediaBBoxSize.width / 2 - cropSize.width / 2 - mediaBBoxSize.width * zoom * (croppedAreaPercentages.x / 100),
+			y: zoom * mediaBBoxSize.height / 2 - cropSize.height / 2 - mediaBBoxSize.height * zoom * (croppedAreaPercentages.y / 100)
+		},
+		zoom
+	};
+}
+/**
+* Compute zoom from the croppedAreaPixels
+*/
+function getZoomFromCroppedAreaPixels(croppedAreaPixels, mediaSize, cropSize) {
+	const mediaZoom = getMediaZoom(mediaSize);
+	return cropSize.height > cropSize.width ? cropSize.height / (croppedAreaPixels.height * mediaZoom) : cropSize.width / (croppedAreaPixels.width * mediaZoom);
+}
+/**
+* Compute crop and zoom from the croppedAreaPixels
+*/
+function getInitialCropFromCroppedAreaPixels(croppedAreaPixels, mediaSize, rotation = 0, cropSize, minZoom, maxZoom) {
+	const mediaNaturalBBoxSize = rotateSize$1(mediaSize.naturalWidth, mediaSize.naturalHeight, rotation);
+	const zoom = clamp(getZoomFromCroppedAreaPixels(croppedAreaPixels, mediaSize, cropSize), minZoom, maxZoom);
+	const cropZoom = cropSize.height > cropSize.width ? cropSize.height / croppedAreaPixels.height : cropSize.width / croppedAreaPixels.width;
+	return {
+		crop: {
+			x: ((mediaNaturalBBoxSize.width - croppedAreaPixels.width) / 2 - croppedAreaPixels.x) * cropZoom,
+			y: ((mediaNaturalBBoxSize.height - croppedAreaPixels.height) / 2 - croppedAreaPixels.y) * cropZoom
+		},
+		zoom
+	};
+}
+/**
+* Return the point that is the center of point a and b
+*/
+function getCenter(a, b) {
+	return {
+		x: (b.x + a.x) / 2,
+		y: (b.y + a.y) / 2
+	};
+}
+function getRadianAngle$1(degreeValue) {
+	return degreeValue * Math.PI / 180;
+}
+/**
+* Returns the new bounding area of a rotated rectangle.
+*/
+function rotateSize$1(width, height, rotation) {
+	const rotRad = getRadianAngle$1(rotation);
+	return {
+		width: Math.abs(Math.cos(rotRad) * width) + Math.abs(Math.sin(rotRad) * height),
+		height: Math.abs(Math.sin(rotRad) * width) + Math.abs(Math.cos(rotRad) * height)
+	};
+}
+/**
+* Clamp value between min and max
+*/
+function clamp(value, min, max) {
+	return Math.min(Math.max(value, min), max);
+}
+/**
+* Combine multiple class names into a single string.
+*/
+function classNames(...args) {
+	return args.filter((value) => {
+		if (typeof value === "string" && value.length > 0) return true;
+		return false;
+	}).join(" ").trim();
+}
+//#endregion
+//#region src/styles.css?raw
+var styles_default = ".reactEasyCrop_Container {\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  overflow: hidden;\n  user-select: none;\n  touch-action: none;\n  cursor: move;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n}\n\n.reactEasyCrop_Image,\n.reactEasyCrop_Video {\n  will-change: transform; /* this improves performances and prevent painting issues on iOS Chrome */\n  max-width: unset; /* prevent global img/video reset rules from constraining the cropper media */\n}\n\n.reactEasyCrop_Contain {\n  max-width: 100%;\n  max-height: 100%;\n  margin: auto;\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  right: 0;\n}\n.reactEasyCrop_Cover_Horizontal {\n  width: 100%;\n  height: auto;\n}\n.reactEasyCrop_Cover_Vertical {\n  width: auto;\n  height: 100%;\n}\n\n.reactEasyCrop_CropArea {\n  position: absolute;\n  left: 50%;\n  top: 50%;\n  transform: translate(-50%, -50%);\n  border: 1px solid rgba(255, 255, 255, 0.5);\n  box-sizing: border-box;\n  box-shadow: 0 0 0 9999em;\n  color: rgba(0, 0, 0, 0.5);\n  overflow: hidden;\n}\n\n.reactEasyCrop_CropAreaRound {\n  border-radius: 50%;\n}\n\n.reactEasyCrop_CropAreaGrid::before {\n  content: ' ';\n  box-sizing: border-box;\n  position: absolute;\n  border: 1px solid rgba(255, 255, 255, 0.5);\n  top: 0;\n  bottom: 0;\n  left: 33.33%;\n  right: 33.33%;\n  border-top: 0;\n  border-bottom: 0;\n}\n\n.reactEasyCrop_CropAreaGrid::after {\n  content: ' ';\n  box-sizing: border-box;\n  position: absolute;\n  border: 1px solid rgba(255, 255, 255, 0.5);\n  top: 33.33%;\n  bottom: 33.33%;\n  left: 0;\n  right: 0;\n  border-left: 0;\n  border-right: 0;\n}\n";
+//#endregion
+//#region src/Cropper.tsx
+const MIN_ZOOM = 1;
+const MAX_ZOOM = 3;
+const KEYBOARD_STEP = 1;
+var Cropper$1 = class Cropper extends React.Component {
+	constructor(..._args) {
+		super(..._args);
+		this.cropperRef = React.createRef();
+		this.imageRef = React.createRef();
+		this.videoRef = React.createRef();
+		this.containerPosition = {
+			x: 0,
+			y: 0
+		};
+		this.containerRef = null;
+		this.styleRef = null;
+		this.containerRect = null;
+		this.mediaSize = {
+			width: 0,
+			height: 0,
+			naturalWidth: 0,
+			naturalHeight: 0
+		};
+		this.dragStartPosition = {
+			x: 0,
+			y: 0
+		};
+		this.dragStartCrop = {
+			x: 0,
+			y: 0
+		};
+		this.gestureZoomStart = 0;
+		this.gestureRotationStart = 0;
+		this.isTouching = false;
+		this.lastPinchDistance = 0;
+		this.lastPinchRotation = 0;
+		this.rafDragTimeout = null;
+		this.rafPinchTimeout = null;
+		this.wheelTimer = null;
+		this.currentDoc = typeof document !== "undefined" ? document : null;
+		this.currentWindow = typeof window !== "undefined" ? window : null;
+		this.resizeObserver = null;
+		this.previousCropSize = null;
+		this.isInitialized = false;
+		this.state = {
+			cropSize: null,
+			hasWheelJustStarted: false,
+			mediaObjectFit: void 0
+		};
+		this.initResizeObserver = () => {
+			if (typeof window.ResizeObserver === "undefined" || !this.containerRef) return;
+			let isFirstResize = true;
+			this.resizeObserver = new window.ResizeObserver((entries) => {
+				if (isFirstResize) {
+					isFirstResize = false;
+					return;
+				}
+				this.computeSizes();
+			});
+			this.resizeObserver.observe(this.containerRef);
+		};
+		this.preventZoomSafari = (e) => e.preventDefault();
+		this.cleanEvents = () => {
+			if (!this.currentDoc) return;
+			this.currentDoc.removeEventListener("mousemove", this.onMouseMove);
+			this.currentDoc.removeEventListener("mouseup", this.onDragStopped);
+			this.currentDoc.removeEventListener("touchmove", this.onTouchMove);
+			this.currentDoc.removeEventListener("touchend", this.onDragStopped);
+			this.currentDoc.removeEventListener("gesturechange", this.onGestureChange);
+			this.currentDoc.removeEventListener("gestureend", this.onGestureEnd);
+			this.currentDoc.removeEventListener("scroll", this.onScroll);
+		};
+		this.clearScrollEvent = () => {
+			if (this.containerRef) this.containerRef.removeEventListener("wheel", this.onWheel);
+			if (this.wheelTimer) clearTimeout(this.wheelTimer);
+		};
+		this.onMediaLoad = () => {
+			const cropSize = this.computeSizes();
+			if (cropSize) {
+				this.previousCropSize = cropSize;
+				this.emitCropData();
+				this.setInitialCrop(cropSize);
+				this.isInitialized = true;
+			}
+			if (this.props.onMediaLoaded) this.props.onMediaLoaded(this.mediaSize);
+		};
+		this.setInitialCrop = (cropSize) => {
+			if (this.props.initialCroppedAreaPercentages) {
+				const { crop, zoom } = getInitialCropFromCroppedAreaPercentages(this.props.initialCroppedAreaPercentages, this.mediaSize, this.props.rotation, cropSize, this.props.minZoom, this.props.maxZoom);
+				this.props.onCropChange(crop);
+				this.props.onZoomChange && this.props.onZoomChange(zoom);
+			} else if (this.props.initialCroppedAreaPixels) {
+				const { crop, zoom } = getInitialCropFromCroppedAreaPixels(this.props.initialCroppedAreaPixels, this.mediaSize, this.props.rotation, cropSize, this.props.minZoom, this.props.maxZoom);
+				this.props.onCropChange(crop);
+				this.props.onZoomChange && this.props.onZoomChange(zoom);
+			}
+		};
+		this.computeSizes = () => {
+			const mediaRef = this.imageRef.current || this.videoRef.current;
+			if (mediaRef && this.containerRef) {
+				var _this$imageRef$curren, _this$videoRef$curren, _this$imageRef$curren2, _this$videoRef$curren2, _this$state$cropSize, _this$state$cropSize2;
+				this.containerRect = this.containerRef.getBoundingClientRect();
+				this.saveContainerPosition();
+				const containerAspect = this.containerRect.width / this.containerRect.height;
+				const naturalWidth = ((_this$imageRef$curren = this.imageRef.current) === null || _this$imageRef$curren === void 0 ? void 0 : _this$imageRef$curren.naturalWidth) || ((_this$videoRef$curren = this.videoRef.current) === null || _this$videoRef$curren === void 0 ? void 0 : _this$videoRef$curren.videoWidth) || 0;
+				const naturalHeight = ((_this$imageRef$curren2 = this.imageRef.current) === null || _this$imageRef$curren2 === void 0 ? void 0 : _this$imageRef$curren2.naturalHeight) || ((_this$videoRef$curren2 = this.videoRef.current) === null || _this$videoRef$curren2 === void 0 ? void 0 : _this$videoRef$curren2.videoHeight) || 0;
+				const isMediaScaledDown = mediaRef.offsetWidth < naturalWidth || mediaRef.offsetHeight < naturalHeight;
+				const mediaAspect = naturalWidth / naturalHeight;
+				let renderedMediaSize;
+				if (isMediaScaledDown) switch (this.state.mediaObjectFit) {
+					default:
+					case "contain":
+						renderedMediaSize = containerAspect > mediaAspect ? {
+							width: this.containerRect.height * mediaAspect,
+							height: this.containerRect.height
+						} : {
+							width: this.containerRect.width,
+							height: this.containerRect.width / mediaAspect
+						};
+						break;
+					case "horizontal-cover":
+						renderedMediaSize = {
+							width: this.containerRect.width,
+							height: this.containerRect.width / mediaAspect
+						};
+						break;
+					case "vertical-cover":
+						renderedMediaSize = {
+							width: this.containerRect.height * mediaAspect,
+							height: this.containerRect.height
+						};
+						break;
+				}
+				else renderedMediaSize = {
+					width: mediaRef.offsetWidth,
+					height: mediaRef.offsetHeight
+				};
+				this.mediaSize = _objectSpread2$1(_objectSpread2$1({}, renderedMediaSize), {}, {
+					naturalWidth,
+					naturalHeight
+				});
+				if (this.props.setMediaSize) this.props.setMediaSize(this.mediaSize);
+				const cropSize = this.props.cropSize ? this.props.cropSize : getCropSize(this.mediaSize.width, this.mediaSize.height, this.containerRect.width, this.containerRect.height, this.props.aspect, this.props.rotation);
+				if (((_this$state$cropSize = this.state.cropSize) === null || _this$state$cropSize === void 0 ? void 0 : _this$state$cropSize.height) !== cropSize.height || ((_this$state$cropSize2 = this.state.cropSize) === null || _this$state$cropSize2 === void 0 ? void 0 : _this$state$cropSize2.width) !== cropSize.width) this.props.onCropSizeChange && this.props.onCropSizeChange(cropSize);
+				this.setState({ cropSize }, this.recomputeCropPosition);
+				if (this.props.setCropSize) this.props.setCropSize(cropSize);
+				return cropSize;
+			}
+		};
+		this.saveContainerPosition = () => {
+			if (this.containerRef) {
+				const bounds = this.containerRef.getBoundingClientRect();
+				this.containerPosition = {
+					x: bounds.left,
+					y: bounds.top
+				};
+			}
+		};
+		this.onMouseDown = (e) => {
+			if (!this.currentDoc) return;
+			e.preventDefault();
+			this.currentDoc.addEventListener("mousemove", this.onMouseMove);
+			this.currentDoc.addEventListener("mouseup", this.onDragStopped);
+			this.saveContainerPosition();
+			this.onDragStart(Cropper.getMousePoint(e));
+		};
+		this.onMouseMove = (e) => this.onDrag(Cropper.getMousePoint(e));
+		this.onScroll = (e) => {
+			if (!this.currentDoc) return;
+			e.preventDefault();
+			this.saveContainerPosition();
+		};
+		this.onTouchStart = (e) => {
+			if (!this.currentDoc) return;
+			this.isTouching = true;
+			if (this.props.onTouchRequest && !this.props.onTouchRequest(e)) return;
+			this.currentDoc.addEventListener("touchmove", this.onTouchMove, { passive: false });
+			this.currentDoc.addEventListener("touchend", this.onDragStopped);
+			this.saveContainerPosition();
+			if (e.touches.length === 2) this.onPinchStart(e);
+			else if (e.touches.length === 1) this.onDragStart(Cropper.getTouchPoint(e.touches[0]));
+		};
+		this.onTouchMove = (e) => {
+			e.preventDefault();
+			if (e.touches.length === 2) this.onPinchMove(e);
+			else if (e.touches.length === 1) this.onDrag(Cropper.getTouchPoint(e.touches[0]));
+		};
+		this.onGestureStart = (e) => {
+			if (!this.currentDoc) return;
+			e.preventDefault();
+			this.currentDoc.addEventListener("gesturechange", this.onGestureChange);
+			this.currentDoc.addEventListener("gestureend", this.onGestureEnd);
+			this.gestureZoomStart = this.props.zoom;
+			this.gestureRotationStart = this.props.rotation;
+		};
+		this.onGestureChange = (e) => {
+			e.preventDefault();
+			if (this.isTouching) return;
+			const point = Cropper.getMousePoint(e);
+			const newZoom = this.gestureZoomStart - 1 + e.scale;
+			this.setNewZoom(newZoom, point, { shouldUpdatePosition: true });
+			if (this.props.onRotationChange) {
+				const newRotation = this.gestureRotationStart + e.rotation;
+				this.props.onRotationChange(newRotation);
+			}
+		};
+		this.onGestureEnd = (e) => {
+			this.cleanEvents();
+		};
+		this.onDragStart = ({ x, y }) => {
+			var _this$props$onInterac, _this$props;
+			this.dragStartPosition = {
+				x,
+				y
+			};
+			this.dragStartCrop = _objectSpread2$1({}, this.props.crop);
+			(_this$props$onInterac = (_this$props = this.props).onInteractionStart) === null || _this$props$onInterac === void 0 || _this$props$onInterac.call(_this$props);
+		};
+		this.onDrag = ({ x, y }) => {
+			if (!this.currentWindow) return;
+			if (this.rafDragTimeout) this.currentWindow.cancelAnimationFrame(this.rafDragTimeout);
+			this.rafDragTimeout = this.currentWindow.requestAnimationFrame(() => {
+				if (!this.state.cropSize) return;
+				if (x === void 0 || y === void 0) return;
+				const offsetX = x - this.dragStartPosition.x;
+				const offsetY = y - this.dragStartPosition.y;
+				const requestedPosition = {
+					x: this.dragStartCrop.x + offsetX,
+					y: this.dragStartCrop.y + offsetY
+				};
+				const newPosition = this.props.restrictPosition ? restrictPosition(requestedPosition, this.mediaSize, this.state.cropSize, this.props.zoom, this.props.rotation) : requestedPosition;
+				this.props.onCropChange(newPosition);
+			});
+		};
+		this.onDragStopped = () => {
+			var _this$props$onInterac2, _this$props2;
+			this.isTouching = false;
+			this.cleanEvents();
+			this.emitCropData();
+			(_this$props$onInterac2 = (_this$props2 = this.props).onInteractionEnd) === null || _this$props$onInterac2 === void 0 || _this$props$onInterac2.call(_this$props2);
+		};
+		this.onWheel = (e) => {
+			if (!this.currentWindow) return;
+			if (this.props.onWheelRequest && !this.props.onWheelRequest(e)) return;
+			e.preventDefault();
+			const point = Cropper.getMousePoint(e);
+			const { pixelY } = normalizeWheel(e);
+			const newZoom = this.props.zoom - pixelY * this.props.zoomSpeed / 200;
+			this.setNewZoom(newZoom, point, { shouldUpdatePosition: true });
+			if (!this.state.hasWheelJustStarted) this.setState({ hasWheelJustStarted: true }, () => {
+				var _this$props$onInterac3, _this$props3;
+				return (_this$props$onInterac3 = (_this$props3 = this.props).onInteractionStart) === null || _this$props$onInterac3 === void 0 ? void 0 : _this$props$onInterac3.call(_this$props3);
+			});
+			if (this.wheelTimer) clearTimeout(this.wheelTimer);
+			this.wheelTimer = this.currentWindow.setTimeout(() => this.setState({ hasWheelJustStarted: false }, () => {
+				var _this$props$onInterac4, _this$props4;
+				return (_this$props$onInterac4 = (_this$props4 = this.props).onInteractionEnd) === null || _this$props$onInterac4 === void 0 ? void 0 : _this$props$onInterac4.call(_this$props4);
+			}), 250);
+		};
+		this.getPointOnContainer = ({ x, y }, containerTopLeft) => {
+			if (!this.containerRect) throw new Error("The Cropper is not mounted");
+			return {
+				x: this.containerRect.width / 2 - (x - containerTopLeft.x),
+				y: this.containerRect.height / 2 - (y - containerTopLeft.y)
+			};
+		};
+		this.getPointOnMedia = ({ x, y }) => {
+			const { crop, zoom } = this.props;
+			return {
+				x: (x + crop.x) / zoom,
+				y: (y + crop.y) / zoom
+			};
+		};
+		this.setNewZoom = (zoom, point, { shouldUpdatePosition = true } = {}) => {
+			if (!this.state.cropSize || !this.props.onZoomChange) return;
+			const newZoom = clamp(zoom, this.props.minZoom, this.props.maxZoom);
+			if (shouldUpdatePosition) {
+				const zoomPoint = this.getPointOnContainer(point, this.containerPosition);
+				const zoomTarget = this.getPointOnMedia(zoomPoint);
+				const requestedPosition = {
+					x: zoomTarget.x * newZoom - zoomPoint.x,
+					y: zoomTarget.y * newZoom - zoomPoint.y
+				};
+				const newPosition = this.props.restrictPosition ? restrictPosition(requestedPosition, this.mediaSize, this.state.cropSize, newZoom, this.props.rotation) : requestedPosition;
+				this.props.onCropChange(newPosition);
+			}
+			this.props.onZoomChange(newZoom);
+		};
+		this.getCropData = () => {
+			if (!this.state.cropSize) return null;
+			return computeCroppedArea(this.props.restrictPosition ? restrictPosition(this.props.crop, this.mediaSize, this.state.cropSize, this.props.zoom, this.props.rotation) : this.props.crop, this.mediaSize, this.state.cropSize, this.getAspect(), this.props.zoom, this.props.rotation, this.props.restrictPosition);
+		};
+		this.emitCropData = () => {
+			const cropData = this.getCropData();
+			if (!cropData) return;
+			const { croppedAreaPercentages, croppedAreaPixels } = cropData;
+			if (this.props.onCropComplete) this.props.onCropComplete(croppedAreaPercentages, croppedAreaPixels);
+			if (this.props.onCropAreaChange) this.props.onCropAreaChange(croppedAreaPercentages, croppedAreaPixels);
+		};
+		this.emitCropAreaChange = () => {
+			const cropData = this.getCropData();
+			if (!cropData) return;
+			const { croppedAreaPercentages, croppedAreaPixels } = cropData;
+			if (this.props.onCropAreaChange) this.props.onCropAreaChange(croppedAreaPercentages, croppedAreaPixels);
+		};
+		this.recomputeCropPosition = () => {
+			var _this$previousCropSiz, _this$previousCropSiz2;
+			if (!this.state.cropSize) return;
+			let adjustedCrop = this.props.crop;
+			if (this.isInitialized && ((_this$previousCropSiz = this.previousCropSize) === null || _this$previousCropSiz === void 0 ? void 0 : _this$previousCropSiz.width) && ((_this$previousCropSiz2 = this.previousCropSize) === null || _this$previousCropSiz2 === void 0 ? void 0 : _this$previousCropSiz2.height)) {
+				if (Math.abs(this.previousCropSize.width - this.state.cropSize.width) > 1e-6 || Math.abs(this.previousCropSize.height - this.state.cropSize.height) > 1e-6) {
+					const scaleX = this.state.cropSize.width / this.previousCropSize.width;
+					const scaleY = this.state.cropSize.height / this.previousCropSize.height;
+					adjustedCrop = {
+						x: this.props.crop.x * scaleX,
+						y: this.props.crop.y * scaleY
+					};
+				}
+			}
+			const newPosition = this.props.restrictPosition ? restrictPosition(adjustedCrop, this.mediaSize, this.state.cropSize, this.props.zoom, this.props.rotation) : adjustedCrop;
+			this.previousCropSize = this.state.cropSize;
+			this.props.onCropChange(newPosition);
+			this.emitCropData();
+		};
+		this.onKeyDown = (event) => {
+			const { crop, onCropChange, keyboardStep, zoom, rotation } = this.props;
+			let step = keyboardStep;
+			if (!this.state.cropSize) return;
+			if (event.shiftKey) step *= .2;
+			let newCrop = _objectSpread2$1({}, crop);
+			switch (event.key) {
+				case "ArrowUp":
+					newCrop.y -= step;
+					event.preventDefault();
+					break;
+				case "ArrowDown":
+					newCrop.y += step;
+					event.preventDefault();
+					break;
+				case "ArrowLeft":
+					newCrop.x -= step;
+					event.preventDefault();
+					break;
+				case "ArrowRight":
+					newCrop.x += step;
+					event.preventDefault();
+					break;
+				default: return;
+			}
+			if (this.props.restrictPosition) newCrop = restrictPosition(newCrop, this.mediaSize, this.state.cropSize, zoom, rotation);
+			if (!event.repeat) {
+				var _this$props$onInterac5, _this$props5;
+				(_this$props$onInterac5 = (_this$props5 = this.props).onInteractionStart) === null || _this$props$onInterac5 === void 0 || _this$props$onInterac5.call(_this$props5);
+			}
+			onCropChange(newCrop);
+		};
+		this.onKeyUp = (event) => {
+			var _this$props$onInterac6, _this$props6;
+			switch (event.key) {
+				case "ArrowUp":
+				case "ArrowDown":
+				case "ArrowLeft":
+				case "ArrowRight":
+					event.preventDefault();
+					break;
+				default: return;
+			}
+			this.emitCropData();
+			(_this$props$onInterac6 = (_this$props6 = this.props).onInteractionEnd) === null || _this$props$onInterac6 === void 0 || _this$props$onInterac6.call(_this$props6);
+		};
+	}
+	componentDidMount() {
+		if (!this.currentDoc || !this.currentWindow) return;
+		if (this.containerRef) {
+			if (this.containerRef.ownerDocument) this.currentDoc = this.containerRef.ownerDocument;
+			if (this.currentDoc.defaultView) this.currentWindow = this.currentDoc.defaultView;
+			this.initResizeObserver();
+			if (typeof window.ResizeObserver === "undefined") this.currentWindow.addEventListener("resize", this.computeSizes);
+			this.props.zoomWithScroll && this.containerRef.addEventListener("wheel", this.onWheel, { passive: false });
+			this.containerRef.addEventListener("gesturestart", this.onGestureStart);
+		}
+		this.currentDoc.addEventListener("scroll", this.onScroll);
+		if (!this.props.disableAutomaticStylesInjection) {
+			this.styleRef = this.currentDoc.createElement("style");
+			this.styleRef.setAttribute("type", "text/css");
+			if (this.props.nonce) this.styleRef.setAttribute("nonce", this.props.nonce);
+			this.styleRef.innerHTML = styles_default;
+			this.currentDoc.head.appendChild(this.styleRef);
+		}
+		if (this.imageRef.current && this.imageRef.current.complete) this.onMediaLoad();
+		if (this.props.setImageRef) this.props.setImageRef(this.imageRef);
+		if (this.props.setVideoRef) this.props.setVideoRef(this.videoRef);
+		if (this.props.setCropperRef) this.props.setCropperRef(this.cropperRef);
+	}
+	componentWillUnmount() {
+		var _this$resizeObserver;
+		if (!this.currentDoc || !this.currentWindow) return;
+		if (typeof window.ResizeObserver === "undefined") this.currentWindow.removeEventListener("resize", this.computeSizes);
+		(_this$resizeObserver = this.resizeObserver) === null || _this$resizeObserver === void 0 || _this$resizeObserver.disconnect();
+		if (this.containerRef) this.containerRef.removeEventListener("gesturestart", this.preventZoomSafari);
+		if (this.styleRef) {
+			var _this$styleRef$parent;
+			(_this$styleRef$parent = this.styleRef.parentNode) === null || _this$styleRef$parent === void 0 || _this$styleRef$parent.removeChild(this.styleRef);
+		}
+		this.cleanEvents();
+		this.props.zoomWithScroll && this.clearScrollEvent();
+	}
+	componentDidUpdate(prevProps) {
+		var _prevProps$cropSize, _this$props$cropSize, _prevProps$cropSize2, _this$props$cropSize2, _prevProps$crop, _this$props$crop, _prevProps$crop2, _this$props$crop2;
+		if (prevProps.rotation !== this.props.rotation) {
+			this.computeSizes();
+			this.recomputeCropPosition();
+		} else if (prevProps.aspect !== this.props.aspect) this.computeSizes();
+		else if (prevProps.objectFit !== this.props.objectFit) this.computeSizes();
+		else if (prevProps.zoom !== this.props.zoom) this.recomputeCropPosition();
+		else if (((_prevProps$cropSize = prevProps.cropSize) === null || _prevProps$cropSize === void 0 ? void 0 : _prevProps$cropSize.height) !== ((_this$props$cropSize = this.props.cropSize) === null || _this$props$cropSize === void 0 ? void 0 : _this$props$cropSize.height) || ((_prevProps$cropSize2 = prevProps.cropSize) === null || _prevProps$cropSize2 === void 0 ? void 0 : _prevProps$cropSize2.width) !== ((_this$props$cropSize2 = this.props.cropSize) === null || _this$props$cropSize2 === void 0 ? void 0 : _this$props$cropSize2.width)) this.computeSizes();
+		else if (((_prevProps$crop = prevProps.crop) === null || _prevProps$crop === void 0 ? void 0 : _prevProps$crop.x) !== ((_this$props$crop = this.props.crop) === null || _this$props$crop === void 0 ? void 0 : _this$props$crop.x) || ((_prevProps$crop2 = prevProps.crop) === null || _prevProps$crop2 === void 0 ? void 0 : _prevProps$crop2.y) !== ((_this$props$crop2 = this.props.crop) === null || _this$props$crop2 === void 0 ? void 0 : _this$props$crop2.y)) this.emitCropAreaChange();
+		if (prevProps.zoomWithScroll !== this.props.zoomWithScroll && this.containerRef) this.props.zoomWithScroll ? this.containerRef.addEventListener("wheel", this.onWheel, { passive: false }) : this.clearScrollEvent();
+		if (prevProps.video !== this.props.video) {
+			var _this$videoRef$curren3;
+			(_this$videoRef$curren3 = this.videoRef.current) === null || _this$videoRef$curren3 === void 0 || _this$videoRef$curren3.load();
+		}
+		const objectFit = this.getObjectFit();
+		if (objectFit !== this.state.mediaObjectFit) this.setState({ mediaObjectFit: objectFit }, this.computeSizes);
+	}
+	getAspect() {
+		const { cropSize, aspect } = this.props;
+		if (cropSize) return cropSize.width / cropSize.height;
+		return aspect;
+	}
+	getObjectFit() {
+		if (this.props.objectFit === "cover") {
+			if ((this.imageRef.current || this.videoRef.current) && this.containerRef) {
+				var _this$imageRef$curren3, _this$videoRef$curren4, _this$imageRef$curren4, _this$videoRef$curren5;
+				this.containerRect = this.containerRef.getBoundingClientRect();
+				const containerAspect = this.containerRect.width / this.containerRect.height;
+				return (((_this$imageRef$curren3 = this.imageRef.current) === null || _this$imageRef$curren3 === void 0 ? void 0 : _this$imageRef$curren3.naturalWidth) || ((_this$videoRef$curren4 = this.videoRef.current) === null || _this$videoRef$curren4 === void 0 ? void 0 : _this$videoRef$curren4.videoWidth) || 0) / (((_this$imageRef$curren4 = this.imageRef.current) === null || _this$imageRef$curren4 === void 0 ? void 0 : _this$imageRef$curren4.naturalHeight) || ((_this$videoRef$curren5 = this.videoRef.current) === null || _this$videoRef$curren5 === void 0 ? void 0 : _this$videoRef$curren5.videoHeight) || 0) < containerAspect ? "horizontal-cover" : "vertical-cover";
+			}
+			return "horizontal-cover";
+		}
+		return this.props.objectFit;
+	}
+	onPinchStart(e) {
+		const pointA = Cropper.getTouchPoint(e.touches[0]);
+		const pointB = Cropper.getTouchPoint(e.touches[1]);
+		this.lastPinchDistance = getDistanceBetweenPoints(pointA, pointB);
+		this.lastPinchRotation = getRotationBetweenPoints(pointA, pointB);
+		this.onDragStart(getCenter(pointA, pointB));
+	}
+	onPinchMove(e) {
+		if (!this.currentDoc || !this.currentWindow) return;
+		const pointA = Cropper.getTouchPoint(e.touches[0]);
+		const pointB = Cropper.getTouchPoint(e.touches[1]);
+		const center = getCenter(pointA, pointB);
+		this.onDrag(center);
+		if (this.rafPinchTimeout) this.currentWindow.cancelAnimationFrame(this.rafPinchTimeout);
+		this.rafPinchTimeout = this.currentWindow.requestAnimationFrame(() => {
+			const distance = getDistanceBetweenPoints(pointA, pointB);
+			const newZoom = this.props.zoom * (distance / this.lastPinchDistance);
+			this.setNewZoom(newZoom, center, { shouldUpdatePosition: false });
+			this.lastPinchDistance = distance;
+			const rotation = getRotationBetweenPoints(pointA, pointB);
+			const newRotation = this.props.rotation + (rotation - this.lastPinchRotation);
+			this.props.onRotationChange && this.props.onRotationChange(newRotation);
+			this.lastPinchRotation = rotation;
+		});
+	}
+	render() {
+		var _this$state$mediaObje;
+		const { image, video, mediaProps, cropperProps, transform, crop: { x, y }, rotation, zoom, cropShape, showGrid, roundCropAreaPixels, style: { containerStyle, cropAreaStyle, mediaStyle }, classes: { containerClassName, cropAreaClassName, mediaClassName } } = this.props;
+		const objectFit = (_this$state$mediaObje = this.state.mediaObjectFit) !== null && _this$state$mediaObje !== void 0 ? _this$state$mediaObje : this.getObjectFit();
+		return /* @__PURE__ */ React.createElement("div", {
+			onMouseDown: this.onMouseDown,
+			onTouchStart: this.onTouchStart,
+			ref: (el) => this.containerRef = el,
+			"data-testid": "container",
+			style: containerStyle,
+			className: classNames("reactEasyCrop_Container", containerClassName)
+		}, image ? /* @__PURE__ */ React.createElement("img", _objectSpread2$1(_objectSpread2$1({
+			alt: "",
+			className: classNames("reactEasyCrop_Image", objectFit === "contain" && "reactEasyCrop_Contain", objectFit === "horizontal-cover" && "reactEasyCrop_Cover_Horizontal", objectFit === "vertical-cover" && "reactEasyCrop_Cover_Vertical", mediaClassName)
+		}, mediaProps), {}, {
+			src: image,
+			ref: this.imageRef,
+			style: _objectSpread2$1(_objectSpread2$1({}, mediaStyle), {}, { transform: transform || `translate(${x}px, ${y}px) rotate(${rotation}deg) scale(${zoom})` }),
+			onLoad: this.onMediaLoad
+		})) : video && /* @__PURE__ */ React.createElement("video", _objectSpread2$1(_objectSpread2$1({
+			autoPlay: true,
+			playsInline: true,
+			loop: true,
+			muted: true,
+			className: classNames("reactEasyCrop_Video", objectFit === "contain" && "reactEasyCrop_Contain", objectFit === "horizontal-cover" && "reactEasyCrop_Cover_Horizontal", objectFit === "vertical-cover" && "reactEasyCrop_Cover_Vertical", mediaClassName)
+		}, mediaProps), {}, {
+			ref: this.videoRef,
+			onLoadedMetadata: this.onMediaLoad,
+			style: _objectSpread2$1(_objectSpread2$1({}, mediaStyle), {}, { transform: transform || `translate(${x}px, ${y}px) rotate(${rotation}deg) scale(${zoom})` }),
+			controls: false
+		}), (Array.isArray(video) ? video : [{ src: video }]).map((item) => /* @__PURE__ */ React.createElement("source", _objectSpread2$1({ key: item.src }, item)))), this.state.cropSize && /* @__PURE__ */ React.createElement("div", _objectSpread2$1({
+			ref: this.cropperRef,
+			style: _objectSpread2$1(_objectSpread2$1({}, cropAreaStyle), {}, {
+				width: roundCropAreaPixels ? Math.round(this.state.cropSize.width) : this.state.cropSize.width,
+				height: roundCropAreaPixels ? Math.round(this.state.cropSize.height) : this.state.cropSize.height
+			}),
+			tabIndex: 0,
+			onKeyDown: this.onKeyDown,
+			onKeyUp: this.onKeyUp,
+			"data-testid": "cropper",
+			className: classNames("reactEasyCrop_CropArea", cropShape === "round" && "reactEasyCrop_CropAreaRound", showGrid && "reactEasyCrop_CropAreaGrid", cropAreaClassName)
+		}, cropperProps)));
+	}
+};
+Cropper$1.defaultProps = {
+	zoom: 1,
+	rotation: 0,
+	aspect: 4 / 3,
+	maxZoom: MAX_ZOOM,
+	minZoom: MIN_ZOOM,
+	cropShape: "rect",
+	objectFit: "contain",
+	showGrid: true,
+	style: {},
+	classes: {},
+	mediaProps: {},
+	cropperProps: {},
+	zoomSpeed: 1,
+	restrictPosition: true,
+	zoomWithScroll: true,
+	keyboardStep: KEYBOARD_STEP
+};
+Cropper$1.getMousePoint = (e) => ({
+	x: Number(e.clientX),
+	y: Number(e.clientY)
+});
+Cropper$1.getTouchPoint = (touch) => ({
+	x: Number(touch.clientX),
+	y: Number(touch.clientY)
+});
+//#endregion
+//#region src/index.ts
+var src_default = Cropper$1;
+
+/*!
+
+pica
+https://github.com/nodeca/pica
+
+*/
+var BASE64_MAP = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+function base64decode(str) {
+	const input = str.replace(/[\r\n=]/g, ""), max = input.length;
+	const out = new Uint8Array(max * 3 >> 2);
+	let bits = 0;
+	let ptr = 0;
+	for (let idx = 0; idx < max; idx++) {
+		if (idx % 4 === 0 && idx) {
+			out[ptr++] = bits >> 16 & 255;
+			out[ptr++] = bits >> 8 & 255;
+			out[ptr++] = bits & 255;
+		}
+		bits = bits << 6 | BASE64_MAP.indexOf(input.charAt(idx));
+	}
+	const tailbits = max % 4 * 6;
+	if (tailbits === 0) {
+		out[ptr++] = bits >> 16 & 255;
+		out[ptr++] = bits >> 8 & 255;
+		out[ptr++] = bits & 255;
+	} else if (tailbits === 18) {
+		out[ptr++] = bits >> 10 & 255;
+		out[ptr++] = bits >> 2 & 255;
+	} else if (tailbits === 12) out[ptr++] = bits >> 4 & 255;
+	return out;
+}
+var wa;
+function hasWebAssembly() {
+	if (typeof wa !== "undefined") return wa;
+	wa = false;
+	if (typeof WebAssembly === "undefined") return wa;
+	try {
+		const bin = new Uint8Array([
+			0,
+			97,
+			115,
+			109,
+			1,
+			0,
+			0,
+			0,
+			1,
+			6,
+			1,
+			96,
+			1,
+			127,
+			1,
+			127,
+			3,
+			2,
+			1,
+			0,
+			5,
+			3,
+			1,
+			0,
+			1,
+			7,
+			8,
+			1,
+			4,
+			116,
+			101,
+			115,
+			116,
+			0,
+			0,
+			10,
+			16,
+			1,
+			14,
+			0,
+			32,
+			0,
+			65,
+			1,
+			54,
+			2,
+			0,
+			32,
+			0,
+			40,
+			2,
+			0,
+			11
+		]);
+		const module = new WebAssembly.Module(bin);
+		if (new WebAssembly.Instance(module, {}).exports.test(4) !== 0) wa = true;
+		return wa;
+	} catch (__) {}
+	return wa;
+}
+var DEFAULT_OPTIONS = {
+	js: true,
+	wasm: true
+};
+var MultiMath = class {
+	constructor(options) {
+		const opts = Object.assign({}, DEFAULT_OPTIONS, options || {});
+		this.options = opts;
+		this.__cache = {};
+		this.__init_promise = null;
+		this.__modules = opts.modules || {};
+		this.__memory = null;
+		this.__wasm = {};
+		this.__isLE = new Uint32Array(new Uint8Array([
+			1,
+			0,
+			0,
+			0
+		]).buffer)[0] === 1;
+		if (!this.options.js && !this.options.wasm) throw new Error("mathlib: at least \"js\" or \"wasm\" should be enabled");
+	}
+	has_wasm() {
+		return hasWebAssembly();
+	}
+	use(module) {
+		this.__modules[module.name] = module;
+		if (this.options.wasm && this.has_wasm() && module.wasm_fn) this[module.name] = module.wasm_fn;
+		else this[module.name] = module.fn;
+		return this;
+	}
+	init() {
+		if (this.__init_promise) return this.__init_promise;
+		if (!this.options.js && this.options.wasm && !this.has_wasm()) return Promise.reject(/* @__PURE__ */ new Error("mathlib: only \"wasm\" was enabled, but it's not supported"));
+		this.__init_promise = Promise.all(Object.keys(this.__modules).map((name) => {
+			const module = this.__modules[name];
+			if (!this.options.wasm || !this.has_wasm() || !module.wasm_fn) return null;
+			if (this.__wasm[name]) return null;
+			return WebAssembly.compile(base64decode(module.wasm_src)).then((m) => {
+				this.__wasm[name] = m;
+			});
+		})).then(() => this);
+		return this.__init_promise;
+	}
+	__reallocate(bytes) {
+		if (!this.__memory) {
+			this.__memory = new WebAssembly.Memory({ initial: Math.ceil(bytes / (64 * 1024)) });
+			return this.__memory;
+		}
+		const mem_size = this.__memory.buffer.byteLength;
+		if (mem_size < bytes) this.__memory.grow(Math.ceil((bytes - mem_size) / (64 * 1024)));
+		return this.__memory;
+	}
+	__instance(name, memsize, env_extra) {
+		if (memsize) this.__reallocate(memsize);
+		if (!this.__wasm[name]) {
+			const module = this.__modules[name];
+			this.__wasm[name] = new WebAssembly.Module(base64decode(module.wasm_src));
+		}
+		if (!this.__cache[name]) {
+			const env_base = {
+				memoryBase: 0,
+				memory: this.__memory,
+				tableBase: 0,
+				table: new WebAssembly.Table({
+					initial: 0,
+					element: "anyfunc"
+				})
+			};
+			this.__cache[name] = new WebAssembly.Instance(this.__wasm[name], { env: Object.assign(env_base, env_extra || {}) });
+		}
+		return this.__cache[name];
+	}
+	__align(number, base) {
+		base = base || 8;
+		const reminder = number % base;
+		return number + (reminder ? base - reminder : 0);
+	}
+};
+function gaussCoef(sigma) {
+	if (sigma < .5) sigma = .5;
+	const a = Math.exp(.726 * .726) / sigma, g1 = Math.exp(-a), g2 = Math.exp(-2 * a), k = (1 - g1) * (1 - g1) / (1 + 2 * a * g1 - g2);
+	const a0 = k;
+	const a1 = k * (a - 1) * g1;
+	const a2 = k * (a + 1) * g1;
+	const a3 = -k * g2;
+	const b1 = 2 * g1;
+	const b2 = -g2;
+	const left_corner = (a0 + a1) / (1 - b1 - b2);
+	const right_corner = (a2 + a3) / (1 - b1 - b2);
+	return new Float32Array([
+		a0,
+		a1,
+		a2,
+		a3,
+		b1,
+		b2,
+		left_corner,
+		right_corner
+	]);
+}
+function convolveMono16(src, out, line, coeff, width, height) {
+	let prev_src, curr_src, curr_out, prev_out, prev_prev_out;
+	let src_index, out_index, line_index;
+	let i, j;
+	let coeff_a0, coeff_a1, coeff_b1, coeff_b2;
+	for (i = 0; i < height; i++) {
+		src_index = i * width;
+		out_index = i;
+		line_index = 0;
+		prev_src = src[src_index];
+		prev_prev_out = prev_src * coeff[6];
+		prev_out = prev_prev_out;
+		coeff_a0 = coeff[0];
+		coeff_a1 = coeff[1];
+		coeff_b1 = coeff[4];
+		coeff_b2 = coeff[5];
+		for (j = 0; j < width; j++) {
+			curr_src = src[src_index];
+			curr_out = curr_src * coeff_a0 + prev_src * coeff_a1 + prev_out * coeff_b1 + prev_prev_out * coeff_b2;
+			prev_prev_out = prev_out;
+			prev_out = curr_out;
+			prev_src = curr_src;
+			line[line_index] = prev_out;
+			line_index++;
+			src_index++;
+		}
+		src_index--;
+		line_index--;
+		out_index += height * (width - 1);
+		prev_src = src[src_index];
+		prev_prev_out = prev_src * coeff[7];
+		prev_out = prev_prev_out;
+		curr_src = prev_src;
+		coeff_a0 = coeff[2];
+		coeff_a1 = coeff[3];
+		for (j = width - 1; j >= 0; j--) {
+			curr_out = curr_src * coeff_a0 + prev_src * coeff_a1 + prev_out * coeff_b1 + prev_prev_out * coeff_b2;
+			prev_prev_out = prev_out;
+			prev_out = curr_out;
+			prev_src = curr_src;
+			curr_src = src[src_index];
+			out[out_index] = line[line_index] + prev_out;
+			src_index--;
+			line_index--;
+			out_index -= height;
+		}
+	}
+}
+function blurMono16(src, width, height, radius) {
+	if (!radius) return;
+	const out = new Uint16Array(src.length), tmp_line = new Float32Array(Math.max(width, height));
+	const coeff = gaussCoef(radius);
+	convolveMono16(src, out, tmp_line, coeff, width, height);
+	convolveMono16(out, src, tmp_line, coeff, height, width);
+}
+function hsv_v16(img, width, height) {
+	const size = width * height;
+	const out = new Uint16Array(size);
+	let r, g, b, max;
+	for (let i = 0; i < size; i++) {
+		r = img[4 * i];
+		g = img[4 * i + 1];
+		b = img[4 * i + 2];
+		max = r >= g && r >= b ? r : g >= b && g >= r ? g : b;
+		out[i] = max << 8;
+	}
+	return out;
+}
+function unsharp$1(img, width, height, amount, radius, threshold) {
+	let v1, v2, vmul;
+	let diff, iTimes4;
+	if (amount === 0 || radius < .5) return;
+	if (radius > 2) radius = 2;
+	const brightness = hsv_v16(img, width, height);
+	const blured = new Uint16Array(brightness);
+	blurMono16(blured, width, height, radius);
+	const amountFp = amount / 100 * 4096 + .5 | 0;
+	const thresholdFp = threshold << 8;
+	const size = width * height;
+	for (let i = 0; i < size; i++) {
+		v1 = brightness[i];
+		diff = v1 - blured[i];
+		if (Math.abs(diff) >= thresholdFp) {
+			v2 = v1 + (amountFp * diff + 2048 >> 12);
+			v2 = v2 > 65280 ? 65280 : v2;
+			v2 = v2 < 0 ? 0 : v2;
+			v1 = v1 !== 0 ? v1 : 1;
+			vmul = (v2 << 12) / v1 | 0;
+			iTimes4 = i * 4;
+			img[iTimes4] = img[iTimes4] * vmul + 2048 >> 12;
+			img[iTimes4 + 1] = img[iTimes4 + 1] * vmul + 2048 >> 12;
+			img[iTimes4 + 2] = img[iTimes4 + 2] * vmul + 2048 >> 12;
+		}
+	}
+}
+function unsharp(img, width, height, amount, radius, threshold) {
+	if (amount === 0 || radius < .5) return;
+	if (radius > 2) radius = 2;
+	const pixels = width * height;
+	const img_bytes_cnt = pixels * 4;
+	const hsv_bytes_cnt = pixels * 2;
+	const blur_bytes_cnt = pixels * 2;
+	const blur_line_byte_cnt = Math.max(width, height) * 4;
+	const blur_coeffs_byte_cnt = 32;
+	const img_offset = 0;
+	const hsv_offset = img_bytes_cnt;
+	const blur_offset = hsv_offset + hsv_bytes_cnt;
+	const blur_tmp_offset = blur_offset + blur_bytes_cnt;
+	const blur_line_offset = blur_tmp_offset + blur_bytes_cnt;
+	const blur_coeffs_offset = blur_line_offset + blur_line_byte_cnt;
+	const instance = this.__instance("unsharp_mask", img_bytes_cnt + hsv_bytes_cnt + blur_bytes_cnt * 2 + blur_line_byte_cnt + blur_coeffs_byte_cnt, { exp: Math.exp });
+	const img32 = new Uint32Array(img.buffer);
+	new Uint32Array(this.__memory.buffer).set(img32);
+	let fn = instance.exports.hsv_v16 || instance.exports._hsv_v16;
+	if (!fn) throw new Error("WASM hsv_v16 function is not available");
+	fn(img_offset, hsv_offset, width, height);
+	fn = instance.exports.blurMono16 || instance.exports._blurMono16;
+	if (!fn) throw new Error("WASM blurMono16 function is not available");
+	fn(hsv_offset, blur_offset, blur_tmp_offset, blur_line_offset, blur_coeffs_offset, width, height, radius);
+	fn = instance.exports.unsharp || instance.exports._unsharp;
+	if (!fn) throw new Error("WASM unsharp function is not available");
+	fn(img_offset, img_offset, hsv_offset, blur_offset, width, height, amount, threshold);
+	img32.set(new Uint32Array(this.__memory.buffer, 0, pixels));
+}
+var mm_unsharp_mask_default = {
+	name: "unsharp_mask",
+	fn: unsharp$1,
+	wasm_fn: unsharp,
+	wasm_src: "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"
+};
+var resize_filter_info_default = { filter: {
+	box: {
+		win: .5,
+		fn(x) {
+			if (x < 0) x = -x;
+			return x < .5 ? 1 : 0;
+		}
+	},
+	hamming: {
+		win: 1,
+		fn(x) {
+			if (x < 0) x = -x;
+			if (x >= 1) return 0;
+			if (x < 1.1920929e-7) return 1;
+			const xpi = x * Math.PI;
+			return Math.sin(xpi) / xpi * (.54 + .46 * Math.cos(xpi / 1));
+		}
+	},
+	lanczos2: {
+		win: 2,
+		fn(x) {
+			if (x < 0) x = -x;
+			if (x >= 2) return 0;
+			if (x < 1.1920929e-7) return 1;
+			const xpi = x * Math.PI;
+			return Math.sin(xpi) / xpi * Math.sin(xpi / 2) / (xpi / 2);
+		}
+	},
+	lanczos3: {
+		win: 3,
+		fn(x) {
+			if (x < 0) x = -x;
+			if (x >= 3) return 0;
+			if (x < 1.1920929e-7) return 1;
+			const xpi = x * Math.PI;
+			return Math.sin(xpi) / xpi * Math.sin(xpi / 3) / (xpi / 3);
+		}
+	},
+	mks2013: {
+		win: 2.5,
+		fn(x) {
+			if (x < 0) x = -x;
+			if (x >= 2.5) return 0;
+			if (x >= 1.5) return -0.125 * (x - 2.5) * (x - 2.5);
+			if (x >= .5) return .25 * (4 * x * x - 11 * x + 7);
+			return 1.0625 - 1.75 * x * x;
+		}
+	}
+} };
+var FIXED_FRAC_BITS = 14;
+function toFixedPoint(num) {
+	return Math.round(num * ((1 << FIXED_FRAC_BITS) - 1));
+}
+function resizeFilterGen(filter, srcSize, destSize, scale, offset) {
+	const filterFunction = resize_filter_info_default.filter[filter].fn;
+	const scaleInverted = 1 / scale;
+	const scaleClamped = Math.min(1, scale);
+	const srcWindow = resize_filter_info_default.filter[filter].win / scaleClamped;
+	let destPixel, srcPixel, srcFirst, srcLast, filterElementSize, floatFilter, fxpFilter, total, pxl, idx, floatVal, filterTotal, filterVal;
+	let leftNotEmpty, rightNotEmpty, filterShift, filterSize;
+	const maxFilterElementSize = Math.floor((srcWindow + 1) * 2);
+	const packedFilter = new Int16Array((maxFilterElementSize + 2) * destSize);
+	let packedFilterPtr = 0;
+	const slowCopy = !packedFilter.subarray || !packedFilter.set;
+	for (destPixel = 0; destPixel < destSize; destPixel++) {
+		srcPixel = (destPixel + .5) * scaleInverted + offset;
+		srcFirst = Math.max(0, Math.floor(srcPixel - srcWindow));
+		srcLast = Math.min(srcSize - 1, Math.ceil(srcPixel + srcWindow));
+		filterElementSize = srcLast - srcFirst + 1;
+		floatFilter = new Float32Array(filterElementSize);
+		fxpFilter = new Int16Array(filterElementSize);
+		total = 0;
+		for (pxl = srcFirst, idx = 0; pxl <= srcLast; pxl++, idx++) {
+			floatVal = filterFunction((pxl + .5 - srcPixel) * scaleClamped);
+			total += floatVal;
+			floatFilter[idx] = floatVal;
+		}
+		filterTotal = 0;
+		for (idx = 0; idx < floatFilter.length; idx++) {
+			filterVal = floatFilter[idx] / total;
+			filterTotal += filterVal;
+			fxpFilter[idx] = toFixedPoint(filterVal);
+		}
+		fxpFilter[destSize >> 1] += toFixedPoint(1 - filterTotal);
+		leftNotEmpty = 0;
+		while (leftNotEmpty < fxpFilter.length && fxpFilter[leftNotEmpty] === 0) leftNotEmpty++;
+		if (leftNotEmpty < fxpFilter.length) {
+			rightNotEmpty = fxpFilter.length - 1;
+			while (rightNotEmpty > 0 && fxpFilter[rightNotEmpty] === 0) rightNotEmpty--;
+			filterShift = srcFirst + leftNotEmpty;
+			filterSize = rightNotEmpty - leftNotEmpty + 1;
+			packedFilter[packedFilterPtr++] = filterShift;
+			packedFilter[packedFilterPtr++] = filterSize;
+			if (!slowCopy) {
+				packedFilter.set(fxpFilter.subarray(leftNotEmpty, rightNotEmpty + 1), packedFilterPtr);
+				packedFilterPtr += filterSize;
+			} else for (idx = leftNotEmpty; idx <= rightNotEmpty; idx++) packedFilter[packedFilterPtr++] = fxpFilter[idx];
+		} else {
+			packedFilter[packedFilterPtr++] = 0;
+			packedFilter[packedFilterPtr++] = 0;
+		}
+	}
+	return packedFilter;
+}
+function clampTo8(i) {
+	return i < 0 ? 0 : i > 255 ? 255 : i;
+}
+function clampNegative(i) {
+	return i >= 0 ? i : 0;
+}
+function convolveHor(src, dest, srcW, srcH, destW, filters) {
+	let r, g, b, a;
+	let filterPtr, filterShift, filterSize;
+	let srcPtr, srcY, destX, filterVal;
+	let srcOffset = 0, destOffset = 0;
+	for (srcY = 0; srcY < srcH; srcY++) {
+		filterPtr = 0;
+		for (destX = 0; destX < destW; destX++) {
+			filterShift = filters[filterPtr++];
+			filterSize = filters[filterPtr++];
+			srcPtr = srcOffset + filterShift * 4 | 0;
+			r = g = b = a = 0;
+			for (; filterSize > 0; filterSize--) {
+				filterVal = filters[filterPtr++];
+				a = a + filterVal * src[srcPtr + 3] | 0;
+				b = b + filterVal * src[srcPtr + 2] | 0;
+				g = g + filterVal * src[srcPtr + 1] | 0;
+				r = r + filterVal * src[srcPtr] | 0;
+				srcPtr = srcPtr + 4 | 0;
+			}
+			dest[destOffset + 3] = clampNegative(a >> 7);
+			dest[destOffset + 2] = clampNegative(b >> 7);
+			dest[destOffset + 1] = clampNegative(g >> 7);
+			dest[destOffset] = clampNegative(r >> 7);
+			destOffset = destOffset + srcH * 4 | 0;
+		}
+		destOffset = (srcY + 1) * 4 | 0;
+		srcOffset = (srcY + 1) * srcW * 4 | 0;
+	}
+}
+function convolveVert(src, dest, srcW, srcH, destW, filters) {
+	let r, g, b, a;
+	let filterPtr, filterShift, filterSize;
+	let srcPtr, srcY, destX, filterVal;
+	let srcOffset = 0, destOffset = 0;
+	for (srcY = 0; srcY < srcH; srcY++) {
+		filterPtr = 0;
+		for (destX = 0; destX < destW; destX++) {
+			filterShift = filters[filterPtr++];
+			filterSize = filters[filterPtr++];
+			srcPtr = srcOffset + filterShift * 4 | 0;
+			r = g = b = a = 0;
+			for (; filterSize > 0; filterSize--) {
+				filterVal = filters[filterPtr++];
+				a = a + filterVal * src[srcPtr + 3] | 0;
+				b = b + filterVal * src[srcPtr + 2] | 0;
+				g = g + filterVal * src[srcPtr + 1] | 0;
+				r = r + filterVal * src[srcPtr] | 0;
+				srcPtr = srcPtr + 4 | 0;
+			}
+			r >>= 7;
+			g >>= 7;
+			b >>= 7;
+			a >>= 7;
+			dest[destOffset + 3] = clampTo8(a + 8192 >> 14);
+			dest[destOffset + 2] = clampTo8(b + 8192 >> 14);
+			dest[destOffset + 1] = clampTo8(g + 8192 >> 14);
+			dest[destOffset] = clampTo8(r + 8192 >> 14);
+			destOffset = destOffset + srcH * 4 | 0;
+		}
+		destOffset = (srcY + 1) * 4 | 0;
+		srcOffset = (srcY + 1) * srcW * 4 | 0;
+	}
+}
+function convolveHorWithPre(src, dest, srcW, srcH, destW, filters) {
+	let r, g, b, a, alpha;
+	let filterPtr, filterShift, filterSize;
+	let srcPtr, srcY, destX, filterVal;
+	let srcOffset = 0, destOffset = 0;
+	for (srcY = 0; srcY < srcH; srcY++) {
+		filterPtr = 0;
+		for (destX = 0; destX < destW; destX++) {
+			filterShift = filters[filterPtr++];
+			filterSize = filters[filterPtr++];
+			srcPtr = srcOffset + filterShift * 4 | 0;
+			r = g = b = a = 0;
+			for (; filterSize > 0; filterSize--) {
+				filterVal = filters[filterPtr++];
+				alpha = src[srcPtr + 3];
+				a = a + filterVal * alpha | 0;
+				b = b + filterVal * src[srcPtr + 2] * alpha | 0;
+				g = g + filterVal * src[srcPtr + 1] * alpha | 0;
+				r = r + filterVal * src[srcPtr] * alpha | 0;
+				srcPtr = srcPtr + 4 | 0;
+			}
+			b = b / 255 | 0;
+			g = g / 255 | 0;
+			r = r / 255 | 0;
+			dest[destOffset + 3] = clampNegative(a >> 7);
+			dest[destOffset + 2] = clampNegative(b >> 7);
+			dest[destOffset + 1] = clampNegative(g >> 7);
+			dest[destOffset] = clampNegative(r >> 7);
+			destOffset = destOffset + srcH * 4 | 0;
+		}
+		destOffset = (srcY + 1) * 4 | 0;
+		srcOffset = (srcY + 1) * srcW * 4 | 0;
+	}
+}
+function convolveVertWithPre(src, dest, srcW, srcH, destW, filters) {
+	let r, g, b, a;
+	let filterPtr, filterShift, filterSize;
+	let srcPtr, srcY, destX, filterVal;
+	let srcOffset = 0, destOffset = 0;
+	for (srcY = 0; srcY < srcH; srcY++) {
+		filterPtr = 0;
+		for (destX = 0; destX < destW; destX++) {
+			filterShift = filters[filterPtr++];
+			filterSize = filters[filterPtr++];
+			srcPtr = srcOffset + filterShift * 4 | 0;
+			r = g = b = a = 0;
+			for (; filterSize > 0; filterSize--) {
+				filterVal = filters[filterPtr++];
+				a = a + filterVal * src[srcPtr + 3] | 0;
+				b = b + filterVal * src[srcPtr + 2] | 0;
+				g = g + filterVal * src[srcPtr + 1] | 0;
+				r = r + filterVal * src[srcPtr] | 0;
+				srcPtr = srcPtr + 4 | 0;
+			}
+			r >>= 7;
+			g >>= 7;
+			b >>= 7;
+			a >>= 7;
+			a = clampTo8(a + 8192 >> 14);
+			if (a > 0) {
+				r = r * 255 / a | 0;
+				g = g * 255 / a | 0;
+				b = b * 255 / a | 0;
+			}
+			dest[destOffset + 3] = a;
+			dest[destOffset + 2] = clampTo8(b + 8192 >> 14);
+			dest[destOffset + 1] = clampTo8(g + 8192 >> 14);
+			dest[destOffset] = clampTo8(r + 8192 >> 14);
+			destOffset = destOffset + srcH * 4 | 0;
+		}
+		destOffset = (srcY + 1) * 4 | 0;
+		srcOffset = (srcY + 1) * srcW * 4 | 0;
+	}
+}
+function hasAlpha$1(src, width, height) {
+	let ptr = 3;
+	const len = width * height * 4 | 0;
+	while (ptr < len) {
+		if (src[ptr] !== 255) return true;
+		ptr = ptr + 4 | 0;
+	}
+	return false;
+}
+function resetAlpha$1(dst, width, height) {
+	let ptr = 3;
+	const len = width * height * 4 | 0;
+	while (ptr < len) {
+		dst[ptr] = 255;
+		ptr = ptr + 4 | 0;
+	}
+}
+function resize(options) {
+	const src = options.src;
+	const srcW = options.width;
+	const srcH = options.height;
+	const destW = options.toWidth;
+	const destH = options.toHeight;
+	const scaleX = options.scaleX || options.toWidth / options.width;
+	const scaleY = options.scaleY || options.toHeight / options.height;
+	const offsetX = options.offsetX || 0;
+	const offsetY = options.offsetY || 0;
+	const dest = options.dest || new Uint8Array(destW * destH * 4);
+	const filter = typeof options.filter === "undefined" ? "mks2013" : options.filter;
+	const filtersX = resizeFilterGen(filter, srcW, destW, scaleX, offsetX), filtersY = resizeFilterGen(filter, srcH, destH, scaleY, offsetY);
+	const tmp = new Uint16Array(destW * srcH * 4);
+	if (hasAlpha$1(src, srcW, srcH)) {
+		convolveHorWithPre(src, tmp, srcW, srcH, destW, filtersX);
+		convolveVertWithPre(tmp, dest, srcH, destW, destH, filtersY);
+	} else {
+		convolveHor(src, tmp, srcW, srcH, destW, filtersX);
+		convolveVert(tmp, dest, srcH, destW, destH, filtersY);
+		resetAlpha$1(dest, destW, destH);
+	}
+	return dest;
+}
+function hasAlpha(src, width, height) {
+	let ptr = 3;
+	const len = width * height * 4 | 0;
+	while (ptr < len) {
+		if (src[ptr] !== 255) return true;
+		ptr = ptr + 4 | 0;
+	}
+	return false;
+}
+function resetAlpha(dst, width, height) {
+	let ptr = 3;
+	const len = width * height * 4 | 0;
+	while (ptr < len) {
+		dst[ptr] = 255;
+		ptr = ptr + 4 | 0;
+	}
+}
+function asUint8Array(src) {
+	return new Uint8Array(src.buffer, 0, src.byteLength);
+}
+var IS_LE = true;
+try {
+	IS_LE = new Uint32Array(new Uint8Array([
+		1,
+		0,
+		0,
+		0
+	]).buffer)[0] === 1;
+} catch (__) {}
+function copyInt16asLE(src, target, target_offset) {
+	if (IS_LE) {
+		target.set(asUint8Array(src), target_offset);
+		return;
+	}
+	for (let ptr = target_offset, i = 0; i < src.length; i++) {
+		const data = src[i];
+		target[ptr++] = data & 255;
+		target[ptr++] = data >> 8 & 255;
+	}
+}
+function resize_wasm(options) {
+	const src = options.src;
+	const srcW = options.width;
+	const srcH = options.height;
+	const destW = options.toWidth;
+	const destH = options.toHeight;
+	const scaleX = options.scaleX || options.toWidth / options.width;
+	const scaleY = options.scaleY || options.toHeight / options.height;
+	const offsetX = options.offsetX || 0;
+	const offsetY = options.offsetY || 0;
+	const dest = options.dest || new Uint8Array(destW * destH * 4);
+	const filter = typeof options.filter === "undefined" ? "mks2013" : options.filter;
+	const filtersX = resizeFilterGen(filter, srcW, destW, scaleX, offsetX), filtersY = resizeFilterGen(filter, srcH, destH, scaleY, offsetY);
+	const src_offset = 0;
+	const src_size = Math.max(src.byteLength, dest.byteLength);
+	const tmp_offset = this.__align(src_offset + src_size);
+	const tmp_size = srcH * destW * 4 * 2;
+	const filtersX_offset = this.__align(tmp_offset + tmp_size);
+	const filtersY_offset = this.__align(filtersX_offset + filtersX.byteLength);
+	const alloc_bytes = filtersY_offset + filtersY.byteLength;
+	const instance = this.__instance("resize", alloc_bytes);
+	const mem = new Uint8Array(this.__memory.buffer);
+	const mem32 = new Uint32Array(this.__memory.buffer);
+	const src32 = new Uint32Array(src.buffer);
+	mem32.set(src32);
+	copyInt16asLE(filtersX, mem, filtersX_offset);
+	copyInt16asLE(filtersY, mem, filtersY_offset);
+	const fn = instance.exports.convolveHV || instance.exports._convolveHV;
+	if (!fn) throw new Error("WASM resize function is not available");
+	if (hasAlpha(src, srcW, srcH)) fn(filtersX_offset, filtersY_offset, tmp_offset, srcW, srcH, destW, destH, 1);
+	else {
+		fn(filtersX_offset, filtersY_offset, tmp_offset, srcW, srcH, destW, destH, 0);
+		resetAlpha(dest, destW, destH);
+	}
+	new Uint32Array(dest.buffer).set(new Uint32Array(this.__memory.buffer, 0, destH * destW));
+	return dest;
+}
+var mm_resize_default = {
+	name: "resize",
+	fn: resize,
+	wasm_fn: resize_wasm,
+	wasm_src: "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"
+};
+var MathLib = class extends MultiMath {
+	constructor(requested_features) {
+		const __requested_features = requested_features || [];
+		const features = {
+			js: __requested_features.indexOf("js") >= 0,
+			wasm: __requested_features.indexOf("wasm") >= 0
+		};
+		super(features);
+		this.features = {
+			js: features.js,
+			wasm: features.wasm && this.has_wasm()
+		};
+		this.use(mm_unsharp_mask_default);
+		this.use(mm_resize_default);
+	}
+	resizeAndUnsharp(options) {
+		const result = this.resize(options);
+		if (options.unsharpAmount) this.unsharp_mask(result, options.toWidth, options.toHeight, options.unsharpAmount, options.unsharpRadius, options.unsharpThreshold);
+		return result;
+	}
+};
+function _typeof(o) {
+	"@babel/helpers - typeof";
+	return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(o) {
+		return typeof o;
+	} : function(o) {
+		return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o;
+	}, _typeof(o);
+}
+function toPrimitive(t, r) {
+	if ("object" != _typeof(t) || !t) return t;
+	var e = t[Symbol.toPrimitive];
+	if (void 0 !== e) {
+		var i = e.call(t, r);
+		if ("object" != _typeof(i)) return i;
+		throw new TypeError("@@toPrimitive must return a primitive value.");
+	}
+	return ("string" === r ? String : Number)(t);
+}
+function toPropertyKey(t) {
+	var i = toPrimitive(t, "string");
+	return "symbol" == _typeof(i) ? i : i + "";
+}
+function _defineProperty(e, r, t) {
+	return (r = toPropertyKey(r)) in e ? Object.defineProperty(e, r, {
+		value: t,
+		enumerable: true,
+		configurable: true,
+		writable: true
+	}) : e[r] = t, e;
+}
+function ownKeys(e, r) {
+	var t = Object.keys(e);
+	if (Object.getOwnPropertySymbols) {
+		var o = Object.getOwnPropertySymbols(e);
+		r && (o = o.filter(function(r) {
+			return Object.getOwnPropertyDescriptor(e, r).enumerable;
+		})), t.push.apply(t, o);
+	}
+	return t;
+}
+function _objectSpread2(e) {
+	for (var r = 1; r < arguments.length; r++) {
+		var t = null != arguments[r] ? arguments[r] : {};
+		r % 2 ? ownKeys(Object(t), true).forEach(function(r) {
+			_defineProperty(e, r, t[r]);
+		}) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function(r) {
+			Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r));
+		});
+	}
+	return e;
+}
+var GC_INTERVAL = 100;
+var Pool = class {
+	constructor(create, idle) {
+		_defineProperty(this, "create", void 0);
+		_defineProperty(this, "available", void 0);
+		_defineProperty(this, "acquired", void 0);
+		_defineProperty(this, "lastId", void 0);
+		_defineProperty(this, "timeoutId", void 0);
+		_defineProperty(this, "idle", void 0);
+		this.create = create;
+		this.available = [];
+		this.acquired = {};
+		this.lastId = 1;
+		this.timeoutId = 0;
+		this.idle = idle || 2e3;
+	}
+	acquire() {
+		let descriptor;
+		if (this.available.length !== 0) descriptor = this.available.pop();
+		else descriptor = _objectSpread2(_objectSpread2({}, this.create()), {}, {
+			id: this.lastId++,
+			lastUsed: 0
+		});
+		this.acquired[descriptor.id] = descriptor;
+		return {
+			value: descriptor.value,
+			release: () => this.release(descriptor)
+		};
+	}
+	release(descriptor) {
+		delete this.acquired[descriptor.id];
+		descriptor.lastUsed = Date.now();
+		this.available.push(descriptor);
+		if (this.timeoutId === 0) this.timeoutId = setTimeout(() => this.gc(), GC_INTERVAL);
+	}
+	gc() {
+		const now = Date.now();
+		this.available = this.available.filter((descriptor) => {
+			if (now - descriptor.lastUsed > this.idle) {
+				descriptor.destroy();
+				return false;
+			}
+			return true;
+		});
+		if (this.available.length !== 0) this.timeoutId = setTimeout(() => this.gc(), GC_INTERVAL);
+		else this.timeoutId = 0;
+	}
+};
+function objClass(obj) {
+	var _obj$constructor$name, _obj$constructor;
+	return (_obj$constructor$name = obj === null || obj === void 0 || (_obj$constructor = obj.constructor) === null || _obj$constructor === void 0 ? void 0 : _obj$constructor.name) !== null && _obj$constructor$name !== void 0 ? _obj$constructor$name : "";
+}
+function isCanvas(element) {
+	const cname = objClass(element);
+	return cname === "HTMLCanvasElement" || cname === "OffscreenCanvas" || cname === "Canvas" || cname === "CanvasElement";
+}
+function isImage(element) {
+	return objClass(element) === "HTMLImageElement";
+}
+function isImageBitmap(element) {
+	return objClass(element) === "ImageBitmap";
+}
+function limiter(concurrency) {
+	let active = 0;
+	const queue = [];
+	function roll() {
+		if (active < concurrency && queue.length) {
+			var _queue$shift;
+			active++;
+			(_queue$shift = queue.shift()) === null || _queue$shift === void 0 || _queue$shift();
+		}
+	}
+	return function limit(fn) {
+		return new Promise((resolve, reject) => {
+			queue.push(() => {
+				fn().then((result) => {
+					resolve(result);
+					active--;
+					roll();
+				}, (err) => {
+					reject(err);
+					active--;
+					roll();
+				});
+			});
+			roll();
+		});
+	};
+}
+function cib_quality_name(num) {
+	switch (num) {
+		case 0: return "pixelated";
+		case 1: return "low";
+		case 2: return "medium";
+	}
+	return "high";
+}
+var CIB_QUALITY_FILTERS = [
+	"box",
+	"hamming",
+	"lanczos2",
+	"lanczos3"
+];
+function cib_quality_filter(num) {
+	return CIB_QUALITY_FILTERS[num];
+}
+function is_cib_filter(filter) {
+	return CIB_QUALITY_FILTERS.indexOf(filter) >= 0;
+}
+function filter_to_cib_quality(filter) {
+	const index = CIB_QUALITY_FILTERS.indexOf(filter);
+	return index >= 0 ? index : void 0;
+}
+var MIN_INNER_TILE_SIZE = 2;
+var DEST_TILE_BORDER = 3;
+function createStages(fromWidth, fromHeight, toWidth, toHeight, srcTileSize) {
+	const scaleX = toWidth / fromWidth;
+	const scaleY = toHeight / fromHeight;
+	const minScale = (2 * DEST_TILE_BORDER + MIN_INNER_TILE_SIZE + 1) / srcTileSize;
+	if (minScale > .5) return [[toWidth, toHeight]];
+	const stageCount = Math.ceil(Math.log(Math.min(scaleX, scaleY)) / Math.log(minScale));
+	if (stageCount <= 1) return [[toWidth, toHeight]];
+	const result = [];
+	for (let i = 0; i < stageCount; i++) {
+		const width = Math.round(Math.pow(Math.pow(fromWidth, stageCount - i - 1) * Math.pow(toWidth, i + 1), 1 / stageCount));
+		const height = Math.round(Math.pow(Math.pow(fromHeight, stageCount - i - 1) * Math.pow(toHeight, i + 1), 1 / stageCount));
+		result.push([width, height]);
+	}
+	return result;
+}
+var PIXEL_EPSILON = 1e-5;
+function pixelFloor(x) {
+	const nearest = Math.round(x);
+	if (Math.abs(x - nearest) < PIXEL_EPSILON) return nearest;
+	return Math.floor(x);
+}
+function pixelCeil(x) {
+	const nearest = Math.round(x);
+	if (Math.abs(x - nearest) < PIXEL_EPSILON) return nearest;
+	return Math.ceil(x);
+}
+function createRegions(options) {
+	const scaleX = options.toWidth / options.width;
+	const scaleY = options.toHeight / options.height;
+	const innerTileWidth = pixelFloor(options.srcTileSize * scaleX) - 2 * options.destTileBorder;
+	const innerTileHeight = pixelFloor(options.srcTileSize * scaleY) - 2 * options.destTileBorder;
+	if (innerTileWidth < 1 || innerTileHeight < 1) throw new Error("Internal error in pica: target tile width/height is too small.");
+	let x, y;
+	let innerX, innerY, toTileWidth, toTileHeight;
+	const tiles = [];
+	let tile;
+	for (innerY = 0; innerY < options.toHeight; innerY += innerTileHeight) for (innerX = 0; innerX < options.toWidth; innerX += innerTileWidth) {
+		x = innerX - options.destTileBorder;
+		if (x < 0) x = 0;
+		toTileWidth = innerX + innerTileWidth + options.destTileBorder - x;
+		if (x + toTileWidth >= options.toWidth) toTileWidth = options.toWidth - x;
+		y = innerY - options.destTileBorder;
+		if (y < 0) y = 0;
+		toTileHeight = innerY + innerTileHeight + options.destTileBorder - y;
+		if (y + toTileHeight >= options.toHeight) toTileHeight = options.toHeight - y;
+		tile = {
+			toX: x,
+			toY: y,
+			toWidth: toTileWidth,
+			toHeight: toTileHeight,
+			toInnerX: innerX,
+			toInnerY: innerY,
+			toInnerWidth: innerTileWidth,
+			toInnerHeight: innerTileHeight,
+			offsetX: x / scaleX - pixelFloor(x / scaleX),
+			offsetY: y / scaleY - pixelFloor(y / scaleY),
+			scaleX,
+			scaleY,
+			x: pixelFloor(x / scaleX),
+			y: pixelFloor(y / scaleY),
+			width: pixelCeil(toTileWidth / scaleX),
+			height: pixelCeil(toTileHeight / scaleY)
+		};
+		tiles.push(tile);
+	}
+	return tiles;
+}
+var ORIENTED_JPEG_BASE64 = "/9j/4QAiRXhpZgAATU0AKgAAAAgAAQESAAMAAAABAAYAAAAAAAD/4AAQskZJRgABAQAAAQABAAD/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/wAALCAACAAMBAREA/8QAFAABAAAAAAAAAAAAAAAAAAAACf/EABsQAAMBAQADAAAAAAAAAAAAAAECAwQFABEx/9oACAEBAAA/AC06fW6va0ps7PT179E88MiV02arrCEkjGQZiSEnKc5ovxURVHoADz//2Q==";
+var features = {
+	canvas: false,
+	offscreen_canvas: false,
+	may_be_worker: false,
+	create_image_bitmap: false,
+	safari_put_image_data_fix: false,
+	bug_canvas_orientation_region: true,
+	bug_image_bitmap_orientation_region: true,
+	cib_resize: false
+};
+var checked = false;
+var checking = null;
+function check_canvas() {
+	if (typeof document === "undefined" || !document.createElement) return false;
+	try {
+		const canvas = document.createElement("canvas");
+		canvas.width = 2;
+		canvas.height = 1;
+		const ctx = canvas.getContext("2d");
+		let d = ctx.createImageData(2, 1);
+		d.data[0] = 12;
+		d.data[1] = 23;
+		d.data[2] = 34;
+		d.data[3] = 255;
+		d.data[4] = 45;
+		d.data[5] = 56;
+		d.data[6] = 67;
+		d.data[7] = 255;
+		ctx.putImageData(d, 0, 0);
+		d = ctx.getImageData(0, 0, 2, 1);
+		return d.data[0] === 12 && d.data[1] === 23 && d.data[2] === 34 && d.data[3] === 255 && d.data[4] === 45 && d.data[5] === 56 && d.data[6] === 67 && d.data[7] === 255;
+	} catch (__) {
+		return false;
+	}
+}
+function check_offscreen_canvas() {
+	if (typeof OffscreenCanvas === "undefined") return false;
+	try {
+		const ctx = new OffscreenCanvas(2, 1).getContext("2d");
+		let d = ctx.createImageData(2, 1);
+		d.data[0] = 12;
+		d.data[1] = 23;
+		d.data[2] = 34;
+		d.data[3] = 255;
+		d.data[4] = 45;
+		d.data[5] = 56;
+		d.data[6] = 67;
+		d.data[7] = 255;
+		ctx.putImageData(d, 0, 0);
+		d = ctx.getImageData(0, 0, 2, 1);
+		return d.data[0] === 12 && d.data[1] === 23 && d.data[2] === 34 && d.data[3] === 255 && d.data[4] === 45 && d.data[5] === 56 && d.data[6] === 67 && d.data[7] === 255;
+	} catch (__) {
+		return false;
+	}
+}
+function check_create_image_bitmap() {
+	return typeof createImageBitmap !== "undefined";
+}
+function check_may_be_worker() {
+	return typeof Worker !== "undefined" && typeof URL !== "undefined" && !!URL.createObjectURL;
+}
+function check_safari_put_image_data_fix() {
+	try {
+		return !!(typeof navigator !== "undefined" && navigator.userAgent && navigator.userAgent.indexOf("Safari") >= 0 && navigator.userAgent.indexOf("Chrome") < 0);
+	} catch (__) {
+		return false;
+	}
+}
+function check_bug_canvas_orientation_region_async() {
+	return Promise.resolve().then(() => {
+		if (check_offscreen_canvas() && check_create_image_bitmap() && typeof Blob !== "undefined" && typeof atob !== "undefined") {
+			const binary = atob(ORIENTED_JPEG_BASE64);
+			const bytes = new Uint8Array(binary.length);
+			for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+			return createImageBitmap(new Blob([bytes], { type: "image/jpeg" })).then((bitmap) => {
+				const canvas = new OffscreenCanvas(1, 1);
+				try {
+					const ctx = canvas.getContext("2d");
+					ctx.drawImage(bitmap, 1, 1, 1, 1, 0, 0, 1, 1);
+					return ctx.getImageData(0, 0, 1, 1).data[0] < 240;
+				} finally {
+					bitmap.close();
+				}
+			});
+		}
+		if (check_canvas() && typeof Image !== "undefined") return new Promise((resolve) => {
+			const image = new Image();
+			image.onload = () => {
+				try {
+					const canvas = document.createElement("canvas");
+					canvas.width = 1;
+					canvas.height = 1;
+					const ctx = canvas.getContext("2d");
+					ctx.drawImage(image, 1, 1, 1, 1, 0, 0, 1, 1);
+					resolve(ctx.getImageData(0, 0, 1, 1).data[0] < 240);
+				} catch (__) {
+					resolve(true);
+				}
+			};
+			image.onerror = () => resolve(true);
+			image.src = `data:image/jpeg;base64,${ORIENTED_JPEG_BASE64}`;
+		});
+		return true;
+	}).catch(() => true);
+}
+function check_bug_image_bitmap_orientation_region_async() {
+	return Promise.resolve().then(() => {
+		if (!features.create_image_bitmap && !check_create_image_bitmap()) return true;
+		if (typeof Blob === "undefined" || typeof atob === "undefined") return true;
+		const canOffscreenCanvas = check_offscreen_canvas();
+		const canCanvas = check_canvas();
+		if (!canOffscreenCanvas && !canCanvas) return true;
+		const binary = atob(ORIENTED_JPEG_BASE64);
+		const bytes = new Uint8Array(binary.length);
+		for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+		return createImageBitmap(new Blob([bytes], { type: "image/jpeg" })).then((imageBitmap) => createImageBitmap(imageBitmap, 1, 1, 1, 1).then((bitmap) => {
+			let canvas;
+			if (canOffscreenCanvas) canvas = new OffscreenCanvas(1, 1);
+			else {
+				canvas = document.createElement("canvas");
+				canvas.width = 1;
+				canvas.height = 1;
+			}
+			try {
+				const ctx = canvas.getContext("2d");
+				ctx.drawImage(bitmap, 0, 0);
+				return bitmap.width !== 1 || bitmap.height !== 1 || ctx.getImageData(0, 0, 1, 1).data[0] < 240;
+			} finally {
+				imageBitmap.close();
+				bitmap.close();
+			}
+		}, () => {
+			imageBitmap.close();
+			return true;
+		}));
+	}).catch(() => true);
+}
+function check_cib_resize_async() {
+	return Promise.resolve().then(() => {
+		if (!check_create_image_bitmap()) return false;
+		const SRC_SIZE = 20;
+		const DST_SIZE = 5;
+		let canvas;
+		if (features.canvas || check_canvas()) {
+			canvas = document.createElement("canvas");
+			canvas.width = SRC_SIZE;
+			canvas.height = SRC_SIZE;
+		} else if (features.offscreen_canvas || check_offscreen_canvas()) {
+			canvas = new OffscreenCanvas(SRC_SIZE, SRC_SIZE);
+			canvas.getContext("2d").clearRect(0, 0, SRC_SIZE, SRC_SIZE);
+		} else return false;
+		return createImageBitmap(canvas, 0, 0, SRC_SIZE, SRC_SIZE, {
+			resizeWidth: DST_SIZE,
+			resizeHeight: DST_SIZE,
+			resizeQuality: "high"
+		}).then((bitmap) => {
+			const status = bitmap.width === DST_SIZE && !!bitmap.close;
+			if (bitmap.close) bitmap.close();
+			canvas = null;
+			return status;
+		});
+	}).catch(() => false);
+}
+function get_supported_features() {
+	if (checked) return Promise.resolve(Object.assign({}, features));
+	if (checking) return checking.then(() => Object.assign({}, features));
+	features.canvas = check_canvas();
+	features.offscreen_canvas = check_offscreen_canvas();
+	features.may_be_worker = check_may_be_worker();
+	features.create_image_bitmap = check_create_image_bitmap();
+	features.safari_put_image_data_fix = check_safari_put_image_data_fix();
+	const bugCanvasOrientationRegion = check_bug_canvas_orientation_region_async().then((result) => {
+		features.bug_canvas_orientation_region = result;
+	}).catch(() => {});
+	const bugImageBitmapOrientationRegion = check_bug_image_bitmap_orientation_region_async().then((result) => {
+		features.bug_image_bitmap_orientation_region = result;
+	}).catch(() => {});
+	const cibResize = check_cib_resize_async().then((result) => {
+		features.cib_resize = result;
+	}).catch(() => {});
+	checking = Promise.all([
+		bugCanvasOrientationRegion,
+		bugImageBitmapOrientationRegion,
+		cibResize
+	]).then(() => {
+		checked = true;
+		checking = null;
+		return Object.assign({}, features);
+	}, (err) => {
+		checking = null;
+		throw err;
+	});
+	return checking;
+}
+function asyncGeneratorStep(n, t, e, r, o, a, c) {
+	try {
+		var i = n[a](c), u = i.value;
+	} catch (n) {
+		e(n);
+		return;
+	}
+	i.done ? t(u) : Promise.resolve(u).then(r, o);
+}
+function _asyncToGenerator(n) {
+	return function() {
+		var t = this, e = arguments;
+		return new Promise(function(r, o) {
+			var a = n.apply(t, e);
+			function _next(n) {
+				asyncGeneratorStep(a, r, o, _next, _throw, "next", n);
+			}
+			function _throw(n) {
+				asyncGeneratorStep(a, r, o, _next, _throw, "throw", n);
+			}
+			_next(void 0);
+		});
+	};
+}
+var WORKER_SRC = "/*!\n\npica\nhttps://github.com/nodeca/pica\n\n*/\n!function(){var A;function t(A){const t=A.replace(/[\\r\\n=]/g,\"\"),e=t.length,n=new Uint8Array(3*e>>2);let a=0,i=0;for(let s=0;s<e;s++)s%4==0&&s&&(n[i++]=a>>16&255,n[i++]=a>>8&255,n[i++]=255&a),a=a<<6|\"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/\".indexOf(t.charAt(s));const r=e%4*6;return 0===r?(n[i++]=a>>16&255,n[i++]=a>>8&255,n[i++]=255&a):18===r?(n[i++]=a>>10&255,n[i++]=a>>2&255):12===r&&(n[i++]=a>>4&255),n}var e={js:!0,wasm:!0},n=class{constructor(A){const t=Object.assign({},e,A||{});if(this.options=t,this.__cache={},this.__init_promise=null,this.__modules=t.modules||{},this.__memory=null,this.__wasm={},this.__isLE=1===new Uint32Array(new Uint8Array([1,0,0,0]).buffer)[0],!this.options.js&&!this.options.wasm)throw new Error('mathlib: at least \"js\" or \"wasm\" should be enabled')}has_wasm(){return function(){if(void 0!==A)return A;if(A=!1,\"undefined\"==typeof WebAssembly)return A;try{const t=new Uint8Array([0,97,115,109,1,0,0,0,1,6,1,96,1,127,1,127,3,2,1,0,5,3,1,0,1,7,8,1,4,116,101,115,116,0,0,10,16,1,14,0,32,0,65,1,54,2,0,32,0,40,2,0,11]),e=new WebAssembly.Module(t);return 0!==new WebAssembly.Instance(e,{}).exports.test(4)&&(A=!0),A}catch(t){}return A}()}use(A){return this.__modules[A.name]=A,this.options.wasm&&this.has_wasm()&&A.wasm_fn?this[A.name]=A.wasm_fn:this[A.name]=A.fn,this}init(){return this.__init_promise?this.__init_promise:this.options.js||!this.options.wasm||this.has_wasm()?(this.__init_promise=Promise.all(Object.keys(this.__modules).map(A=>{const e=this.__modules[A];return this.options.wasm&&this.has_wasm()&&e.wasm_fn?this.__wasm[A]?null:WebAssembly.compile(t(e.wasm_src)).then(t=>{this.__wasm[A]=t}):null})).then(()=>this),this.__init_promise):Promise.reject(new Error('mathlib: only \"wasm\" was enabled, but it\\'s not supported'))}__reallocate(A){if(!this.__memory)return this.__memory=new WebAssembly.Memory({initial:Math.ceil(A/65536)}),this.__memory;const t=this.__memory.buffer.byteLength;return t<A&&this.__memory.grow(Math.ceil((A-t)/65536)),this.__memory}__instance(A,e,n){if(e&&this.__reallocate(e),!this.__wasm[A]){const e=this.__modules[A];this.__wasm[A]=new WebAssembly.Module(t(e.wasm_src))}if(!this.__cache[A]){const t={memoryBase:0,memory:this.__memory,tableBase:0,table:new WebAssembly.Table({initial:0,element:\"anyfunc\"})};this.__cache[A]=new WebAssembly.Instance(this.__wasm[A],{env:Object.assign(t,n||{})})}return this.__cache[A]}__align(A,t){const e=A%(t=t||8);return A+(e?t-e:0)}};function a(A,t,e,n,a,i){let r,s,o,g,I,h,B,Q,E,C,c,f,u,m;for(E=0;E<i;E++){for(h=E*a,B=E,Q=0,r=A[h],I=r*n[6],g=I,c=n[0],f=n[1],u=n[4],m=n[5],C=0;C<a;C++)s=A[h],o=s*c+r*f+g*u+I*m,I=g,g=o,r=s,e[Q]=g,Q++,h++;for(h--,Q--,B+=i*(a-1),r=A[h],I=r*n[7],g=I,s=r,c=n[2],f=n[3],C=a-1;C>=0;C--)o=s*c+r*f+g*u+I*m,I=g,g=o,r=s,s=A[h],t[B]=e[Q]+g,h--,Q--,B-=i}}function i(A,t,e,n){if(!n)return;const i=new Uint16Array(A.length),r=new Float32Array(Math.max(t,e)),s=function(A){A<.5&&(A=.5);const t=Math.exp(.527076)/A,e=Math.exp(-t),n=Math.exp(-2*t),a=(1-e)*(1-e)/(1+2*t*e-n),i=a*(t-1)*e,r=a*(t+1)*e,s=-a*n,o=2*e,g=-n;return new Float32Array([a,i,r,s,o,g,(a+i)/(1-o-g),(r+s)/(1-o-g)])}(n);a(A,i,r,s,t,e),a(i,A,r,s,e,t)}var r={name:\"unsharp_mask\",fn:function(A,t,e,n,a,r){let s,o,g,I,h;if(0===n||a<.5)return;a>2&&(a=2);const B=function(A,t,e){const n=t*e,a=new Uint16Array(n);let i,r,s,o;for(let g=0;g<n;g++)i=A[4*g],r=A[4*g+1],s=A[4*g+2],o=i>=r&&i>=s?i:r>=s&&r>=i?r:s,a[g]=o<<8;return a}(A,t,e),Q=new Uint16Array(B);i(Q,t,e,a);const E=n/100*4096+.5|0,C=r<<8,c=t*e;for(let i=0;i<c;i++)s=B[i],I=s-Q[i],Math.abs(I)>=C&&(o=s+(E*I+2048>>12),o=o>65280?65280:o,o=o<0?0:o,s=0!==s?s:1,g=(o<<12)/s|0,h=4*i,A[h]=A[h]*g+2048>>12,A[h+1]=A[h+1]*g+2048>>12,A[h+2]=A[h+2]*g+2048>>12)},wasm_fn:function(A,t,e,n,a,i){if(0===n||a<.5)return;a>2&&(a=2);const r=t*e,s=4*r,o=2*r,g=2*r,I=4*Math.max(t,e),h=s,B=h+o,Q=B+g,E=Q+g,C=E+I,c=this.__instance(\"unsharp_mask\",s+o+2*g+I+32,{exp:Math.exp}),f=new Uint32Array(A.buffer);new Uint32Array(this.__memory.buffer).set(f);let u=c.exports.hsv_v16||c.exports._hsv_v16;if(!u)throw new Error(\"WASM hsv_v16 function is not available\");if(u(0,h,t,e),u=c.exports.blurMono16||c.exports._blurMono16,!u)throw new Error(\"WASM blurMono16 function is not available\");if(u(h,B,Q,E,C,t,e,a),u=c.exports.unsharp||c.exports._unsharp,!u)throw new Error(\"WASM unsharp function is not available\");u(0,0,h,B,t,e,n,i),f.set(new Uint32Array(this.__memory.buffer,0,r))},wasm_src:\"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\"},s={filter:{box:{win:.5,fn:A=>(A<0&&(A=-A),A<.5?1:0)},hamming:{win:1,fn(A){if(A<0&&(A=-A),A>=1)return 0;if(A<1.1920929e-7)return 1;const t=A*Math.PI;return Math.sin(t)/t*(.54+.46*Math.cos(t/1))}},lanczos2:{win:2,fn(A){if(A<0&&(A=-A),A>=2)return 0;if(A<1.1920929e-7)return 1;const t=A*Math.PI;return Math.sin(t)/t*Math.sin(t/2)/(t/2)}},lanczos3:{win:3,fn(A){if(A<0&&(A=-A),A>=3)return 0;if(A<1.1920929e-7)return 1;const t=A*Math.PI;return Math.sin(t)/t*Math.sin(t/3)/(t/3)}},mks2013:{win:2.5,fn:A=>(A<0&&(A=-A),A>=2.5?0:A>=1.5?-.125*(A-2.5)*(A-2.5):A>=.5?.25*(4*A*A-11*A+7):1.0625-1.75*A*A)}}};function o(A){return Math.round(16383*A)}function g(A,t,e,n,a){const i=s.filter[A].fn,r=1/n,g=Math.min(1,n),I=s.filter[A].win/g;let h,B,Q,E,C,c,f,u,m,d,w,l,y,_,b,D,M;const p=Math.floor(2*(I+1)),G=new Int16Array((p+2)*e);let U=0;const k=!G.subarray||!G.set;for(h=0;h<e;h++){for(B=(h+.5)*r+a,Q=Math.max(0,Math.floor(B-I)),E=Math.min(t-1,Math.ceil(B+I)),C=E-Q+1,c=new Float32Array(C),f=new Int16Array(C),u=0,m=Q,d=0;m<=E;m++,d++)w=i((m+.5-B)*g),u+=w,c[d]=w;for(l=0,d=0;d<c.length;d++)y=c[d]/u,l+=y,f[d]=o(y);for(f[e>>1]+=o(1-l),_=0;_<f.length&&0===f[_];)_++;if(_<f.length){for(b=f.length-1;b>0&&0===f[b];)b--;if(D=Q+_,M=b-_+1,G[U++]=D,G[U++]=M,k)for(d=_;d<=b;d++)G[U++]=f[d];else G.set(f.subarray(_,b+1),U),U+=M}else G[U++]=0,G[U++]=0}return G}function I(A){return A<0?0:A>255?255:A}function h(A){return A>=0?A:0}var B=!0;try{B=1===new Uint32Array(new Uint8Array([1,0,0,0]).buffer)[0]}catch(p){}function Q(A,t,e){if(B)t.set(function(A){return new Uint8Array(A.buffer,0,A.byteLength)}(A),e);else for(let n=e,a=0;a<A.length;a++){const e=A[a];t[n++]=255&e,t[n++]=e>>8&255}}var E={name:\"resize\",fn:function(A){const t=A.src,e=A.width,n=A.height,a=A.toWidth,i=A.toHeight,r=A.scaleX||A.toWidth/A.width,s=A.scaleY||A.toHeight/A.height,o=A.offsetX||0,B=A.offsetY||0,Q=A.dest||new Uint8Array(a*i*4),E=void 0===A.filter?\"mks2013\":A.filter,C=g(E,e,a,r,o),c=g(E,n,i,s,B),f=new Uint16Array(a*n*4);return!function(A,t,e){let n=3;const a=t*e*4|0;for(;n<a;){if(255!==A[n])return!0;n=n+4|0}return!1}(t,e,n)?(function(A,t,e,n,a,i){let r,s,o,g,I,B,Q,E,C,c,f,u=0,m=0;for(C=0;C<n;C++){for(I=0,c=0;c<a;c++){for(B=i[I++],Q=i[I++],E=u+4*B|0,r=s=o=g=0;Q>0;Q--)f=i[I++],g=g+f*A[E+3]|0,o=o+f*A[E+2]|0,s=s+f*A[E+1]|0,r=r+f*A[E]|0,E=E+4|0;t[m+3]=h(g>>7),t[m+2]=h(o>>7),t[m+1]=h(s>>7),t[m]=h(r>>7),m=m+4*n|0}m=4*(C+1)|0,u=(C+1)*e*4|0}}(t,f,e,n,a,C),function(A,t,e,n,a,i){let r,s,o,g,h,B,Q,E,C,c,f,u=0,m=0;for(C=0;C<n;C++){for(h=0,c=0;c<a;c++){for(B=i[h++],Q=i[h++],E=u+4*B|0,r=s=o=g=0;Q>0;Q--)f=i[h++],g=g+f*A[E+3]|0,o=o+f*A[E+2]|0,s=s+f*A[E+1]|0,r=r+f*A[E]|0,E=E+4|0;r>>=7,s>>=7,o>>=7,g>>=7,t[m+3]=I(g+8192>>14),t[m+2]=I(o+8192>>14),t[m+1]=I(s+8192>>14),t[m]=I(r+8192>>14),m=m+4*n|0}m=4*(C+1)|0,u=(C+1)*e*4|0}}(f,Q,n,a,i,c),function(A,t,e){let n=3;const a=t*e*4|0;for(;n<a;)A[n]=255,n=n+4|0}(Q,a,i)):(function(A,t,e,n,a,i){let r,s,o,g,I,B,Q,E,C,c,f,u,m=0,d=0;for(c=0;c<n;c++){for(B=0,f=0;f<a;f++){for(Q=i[B++],E=i[B++],C=m+4*Q|0,r=s=o=g=0;E>0;E--)u=i[B++],I=A[C+3],g=g+u*I|0,o=o+u*A[C+2]*I|0,s=s+u*A[C+1]*I|0,r=r+u*A[C]*I|0,C=C+4|0;o=o/255|0,s=s/255|0,r=r/255|0,t[d+3]=h(g>>7),t[d+2]=h(o>>7),t[d+1]=h(s>>7),t[d]=h(r>>7),d=d+4*n|0}d=4*(c+1)|0,m=(c+1)*e*4|0}}(t,f,e,n,a,C),function(A,t,e,n,a,i){let r,s,o,g,h,B,Q,E,C,c,f,u=0,m=0;for(C=0;C<n;C++){for(h=0,c=0;c<a;c++){for(B=i[h++],Q=i[h++],E=u+4*B|0,r=s=o=g=0;Q>0;Q--)f=i[h++],g=g+f*A[E+3]|0,o=o+f*A[E+2]|0,s=s+f*A[E+1]|0,r=r+f*A[E]|0,E=E+4|0;r>>=7,s>>=7,o>>=7,g>>=7,g=I(g+8192>>14),g>0&&(r=255*r/g|0,s=255*s/g|0,o=255*o/g|0),t[m+3]=g,t[m+2]=I(o+8192>>14),t[m+1]=I(s+8192>>14),t[m]=I(r+8192>>14),m=m+4*n|0}m=4*(C+1)|0,u=(C+1)*e*4|0}}(f,Q,n,a,i,c)),Q},wasm_fn:function(A){const t=A.src,e=A.width,n=A.height,a=A.toWidth,i=A.toHeight,r=A.scaleX||A.toWidth/A.width,s=A.scaleY||A.toHeight/A.height,o=A.offsetX||0,I=A.offsetY||0,h=A.dest||new Uint8Array(a*i*4),B=void 0===A.filter?\"mks2013\":A.filter,E=g(B,e,a,r,o),C=g(B,n,i,s,I),c=Math.max(t.byteLength,h.byteLength),f=this.__align(0+c),u=n*a*4*2,m=this.__align(f+u),d=this.__align(m+E.byteLength),w=d+C.byteLength,l=this.__instance(\"resize\",w),y=new Uint8Array(this.__memory.buffer),_=new Uint32Array(this.__memory.buffer),b=new Uint32Array(t.buffer);_.set(b),Q(E,y,m),Q(C,y,d);const D=l.exports.convolveHV||l.exports._convolveHV;if(!D)throw new Error(\"WASM resize function is not available\");return!function(A,t,e){let n=3;const a=t*e*4|0;for(;n<a;){if(255!==A[n])return!0;n=n+4|0}return!1}(t,e,n)?(D(m,d,f,e,n,a,i,0),function(A,t,e){let n=3;const a=t*e*4|0;for(;n<a;)A[n]=255,n=n+4|0}(h,a,i)):D(m,d,f,e,n,a,i,1),new Uint32Array(h.buffer).set(new Uint32Array(this.__memory.buffer,0,i*a)),h},wasm_src:\"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\"},C=class extends n{constructor(A){const t=A||[],e={js:t.indexOf(\"js\")>=0,wasm:t.indexOf(\"wasm\")>=0};super(e),this.features={js:e.js,wasm:e.wasm&&this.has_wasm()},this.use(r),this.use(E)}resizeAndUnsharp(A){const t=this.resize(A);return A.unsharpAmount&&this.unsharp_mask(t,A.toWidth,A.toHeight,A.unsharpAmount,A.unsharpRadius,A.unsharpThreshold),t}},c=\"/9j/4QAiRXhpZgAATU0AKgAAAAgAAQESAAMAAAABAAYAAAAAAAD/4AAQskZJRgABAQAAAQABAAD/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/wAALCAACAAMBAREA/8QAFAABAAAAAAAAAAAAAAAAAAAACf/EABsQAAMBAQADAAAAAAAAAAAAAAECAwQFABEx/9oACAEBAAA/AC06fW6va0ps7PT179E88MiV02arrCEkjGQZiSEnKc5ovxURVHoADz//2Q==\",f={canvas:!1,offscreen_canvas:!1,may_be_worker:!1,create_image_bitmap:!1,safari_put_image_data_fix:!1,bug_canvas_orientation_region:!0,bug_image_bitmap_orientation_region:!0,cib_resize:!1},u=!1,m=null;function d(){if(\"undefined\"==typeof document||!document.createElement)return!1;try{const A=document.createElement(\"canvas\");A.width=2,A.height=1;const t=A.getContext(\"2d\");let e=t.createImageData(2,1);return e.data[0]=12,e.data[1]=23,e.data[2]=34,e.data[3]=255,e.data[4]=45,e.data[5]=56,e.data[6]=67,e.data[7]=255,t.putImageData(e,0,0),e=t.getImageData(0,0,2,1),12===e.data[0]&&23===e.data[1]&&34===e.data[2]&&255===e.data[3]&&45===e.data[4]&&56===e.data[5]&&67===e.data[6]&&255===e.data[7]}catch(p){return!1}}function w(){if(\"undefined\"==typeof OffscreenCanvas)return!1;try{const A=new OffscreenCanvas(2,1).getContext(\"2d\");let t=A.createImageData(2,1);return t.data[0]=12,t.data[1]=23,t.data[2]=34,t.data[3]=255,t.data[4]=45,t.data[5]=56,t.data[6]=67,t.data[7]=255,A.putImageData(t,0,0),t=A.getImageData(0,0,2,1),12===t.data[0]&&23===t.data[1]&&34===t.data[2]&&255===t.data[3]&&45===t.data[4]&&56===t.data[5]&&67===t.data[6]&&255===t.data[7]}catch(p){return!1}}function l(){return\"undefined\"!=typeof createImageBitmap}function y(){if(u)return Promise.resolve(Object.assign({},f));if(m)return m.then(()=>Object.assign({},f));f.canvas=d(),f.offscreen_canvas=w(),f.may_be_worker=\"undefined\"!=typeof Worker&&\"undefined\"!=typeof URL&&!!URL.createObjectURL,f.create_image_bitmap=l(),f.safari_put_image_data_fix=function(){try{return!!(\"undefined\"!=typeof navigator&&navigator.userAgent&&navigator.userAgent.indexOf(\"Safari\")>=0&&navigator.userAgent.indexOf(\"Chrome\")<0)}catch(p){return!1}}();const A=Promise.resolve().then(()=>{if(w()&&l()&&\"undefined\"!=typeof Blob&&\"undefined\"!=typeof atob){const A=atob(c),t=new Uint8Array(A.length);for(let e=0;e<A.length;e++)t[e]=A.charCodeAt(e);return createImageBitmap(new Blob([t],{type:\"image/jpeg\"})).then(A=>{const t=new OffscreenCanvas(1,1);try{const e=t.getContext(\"2d\");return e.drawImage(A,1,1,1,1,0,0,1,1),e.getImageData(0,0,1,1).data[0]<240}finally{A.close()}})}return!d()||\"undefined\"==typeof Image||new Promise(A=>{const t=new Image;t.onload=()=>{try{const e=document.createElement(\"canvas\");e.width=1,e.height=1;const n=e.getContext(\"2d\");n.drawImage(t,1,1,1,1,0,0,1,1),A(n.getImageData(0,0,1,1).data[0]<240)}catch(p){A(!0)}},t.onerror=()=>A(!0),t.src=`data:image/jpeg;base64,${c}`})}).catch(()=>!0).then(A=>{f.bug_canvas_orientation_region=A}).catch(()=>{}),t=Promise.resolve().then(()=>{if(!f.create_image_bitmap&&!l())return!0;if(\"undefined\"==typeof Blob||\"undefined\"==typeof atob)return!0;const A=w(),t=d();if(!A&&!t)return!0;const e=atob(c),n=new Uint8Array(e.length);for(let a=0;a<e.length;a++)n[a]=e.charCodeAt(a);return createImageBitmap(new Blob([n],{type:\"image/jpeg\"})).then(t=>createImageBitmap(t,1,1,1,1).then(e=>{let n;A?n=new OffscreenCanvas(1,1):(n=document.createElement(\"canvas\"),n.width=1,n.height=1);try{const A=n.getContext(\"2d\");return A.drawImage(e,0,0),1!==e.width||1!==e.height||A.getImageData(0,0,1,1).data[0]<240}finally{t.close(),e.close()}},()=>(t.close(),!0)))}).catch(()=>!0).then(A=>{f.bug_image_bitmap_orientation_region=A}).catch(()=>{}),e=Promise.resolve().then(()=>{if(!l())return!1;const A=20;let t;if(f.canvas||d())t=document.createElement(\"canvas\"),t.width=A,t.height=A;else{if(!f.offscreen_canvas&&!w())return!1;t=new OffscreenCanvas(A,A),t.getContext(\"2d\").clearRect(0,0,A,A)}return createImageBitmap(t,0,0,A,A,{resizeWidth:5,resizeHeight:5,resizeQuality:\"high\"}).then(A=>{const e=5===A.width&&!!A.close;return A.close&&A.close(),t=null,e})}).catch(()=>!1).then(A=>{f.cib_resize=A}).catch(()=>{});return m=Promise.all([A,t,e]).then(()=>(u=!0,m=null,Object.assign({},f)),A=>{throw m=null,A})}var _=self,b=null;function D(A,t){return b||(b=new C(A.features)),b.resizeAndUnsharp(t)}function M(A){if(\"bitmap\"===A.job.kind)return void function(A,t){let e=new OffscreenCanvas(t.width,t.height);const n=e.getContext(\"2d\");n.drawImage(t.src,0,0);const a=n.getImageData(0,0,t.width,t.height).data;e.width=e.height=0,e=null,t.src.close();const i=D(A,{src:a,width:t.width,height:t.height,toWidth:t.toWidth,toHeight:t.toHeight,scaleX:t.scaleX,scaleY:t.scaleY,offsetX:t.offsetX,offsetY:t.offsetY,filter:t.filter,unsharpAmount:t.unsharpAmount,unsharpRadius:t.unsharpRadius,unsharpThreshold:t.unsharpThreshold}),r=new OffscreenCanvas(t.toWidth,t.toHeight),s=r.getContext(\"2d\"),o=s.createImageData(t.toWidth,t.toHeight);o.data.set(i),s.putImageData(o,0,0);const g=r.transferToImageBitmap();_.postMessage({kind:\"bitmap\",data:g},[g])}(A,A.job);const t=D(A,A.job);_.postMessage({kind:\"array\",data:t},[t.buffer])}_.onmessage=function(A){Promise.resolve().then(()=>function(A){switch(A.method){case\"get_supported_features\":return y().then(A=>{_.postMessage({data:A})});case\"resize\":return M(A),Promise.resolve();default:return Promise.reject(new Error(`Unknown worker method: ${A.method}`))}}(A.data)).catch(A=>{_.postMessage({err:A})})}}();\n//# sourceURL=pica-inline-worker.js";
+var concurrency = 1;
+if (typeof navigator !== "undefined") concurrency = Math.min(navigator.hardwareConcurrency || 1, 4);
+var DEFAULT_PICA_OPTS = {
+	tile: 1024,
+	concurrency,
+	features: [
+		"js",
+		"wasm",
+		"ww"
+	],
+	idle: 2e3
+};
+var DEFAULT_RESIZE_OPTS = {
+	filter: "mks2013",
+	unsharpAmount: 0,
+	unsharpRadius: 0,
+	unsharpThreshold: 0
+};
+var Pica = class {
+	constructor(options) {
+		_defineProperty(this, "options", void 0);
+		_defineProperty(this, "__limit", void 0);
+		_defineProperty(this, "resize_features", void 0);
+		_defineProperty(this, "__workersPool", void 0);
+		_defineProperty(this, "capabilities", void 0);
+		_defineProperty(this, "__requested_features", void 0);
+		_defineProperty(this, "__mathlib", void 0);
+		_defineProperty(this, "__initPromise", void 0);
+		this.options = Object.assign({}, DEFAULT_PICA_OPTS, options || {});
+		if ((this.options.features.indexOf("ww") >= 0 || this.options.features.indexOf("all") >= 0) && !this.options.workerURL && false);
+		this.__limit = limiter(this.options.concurrency);
+		this.resize_features = {
+			js: false,
+			wasm: false,
+			cib: false,
+			ww: false
+		};
+		this.__workersPool = null;
+		this.capabilities = {
+			worker: false,
+			ww_offscreen_canvas: false,
+			canvas: false,
+			offscreen_canvas: false,
+			may_be_worker: false,
+			create_image_bitmap: false,
+			safari_put_image_data_fix: false,
+			bug_canvas_orientation_region: true,
+			bug_image_bitmap_orientation_region: true,
+			cib_resize: false
+		};
+		this.__requested_features = [];
+		this.__mathlib = null;
+	}
+	init() {
+		if (this.__initPromise) return this.__initPromise;
+		this.__initPromise = this.__init();
+		return this.__initPromise;
+	}
+	__init() {
+		var _this = this;
+		return _asyncToGenerator(function* () {
+			let features = _this.options.features.slice();
+			if (features.indexOf("all") >= 0) features = [
+				"cib",
+				"wasm",
+				"js",
+				"ww"
+			];
+			_this.__requested_features = features;
+			_this.__mathlib = new MathLib(features);
+			const result = yield get_supported_features();
+			Object.assign(_this.capabilities, result);
+			if (_this.capabilities.cib_resize && features.indexOf("cib") >= 0) _this.resize_features.cib = true;
+			if (_this.capabilities.may_be_worker && features.indexOf("ww") >= 0 && WORKER_SRC) _this.__workersPool = new Pool(() => _this.__createWorkerSlot(), _this.options.idle);
+			if (_this.__workersPool) try {
+				const result = yield _this.__invokeWorker("get_supported_features");
+				const resultData = result && result.data;
+				if (resultData) {
+					_this.capabilities.worker = true;
+					_this.resize_features.ww = true;
+					_this.capabilities.ww_offscreen_canvas = !!resultData.offscreen_canvas;
+				}
+			} catch (__) {}
+			const mathlib = yield _this.__mathlib.init();
+			Object.assign(_this.resize_features, mathlib.features);
+			return _this;
+		})();
+	}
+	createCanvas(width, height, preferOffscreen) {
+		if (preferOffscreen && this.capabilities.offscreen_canvas) return new OffscreenCanvas(width, height);
+		if (this.capabilities.canvas) {
+			const canvas = document.createElement("canvas");
+			canvas.width = width;
+			canvas.height = height;
+			return canvas;
+		}
+		if (this.capabilities.ww_offscreen_canvas) return new OffscreenCanvas(width, height);
+		throw new Error("Pica: cannot create canvas");
+	}
+	__createWorkerSlot() {
+		if (this.options.workerURL) {
+			const worker = new Worker(String(this.options.workerURL));
+			return {
+				value: worker,
+				destroy() {
+					worker.terminate();
+				}
+			};
+		}
+		{
+			const objectURL = window.URL.createObjectURL(new Blob([WORKER_SRC], { type: "text/javascript" }));
+			const worker = new Worker(objectURL);
+			return {
+				value: worker,
+				destroy() {
+					worker.terminate();
+					if (typeof window !== "undefined") {
+						var _window$URL, _window$URL$revokeObj;
+						(_window$URL = window.URL) === null || _window$URL === void 0 || (_window$URL$revokeObj = _window$URL.revokeObjectURL) === null || _window$URL$revokeObj === void 0 || _window$URL$revokeObj.call(_window$URL, objectURL);
+					}
+				}
+			};
+		}
+	}
+	__invokeWorker(method, payload, transfer, opts) {
+		return new Promise((resolve, reject) => {
+			const w = this.__workersPool.acquire();
+			if (opts && opts.cancelToken) opts.cancelToken.catch((err) => reject(err));
+			w.value.onmessage = (ev) => {
+				w.release();
+				if (ev.data.err) reject(ev.data.err);
+				else resolve(ev.data);
+			};
+			w.value.postMessage(Object.assign({ method }, payload || {}), transfer || []);
+		});
+	}
+	__invokeResize(tileJob, ctx) {
+		var _this2 = this;
+		return _asyncToGenerator(function* () {
+			yield Promise.resolve();
+			if (!_this2.resize_features.ww) {
+				if (tileJob.kind !== "array") throw new Error("Pica: resize tile data is missing");
+				const mathOpts = {
+					src: tileJob.src,
+					width: tileJob.width,
+					height: tileJob.height,
+					toWidth: tileJob.toWidth,
+					toHeight: tileJob.toHeight,
+					scaleX: tileJob.scaleX,
+					scaleY: tileJob.scaleY,
+					offsetX: tileJob.offsetX,
+					offsetY: tileJob.offsetY,
+					filter: tileJob.filter,
+					unsharpAmount: tileJob.unsharpAmount,
+					unsharpRadius: tileJob.unsharpRadius,
+					unsharpThreshold: tileJob.unsharpThreshold
+				};
+				return {
+					kind: "array",
+					data: _this2.__mathlib.resizeAndUnsharp(mathOpts)
+				};
+			}
+			const transfer = [];
+			if (tileJob.kind === "array") transfer.push(tileJob.src.buffer);
+			else transfer.push(tileJob.src);
+			return _this2.__invokeWorker("resize", {
+				job: tileJob,
+				features: _this2.__requested_features
+			}, transfer, ctx);
+		})();
+	}
+	__extractTileData(tile, from, stageEnv, extractTo) {
+		if (this.resize_features.ww && this.capabilities.ww_offscreen_canvas) {
+			this.debug("Create tile imageBitmap");
+			const tileCanvas = this.createCanvas(tile.width, tile.height, { preferOffscreen: true });
+			tileCanvas.getContext("2d").drawImage(stageEnv.srcImageBitmap || from, tile.x, tile.y, tile.width, tile.height, 0, 0, tile.width, tile.height);
+			if (!("transferToImageBitmap" in tileCanvas)) throw new Error("Pica: offscreen canvas is not available for worker transfer");
+			return Object.assign({}, extractTo, {
+				kind: "bitmap",
+				src: tileCanvas.transferToImageBitmap()
+			});
+		}
+		if (isCanvas(from)) {
+			if (!stageEnv.srcCtx) stageEnv.srcCtx = from.getContext("2d");
+			this.debug("Get tile pixel data");
+			return Object.assign({}, extractTo, {
+				kind: "array",
+				src: stageEnv.srcCtx.getImageData(tile.x, tile.y, tile.width, tile.height).data
+			});
+		}
+		this.debug("Draw tile imageBitmap/image to temporary canvas");
+		const tmpCanvas = this.createCanvas(tile.width, tile.height, { preferOffscreen: true });
+		const tmpCtx = tmpCanvas.getContext("2d");
+		tmpCtx.globalCompositeOperation = "copy";
+		tmpCtx.drawImage(stageEnv.srcImageBitmap || from, tile.x, tile.y, tile.width, tile.height, 0, 0, tile.width, tile.height);
+		this.debug("Get tile pixel data");
+		const src = tmpCtx.getImageData(0, 0, tile.width, tile.height).data;
+		tmpCanvas.width = tmpCanvas.height = 0;
+		return Object.assign({}, extractTo, {
+			kind: "array",
+			src
+		});
+	}
+	__landTileData(tile, result, stageEnv) {
+		if (result.kind === "bitmap") {
+			stageEnv.toCtx.drawImage(result.data, tile.toX, tile.toY);
+			result.data.close();
+			return null;
+		}
+		this.debug("Draw tile");
+		const toImageData = stageEnv.toCtx.createImageData(tile.toWidth, tile.toHeight);
+		toImageData.data.set(result.data);
+		if (this.capabilities.safari_put_image_data_fix) stageEnv.toCtx.putImageData(toImageData, tile.toX, tile.toY, tile.toInnerX - tile.toX, tile.toInnerY - tile.toY, tile.toInnerWidth + 1e-5, tile.toInnerHeight + 1e-5);
+		else stageEnv.toCtx.putImageData(toImageData, tile.toX, tile.toY, tile.toInnerX - tile.toX, tile.toInnerY - tile.toY, tile.toInnerWidth, tile.toInnerHeight);
+		return null;
+	}
+	__tileAndResize(from, to, resizeParams, ctx) {
+		var _this3 = this;
+		return _asyncToGenerator(function* () {
+			const stageEnv = {
+				srcCtx: null,
+				srcImageBitmap: null,
+				isImageBitmapReused: false,
+				toCtx: null
+			};
+			const processTile = (tile) => _this3.__limit(_asyncToGenerator(function* () {
+				if (ctx.canceled) return ctx.cancelToken;
+				const tileJob = {
+					width: tile.width,
+					height: tile.height,
+					toWidth: tile.toWidth,
+					toHeight: tile.toHeight,
+					scaleX: tile.scaleX,
+					scaleY: tile.scaleY,
+					offsetX: tile.offsetX,
+					offsetY: tile.offsetY,
+					filter: resizeParams.filter,
+					unsharpAmount: resizeParams.unsharpAmount,
+					unsharpRadius: resizeParams.unsharpRadius,
+					unsharpThreshold: resizeParams.unsharpThreshold
+				};
+				_this3.debug("Invoke resize math");
+				const extractedTileJob = yield _this3.__extractTileData(tile, from, stageEnv, tileJob);
+				_this3.debug("Invoke resize math");
+				const result = yield _this3.__invokeResize(extractedTileJob, ctx);
+				if (ctx.canceled) return ctx.cancelToken;
+				return _this3.__landTileData(tile, result, stageEnv);
+			}));
+			yield Promise.resolve();
+			stageEnv.toCtx = to.getContext("2d");
+			if (isCanvas(from)) ; else if (isImageBitmap(from)) {
+				stageEnv.srcImageBitmap = from;
+				stageEnv.isImageBitmapReused = true;
+			} else if (isImage(from)) {
+				if (_this3.capabilities.create_image_bitmap) {
+					_this3.debug("Decode image via createImageBitmap");
+					try {
+						stageEnv.srcImageBitmap = yield createImageBitmap(from);
+					} catch (__) {}
+				}
+			} else throw new Error("Pica: \".from\" should be Image, Canvas or ImageBitmap");
+			if (ctx.canceled) return ctx.cancelToken;
+			_this3.debug("Calculate tiles");
+			const jobs = createRegions({
+				width: resizeParams.width,
+				height: resizeParams.height,
+				srcTileSize: _this3.options.tile,
+				toWidth: resizeParams.toWidth,
+				toHeight: resizeParams.toHeight,
+				destTileBorder: Math.ceil(Math.max(3, 2.5 * resizeParams.unsharpRadius | 0))
+			}).map((tile) => processTile(tile));
+			function cleanup(stageEnv) {
+				if (stageEnv.srcImageBitmap) {
+					if (!stageEnv.isImageBitmapReused) stageEnv.srcImageBitmap.close();
+					stageEnv.srcImageBitmap = null;
+				}
+			}
+			_this3.debug("Process tiles");
+			try {
+				yield Promise.all(jobs);
+				_this3.debug("Finished!");
+				cleanup(stageEnv);
+				return to;
+			} catch (err) {
+				cleanup(stageEnv);
+				throw err;
+			}
+		})();
+	}
+	__planStagesAndResize(from, to, resizeParams, ctx) {
+		var _this4 = this;
+		return _asyncToGenerator(function* () {
+			let src = from;
+			let srcWidth = resizeParams.width;
+			let srcHeight = resizeParams.height;
+			const stages = createStages(resizeParams.width, resizeParams.height, resizeParams.toWidth, resizeParams.toHeight, _this4.options.tile);
+			while (stages.length > 0) {
+				if (ctx.canceled) return ctx.cancelToken;
+				const [toWidth, toHeight] = stages.shift();
+				const isLastStage = stages.length === 0;
+				let filter;
+				if (isLastStage || !is_cib_filter(resizeParams.filter)) filter = resizeParams.filter;
+				else if (resizeParams.filter === "box") filter = "box";
+				else filter = "hamming";
+				const stageParams = _objectSpread2(_objectSpread2({}, resizeParams), {}, {
+					filter,
+					width: srcWidth,
+					height: srcHeight,
+					toWidth,
+					toHeight
+				});
+				const dest = isLastStage ? to : _this4.createCanvas(toWidth, toHeight, { preferOffscreen: true });
+				const prevTmp = src !== from ? src : void 0;
+				try {
+					yield _this4.__tileAndResize(src, dest, stageParams, ctx);
+				} finally {
+					if (prevTmp) prevTmp.width = prevTmp.height = 0;
+				}
+				src = dest;
+				srcWidth = toWidth;
+				srcHeight = toHeight;
+			}
+			return to;
+		})();
+	}
+	__resizeViaCreateImageBitmap(from, to, resizeParams, ctx) {
+		var _this5 = this;
+		return _asyncToGenerator(function* () {
+			var _utils$filter_to_cib_;
+			let toCtx = to.getContext("2d");
+			_this5.debug("Resize via createImageBitmap()");
+			const imageBitmap = yield createImageBitmap(from, {
+				resizeWidth: resizeParams.toWidth,
+				resizeHeight: resizeParams.toHeight,
+				resizeQuality: cib_quality_name((_utils$filter_to_cib_ = filter_to_cib_quality(resizeParams.filter)) !== null && _utils$filter_to_cib_ !== void 0 ? _utils$filter_to_cib_ : 3)
+			});
+			if (ctx.canceled) return ctx.cancelToken;
+			if (!resizeParams.unsharpAmount) {
+				toCtx.drawImage(imageBitmap, 0, 0);
+				imageBitmap.close();
+				toCtx = null;
+				_this5.debug("Finished!");
+				return to;
+			}
+			_this5.debug("Unsharp result");
+			let tmpCanvas = _this5.createCanvas(resizeParams.toWidth, resizeParams.toHeight);
+			let tmpCtx = tmpCanvas.getContext("2d");
+			tmpCtx.drawImage(imageBitmap, 0, 0);
+			imageBitmap.close();
+			let iData = tmpCtx.getImageData(0, 0, resizeParams.toWidth, resizeParams.toHeight);
+			_this5.__mathlib.unsharp_mask(iData.data, resizeParams.toWidth, resizeParams.toHeight, resizeParams.unsharpAmount, resizeParams.unsharpRadius, resizeParams.unsharpThreshold);
+			toCtx.putImageData(iData, 0, 0);
+			tmpCanvas.width = tmpCanvas.height = 0;
+			iData = tmpCtx = tmpCanvas = toCtx = null;
+			_this5.debug("Finished!");
+			return to;
+		})();
+	}
+	resize(from, to, options) {
+		var _this6 = this;
+		return _asyncToGenerator(function* () {
+			_this6.debug("Start resize...");
+			const requested = {};
+			if (options) Object.assign(requested, options);
+			let filter = requested.filter || DEFAULT_RESIZE_OPTS.filter;
+			if (Object.prototype.hasOwnProperty.call(requested, "quality")) {
+				const quality = requested.quality;
+				if (typeof quality !== "number" || quality < 0 || quality > 3) throw new Error(`Pica: .quality should be [0..3], got ${quality}`);
+				filter = cib_quality_filter(quality);
+			}
+			const resizeParams = {
+				filter,
+				unsharpAmount: requested.unsharpAmount || DEFAULT_RESIZE_OPTS.unsharpAmount,
+				unsharpRadius: requested.unsharpRadius || DEFAULT_RESIZE_OPTS.unsharpRadius,
+				unsharpThreshold: requested.unsharpThreshold || DEFAULT_RESIZE_OPTS.unsharpThreshold,
+				width: isImage(from) ? from.naturalWidth : from.width,
+				height: isImage(from) ? from.naturalHeight : from.height,
+				toWidth: to.width,
+				toHeight: to.height
+			};
+			if (resizeParams.unsharpRadius > 2) resizeParams.unsharpRadius = 2;
+			if (to.width === 0 || to.height === 0) return Promise.reject(/* @__PURE__ */ new Error(`Invalid output size: ${to.width}x${to.height}`));
+			const ctx = {
+				cancelToken: requested.cancelToken,
+				canceled: false
+			};
+			if (ctx.cancelToken) ctx.cancelToken = ctx.cancelToken.then((data) => {
+				ctx.canceled = true;
+				throw data;
+			}, (err) => {
+				ctx.canceled = true;
+				throw err;
+			});
+			yield _this6.init();
+			if (ctx.canceled) return ctx.cancelToken;
+			if (_this6.capabilities.bug_image_bitmap_orientation_region && (isImage(from) || isImageBitmap(from))) {
+				const tmpCanvas = _this6.createCanvas(resizeParams.width, resizeParams.height);
+				tmpCanvas.getContext("2d").drawImage(from, 0, 0);
+				from = tmpCanvas;
+			}
+			if (_this6.resize_features.cib) {
+				if (is_cib_filter(resizeParams.filter)) return _this6.__resizeViaCreateImageBitmap(from, to, resizeParams, ctx);
+				_this6.debug("cib is enabled, but not supports provided filter, fallback to manual math");
+			}
+			if (!_this6.capabilities.canvas && !_this6.capabilities.offscreen_canvas) {
+				const err = /* @__PURE__ */ new Error("Pica: cannot use getImageData on canvas, make sure fingerprinting protection isn't enabled");
+				err.code = "ERR_GET_IMAGE_DATA";
+				throw err;
+			}
+			return _this6.__planStagesAndResize(from, to, resizeParams, ctx);
+		})();
+	}
+	resizeBuffer(options) {
+		var _this7 = this;
+		return _asyncToGenerator(function* () {
+			const opts = Object.assign({}, DEFAULT_RESIZE_OPTS, options);
+			if (Object.prototype.hasOwnProperty.call(opts, "quality")) {
+				const quality = opts.quality;
+				if (typeof quality !== "number" || quality < 0 || quality > 3) throw new Error(`Pica: .quality should be [0..3], got ${quality}`);
+				opts.filter = cib_quality_filter(quality);
+			}
+			yield _this7.init();
+			if (!_this7.__mathlib) throw new Error("Pica: math library is not initialized");
+			const mathOpts = {
+				src: opts.src,
+				width: opts.width,
+				height: opts.height,
+				toWidth: opts.toWidth,
+				toHeight: opts.toHeight,
+				dest: opts.dest,
+				scaleX: opts.toWidth / opts.width,
+				scaleY: opts.toHeight / opts.height,
+				offsetX: 0,
+				offsetY: 0,
+				filter: opts.filter,
+				unsharpAmount: opts.unsharpAmount,
+				unsharpRadius: opts.unsharpRadius,
+				unsharpThreshold: opts.unsharpThreshold
+			};
+			return _this7.__mathlib.resizeAndUnsharp(mathOpts);
+		})();
+	}
+	toBlob(canvas, mimeType, quality) {
+		return _asyncToGenerator(function* () {
+			mimeType = mimeType || "image/png";
+			if ("toBlob" in canvas && canvas.toBlob) return new Promise((resolve) => {
+				canvas.toBlob((blob) => resolve(blob), mimeType, quality);
+			});
+			if ("convertToBlob" in canvas && canvas.convertToBlob) return canvas.convertToBlob({
+				type: mimeType,
+				quality
+			});
+			const asString = atob(canvas.toDataURL(mimeType, quality).split(",")[1]);
+			const len = asString.length;
+			const asBuffer = new Uint8Array(len);
+			for (let i = 0; i < len; i++) asBuffer[i] = asString.charCodeAt(i);
+			return new Blob([asBuffer], { type: mimeType });
+		})();
+	}
+	debug(..._args) {}
+};
+function pica(options) {
+	return new Pica(options);
+}
+
+/*
+ * Copyright (C) 2007-2026 Crafter Software Corporation. All Rights Reserved.
+ */
+var DEFAULT_ADJUSTMENTS = {
+    brightness: 100,
+    contrast: 100,
+    saturation: 100,
+    rotation: 0,
+    flipHorizontal: false,
+    flipVertical: false
+};
+function blobToDataUrl(blob) {
+    return new Promise(function (resolve, reject) {
+        var reader = new FileReader();
+        reader.onload = function () { return resolve(reader.result); };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+    });
+}
+function dataUrlToFile(dataUrl, name, type) {
+    var _a, _b;
+    var mime = (_b = type !== null && type !== void 0 ? type : (_a = dataUrl.match(/^data:([^;]+);/)) === null || _a === void 0 ? void 0 : _a[1]) !== null && _b !== void 0 ? _b : 'image/png';
+    return { name: name, type: mime, dataUrl: dataUrl };
+}
+function loadRepoImageAsDataUrl(siteId, assetPath, guestOrigin) {
+    return __awaiter(this, void 0, void 0, function () {
+        var urls, _i, urls_1, url, response, blob;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    urls = [];
+                    if (guestOrigin) {
+                        urls.push("".concat(guestOrigin.replace(/\/$/, '')).concat(assetPath));
+                    }
+                    urls.push("/studio/api/2/content/get_content_by_commit_id?siteId=".concat(encodeURIComponent(siteId), "&path=").concat(encodeURIComponent(assetPath)));
+                    _i = 0, urls_1 = urls;
+                    _b.label = 1;
+                case 1:
+                    if (!(_i < urls_1.length)) return [3 /*break*/, 8];
+                    url = urls_1[_i];
+                    _b.label = 2;
+                case 2:
+                    _b.trys.push([2, 6, , 7]);
+                    return [4 /*yield*/, fetch(url, { headers: getGlobalHeaders(), credentials: 'include' })];
+                case 3:
+                    response = _b.sent();
+                    if (!response.ok) {
+                        return [3 /*break*/, 7];
+                    }
+                    return [4 /*yield*/, response.blob()];
+                case 4:
+                    blob = _b.sent();
+                    if (!blob.type.startsWith('image/')) {
+                        return [3 /*break*/, 7];
+                    }
+                    return [4 /*yield*/, blobToDataUrl(blob)];
+                case 5: return [2 /*return*/, _b.sent()];
+                case 6:
+                    _b.sent();
+                    return [3 /*break*/, 7];
+                case 7:
+                    _i++;
+                    return [3 /*break*/, 1];
+                case 8: throw new Error("Unable to load image at ".concat(assetPath));
+            }
+        });
+    });
+}
+function createImage(url) {
+    return new Promise(function (resolve, reject) {
+        var image = new Image();
+        image.addEventListener('load', function () { return resolve(image); });
+        image.addEventListener('error', function (error) { return reject(error); });
+        image.setAttribute('crossOrigin', 'anonymous');
+        image.src = url;
+    });
+}
+function getRadianAngle(degreeValue) {
+    return (degreeValue * Math.PI) / 180;
+}
+function rotateSize(width, height, rotation) {
+    var rotRad = getRadianAngle(rotation);
+    return {
+        width: Math.abs(Math.cos(rotRad) * width) + Math.abs(Math.sin(rotRad) * height),
+        height: Math.abs(Math.sin(rotRad) * width) + Math.abs(Math.cos(rotRad) * height)
+    };
+}
+/** Apply rotation / flip transforms before cropping (react-easy-crop pattern). */
+function getCroppedImageBlob(imageSrc_1, pixelCrop_1, adjustments_1, outputWidth_1, outputHeight_1) {
+    return __awaiter(this, arguments, void 0, function (imageSrc, pixelCrop, adjustments, outputWidth, outputHeight, mimeType, quality) {
+        var image, canvas, ctx, rotRad, _a, bBoxWidth, bBoxHeight, scaleX, scaleY, croppedCanvas, croppedCtx, resultCanvas, resized, pica_1;
+        if (mimeType === void 0) { mimeType = 'image/png'; }
+        if (quality === void 0) { quality = 0.92; }
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0: return [4 /*yield*/, createImage(imageSrc)];
+                case 1:
+                    image = _b.sent();
+                    canvas = document.createElement('canvas');
+                    ctx = canvas.getContext('2d');
+                    if (!ctx) {
+                        throw new Error('Canvas not supported');
+                    }
+                    rotRad = getRadianAngle(adjustments.rotation);
+                    _a = rotateSize(image.width, image.height, adjustments.rotation), bBoxWidth = _a.width, bBoxHeight = _a.height;
+                    canvas.width = bBoxWidth;
+                    canvas.height = bBoxHeight;
+                    ctx.translate(bBoxWidth / 2, bBoxHeight / 2);
+                    ctx.rotate(rotRad);
+                    scaleX = adjustments.flipHorizontal ? -1 : 1;
+                    scaleY = adjustments.flipVertical ? -1 : 1;
+                    ctx.scale(scaleX, scaleY);
+                    ctx.translate(-image.width / 2, -image.height / 2);
+                    ctx.filter = "brightness(".concat(adjustments.brightness, "%) contrast(").concat(adjustments.contrast, "%) saturate(").concat(adjustments.saturation, "%)");
+                    ctx.drawImage(image, 0, 0);
+                    croppedCanvas = document.createElement('canvas');
+                    croppedCtx = croppedCanvas.getContext('2d');
+                    if (!croppedCtx) {
+                        throw new Error('Canvas not supported');
+                    }
+                    croppedCanvas.width = pixelCrop.width;
+                    croppedCanvas.height = pixelCrop.height;
+                    croppedCtx.drawImage(canvas, pixelCrop.x, pixelCrop.y, pixelCrop.width, pixelCrop.height, 0, 0, pixelCrop.width, pixelCrop.height);
+                    resultCanvas = croppedCanvas;
+                    if (!(outputWidth && outputHeight && (outputWidth !== pixelCrop.width || outputHeight !== pixelCrop.height))) return [3 /*break*/, 3];
+                    resized = document.createElement('canvas');
+                    resized.width = outputWidth;
+                    resized.height = outputHeight;
+                    pica_1 = pica({ features: ['js', 'wasm'] });
+                    return [4 /*yield*/, pica_1.resize(croppedCanvas, resized, { quality: 3 })];
+                case 2:
+                    _b.sent();
+                    resultCanvas = resized;
+                    _b.label = 3;
+                case 3: return [2 /*return*/, new Promise(function (resolve, reject) {
+                        resultCanvas.toBlob(function (blob) {
+                            if (!blob) {
+                                reject(new Error('Export failed'));
+                                return;
+                            }
+                            resolve(blob);
+                        }, mimeType, quality);
+                    })];
+            }
+        });
+    });
+}
+/** Compute a crop rectangle around a focal point for a target aspect ratio. */
+function focalCropArea(imageWidth, imageHeight, focal, aspectRatio) {
+    var fx = (focal.x / 100) * imageWidth;
+    var fy = (focal.y / 100) * imageHeight;
+    var cropWidth = imageWidth;
+    var cropHeight = imageHeight;
+    if (imageWidth / imageHeight > aspectRatio) {
+        cropHeight = imageHeight;
+        cropWidth = cropHeight * aspectRatio;
+    }
+    else {
+        cropWidth = imageWidth;
+        cropHeight = cropWidth / aspectRatio;
+    }
+    var x = fx - cropWidth / 2;
+    var y = fy - cropHeight / 2;
+    x = Math.max(0, Math.min(x, imageWidth - cropWidth));
+    y = Math.max(0, Math.min(y, imageHeight - cropHeight));
+    return {
+        x: Math.round(x),
+        y: Math.round(y),
+        width: Math.round(cropWidth),
+        height: Math.round(cropHeight)
+    };
+}
+function suggestVariantFilename(originalPath) {
+    var lastSlash = originalPath.lastIndexOf('/');
+    var dir = lastSlash >= 0 ? originalPath.slice(0, lastSlash + 1) : '';
+    var file = lastSlash >= 0 ? originalPath.slice(lastSlash + 1) : originalPath;
+    var dot = file.lastIndexOf('.');
+    var base = dot >= 0 ? file.slice(0, dot) : file;
+    var ext = dot >= 0 ? file.slice(dot) : '.png';
+    var stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    return "".concat(dir).concat(base, "-variant-").concat(stamp).concat(ext);
+}
+function parseRangeProperty(value) {
+    if (!value) {
+        return {};
+    }
+    try {
+        var parsed = JSON.parse(value);
+        var exact = parsed.exact ? Number(parsed.exact) : undefined;
+        var min = parsed.min ? Number(parsed.min) : undefined;
+        var max = parsed.max ? Number(parsed.max) : undefined;
+        return {
+            exact: Number.isFinite(exact) ? exact : undefined,
+            min: Number.isFinite(min) ? min : undefined,
+            max: Number.isFinite(max) ? max : undefined
+        };
+    }
+    catch (_a) {
+        return {};
+    }
+}
+function formatDimensionSpec(req) {
+    var _a, _b, _c, _d;
+    var parts = [];
+    var w = req.widthExact != null
+        ? "".concat(req.widthExact, "px")
+        : req.widthMin != null || req.widthMax != null
+            ? "".concat((_a = req.widthMin) !== null && _a !== void 0 ? _a : '—', "\u2013").concat((_b = req.widthMax) !== null && _b !== void 0 ? _b : '—', "px")
+            : null;
+    var h = req.heightExact != null
+        ? "".concat(req.heightExact, "px")
+        : req.heightMin != null || req.heightMax != null
+            ? "".concat((_c = req.heightMin) !== null && _c !== void 0 ? _c : '—', "\u2013").concat((_d = req.heightMax) !== null && _d !== void 0 ? _d : '—', "px")
+            : null;
+    if (w)
+        parts.push("W: ".concat(w));
+    if (h)
+        parts.push("H: ".concat(h));
+    return parts.length ? parts.join(', ') : 'No size constraints';
+}
+function imageMatchesRequirement(width, height, req) {
+    var check = function (value, exact, min, max) {
+        if (exact != null && value !== exact)
+            return false;
+        if (min != null && value < min)
+            return false;
+        if (max != null && value > max)
+            return false;
+        return true;
+    };
+    return check(width, req.widthExact, req.widthMin, req.widthMax) && check(height, req.heightExact, req.heightMin, req.heightMax);
+}
+var ASPECT_PRESETS = [
+    { label: 'Free', value: undefined },
+    { label: '1:1', value: 1 },
+    { label: '4:3', value: 4 / 3 },
+    { label: '3:2', value: 3 / 2 },
+    { label: '16:9', value: 16 / 9 },
+    { label: '9:16', value: 9 / 16 },
+    { label: '2:1', value: 2 }
+];
+var FOCAL_PREVIEW_RATIOS = [
+    { label: '16:9', ratio: 16 / 9 },
+    { label: '4:3', ratio: 4 / 3 },
+    { label: '1:1', ratio: 1 },
+    { label: '9:16', ratio: 9 / 16 }
+];
+var DEFAULT_FOCAL = { x: 50, y: 50 };
+function clampFocal(point) {
+    return {
+        x: Math.max(0, Math.min(100, point.x)),
+        y: Math.max(0, Math.min(100, point.y))
+    };
+}
+
+var Cropper = src_default;
+function ImageStudioEditor(_a) {
+    var imageSrc = _a.imageSrc, tool = _a.tool, adjustments = _a.adjustments, onAdjustmentsChange = _a.onAdjustmentsChange, focal = _a.focal, onFocalChange = _a.onFocalChange, cropPosition = _a.cropPosition, onCropPositionChange = _a.onCropPositionChange, croppedAreaPixels = _a.croppedAreaPixels, onCroppedAreaPixelsChange = _a.onCroppedAreaPixelsChange, aspect = _a.aspect, onAspectChange = _a.onAspectChange, outputWidth = _a.outputWidth, outputHeight = _a.outputHeight, onOutputWidthChange = _a.onOutputWidthChange, onOutputHeightChange = _a.onOutputHeightChange, lockOutputAspect = _a.lockOutputAspect, onLockOutputAspectChange = _a.onLockOutputAspectChange, onReset = _a.onReset;
+    var _b = useState(1), zoom = _b[0], setZoom = _b[1];
+    var _c = useState({ width: 0, height: 0 }), naturalSize = _c[0], setNaturalSize = _c[1];
+    useEffect(function () {
+        var img = new Image();
+        img.onload = function () { return setNaturalSize({ width: img.naturalWidth, height: img.naturalHeight }); };
+        img.src = imageSrc;
+    }, [imageSrc]);
+    var onCropComplete = useCallback(function (_, pixels) {
+        onCroppedAreaPixelsChange(pixels);
+    }, [onCroppedAreaPixelsChange]);
+    var focalPreviews = useMemo(function () {
+        if (!naturalSize.width || !naturalSize.height) {
+            return [];
+        }
+        return FOCAL_PREVIEW_RATIOS.map(function (preset) { return (__assign(__assign({}, preset), { area: focalCropArea(naturalSize.width, naturalSize.height, focal, preset.ratio) })); });
+    }, [naturalSize, focal]);
+    var handleFocalClick = function (e) {
+        var rect = e.currentTarget.getBoundingClientRect();
+        var x = ((e.clientX - rect.left) / rect.width) * 100;
+        var y = ((e.clientY - rect.top) / rect.height) * 100;
+        onFocalChange(clampFocal({ x: x, y: y }));
+    };
+    var rotate = function (delta) {
+        onAdjustmentsChange(__assign(__assign({}, adjustments), { rotation: (adjustments.rotation + delta) % 360 }));
+    };
+    return (jsxs(Box$1, { sx: { display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minHeight: 0 }, children: [jsxs(Paper, { variant: "outlined", sx: { position: 'relative', flex: 1, minHeight: 320, bgcolor: '#1e1e1e' }, children: [tool === 'crop' && (jsx(Cropper, { image: imageSrc, crop: cropPosition, zoom: zoom, aspect: aspect !== null && aspect !== void 0 ? aspect : (naturalSize.width && naturalSize.height ? naturalSize.width / naturalSize.height : 1), rotation: adjustments.rotation, minZoom: 1, maxZoom: 3, cropShape: "rect", zoomSpeed: 1, restrictPosition: true, keyboardStep: 1, style: { containerStyle: { borderRadius: 4 } }, classes: {}, mediaProps: {}, cropperProps: {}, onCropChange: onCropPositionChange, onZoomChange: setZoom, onCropComplete: onCropComplete })), tool === 'focal' && (jsx(Box$1, { sx: {
+                            position: 'absolute',
+                            inset: 0,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            p: 2
+                        }, children: jsxs(Box$1, { onClick: handleFocalClick, sx: {
+                                position: 'relative',
+                                maxWidth: '100%',
+                                maxHeight: '100%',
+                                cursor: 'crosshair',
+                                userSelect: 'none'
+                            }, children: [jsx("img", { src: imageSrc, alt: "Focal point", style: {
+                                        maxWidth: '100%',
+                                        maxHeight: 'calc(100vh - 280px)',
+                                        display: 'block',
+                                        filter: "brightness(".concat(adjustments.brightness, "%) contrast(").concat(adjustments.contrast, "%) saturate(").concat(adjustments.saturation, "%)")
+                                    } }), jsx(Box$1, { sx: {
+                                        position: 'absolute',
+                                        left: "".concat(focal.x, "%"),
+                                        top: "".concat(focal.y, "%"),
+                                        width: 20,
+                                        height: 20,
+                                        borderRadius: '50%',
+                                        border: '2px solid #fff',
+                                        boxShadow: '0 0 0 2px rgba(0,0,0,0.5)',
+                                        transform: 'translate(-50%, -50%)',
+                                        pointerEvents: 'none'
+                                    } })] }) })), (tool === 'adjust' || tool === 'resize') && (jsx(Box$1, { sx: { position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', p: 2 }, children: jsx("img", { src: imageSrc, alt: "Preview", style: {
+                                maxWidth: '100%',
+                                maxHeight: 'calc(100vh - 280px)',
+                                transform: "rotate(".concat(adjustments.rotation, "deg) scaleX(").concat(adjustments.flipHorizontal ? -1 : 1, ") scaleY(").concat(adjustments.flipVertical ? -1 : 1, ")"),
+                                filter: "brightness(".concat(adjustments.brightness, "%) contrast(").concat(adjustments.contrast, "%) saturate(").concat(adjustments.saturation, "%)")
+                            } }) }))] }), tool === 'crop' && (jsxs(Stack$1, { direction: "row", spacing: 1, alignItems: "center", flexWrap: "wrap", useFlexGap: true, children: [jsx(Typography, { variant: "caption", color: "text.secondary", children: "Aspect:" }), jsx(ToggleButtonGroup, { size: "small", value: aspect !== null && aspect !== void 0 ? aspect : 'free', exclusive: true, onChange: function (_, val) {
+                            if (val === null)
+                                return;
+                            onAspectChange(val === 'free' ? undefined : Number(val));
+                        }, children: ASPECT_PRESETS.map(function (preset) {
+                            var _a;
+                            return (jsx(ToggleButton, { value: (_a = preset.value) !== null && _a !== void 0 ? _a : 'free', children: preset.label }, preset.label));
+                        }) }), jsxs(Box$1, { sx: { flex: 1, minWidth: 120, px: 1 }, children: [jsx(Typography, { variant: "caption", children: "Zoom" }), jsx(Slider, { size: "small", min: 1, max: 3, step: 0.05, value: zoom, onChange: function (_, v) { return setZoom(v); } })] })] })), tool === 'focal' && (jsx(Box$1, { sx: { display: 'flex', flexWrap: 'wrap', gap: 1 }, children: focalPreviews.map(function (preview) { return (jsxs(Box$1, { sx: { width: { xs: '48%', sm: '23%' } }, children: [jsxs(Typography, { variant: "caption", display: "block", children: [preview.label, " preview"] }), jsx(Box$1, { sx: {
+                                position: 'relative',
+                                width: '100%',
+                                aspectRatio: "".concat(preview.ratio),
+                                overflow: 'hidden',
+                                bgcolor: '#111',
+                                borderRadius: 1
+                            }, children: jsx("img", { src: imageSrc, alt: preview.label, style: {
+                                    position: 'absolute',
+                                    width: "".concat((naturalSize.width / preview.area.width) * 100, "%"),
+                                    height: "".concat((naturalSize.height / preview.area.height) * 100, "%"),
+                                    left: "".concat(-(preview.area.x / preview.area.width) * 100, "%"),
+                                    top: "".concat(-(preview.area.y / preview.area.height) * 100, "%"),
+                                    maxWidth: 'none'
+                                } }) })] }, preview.label)); }) })), tool === 'adjust' && (jsxs(Box$1, { sx: { display: 'flex', flexWrap: 'wrap', gap: 2 }, children: [jsxs(Box$1, { sx: { flex: 1, minWidth: 160 }, children: [jsx(Typography, { variant: "caption", children: "Brightness" }), jsx(Slider, { min: 50, max: 150, value: adjustments.brightness, onChange: function (_, v) { return onAdjustmentsChange(__assign(__assign({}, adjustments), { brightness: v })); } })] }), jsxs(Box$1, { sx: { flex: 1, minWidth: 160 }, children: [jsx(Typography, { variant: "caption", children: "Contrast" }), jsx(Slider, { min: 50, max: 150, value: adjustments.contrast, onChange: function (_, v) { return onAdjustmentsChange(__assign(__assign({}, adjustments), { contrast: v })); } })] }), jsxs(Box$1, { sx: { flex: 1, minWidth: 160 }, children: [jsx(Typography, { variant: "caption", children: "Saturation" }), jsx(Slider, { min: 0, max: 200, value: adjustments.saturation, onChange: function (_, v) { return onAdjustmentsChange(__assign(__assign({}, adjustments), { saturation: v })); } })] })] })), tool === 'resize' && (jsxs(Stack$1, { direction: "row", spacing: 2, alignItems: "center", flexWrap: "wrap", useFlexGap: true, children: [jsx(TextField$1, { size: "small", label: "Output width", type: "number", value: outputWidth, onChange: function (e) {
+                            var val = e.target.value === '' ? '' : Number(e.target.value);
+                            onOutputWidthChange(val);
+                            if (lockOutputAspect && val && croppedAreaPixels) {
+                                var ratio = croppedAreaPixels.height / croppedAreaPixels.width;
+                                onOutputHeightChange(Math.round(Number(val) * ratio));
+                            }
+                        } }), jsx(TextField$1, { size: "small", label: "Output height", type: "number", value: outputHeight, onChange: function (e) {
+                            var val = e.target.value === '' ? '' : Number(e.target.value);
+                            onOutputHeightChange(val);
+                            if (lockOutputAspect && val && croppedAreaPixels) {
+                                var ratio = croppedAreaPixels.width / croppedAreaPixels.height;
+                                onOutputWidthChange(Math.round(Number(val) * ratio));
+                            }
+                        } }), jsx(FormControlLabel, { control: jsx(Switch, { checked: lockOutputAspect, onChange: function (e) { return onLockOutputAspectChange(e.target.checked); } }), label: "Lock aspect" }), croppedAreaPixels && (jsxs(Typography, { variant: "body2", color: "text.secondary", children: ["Crop area: ", croppedAreaPixels.width, " \u00D7 ", croppedAreaPixels.height, "px"] }))] })), jsx(Divider, {}), jsxs(Stack$1, { direction: "row", spacing: 1, alignItems: "center", flexWrap: "wrap", useFlexGap: true, children: [jsxs(ButtonGroup, { size: "small", variant: "outlined", children: [jsx(Button$1, { onClick: function () { return rotate(-90); }, title: "Rotate left", children: jsx(RotateLeftRoundedIcon, { fontSize: "small" }) }), jsx(Button$1, { onClick: function () { return rotate(90); }, title: "Rotate right", children: jsx(RotateRightRoundedIcon, { fontSize: "small" }) }), jsx(Button$1, { onClick: function () { return onAdjustmentsChange(__assign(__assign({}, adjustments), { flipHorizontal: !adjustments.flipHorizontal })); }, title: "Flip horizontal", children: jsx(FlipRoundedIcon, { fontSize: "small" }) })] }), jsx(Button$1, { size: "small", startIcon: jsx(RestartAltRoundedIcon, {}), onClick: onReset, children: "Reset edits" }), naturalSize.width > 0 && (jsxs(Typography, { variant: "caption", color: "text.secondary", children: ["Source: ", naturalSize.width, " \u00D7 ", naturalSize.height, "px"] }))] })] }));
+}
+
+/*
+ * Copyright (C) 2007-2026 Crafter Software Corporation. All Rights Reserved.
+ */
+var CONTENT_TYPES_ROOT = '/config/studio/content-types';
+var FETCH_LIMIT = 500;
+function collectFormDefinitionPaths(siteId) {
+    return __awaiter(this, void 0, void 0, function () {
+        var paths, queue, current, response, i, item;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    paths = [];
+                    queue = [CONTENT_TYPES_ROOT];
+                    _a.label = 1;
+                case 1:
+                    if (!(queue.length > 0)) return [3 /*break*/, 3];
+                    current = queue.shift();
+                    return [4 /*yield*/, fetchChildrenByPath(siteId, current, { limit: FETCH_LIMIT }).pipe(take(1)).toPromise()];
+                case 2:
+                    response = _a.sent();
+                    if (!response) {
+                        return [3 /*break*/, 1];
+                    }
+                    for (i = 0; i < response.length; i++) {
+                        item = response[i];
+                        if (!(item === null || item === void 0 ? void 0 : item.path)) {
+                            continue;
+                        }
+                        if (item.path.endsWith('/form-definition.xml')) {
+                            paths.push(item.path);
+                        }
+                        else if (item.systemType === 'folder' || item.path.split('/').length < 8) {
+                            queue.push(item.path);
+                        }
+                    }
+                    return [3 /*break*/, 1];
+                case 3: return [2 /*return*/, paths];
+            }
+        });
+    });
+}
+function getFieldPropertyValue(field, propertyName) {
+    var _a, _b, _c, _d;
+    var properties = field.querySelectorAll('properties > property');
+    for (var i = 0; i < properties.length; i++) {
+        var property = properties[i];
+        var name_1 = (_b = (_a = property.querySelector('name')) === null || _a === void 0 ? void 0 : _a.textContent) === null || _b === void 0 ? void 0 : _b.trim();
+        if (name_1 === propertyName) {
+            return (_d = (_c = property.querySelector('value')) === null || _c === void 0 ? void 0 : _c.textContent) === null || _d === void 0 ? void 0 : _d.trim();
+        }
+    }
+    return undefined;
+}
+function parseImageRequirementsFromXml(xml, formPath) {
+    var _a, _b, _c, _d;
+    var results = [];
+    var parser = new DOMParser();
+    var doc = parser.parseFromString(xml, 'text/xml');
+    var contentTypeNode = doc.querySelector('content-type');
+    var contentType = (_b = (_a = contentTypeNode === null || contentTypeNode === void 0 ? void 0 : contentTypeNode.textContent) === null || _a === void 0 ? void 0 : _a.trim()) !== null && _b !== void 0 ? _b : formPath.replace('/config/studio/content-types/', '').replace('/form-definition.xml', '');
+    var titleNode = doc.querySelector('title');
+    var contentTypeLabel = (_d = (_c = titleNode === null || titleNode === void 0 ? void 0 : titleNode.textContent) === null || _c === void 0 ? void 0 : _c.trim()) !== null && _d !== void 0 ? _d : contentType;
+    var fields = doc.querySelectorAll('field');
+    fields.forEach(function (field) {
+        var _a, _b, _c, _d, _e, _f, _g, _h;
+        var type = (_b = (_a = field.querySelector('type')) === null || _a === void 0 ? void 0 : _a.textContent) === null || _b === void 0 ? void 0 : _b.trim();
+        if (type !== 'image-picker') {
+            return;
+        }
+        var fieldId = (_e = (_d = (_c = field.querySelector('id')) === null || _c === void 0 ? void 0 : _c.textContent) === null || _d === void 0 ? void 0 : _d.trim()) !== null && _e !== void 0 ? _e : '';
+        var fieldTitle = (_h = (_g = (_f = field.querySelector('title')) === null || _f === void 0 ? void 0 : _f.textContent) === null || _g === void 0 ? void 0 : _g.trim()) !== null && _h !== void 0 ? _h : fieldId;
+        var widthProp = getFieldPropertyValue(field, 'width');
+        var heightProp = getFieldPropertyValue(field, 'height');
+        var width = parseRangeProperty(widthProp !== null && widthProp !== void 0 ? widthProp : undefined);
+        var height = parseRangeProperty(heightProp !== null && heightProp !== void 0 ? heightProp : undefined);
+        if (width.exact == null &&
+            width.min == null &&
+            width.max == null &&
+            height.exact == null &&
+            height.min == null &&
+            height.max == null) {
+            results.push({
+                contentType: contentType.startsWith('/') ? contentType : "/page/".concat(contentType),
+                contentTypeLabel: contentTypeLabel,
+                fieldId: fieldId,
+                fieldTitle: fieldTitle
+            });
+            return;
+        }
+        results.push({
+            contentType: contentType.startsWith('/') ? contentType : contentType.includes('/') ? contentType : "/component/".concat(contentType),
+            contentTypeLabel: contentTypeLabel,
+            fieldId: fieldId,
+            fieldTitle: fieldTitle,
+            widthMin: width.min,
+            widthMax: width.max,
+            widthExact: width.exact,
+            heightMin: height.min,
+            heightMax: height.max,
+            heightExact: height.exact
+        });
+    });
+    return results;
+}
+function scanImageSizeRequirements(siteId) {
+    return __awaiter(this, void 0, void 0, function () {
+        var formPaths, all, _i, formPaths_1, path, xml;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0: return [4 /*yield*/, collectFormDefinitionPaths(siteId)];
+                case 1:
+                    formPaths = _b.sent();
+                    all = [];
+                    _i = 0, formPaths_1 = formPaths;
+                    _b.label = 2;
+                case 2:
+                    if (!(_i < formPaths_1.length)) return [3 /*break*/, 7];
+                    path = formPaths_1[_i];
+                    _b.label = 3;
+                case 3:
+                    _b.trys.push([3, 5, , 6]);
+                    return [4 /*yield*/, fetchContentXML(siteId, path).pipe(take(1)).toPromise()];
+                case 4:
+                    xml = _b.sent();
+                    if (!xml) {
+                        return [3 /*break*/, 6];
+                    }
+                    all.push.apply(all, parseImageRequirementsFromXml(xml, path));
+                    return [3 /*break*/, 6];
+                case 5:
+                    _b.sent();
+                    return [3 /*break*/, 6];
+                case 6:
+                    _i++;
+                    return [3 /*break*/, 2];
+                case 7: return [2 /*return*/, all.sort(function (a, b) {
+                        var labelCmp = a.contentTypeLabel.localeCompare(b.contentTypeLabel);
+                        return labelCmp !== 0 ? labelCmp : a.fieldTitle.localeCompare(b.fieldTitle);
+                    })];
+            }
+        });
+    });
+}
+
+function ImageSizeRequirementsPanel(_a) {
+    var currentWidth = _a.currentWidth, currentHeight = _a.currentHeight;
+    var siteId = useActiveSiteId();
+    var _b = useState(false), loading = _b[0], setLoading = _b[1];
+    var _c = useState([]), requirements = _c[0], setRequirements = _c[1];
+    var _d = useState(''), filter = _d[0], setFilter = _d[1];
+    var _e = useState(null), error = _e[0], setError = _e[1];
+    useEffect(function () {
+        if (!siteId) {
+            return;
+        }
+        setLoading(true);
+        setError(null);
+        scanImageSizeRequirements(siteId)
+            .then(setRequirements)
+            .catch(function (e) { return setError(e.message); })
+            .finally(function () { return setLoading(false); });
+    }, [siteId]);
+    var filtered = useMemo(function () {
+        var q = filter.trim().toLowerCase();
+        if (!q) {
+            return requirements;
+        }
+        return requirements.filter(function (req) {
+            return req.contentTypeLabel.toLowerCase().includes(q) ||
+                req.contentType.toLowerCase().includes(q) ||
+                req.fieldId.toLowerCase().includes(q) ||
+                req.fieldTitle.toLowerCase().includes(q);
+        });
+    }, [requirements, filter]);
+    return (jsxs(Paper, { variant: "outlined", sx: { p: 2, height: '100%' }, children: [jsx(Typography, { variant: "subtitle1", gutterBottom: true, children: "Image size requirements" }), jsx(Typography, { variant: "body2", color: "text.secondary", sx: { mb: 2 }, children: "Scans content type form definitions for image-picker width and height constraints." }), currentWidth && currentHeight && (jsx(Box$1, { sx: { mb: 2 }, children: jsxs(Typography, { variant: "body2", children: ["Current image: ", jsxs("strong", { children: [currentWidth, " \u00D7 ", currentHeight, "px"] })] }) })), jsx(TextField$1, { size: "small", fullWidth: true, placeholder: "Filter by content type or field\u2026", value: filter, onChange: function (e) { return setFilter(e.target.value); }, sx: { mb: 2 }, InputProps: {
+                    startAdornment: (jsx(InputAdornment, { position: "start", children: jsx(SearchRoundedIcon, { fontSize: "small" }) }))
+                } }), loading && (jsx(Box$1, { sx: { display: 'flex', justifyContent: 'center', py: 4 }, children: jsx(CircularProgress, { size: 28 }) })), error && (jsx(Typography, { color: "error", variant: "body2", children: error })), !loading && !error && (jsx(Box$1, { sx: { maxHeight: 360, overflow: 'auto' }, children: jsxs(Table, { size: "small", stickyHeader: true, children: [jsx(TableHead, { children: jsxs(TableRow, { children: [jsx(TableCell, { children: "Content type" }), jsx(TableCell, { children: "Field" }), jsx(TableCell, { children: "Requirements" }), currentWidth && currentHeight ? jsx(TableCell, { children: "Match" }) : null] }) }), jsxs(TableBody, { children: [filtered.map(function (req) {
+                                    var matches = currentWidth && currentHeight
+                                        ? imageMatchesRequirement(currentWidth, currentHeight, req)
+                                        : null;
+                                    return (jsxs(TableRow, { hover: true, children: [jsxs(TableCell, { children: [jsx(Typography, { variant: "body2", children: req.contentTypeLabel }), jsx(Typography, { variant: "caption", color: "text.secondary", children: req.contentType })] }), jsxs(TableCell, { children: [jsx(Typography, { variant: "body2", children: req.fieldTitle }), jsx(Typography, { variant: "caption", color: "text.secondary", children: req.fieldId })] }), jsx(TableCell, { children: jsx(Typography, { variant: "body2", children: formatDimensionSpec(req) }) }), currentWidth && currentHeight ? (jsx(TableCell, { children: jsx(Chip, { size: "small", label: matches ? 'OK' : 'Mismatch', color: matches ? 'success' : 'warning', variant: matches ? 'filled' : 'outlined' }) })) : null] }, "".concat(req.contentType, "-").concat(req.fieldId)));
+                                }), !filtered.length && (jsx(TableRow, { children: jsx(TableCell, { colSpan: currentWidth ? 4 : 3, children: jsx(Typography, { variant: "body2", color: "text.secondary", children: "No image-picker fields found." }) }) }))] })] }) }))] }));
+}
+
+function ImageStudioSaveDialog(_a) {
+    var open = _a.open, onClose = _a.onClose, onSave = _a.onSave, saving = _a.saving, defaultFolder = _a.defaultFolder, sourcePath = _a.sourcePath, suggestedName = _a.suggestedName;
+    var dispatch = useDispatch();
+    var _b = useState(defaultFolder), folder = _b[0], setFolder = _b[1];
+    var _c = useState(suggestedName !== null && suggestedName !== void 0 ? suggestedName : 'image.png'), fileName = _c[0], setFileName = _c[1];
+    var _d = useState(sourcePath ? 'variant' : 'new'), mode = _d[0], setMode = _d[1];
+    var _e = useState('image/png'), mimeType = _e[0], setMimeType = _e[1];
+    var _f = useState(0.92), quality = _f[0], setQuality = _f[1];
+    useEffect(function () {
+        if (open) {
+            setFolder(defaultFolder);
+            setFileName(suggestedName !== null && suggestedName !== void 0 ? suggestedName : 'image.png');
+            setMode(sourcePath ? 'variant' : 'new');
+        }
+    }, [open, defaultFolder, suggestedName, sourcePath]);
+    var fullPath = useMemo(function () {
+        var normalizedFolder = folder.replace(/\/$/, '');
+        var name = fileName.replace(/^\//, '');
+        return "".concat(normalizedFolder, "/").concat(name);
+    }, [folder, fileName]);
+    var handleModeChange = function (nextMode) {
+        setMode(nextMode);
+        if (nextMode === 'replace' && sourcePath) {
+            setFolder(sourcePath.substring(0, sourcePath.lastIndexOf('/')));
+            setFileName(sourcePath.substring(sourcePath.lastIndexOf('/') + 1));
+        }
+        else if (nextMode === 'variant' && sourcePath) {
+            var variantPath = suggestVariantFilename(sourcePath);
+            setFolder(variantPath.substring(0, variantPath.lastIndexOf('/')));
+            setFileName(variantPath.substring(variantPath.lastIndexOf('/') + 1));
+        }
+    };
+    var handleSelectFolder = function () {
+        var callbackId = 'ImageStudioSavePathSelection';
+        var callbackAccept = 'accept';
+        dispatch(showPathSelectionDialog({
+            rootPath: '/static-assets',
+            initialPath: folder,
+            showCreateFolderOption: true,
+            allowSwitchingRootPath: true,
+            stripXmlIndex: true,
+            onClosed: batchActions([
+                dispatchDOMEvent({ id: callbackId, action: 'close' }),
+                pathSelectionDialogClosed()
+            ]),
+            onOk: batchActions([
+                dispatchDOMEvent({ id: callbackId, action: callbackAccept }),
+                closePathSelectionDialog()
+            ])
+        }));
+        createCustomDocumentEventListener(callbackId, function (detail) {
+            if (detail.action === callbackAccept) {
+                setFolder(detail.path);
+            }
+        });
+    };
+    var handleSubmit = function () {
+        onSave({
+            fullPath: mode === 'replace' && sourcePath ? sourcePath : fullPath,
+            mode: mode,
+            mimeType: mimeType,
+            quality: quality
+        });
+    };
+    return (jsxs(Dialog, { open: open, onClose: onClose, maxWidth: "sm", fullWidth: true, children: [jsx(DialogTitle, { children: "Save image" }), jsxs(DialogContent, { children: [sourcePath && (jsxs(Box$1, { sx: { mb: 2 }, children: [jsx(Typography, { variant: "subtitle2", gutterBottom: true, children: "Save as" }), jsxs(RadioGroup, { value: mode, onChange: function (e) { return handleModeChange(e.target.value); }, children: [jsx(FormControlLabel, { value: "replace", control: jsx(Radio, {}), label: "Replace original image" }), jsx(FormControlLabel, { value: "variant", control: jsx(Radio, {}), label: "Save as new variant (recommended)" }), jsx(FormControlLabel, { value: "new", control: jsx(Radio, {}), label: "Save to a new path" })] })] })), mode !== 'replace' && (jsxs(Box$1, { sx: { display: 'flex', gap: 1, alignItems: 'flex-start', mb: 2 }, children: [jsx(TextField$1, { label: "Folder", fullWidth: true, value: folder, onChange: function (e) { return setFolder(e.target.value); }, helperText: "Repository folder under /static-assets" }), jsx(Button$1, { variant: "outlined", onClick: handleSelectFolder, sx: { mt: 1, minWidth: 120 }, children: "Browse" })] })), mode !== 'replace' && (jsx(TextField$1, { label: "File name", fullWidth: true, value: fileName, onChange: function (e) { return setFileName(e.target.value); }, sx: { mb: 2 }, helperText: "Use letters, numbers, dots, dashes, and underscores" })), jsxs(FormControl, { fullWidth: true, sx: { mb: 2 }, children: [jsx(InputLabel, { children: "Format" }), jsxs(Select, { label: "Format", value: mimeType, onChange: function (e) { return setMimeType(e.target.value); }, children: [jsx(MenuItem$1, { value: "image/png", children: "PNG (lossless)" }), jsx(MenuItem$1, { value: "image/jpeg", children: "JPEG" }), jsx(MenuItem$1, { value: "image/webp", children: "WebP" })] })] }), mimeType !== 'image/png' && (jsx(TextField$1, { label: "Quality", type: "number", fullWidth: true, inputProps: { min: 0.1, max: 1, step: 0.05 }, value: quality, onChange: function (e) { return setQuality(Number(e.target.value)); }, sx: { mb: 1 } })), jsxs(FormHelperText, { children: ["Destination: ", jsx("strong", { children: mode === 'replace' && sourcePath ? sourcePath : fullPath })] })] }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: onClose, disabled: saving, children: "Cancel" }), jsx(Button$1, { onClick: handleSubmit, variant: "contained", disabled: saving || !fileName.trim(), children: saving ? 'Saving…' : 'Save' })] })] }));
+}
+
+function ImageStudio(_a) {
+    var _this = this;
+    var _b;
+    var _c = _a.defaultPath, defaultPath = _c === void 0 ? '/static-assets/images' : _c;
+    var siteId = useActiveSiteId();
+    var dispatch = useDispatch();
+    var guestOrigin = useSelector(function (state) { var _a, _b; return (_b = (_a = state.preview) === null || _a === void 0 ? void 0 : _a.guest) === null || _b === void 0 ? void 0 : _b.origin; });
+    var _d = useState('studio'), mainTab = _d[0], setMainTab = _d[1];
+    var _e = useState(null), loaded = _e[0], setLoaded = _e[1];
+    var _f = useState('crop'), tool = _f[0], setTool = _f[1];
+    var _g = useState(DEFAULT_ADJUSTMENTS), adjustments = _g[0], setAdjustments = _g[1];
+    var _h = useState(DEFAULT_FOCAL), focal = _h[0], setFocal = _h[1];
+    var _j = useState({ x: 0, y: 0 }), cropPosition = _j[0], setCropPosition = _j[1];
+    var _k = useState(null), croppedAreaPixels = _k[0], setCroppedAreaPixels = _k[1];
+    var _l = useState(undefined), aspect = _l[0], setAspect = _l[1];
+    var _m = useState(''), outputWidth = _m[0], setOutputWidth = _m[1];
+    var _o = useState(''), outputHeight = _o[0], setOutputHeight = _o[1];
+    var _p = useState(true), lockOutputAspect = _p[0], setLockOutputAspect = _p[1];
+    var _q = useState(false), saveOpen = _q[0], setSaveOpen = _q[1];
+    var _r = useState(false), saving = _r[0], setSaving = _r[1];
+    var loadRepoImage = useCallback(function (path) { return loadRepoImageAsDataUrl(siteId, path, guestOrigin); }, [siteId, guestOrigin]);
+    var resetEdits = useCallback(function () {
+        setAdjustments(DEFAULT_ADJUSTMENTS);
+        setFocal(DEFAULT_FOCAL);
+        setCropPosition({ x: 0, y: 0 });
+        setCroppedAreaPixels(null);
+        setAspect(undefined);
+        setOutputWidth('');
+        setOutputHeight('');
+    }, []);
+    var handleImageSelected = function (payload) {
+        setLoaded(payload);
+        resetEdits();
+        setMainTab('studio');
+        setTool('crop');
+    };
+    var handleError = function (message) {
+        dispatch(showSystemNotification({ message: message, options: { variant: 'error' } }));
+    };
+    // Clipboard paste support
+    useEffect(function () {
+        var onPaste = function (e) {
+            var _a;
+            var items = (_a = e.clipboardData) === null || _a === void 0 ? void 0 : _a.items;
+            if (!items) {
+                return;
+            }
+            var _loop_1 = function (i) {
+                var item = items[i];
+                if (item.type.startsWith('image/')) {
+                    var file_1 = item.getAsFile();
+                    if (file_1) {
+                        blobToDataUrl(file_1).then(function (dataUrl) {
+                            handleImageSelected({ dataUrl: dataUrl, name: file_1.name || 'pasted-image.png' });
+                        });
+                    }
+                    return "break";
+                }
+            };
+            for (var i = 0; i < items.length; i++) {
+                var state_1 = _loop_1(i);
+                if (state_1 === "break")
+                    break;
+            }
+        };
+        window.addEventListener('paste', onPaste);
+        return function () { return window.removeEventListener('paste', onPaste); };
+    }, []);
+    var openSave = function () {
+        if (!loaded) {
+            return;
+        }
+        setSaveOpen(true);
+    };
+    var previewDimensions = useMemo(function () {
+        if (croppedAreaPixels) {
+            return { width: croppedAreaPixels.width, height: croppedAreaPixels.height };
+        }
+        return null;
+    }, [croppedAreaPixels]);
+    var handleSave = function (options) { return __awaiter(_this, void 0, void 0, function () {
+        var cropArea, img, ratio, outW, outH, blob, ext, targetPath, fileName, savedDataUrl, file, e_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    if (!loaded || !siteId) {
+                        return [2 /*return*/];
+                    }
+                    setSaving(true);
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 6, 7, 8]);
+                    cropArea = croppedAreaPixels;
+                    return [4 /*yield*/, new Promise(function (resolve, reject) {
+                            var image = new Image();
+                            image.onload = function () { return resolve(image); };
+                            image.onerror = reject;
+                            image.src = loaded.dataUrl;
+                        })];
+                case 2:
+                    img = _a.sent();
+                    if (!cropArea) {
+                        cropArea = {
+                            x: 0,
+                            y: 0,
+                            width: img.naturalWidth,
+                            height: img.naturalHeight
+                        };
+                    }
+                    if (tool === 'focal') {
+                        ratio = aspect !== null && aspect !== void 0 ? aspect : img.naturalWidth / img.naturalHeight;
+                        cropArea = focalCropArea(img.naturalWidth, img.naturalHeight, focal, ratio);
+                    }
+                    outW = outputWidth === '' ? undefined : Number(outputWidth);
+                    outH = outputHeight === '' ? undefined : Number(outputHeight);
+                    return [4 /*yield*/, getCroppedImageBlob(loaded.dataUrl, cropArea, adjustments, outW, outH, options.mimeType, options.quality)];
+                case 3:
+                    blob = _a.sent();
+                    ext = options.mimeType === 'image/jpeg'
+                        ? '.jpg'
+                        : options.mimeType === 'image/webp'
+                            ? '.webp'
+                            : '.png';
+                    targetPath = options.fullPath;
+                    fileName = targetPath.substring(targetPath.lastIndexOf('/') + 1);
+                    return [4 /*yield*/, blobToDataUrl(blob)];
+                case 4:
+                    savedDataUrl = _a.sent();
+                    file = dataUrlToFile(savedDataUrl, fileName.endsWith(ext) ? fileName : "".concat(fileName.replace(/\.[^.]+$/, '')).concat(ext), options.mimeType);
+                    return [4 /*yield*/, uploadDataUrl(siteId, file, targetPath, '_csrf').pipe(take(1)).toPromise()];
+                case 5:
+                    _a.sent();
+                    dispatch(showSystemNotification({
+                        message: "Image saved to ".concat(targetPath),
+                        options: { variant: 'success' }
+                    }));
+                    setSaveOpen(false);
+                    if (options.mode === 'replace') {
+                        setLoaded(__assign(__assign({}, loaded), { sourcePath: targetPath, name: fileName }));
+                    }
+                    else {
+                        setLoaded({ dataUrl: savedDataUrl, sourcePath: targetPath, name: file.name });
+                    }
+                    return [3 /*break*/, 8];
+                case 6:
+                    e_1 = _a.sent();
+                    handleError("Save failed: ".concat(e_1.message));
+                    return [3 /*break*/, 8];
+                case 7:
+                    setSaving(false);
+                    return [7 /*endfinally*/];
+                case 8: return [2 /*return*/];
+            }
+        });
+    }); };
+    var suggestedSaveName = loaded
+        ? loaded.sourcePath
+            ? (_b = suggestVariantFilename(loaded.sourcePath).split('/').pop()) !== null && _b !== void 0 ? _b : loaded.name
+            : loaded.name
+        : 'image.png';
+    return (jsxs(Fragment, { children: [jsxs(DialogBody, { sx: { p: 2, display: 'flex', flexDirection: 'column', minHeight: 480 }, children: [jsxs(Tabs, { value: mainTab, onChange: function (_, v) { return setMainTab(v); }, sx: { mb: 2 }, children: [jsx(Tab, { value: "studio", label: "Image Studio" }), jsx(Tab, { value: "requirements", label: "Size requirements" })] }), mainTab === 'requirements' && (jsx(ImageSizeRequirementsPanel, { currentWidth: previewDimensions === null || previewDimensions === void 0 ? void 0 : previewDimensions.width, currentHeight: previewDimensions === null || previewDimensions === void 0 ? void 0 : previewDimensions.height })), mainTab === 'studio' && (jsxs(Box$1, { sx: { display: 'flex', gap: 2, flex: 1, minHeight: 0, flexWrap: { xs: 'wrap', md: 'nowrap' } }, children: [jsx(ImageSourcePicker, { defaultPath: defaultPath, onImageSelected: handleImageSelected, onError: handleError, loadRepoImage: loadRepoImage }), jsx(Box$1, { sx: { flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }, children: !loaded ? (jsx(Box$1, { sx: {
+                                        flex: 1,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        border: '1px dashed',
+                                        borderColor: 'divider',
+                                        borderRadius: 1,
+                                        p: 4
+                                    }, children: jsx(Typography, { color: "text.secondary", align: "center", children: "Select an existing image, drag one in, paste from clipboard, or upload to start editing." }) })) : (jsxs(Fragment, { children: [jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2 }, children: [jsxs(Box$1, { children: [jsx(Typography, { variant: "subtitle1", children: loaded.name }), loaded.sourcePath && (jsx(Typography, { variant: "caption", color: "text.secondary", children: loaded.sourcePath }))] }), jsxs(ToggleButtonGroup, { size: "small", value: tool, exclusive: true, onChange: function (_, val) { return val && setTool(val); }, children: [jsxs(ToggleButton, { value: "crop", children: [jsx(CropRoundedIcon, { fontSize: "small", sx: { mr: 0.5 } }), " Crop"] }), jsxs(ToggleButton, { value: "focal", children: [jsx(CenterFocusStrongRoundedIcon, { fontSize: "small", sx: { mr: 0.5 } }), " Focal"] }), jsxs(ToggleButton, { value: "adjust", children: [jsx(TuneRoundedIcon, { fontSize: "small", sx: { mr: 0.5 } }), " Adjust"] }), jsxs(ToggleButton, { value: "resize", children: [jsx(PhotoSizeSelectLargeRoundedIcon, { fontSize: "small", sx: { mr: 0.5 } }), " Resize"] })] })] }), jsx(ImageStudioEditor, { imageSrc: loaded.dataUrl, tool: tool, adjustments: adjustments, onAdjustmentsChange: setAdjustments, focal: focal, onFocalChange: setFocal, cropPosition: cropPosition, onCropPositionChange: setCropPosition, croppedAreaPixels: croppedAreaPixels, onCroppedAreaPixelsChange: setCroppedAreaPixels, aspect: aspect, onAspectChange: setAspect, outputWidth: outputWidth, outputHeight: outputHeight, onOutputWidthChange: setOutputWidth, onOutputHeightChange: setOutputHeight, lockOutputAspect: lockOutputAspect, onLockOutputAspectChange: setLockOutputAspect, onReset: resetEdits })] })) })] }))] }), jsx(Divider, {}), jsx(DialogFooter$1, { children: jsx(MyLoadingButton, { variant: "contained", startIcon: jsx(SaveRoundedIcon, {}), disabled: !loaded, loading: saving, onClick: openSave, children: "Save image\u2026" }) }), jsx(ImageStudioSaveDialog, { open: saveOpen, onClose: function () { return setSaveOpen(false); }, onSave: handleSave, saving: saving, defaultFolder: (loaded === null || loaded === void 0 ? void 0 : loaded.sourcePath) ? loaded.sourcePath.substring(0, loaded.sourcePath.lastIndexOf('/')) : defaultPath, sourcePath: loaded === null || loaded === void 0 ? void 0 : loaded.sourcePath, suggestedName: suggestedSaveName })] }));
+}
+
+function OpenImageStudioPanelButton(props) {
+    var _a = props.title, title = _a === void 0 ? IMAGE_STUDIO_DEFAULTS.title : _a, _b = props.icon, icon = _b === void 0 ? IMAGE_STUDIO_DEFAULTS.icon : _b, _c = props.dialogTitle, dialogTitle = _c === void 0 ? title : _c, defaultPath = props.defaultPath;
+    var handleClick = useOpenImageStudio({ title: dialogTitle, defaultPath: defaultPath });
+    return jsx(ToolsPanelListItemButton, { icon: icon, title: title, onClick: handleClick });
+}
+
 var plugin = {
     locales: undefined,
     scripts: undefined,
@@ -41416,8 +45389,10 @@ var plugin = {
         'org.rd.plugin.uigoodies.openCannedSearchPanelButton': OpenCannedSearchPanelButton,
         'org.rd.plugin.uigoodies.openCannedSearchToolbarButton': OpenCannedSearchToolbarButton,
         'org.rd.plugin.uigoodies.OpenSearchPlayground': OpenSearchPlayground,
-        'org.rd.plugin.uigoodies.LogTail': LogTail
+        'org.rd.plugin.uigoodies.LogTail': LogTail,
+        'org.rd.plugin.uigoodies.ImageStudio': ImageStudio,
+        'org.rd.plugin.uigoodies.openImageStudioPanelButton': OpenImageStudioPanelButton
     }
 };
 
-export { AudienceTargetingFlyoutToolbarButton, BulkPublishView, ComponentPreviewPathNavigator, ContentUpload, CopyCurrentPageUrl, CrossSiteContentCopy, CrossSiteContentTypeCopy, DeviceSimulatorFlyoutToolbarButton, EditOrViewCurrent, LogTail, OpenBulkPublishPanelButton, OpenBulkPublishToolbarButton, OpenCannedSearchPanelButton, OpenCannedSearchToolbarButton, OpenContentUploadPanelButton, OpenContentUploadToolbarButton, OpenSearchPlayground, PublishOrRequestPublish, PullPushRemoteButtons, ToolPanelAccordion, plugin as default };
+export { AudienceTargetingFlyoutToolbarButton, BulkPublishView, ComponentPreviewPathNavigator, ContentUpload, CopyCurrentPageUrl, CrossSiteContentCopy, CrossSiteContentTypeCopy, DeviceSimulatorFlyoutToolbarButton, EditOrViewCurrent, ImageStudio, LogTail, OpenBulkPublishPanelButton, OpenBulkPublishToolbarButton, OpenCannedSearchPanelButton, OpenCannedSearchToolbarButton, OpenContentUploadPanelButton, OpenContentUploadToolbarButton, OpenImageStudioPanelButton, OpenSearchPlayground, PublishOrRequestPublish, PullPushRemoteButtons, ToolPanelAccordion, plugin as default };

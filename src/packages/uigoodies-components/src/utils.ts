@@ -15,6 +15,30 @@ export const BULK_PUBLISH_DEFAULTS = {
   icon: { id: '@mui/icons-material/AutoAwesomeMotionOutlined' }
 };
 
+export const IMAGE_STUDIO_DEFAULTS = {
+  title: 'Image Studio',
+  defaultPath: '/static-assets/images',
+  icon: { id: '@mui/icons-material/PhotoLibraryRounded' }
+};
+
+export function useOpenImageStudio(props: { title?: string; defaultPath?: string }) {
+  const dispatch = useDispatch();
+  return () =>
+    dispatch(
+      showWidgetDialog({
+        title: props.title ?? IMAGE_STUDIO_DEFAULTS.title,
+        fullHeight: true,
+        fullWidth: true,
+        widget: {
+          id: 'org.rd.plugin.uigoodies.ImageStudio',
+          configuration: {
+            defaultPath: props.defaultPath ?? IMAGE_STUDIO_DEFAULTS.defaultPath
+          }
+        }
+      })
+    );
+}
+
 export function useOpenContentUpload(props: {
   title?: string;
   defaultPath?: string;
