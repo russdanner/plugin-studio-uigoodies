@@ -1,0 +1,11 @@
+            <widget id="org.rd.plugin.uigoodies.openImageStudioPanelButton">
+               <plugin id="org.rd.plugin.uigoodies"
+                       type="apps"
+                       name="uigoodies"
+                       file="index.js"/>
+               <configuration>
+                  <title>Image Studio</title>
+                  <icon id="@mui/icons-material/PhotoLibraryRounded"/>
+                  <defaultPath>/static-assets/images</defaultPath>
+               </configuration>
+            </widget>

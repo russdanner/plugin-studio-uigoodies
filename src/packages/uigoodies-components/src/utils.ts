@@ -1,4 +1,4 @@
-import { showWidgetDialog } from '@craftercms/studio-ui/state/actions/dialogs';
+import { showWidgetDialog, updateWidgetDialog } from '@craftercms/studio-ui/state/actions/dialogs';
 import { useDispatch } from 'react-redux';
 
 export const CONTENT_UPLOAD_DEFAULTS = {
@@ -29,6 +29,9 @@ export function useOpenImageStudio(props: { title?: string; defaultPath?: string
         title: props.title ?? IMAGE_STUDIO_DEFAULTS.title,
         fullHeight: true,
         fullWidth: true,
+        isFullScreen: false,
+        onFullScreen: updateWidgetDialog({ isFullScreen: true }),
+        onCancelFullScreen: updateWidgetDialog({ isFullScreen: false }),
         widget: {
           id: 'org.rd.plugin.uigoodies.ImageStudio',
           configuration: {

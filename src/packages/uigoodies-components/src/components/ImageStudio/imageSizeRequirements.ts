@@ -2,39 +2,102 @@
  * Copyright (C) 2007-2026 Crafter Software Corporation. All Rights Reserved.
  */
 
-import { fetchChildrenByPath, fetchContentXML } from '@craftercms/studio-ui/services/content';
+import { fetchContentXML, updateField } from '@craftercms/studio-ui/services/content';
+import { fetchContentTypes } from '@craftercms/studio-ui/services/contentTypes';
+import type ContentType from '@craftercms/studio-ui/models/ContentType';
+import type { ContentTypeField } from '@craftercms/studio-ui/models/ContentType';
+import type LookupTable from '@craftercms/studio-ui/models/LookupTable';
 import { take } from 'rxjs/operators';
 import {
   ImageRequirement,
   parseRangeProperty
 } from './imageStudioUtils';
 
-const CONTENT_TYPES_ROOT = '/config/studio/content-types';
-const FETCH_LIMIT = 500;
+export type ContentTypeFormOption = {
+  formPath: string;
+  contentType: string;
+  label: string;
+};
 
-async function collectFormDefinitionPaths(siteId: string): Promise<string[]> {
-  const paths: string[] = [];
-  const queue = [CONTENT_TYPES_ROOT];
-
-  while (queue.length > 0) {
-    const current = queue.shift()!;
-    const response = await fetchChildrenByPath(siteId, current, { limit: FETCH_LIMIT }).pipe(take(1)).toPromise();
-    if (!response) {
-      continue;
-    }
-    for (let i = 0; i < response.length; i++) {
-      const item = response[i];
-      if (!item?.path) {
-        continue;
-      }
-      if (item.path.endsWith('/form-definition.xml')) {
-        paths.push(item.path);
-      } else if (item.systemType === 'folder' || item.path.split('/').length < 8) {
-        queue.push(item.path);
-      }
-    }
+function labelFromFormPath(formPath: string): string {
+  const relative = formPath
+    .replace('/config/studio/content-types/', '')
+    .replace('/form-definition.xml', '');
+  const parts = relative.split('/').filter(Boolean);
+  if (parts.length >= 2) {
+    const category = parts[0];
+    const name = parts.slice(1).join(' / ');
+    const categoryLabel = category.charAt(0).toUpperCase() + category.slice(1);
+    return `${name} (${categoryLabel})`;
   }
-  return paths;
+  return relative;
+}
+
+function contentTypeIdFromFormPath(formPath: string): string {
+  const relative = formPath
+    .replace('/config/studio/content-types/', '')
+    .replace('/form-definition.xml', '');
+  const parts = relative.split('/').filter(Boolean);
+  if (parts.length >= 2) {
+    return `/${parts[0]}/${parts.slice(1).join('/')}`;
+  }
+  return relative.startsWith('/') ? relative : `/${relative}`;
+}
+
+export type ImagePickerFieldOption = {
+  fieldId: string;
+  fieldTitle: string;
+};
+
+export function parseImagePickerFieldsFromXml(xml: string): ImagePickerFieldOption[] {
+  const results: ImagePickerFieldOption[] = [];
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(xml, 'text/xml');
+  doc.querySelectorAll('field').forEach((field) => {
+    const type = field.querySelector('type')?.textContent?.trim();
+    if (type !== 'image-picker') {
+      return;
+    }
+    const fieldId = field.querySelector('id')?.textContent?.trim() ?? '';
+    const fieldTitle = field.querySelector('title')?.textContent?.trim() ?? fieldId;
+    if (fieldId) {
+      results.push({ fieldId, fieldTitle });
+    }
+  });
+  return results;
+}
+
+function contentTypeToFormPath(contentType: string): string {
+  const normalized = contentType.replace(/^\//, '');
+  return `/config/studio/content-types/${normalized}/form-definition.xml`;
+}
+
+export async function loadImagePickerFieldsForContent(
+  siteId: string,
+  contentPath: string
+): Promise<{ objectId: string; contentType: string; fields: ImagePickerFieldOption[] }> {
+  const xml = await fetchContentXML(siteId, contentPath).pipe(take(1)).toPromise();
+  if (!xml) {
+    return { objectId: '', contentType: '', fields: [] };
+  }
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(xml, 'text/xml');
+  const contentType = doc.querySelector('content-type')?.textContent?.trim() ?? '';
+  const objectId = doc.querySelector('objectId')?.textContent?.trim() ?? '';
+  const formPath = contentTypeToFormPath(contentType);
+  const formXml = await fetchContentXML(siteId, formPath).pipe(take(1)).toPromise();
+  const fields = formXml ? parseImagePickerFieldsFromXml(formXml) : [];
+  return { objectId, contentType, fields };
+}
+
+export async function updateContentImageField(
+  siteId: string,
+  contentPath: string,
+  objectId: string,
+  fieldId: string,
+  imagePath: string
+): Promise<void> {
+  await updateField(siteId, objectId, fieldId, null, contentPath, imagePath, false).pipe(take(1)).toPromise();
 }
 
 function getFieldPropertyValue(field: Element, propertyName: string): string | undefined {
@@ -54,11 +117,18 @@ function parseImageRequirementsFromXml(xml: string, formPath: string): ImageRequ
   const parser = new DOMParser();
   const doc = parser.parseFromString(xml, 'text/xml');
   const contentTypeNode = doc.querySelector('content-type');
+  const pathContentType = contentTypeIdFromFormPath(formPath);
+  const xmlContentType = contentTypeNode?.textContent?.trim();
   const contentType =
-    contentTypeNode?.textContent?.trim() ??
-    formPath.replace('/config/studio/content-types/', '').replace('/form-definition.xml', '');
+    xmlContentType?.startsWith('/')
+      ? xmlContentType
+      : xmlContentType
+        ? pathContentType.includes(xmlContentType)
+          ? pathContentType
+          : `/${xmlContentType}`
+        : pathContentType;
   const titleNode = doc.querySelector('title');
-  const contentTypeLabel = titleNode?.textContent?.trim() ?? contentType;
+  const contentTypeLabel = titleNode?.textContent?.trim() ?? labelFromFormPath(formPath);
 
   const fields = doc.querySelectorAll('field');
   fields.forEach((field) => {
@@ -83,7 +153,7 @@ function parseImageRequirementsFromXml(xml: string, formPath: string): ImageRequ
       height.max == null
     ) {
       results.push({
-        contentType: contentType.startsWith('/') ? contentType : `/page/${contentType}`,
+        contentType,
         contentTypeLabel,
         fieldId,
         fieldTitle
@@ -92,7 +162,7 @@ function parseImageRequirementsFromXml(xml: string, formPath: string): ImageRequ
     }
 
     results.push({
-      contentType: contentType.startsWith('/') ? contentType : contentType.includes('/') ? contentType : `/component/${contentType}`,
+      contentType,
       contentTypeLabel,
       fieldId,
       fieldTitle,
@@ -108,22 +178,108 @@ function parseImageRequirementsFromXml(xml: string, formPath: string): ImageRequ
   return results;
 }
 
-export async function scanImageSizeRequirements(siteId: string): Promise<ImageRequirement[]> {
-  const formPaths = await collectFormDefinitionPaths(siteId);
-  const all: ImageRequirement[] = [];
+export function contentTypeFormOptionsFromCatalog(types: ContentType[]): ContentTypeFormOption[] {
+  return types
+    .map((ct) => ({
+      formPath: contentTypeToFormPath(ct.id),
+      contentType: ct.id,
+      label: ct.name?.trim() || labelFromFormPath(contentTypeToFormPath(ct.id))
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label));
+}
 
-  for (const path of formPaths) {
-    try {
-      const xml = await fetchContentXML(siteId, path).pipe(take(1)).toPromise();
-      if (!xml) {
-        continue;
-      }
-      all.push(...parseImageRequirementsFromXml(xml, path));
-    } catch {
-      // skip unreadable definitions
+function collectContentTypeFields(fields: LookupTable<ContentTypeField> | undefined, acc: ContentTypeField[] = []) {
+  if (!fields) {
+    return acc;
+  }
+  Object.values(fields).forEach((field) => {
+    acc.push(field);
+    if (field.fields) {
+      collectContentTypeFields(field.fields, acc);
     }
+  });
+  return acc;
+}
+
+function dimensionFromValidation(
+  validations: ContentTypeField['validations'],
+  exactKey: 'width' | 'height',
+  minKey: 'minWidth' | 'minHeight',
+  maxKey: 'maxWidth' | 'maxHeight'
+): { exact?: number; min?: number; max?: number } {
+  const exactVal = validations[exactKey]?.value;
+  if (exactVal != null && exactVal !== '' && Number.isFinite(Number(exactVal))) {
+    return { exact: Number(exactVal) };
+  }
+  const min = validations[minKey]?.value;
+  const max = validations[maxKey]?.value;
+  return {
+    min: min != null && min !== '' && Number.isFinite(Number(min)) ? Number(min) : undefined,
+    max: max != null && max !== '' && Number.isFinite(Number(max)) ? Number(max) : undefined
+  };
+}
+
+/** Build image-picker requirements from an in-memory ContentType (no extra API call). */
+export function parseImageRequirementsFromContentType(contentType: ContentType): ImageRequirement[] {
+  const fields = collectContentTypeFields(contentType.fields);
+  const results: ImageRequirement[] = [];
+
+  fields.forEach((field) => {
+    if (field.type !== 'image') {
+      return;
+    }
+    const width = dimensionFromValidation(field.validations, 'width', 'minWidth', 'maxWidth');
+    const height = dimensionFromValidation(field.validations, 'height', 'minHeight', 'maxHeight');
+
+    results.push({
+      contentType: contentType.id,
+      contentTypeLabel: contentType.name,
+      fieldId: field.id,
+      fieldTitle: field.name || field.id,
+      widthMin: width.min,
+      widthMax: width.max,
+      widthExact: width.exact,
+      heightMin: height.min,
+      heightMax: height.max,
+      heightExact: height.exact
+    });
+  });
+
+  return results.sort((a, b) => a.fieldTitle.localeCompare(b.fieldTitle));
+}
+
+/** Lists content types via Crafter model API (single request). */
+export async function listContentTypeFormOptions(siteId: string): Promise<ContentTypeFormOption[]> {
+  const types = await fetchContentTypes(siteId).pipe(take(1)).toPromise();
+  return contentTypeFormOptionsFromCatalog(types ?? []);
+}
+
+/** Fetches image-picker constraints for a single content type. */
+export async function fetchImageRequirementsForForm(
+  siteId: string,
+  formPath: string
+): Promise<ImageRequirement[]> {
+  const contentTypeId = contentTypeIdFromFormPath(formPath);
+  const types = await fetchContentTypes(siteId).pipe(take(1)).toPromise();
+  const match = types?.find((ct) => ct.id === contentTypeId);
+  if (match) {
+    return parseImageRequirementsFromContentType(match);
   }
 
+  const xml = await fetchContentXML(siteId, formPath).pipe(take(1)).toPromise();
+  if (!xml) {
+    return [];
+  }
+  return parseImageRequirementsFromXml(xml, formPath).sort((a, b) => a.fieldTitle.localeCompare(b.fieldTitle));
+}
+
+/** @deprecated Scans every form definition — use fetchContentTypes instead. */
+export async function scanImageSizeRequirements(siteId: string): Promise<ImageRequirement[]> {
+  const types = await fetchContentTypes(siteId).pipe(take(1)).toPromise();
+  if (!types?.length) {
+    return [];
+  }
+  const all = types.flatMap((ct) => parseImageRequirementsFromContentType(ct));
   return all.sort((a, b) => {
     const labelCmp = a.contentTypeLabel.localeCompare(b.contentTypeLabel);
     return labelCmp !== 0 ? labelCmp : a.fieldTitle.localeCompare(b.fieldTitle);

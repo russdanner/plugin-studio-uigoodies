@@ -2,12 +2,16 @@
 
 Full-screen dialog widget for image editing in Studio. Usually opened via [open-image-studio-panel-button](open-image-studio-panel-button.md).
 
+![Image Studio editor with crop tool, aspect presets, and zoom controls](../images/image-studio-editor.png)
+
 ## Features
 
 - **Sources:** browse `/static-assets`, drag-and-drop, clipboard paste, file upload
 - **Crop:** `react-easy-crop` (MIT) with aspect presets and zoom
 - **Focal point:** click to set focus; live previews at 16:9, 4:3, 1:1, 9:16
-- **Adjust:** brightness, contrast, saturation; rotate and flip
+- **Filters:** 20 Instagram-inspired looks (CSS filters + vignette)
+- **Adjust:** brightness, contrast, saturation, hue, blur, vignette; rotate and flip
+- **Draw:** brush, eraser, line, and text annotations (canvas 2D, no extra deps)
 - **Resize:** optional output dimensions (Pica for high-quality scaling)
 - **Save:** choose folder and filename; when editing an existing asset, replace original or save as variant
 - **Size requirements:** scans `form-definition.xml` for `image-picker` width/height constraints

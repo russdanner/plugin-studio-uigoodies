@@ -1,6 +1,6 @@
 const { jsx, Fragment, jsxs } = craftercms.libs.reactJsxRuntime;
 const { useSelector, useDispatch } = craftercms.libs.ReactRedux;
-const { Tooltip, useTheme, accordionClasses, accordionSummaryClasses, Accordion, AccordionSummary, Typography, AccordionDetails, Button: Button$1, CircularProgress, alpha, buttonClasses, Backdrop, Alert, Paper, Box: Box$1, AlertTitle, Stepper, Step, StepLabel, Autocomplete, TextField: TextField$1, FormControlLabel, Checkbox, List, ListItem, Dialog, FormControl, InputAdornment, IconButton: IconButton$1, FormHelperText, Stack: Stack$1, TableRow, TableCell, Menu: Menu$1, MenuItem: MenuItem$1, Divider, Chip, Table, TableHead, TableBody, ListItemText, DialogTitle, DialogContent, DialogActions, Collapse: Collapse$1, useMediaQuery, Tabs, Tab, ListItemButton, ToggleButtonGroup, ToggleButton, Slider, Switch, ButtonGroup, RadioGroup, Radio, InputLabel, Select } = craftercms.libs.MaterialUI;
+const { Tooltip, useTheme, accordionClasses, accordionSummaryClasses, Accordion, AccordionSummary, Typography, AccordionDetails, Button: Button$1, CircularProgress, alpha, buttonClasses, Backdrop, Alert, Paper, Box: Box$1, AlertTitle, Stepper, Step, StepLabel, Autocomplete, TextField: TextField$1, FormControlLabel, Checkbox, List, ListItem, Dialog, FormControl, InputAdornment, IconButton: IconButton$1, FormHelperText, Stack: Stack$1, TableRow, TableCell, Menu: Menu$1, MenuItem: MenuItem$1, Divider, Chip, Table, TableHead, TableBody, ListItemText, DialogTitle, DialogContent, DialogActions, Collapse: Collapse$1, useMediaQuery, Tabs, Tab, Slider, ToggleButtonGroup, ToggleButton, InputLabel, Select, Switch, ButtonGroup, ListItemButton, RadioGroup, Radio, Breadcrumbs, Link, ListItemIcon } = craftercms.libs.MaterialUI;
 const IconButton = craftercms.libs.MaterialUI.IconButton && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.IconButton, 'default') ? craftercms.libs.MaterialUI.IconButton['default'] : craftercms.libs.MaterialUI.IconButton;
 const Button = craftercms.libs.MaterialUI.Button && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Button, 'default') ? craftercms.libs.MaterialUI.Button['default'] : craftercms.libs.MaterialUI.Button;
 const SystemIcon = craftercms.components.SystemIcon && Object.prototype.hasOwnProperty.call(craftercms.components.SystemIcon, 'default') ? craftercms.components.SystemIcon['default'] : craftercms.components.SystemIcon;
@@ -14,7 +14,7 @@ const { createCustomDocumentEventListener } = craftercms.utils.dom;
 const TextField = craftercms.libs.MaterialUI.TextField && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.TextField, 'default') ? craftercms.libs.MaterialUI.TextField['default'] : craftercms.libs.MaterialUI.TextField;
 const Container = craftercms.libs.MaterialUI.Container && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Container, 'default') ? craftercms.libs.MaterialUI.Container['default'] : craftercms.libs.MaterialUI.Container;
 const Box = craftercms.libs.MaterialUI.Box && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Box, 'default') ? craftercms.libs.MaterialUI.Box['default'] : craftercms.libs.MaterialUI.Box;
-const { writeContent, fetchChildrenByPath, checkPathExistence, fetchDetailedItems, fetchContentXML, uploadDataUrl } = craftercms.services.content;
+const { writeContent, fetchChildrenByPath, checkPathExistence, fetchDetailedItems, fetchContentXML, updateField, fetchItemsByPath, uploadDataUrl } = craftercms.services.content;
 const { DialogFooter, PathNavigator } = craftercms.components;
 const ToolsPanelListItemButton = craftercms.components.ToolsPanelListItemButton && Object.prototype.hasOwnProperty.call(craftercms.components.ToolsPanelListItemButton, 'default') ? craftercms.components.ToolsPanelListItemButton['default'] : craftercms.components.ToolsPanelListItemButton;
 const Tooltip$1 = craftercms.libs.MaterialUI.Tooltip && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Tooltip, 'default') ? craftercms.libs.MaterialUI.Tooltip['default'] : craftercms.libs.MaterialUI.Tooltip;
@@ -23,9 +23,9 @@ const DownloadIcon = craftercms.utils.constants.components.get('@mui/icons-mater
 const PublishIcon = craftercms.utils.constants.components.get('@mui/icons-material/PublishOutlined') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/PublishOutlined'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/PublishOutlined')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/PublishOutlined');
 const Snackbar = craftercms.libs.MaterialUI.Snackbar && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Snackbar, 'default') ? craftercms.libs.MaterialUI.Snackbar['default'] : craftercms.libs.MaterialUI.Snackbar;
 const { FormattedMessage } = craftercms.libs.ReactIntl;
-const { of, from, concatMap: concatMap$1, forkJoin, Subject } = craftercms.libs.rxjs;
+const { of, from, concatMap: concatMap$1, forkJoin, Subject, firstValueFrom } = craftercms.libs.rxjs;
 const { concatMap, expand, toArray, catchError, switchMap, takeUntil, map, take } = craftercms.libs.rxjs;
-const { fetchUnpublished } = craftercms.services.dashboard;
+const { fetchUnpublished, fetchMyActivity } = craftercms.services.dashboard;
 const { nou } = craftercms.utils.object;
 const { lookupItemByPath } = craftercms.utils.content;
 const { hasInitialPublish, fetchAll } = craftercms.services.sites;
@@ -34,7 +34,7 @@ const InfoOutlinedIcon = craftercms.utils.constants.components.get('@mui/icons-m
 const Menu = craftercms.libs.MaterialUI.Menu && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Menu, 'default') ? craftercms.libs.MaterialUI.Menu['default'] : craftercms.libs.MaterialUI.Menu;
 const MenuItem = craftercms.libs.MaterialUI.MenuItem && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.MenuItem, 'default') ? craftercms.libs.MaterialUI.MenuItem['default'] : craftercms.libs.MaterialUI.MenuItem;
 const ExpandMoreRounded = craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreRounded');
-const { fetchContentTypes } = craftercms.services.contentTypes;
+const { fetchContentTypes: fetchContentTypes$1 } = craftercms.services.contentTypes;
 const { fetchConfigurationXML, writeConfiguration } = craftercms.services.configuration;
 const { createSvgIcon } = craftercms.libs.MaterialUI;
 const ItemPublishingTargetIcon = craftercms.components.ItemPublishingTargetIcon && Object.prototype.hasOwnProperty.call(craftercms.components.ItemPublishingTargetIcon, 'default') ? craftercms.components.ItemPublishingTargetIcon['default'] : craftercms.components.ItemPublishingTargetIcon;
@@ -80,14 +80,31 @@ const CropRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-ma
 const CenterFocusStrongRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/CenterFocusStrongRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/CenterFocusStrongRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/CenterFocusStrongRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/CenterFocusStrongRounded');
 const TuneRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/TuneRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/TuneRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/TuneRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/TuneRounded');
 const PhotoSizeSelectLargeRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/PhotoSizeSelectLargeRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/PhotoSizeSelectLargeRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/PhotoSizeSelectLargeRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/PhotoSizeSelectLargeRounded');
+const AutoAwesomeRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/AutoAwesomeRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/AutoAwesomeRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/AutoAwesomeRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/AutoAwesomeRounded');
+const BrushRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/BrushRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/BrushRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/BrushRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/BrushRounded');
 const SaveRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/SaveRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/SaveRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/SaveRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/SaveRounded');
-const FolderOpenRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/FolderOpenRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/FolderOpenRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/FolderOpenRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/FolderOpenRounded');
-const UploadFileRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/UploadFileRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/UploadFileRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/UploadFileRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/UploadFileRounded');
-const ImageSearchRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/ImageSearchRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ImageSearchRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ImageSearchRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ImageSearchRounded');
+const SwapHorizRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/SwapHorizRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/SwapHorizRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/SwapHorizRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/SwapHorizRounded');
 const RotateLeftRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/RotateLeftRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/RotateLeftRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/RotateLeftRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/RotateLeftRounded');
 const RotateRightRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/RotateRightRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/RotateRightRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/RotateRightRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/RotateRightRounded');
 const FlipRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/FlipRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/FlipRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/FlipRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/FlipRounded');
 const RestartAltRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/RestartAltRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/RestartAltRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/RestartAltRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/RestartAltRounded');
+const AutoFixOffRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/AutoFixOffRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/AutoFixOffRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/AutoFixOffRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/AutoFixOffRounded');
+const ShowChartRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/ShowChartRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ShowChartRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ShowChartRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ShowChartRounded');
+const TextFieldsRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/TextFieldsRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/TextFieldsRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/TextFieldsRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/TextFieldsRounded');
+const CropSquareRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/CropSquareRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/CropSquareRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/CropSquareRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/CropSquareRounded');
+const CircleOutlinedIcon = craftercms.utils.constants.components.get('@mui/icons-material/CircleOutlined') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/CircleOutlined'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/CircleOutlined')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/CircleOutlined');
+const UndoRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/UndoRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/UndoRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/UndoRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/UndoRounded');
+const ZoomInRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/ZoomInRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ZoomInRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ZoomInRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ZoomInRounded');
+const ZoomOutRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/ZoomOutRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ZoomOutRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ZoomOutRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ZoomOutRounded');
+const FitScreenRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/FitScreenRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/FitScreenRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/FitScreenRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/FitScreenRounded');
+const Search = craftercms.components.Search && Object.prototype.hasOwnProperty.call(craftercms.components.Search, 'default') ? craftercms.components.Search['default'] : craftercms.components.Search;
+const PathNavigator$1 = craftercms.components.PathNavigator && Object.prototype.hasOwnProperty.call(craftercms.components.PathNavigator, 'default') ? craftercms.components.PathNavigator['default'] : craftercms.components.PathNavigator;
+const CloudUploadRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/CloudUploadRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/CloudUploadRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/CloudUploadRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/CloudUploadRounded');
+const PhotoLibraryRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/PhotoLibraryRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/PhotoLibraryRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/PhotoLibraryRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/PhotoLibraryRounded');
+const ContentPasteRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/ContentPasteRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ContentPasteRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ContentPasteRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ContentPasteRounded');
+const CloseRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/CloseRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/CloseRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/CloseRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/CloseRounded');
+const FolderRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/FolderRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/FolderRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/FolderRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/FolderRounded');
+const ImageRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/ImageRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ImageRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ImageRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ImageRounded');
 
 /*
  * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
@@ -1140,6 +1157,7 @@ const pathSelectionDialogClosed = /*#__PURE__*/ createAction('PATH_SELECTION_CLO
 // endregion
 // region Widget Dialog
 const showWidgetDialog = /*#__PURE__*/ createAction('SHOW_WIDGET_DIALOG');
+const updateWidgetDialog = /*#__PURE__*/ createAction('UPDATE_WIDGET_DIALOG');
 // endregion
 
 function EditOrViewCurrent(props) {
@@ -1506,6 +1524,9 @@ function useOpenImageStudio(props) {
             title: (_a = props.title) !== null && _a !== void 0 ? _a : IMAGE_STUDIO_DEFAULTS.title,
             fullHeight: true,
             fullWidth: true,
+            isFullScreen: false,
+            onFullScreen: updateWidgetDialog({ isFullScreen: true }),
+            onCancelFullScreen: updateWidgetDialog({ isFullScreen: false }),
             widget: {
                 id: 'org.rd.plugin.uigoodies.ImageStudio',
                 configuration: {
@@ -2034,7 +2055,9 @@ function isFolder(item) {
  */
 
 const contentTypeDropTargetsResponse = /*#__PURE__*/ createAction('CONTENT_TYPE_DROP_TARGETS_RESPONSE');
+const FETCH_CONTENT_TYPES = 'FETCH_CONTENT_TYPES';
 const CHANGE_CURRENT_URL = 'CHANGE_CURRENT_URL';
+const fetchContentTypes = /*#__PURE__*/ createAction(FETCH_CONTENT_TYPES);
 const changeCurrentUrl = /*#__PURE__*/ createAction(CHANGE_CURRENT_URL);
 /*#__PURE__*/ createAction(contentTypeDropTargetsResponse.type);
 
@@ -2216,7 +2239,7 @@ function CrossSiteContentTypeCopy() {
             return;
         }
         setTypesLoading(true);
-        var sub = fetchContentTypes(sourceSite.id).subscribe({
+        var sub = fetchContentTypes$1(sourceSite.id).subscribe({
             next: function (types) {
                 var rows = (types !== null && types !== void 0 ? types : [])
                     .map(function (t) {
@@ -2244,7 +2267,7 @@ function CrossSiteContentTypeCopy() {
             return;
         }
         setDestinationTypesLoading(true);
-        var sub = fetchContentTypes(destSite.id).subscribe({
+        var sub = fetchContentTypes$1(destSite.id).subscribe({
             next: function (types) {
                 var ids = new Set((types !== null && types !== void 0 ? types : []).map(function (t) { var _a; return normalizeContentTypeId((_a = t.id) !== null && _a !== void 0 ? _a : ''); }).filter(Boolean));
                 setDestinationTypeIds(ids);
@@ -40220,7 +40243,7 @@ function OpenSearchPlayground() {
         dictionaryRequestKeyRef.current = requestKey;
         setDictionaryLoading(true);
         setDictionaryError('');
-        var sub = fetchContentTypes(siteId).subscribe({
+        var sub = fetchContentTypes$1(siteId).subscribe({
             next: function (types) {
                 var rows = (types !== null && types !== void 0 ? types : [])
                     .map(function (type) { var _a, _b, _c; return ({ id: ((_a = type.id) !== null && _a !== void 0 ? _a : '').trim(), name: ((_c = (_b = type.name) !== null && _b !== void 0 ? _b : type.id) !== null && _c !== void 0 ? _c : '').trim() }); })
@@ -41425,1521 +41448,123 @@ function LogEntryRow(_a) {
                         }, children: entry.trace.map(function (line, i) { return (jsx(Box$1, { children: line }, i)); }) }))] })] }));
 }
 
-function isImageAsset(item) {
-    var _a;
-    return item.systemType === 'asset' && ((_a = item.mimeType) === null || _a === void 0 ? void 0 : _a.startsWith('image/'));
+/*
+ * Copyright (C) 2007-2026 Crafter Software Corporation. All Rights Reserved.
+ */
+var DEFAULT_CANVAS_VIEW = { zoom: 1, panX: 0, panY: 0 };
+var MIN_CANVAS_ZOOM = 0.25;
+var MAX_CANVAS_ZOOM = 6;
+function clampCanvasZoom(zoom) {
+    return Math.min(MAX_CANVAS_ZOOM, Math.max(MIN_CANVAS_ZOOM, zoom));
 }
-function ImageSourcePicker(_a) {
-    var _this = this;
-    var defaultPath = _a.defaultPath, onImageSelected = _a.onImageSelected, onError = _a.onError, loadRepoImage = _a.loadRepoImage;
-    var siteId = useActiveSiteId();
-    var _b = useState(defaultPath), browsePath = _b[0], setBrowsePath = _b[1];
-    var _c = useState([]), items = _c[0], setItems = _c[1];
-    var _d = useState(false), loading = _d[0], setLoading = _d[1];
-    var _e = useState(false), dragOver = _e[0], setDragOver = _e[1];
-    var fileInputRef = React__default.useRef(null);
-    var loadFolder = useCallback(function (path) { return __awaiter(_this, void 0, void 0, function () {
-        var response, list, i, item, e_1;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    if (!siteId) {
-                        return [2 /*return*/];
-                    }
-                    setLoading(true);
-                    _a.label = 1;
-                case 1:
-                    _a.trys.push([1, 3, 4, 5]);
-                    return [4 /*yield*/, fetchChildrenByPath(siteId, path, { limit: 200 }).pipe(take(1)).toPromise()];
-                case 2:
-                    response = _a.sent();
-                    list = [];
-                    if (response) {
-                        for (i = 0; i < response.length; i++) {
-                            item = response[i];
-                            if (item === null || item === void 0 ? void 0 : item.path) {
-                                list.push(item);
-                            }
-                        }
-                    }
-                    setItems(list);
-                    setBrowsePath(path);
-                    return [3 /*break*/, 5];
-                case 3:
-                    e_1 = _a.sent();
-                    onError(e_1.message);
-                    return [3 /*break*/, 5];
-                case 4:
-                    setLoading(false);
-                    return [7 /*endfinally*/];
-                case 5: return [2 /*return*/];
-            }
-        });
-    }); }, [siteId, onError]);
-    useEffect(function () {
-        loadFolder(defaultPath);
-    }, [defaultPath, loadFolder]);
-    var folders = useMemo(function () { return items.filter(function (item) { return item.systemType === 'folder'; }); }, [items]);
-    var images = useMemo(function () { return items.filter(isImageAsset); }, [items]);
-    var handleLocalFile = function (file) { return __awaiter(_this, void 0, void 0, function () {
-        var dataUrl, e_2;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    _a.trys.push([0, 2, , 3]);
-                    return [4 /*yield*/, new Promise(function (resolve, reject) {
-                            var reader = new FileReader();
-                            reader.onload = function () { return resolve(reader.result); };
-                            reader.onerror = reject;
-                            reader.readAsDataURL(file);
-                        })];
-                case 1:
-                    dataUrl = _a.sent();
-                    onImageSelected({ dataUrl: dataUrl, name: file.name });
-                    return [3 /*break*/, 3];
-                case 2:
-                    e_2 = _a.sent();
-                    onError(e_2.message);
-                    return [3 /*break*/, 3];
-                case 3: return [2 /*return*/];
-            }
-        });
-    }); };
-    var onDrop = function (e) {
-        var _a;
-        e.preventDefault();
-        setDragOver(false);
-        var file = (_a = e.dataTransfer.files) === null || _a === void 0 ? void 0 : _a[0];
-        if (file) {
-            handleLocalFile(file);
-        }
+function computeImageLayout(containerWidth, containerHeight, imageWidth, imageHeight, view) {
+    if (view === void 0) { view = { zoom: 1, panX: 0, panY: 0 }; }
+    var fitScale = Math.min(containerWidth / imageWidth, containerHeight / imageHeight);
+    var scale = fitScale * view.zoom;
+    var drawWidth = imageWidth * scale;
+    var drawHeight = imageHeight * scale;
+    return {
+        containerWidth: containerWidth,
+        containerHeight: containerHeight,
+        offsetX: (containerWidth - drawWidth) / 2 + view.panX,
+        offsetY: (containerHeight - drawHeight) / 2 + view.panY,
+        scale: scale,
+        fitScale: fitScale,
+        imageWidth: imageWidth,
+        imageHeight: imageHeight
     };
-    var openRepoImage = function (path, name) { return __awaiter(_this, void 0, void 0, function () {
-        var dataUrl, e_3;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    setLoading(true);
-                    _a.label = 1;
-                case 1:
-                    _a.trys.push([1, 3, 4, 5]);
-                    return [4 /*yield*/, loadRepoImage(path)];
-                case 2:
-                    dataUrl = _a.sent();
-                    onImageSelected({ dataUrl: dataUrl, sourcePath: path, name: name });
-                    return [3 /*break*/, 5];
-                case 3:
-                    e_3 = _a.sent();
-                    onError(e_3.message);
-                    return [3 /*break*/, 5];
-                case 4:
-                    setLoading(false);
-                    return [7 /*endfinally*/];
-                case 5: return [2 /*return*/];
-            }
-        });
-    }); };
-    return (jsxs(Box$1, { sx: { display: 'flex', flexDirection: 'column', gap: 2, minWidth: 280 }, children: [jsxs(Paper, { variant: "outlined", onDragOver: function (e) {
-                    e.preventDefault();
-                    setDragOver(true);
-                }, onDragLeave: function () { return setDragOver(false); }, onDrop: onDrop, sx: {
-                    p: 2,
-                    textAlign: 'center',
-                    borderStyle: 'dashed',
-                    borderColor: dragOver ? 'primary.main' : 'divider',
-                    bgcolor: dragOver ? 'action.hover' : 'background.paper'
-                }, children: [jsx(UploadFileRoundedIcon, { color: "action", sx: { fontSize: 36, mb: 1 } }), jsx(Typography, { variant: "body2", gutterBottom: true, children: "Drag an image here, paste from clipboard, or upload" }), jsx(Box$1, { sx: { display: 'flex', gap: 1, justifyContent: 'center', mt: 1 }, children: jsx(Button$1, { size: "small", variant: "outlined", onClick: function () { var _a; return (_a = fileInputRef.current) === null || _a === void 0 ? void 0 : _a.click(); }, children: "Upload file" }) }), jsx("input", { ref: fileInputRef, type: "file", accept: "image/*", hidden: true, onChange: function (e) {
-                            var _a;
-                            var file = (_a = e.target.files) === null || _a === void 0 ? void 0 : _a[0];
-                            if (file) {
-                                handleLocalFile(file);
-                            }
-                            e.target.value = '';
-                        } })] }), jsxs(Box$1, { children: [jsxs(Typography, { variant: "subtitle2", sx: { display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }, children: [jsx(ImageSearchRoundedIcon, { fontSize: "small" }), "Browse repository"] }), jsx(TextField$1, { size: "small", fullWidth: true, label: "Folder", value: browsePath, onChange: function (e) { return setBrowsePath(e.target.value); }, onKeyDown: function (e) {
-                            if (e.key === 'Enter') {
-                                loadFolder(browsePath);
-                            }
-                        }, InputProps: {
-                            endAdornment: (jsx(IconButton$1, { size: "small", onClick: function () { return loadFolder(browsePath); }, title: "Open folder", children: jsx(FolderOpenRoundedIcon, { fontSize: "small" }) }))
-                        } }), loading ? (jsx(Box$1, { sx: { display: 'flex', justifyContent: 'center', py: 2 }, children: jsx(CircularProgress, { size: 24 }) })) : (jsxs(List, { dense: true, sx: { maxHeight: 220, overflow: 'auto', mt: 1 }, children: [folders.map(function (folder) { return (jsx(ListItemButton, { onClick: function () { return loadFolder(folder.path); }, children: jsx(ListItemText, { primary: folder.label || folder.path.split('/').pop(), secondary: "Folder" }) }, folder.path)); }), images.map(function (image) { return (jsx(ListItemButton, { onClick: function () { return openRepoImage(image.path, image.label || image.path); }, children: jsx(ListItemText, { primary: image.label || image.path.split('/').pop(), secondary: image.path }) }, image.path)); }), !folders.length && !images.length && (jsx(Typography, { variant: "body2", color: "text.secondary", sx: { p: 1 }, children: "No subfolders or images in this folder." }))] }))] })] }));
 }
-
-/**
- * Copyright 2004-present Facebook. All Rights Reserved.
- *
- * @providesModule UserAgent_DEPRECATED
- */
-
-var UserAgent_DEPRECATED_1;
-var hasRequiredUserAgent_DEPRECATED;
-
-function requireUserAgent_DEPRECATED () {
-	if (hasRequiredUserAgent_DEPRECATED) return UserAgent_DEPRECATED_1;
-	hasRequiredUserAgent_DEPRECATED = 1;
-	/**
-	 *  Provides entirely client-side User Agent and OS detection. You should prefer
-	 *  the non-deprecated UserAgent module when possible, which exposes our
-	 *  authoritative server-side PHP-based detection to the client.
-	 *
-	 *  Usage is straightforward:
-	 *
-	 *    if (UserAgent_DEPRECATED.ie()) {
-	 *      //  IE
-	 *    }
-	 *
-	 *  You can also do version checks:
-	 *
-	 *    if (UserAgent_DEPRECATED.ie() >= 7) {
-	 *      //  IE7 or better
-	 *    }
-	 *
-	 *  The browser functions will return NaN if the browser does not match, so
-	 *  you can also do version compares the other way:
-	 *
-	 *    if (UserAgent_DEPRECATED.ie() < 7) {
-	 *      //  IE6 or worse
-	 *    }
-	 *
-	 *  Note that the version is a float and may include a minor version number,
-	 *  so you should always use range operators to perform comparisons, not
-	 *  strict equality.
-	 *
-	 *  **Note:** You should **strongly** prefer capability detection to browser
-	 *  version detection where it's reasonable:
-	 *
-	 *    http://www.quirksmode.org/js/support.html
-	 *
-	 *  Further, we have a large number of mature wrapper functions and classes
-	 *  which abstract away many browser irregularities. Check the documentation,
-	 *  grep for things, or ask on javascript@lists.facebook.com before writing yet
-	 *  another copy of "event || window.event".
-	 *
-	 */
-
-	var _populated = false;
-
-	// Browsers
-	var _ie, _firefox, _opera, _webkit, _chrome;
-
-	// Actual IE browser for compatibility mode
-	var _ie_real_version;
-
-	// Platforms
-	var _osx, _windows, _linux, _android;
-
-	// Architectures
-	var _win64;
-
-	// Devices
-	var _iphone, _ipad, _native;
-
-	var _mobile;
-
-	function _populate() {
-	  if (_populated) {
-	    return;
-	  }
-
-	  _populated = true;
-
-	  // To work around buggy JS libraries that can't handle multi-digit
-	  // version numbers, Opera 10's user agent string claims it's Opera
-	  // 9, then later includes a Version/X.Y field:
-	  //
-	  // Opera/9.80 (foo) Presto/2.2.15 Version/10.10
-	  var uas = navigator.userAgent;
-	  var agent = /(?:MSIE.(\d+\.\d+))|(?:(?:Firefox|GranParadiso|Iceweasel).(\d+\.\d+))|(?:Opera(?:.+Version.|.)(\d+\.\d+))|(?:AppleWebKit.(\d+(?:\.\d+)?))|(?:Trident\/\d+\.\d+.*rv:(\d+\.\d+))/.exec(uas);
-	  var os    = /(Mac OS X)|(Windows)|(Linux)/.exec(uas);
-
-	  _iphone = /\b(iPhone|iP[ao]d)/.exec(uas);
-	  _ipad = /\b(iP[ao]d)/.exec(uas);
-	  _android = /Android/i.exec(uas);
-	  _native = /FBAN\/\w+;/i.exec(uas);
-	  _mobile = /Mobile/i.exec(uas);
-
-	  // Note that the IE team blog would have you believe you should be checking
-	  // for 'Win64; x64'.  But MSDN then reveals that you can actually be coming
-	  // from either x64 or ia64;  so ultimately, you should just check for Win64
-	  // as in indicator of whether you're in 64-bit IE.  32-bit IE on 64-bit
-	  // Windows will send 'WOW64' instead.
-	  _win64 = !!(/Win64/.exec(uas));
-
-	  if (agent) {
-	    _ie = agent[1] ? parseFloat(agent[1]) : (
-	          agent[5] ? parseFloat(agent[5]) : NaN);
-	    // IE compatibility mode
-	    if (_ie && document && document.documentMode) {
-	      _ie = document.documentMode;
-	    }
-	    // grab the "true" ie version from the trident token if available
-	    var trident = /(?:Trident\/(\d+.\d+))/.exec(uas);
-	    _ie_real_version = trident ? parseFloat(trident[1]) + 4 : _ie;
-
-	    _firefox = agent[2] ? parseFloat(agent[2]) : NaN;
-	    _opera   = agent[3] ? parseFloat(agent[3]) : NaN;
-	    _webkit  = agent[4] ? parseFloat(agent[4]) : NaN;
-	    if (_webkit) {
-	      // We do not add the regexp to the above test, because it will always
-	      // match 'safari' only since 'AppleWebKit' appears before 'Chrome' in
-	      // the userAgent string.
-	      agent = /(?:Chrome\/(\d+\.\d+))/.exec(uas);
-	      _chrome = agent && agent[1] ? parseFloat(agent[1]) : NaN;
-	    } else {
-	      _chrome = NaN;
-	    }
-	  } else {
-	    _ie = _firefox = _opera = _chrome = _webkit = NaN;
-	  }
-
-	  if (os) {
-	    if (os[1]) {
-	      // Detect OS X version.  If no version number matches, set _osx to true.
-	      // Version examples:  10, 10_6_1, 10.7
-	      // Parses version number as a float, taking only first two sets of
-	      // digits.  If only one set of digits is found, returns just the major
-	      // version number.
-	      var ver = /(?:Mac OS X (\d+(?:[._]\d+)?))/.exec(uas);
-
-	      _osx = ver ? parseFloat(ver[1].replace('_', '.')) : true;
-	    } else {
-	      _osx = false;
-	    }
-	    _windows = !!os[2];
-	    _linux   = !!os[3];
-	  } else {
-	    _osx = _windows = _linux = false;
-	  }
-	}
-
-	var UserAgent_DEPRECATED = {
-
-	  /**
-	   *  Check if the UA is Internet Explorer.
-	   *
-	   *
-	   *  @return float|NaN Version number (if match) or NaN.
-	   */
-	  ie: function() {
-	    return _populate() || _ie;
-	  },
-
-	  /**
-	   * Check if we're in Internet Explorer compatibility mode.
-	   *
-	   * @return bool true if in compatibility mode, false if
-	   * not compatibility mode or not ie
-	   */
-	  ieCompatibilityMode: function() {
-	    return _populate() || (_ie_real_version > _ie);
-	  },
-
-
-	  /**
-	   * Whether the browser is 64-bit IE.  Really, this is kind of weak sauce;  we
-	   * only need this because Skype can't handle 64-bit IE yet.  We need to remove
-	   * this when we don't need it -- tracked by #601957.
-	   */
-	  ie64: function() {
-	    return UserAgent_DEPRECATED.ie() && _win64;
-	  },
-
-	  /**
-	   *  Check if the UA is Firefox.
-	   *
-	   *
-	   *  @return float|NaN Version number (if match) or NaN.
-	   */
-	  firefox: function() {
-	    return _populate() || _firefox;
-	  },
-
-
-	  /**
-	   *  Check if the UA is Opera.
-	   *
-	   *
-	   *  @return float|NaN Version number (if match) or NaN.
-	   */
-	  opera: function() {
-	    return _populate() || _opera;
-	  },
-
-
-	  /**
-	   *  Check if the UA is WebKit.
-	   *
-	   *
-	   *  @return float|NaN Version number (if match) or NaN.
-	   */
-	  webkit: function() {
-	    return _populate() || _webkit;
-	  },
-
-	  /**
-	   *  For Push
-	   *  WILL BE REMOVED VERY SOON. Use UserAgent_DEPRECATED.webkit
-	   */
-	  safari: function() {
-	    return UserAgent_DEPRECATED.webkit();
-	  },
-
-	  /**
-	   *  Check if the UA is a Chrome browser.
-	   *
-	   *
-	   *  @return float|NaN Version number (if match) or NaN.
-	   */
-	  chrome : function() {
-	    return _populate() || _chrome;
-	  },
-
-
-	  /**
-	   *  Check if the user is running Windows.
-	   *
-	   *  @return bool `true' if the user's OS is Windows.
-	   */
-	  windows: function() {
-	    return _populate() || _windows;
-	  },
-
-
-	  /**
-	   *  Check if the user is running Mac OS X.
-	   *
-	   *  @return float|bool   Returns a float if a version number is detected,
-	   *                       otherwise true/false.
-	   */
-	  osx: function() {
-	    return _populate() || _osx;
-	  },
-
-	  /**
-	   * Check if the user is running Linux.
-	   *
-	   * @return bool `true' if the user's OS is some flavor of Linux.
-	   */
-	  linux: function() {
-	    return _populate() || _linux;
-	  },
-
-	  /**
-	   * Check if the user is running on an iPhone or iPod platform.
-	   *
-	   * @return bool `true' if the user is running some flavor of the
-	   *    iPhone OS.
-	   */
-	  iphone: function() {
-	    return _populate() || _iphone;
-	  },
-
-	  mobile: function() {
-	    return _populate() || (_iphone || _ipad || _android || _mobile);
-	  },
-
-	  nativeApp: function() {
-	    // webviews inside of the native apps
-	    return _populate() || _native;
-	  },
-
-	  android: function() {
-	    return _populate() || _android;
-	  },
-
-	  ipad: function() {
-	    return _populate() || _ipad;
-	  }
-	};
-
-	UserAgent_DEPRECATED_1 = UserAgent_DEPRECATED;
-	return UserAgent_DEPRECATED_1;
+/** Zoom toward a display-space point (e.g. cursor) so that point stays fixed on the image. */
+function zoomViewAtPoint(containerWidth, containerHeight, imageWidth, imageHeight, view, displayX, displayY, newZoom) {
+    var zoom = clampCanvasZoom(newZoom);
+    var layout = computeImageLayout(containerWidth, containerHeight, imageWidth, imageHeight, view);
+    var imgX = (displayX - layout.offsetX) / layout.scale;
+    var imgY = (displayY - layout.offsetY) / layout.scale;
+    var fitScale = layout.fitScale;
+    var scale = fitScale * zoom;
+    var panX = displayX - imgX * scale - (containerWidth - imageWidth * scale) / 2;
+    var panY = displayY - imgY * scale - (containerHeight - imageHeight * scale) / 2;
+    return { zoom: zoom, panX: panX, panY: panY };
 }
-
-/**
- * Copyright (c) 2015, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
- *
- * @providesModule ExecutionEnvironment
- */
-
-var ExecutionEnvironment_1;
-var hasRequiredExecutionEnvironment;
-
-function requireExecutionEnvironment () {
-	if (hasRequiredExecutionEnvironment) return ExecutionEnvironment_1;
-	hasRequiredExecutionEnvironment = 1;
-
-	var canUseDOM = !!(
-	  typeof window !== 'undefined' &&
-	  window.document &&
-	  window.document.createElement
-	);
-
-	/**
-	 * Simple, lightweight module assisting with the detection and context of
-	 * Worker. Helps avoid circular dependencies and allows code to reason about
-	 * whether or not they are in a Worker, even if they never include the main
-	 * `ReactWorker` dependency.
-	 */
-	var ExecutionEnvironment = {
-
-	  canUseDOM: canUseDOM,
-
-	  canUseWorkers: typeof Worker !== 'undefined',
-
-	  canUseEventListeners:
-	    canUseDOM && !!(window.addEventListener || window.attachEvent),
-
-	  canUseViewport: canUseDOM && !!window.screen,
-
-	  isInWorker: !canUseDOM // For now, this is true - might change in the future.
-
-	};
-
-	ExecutionEnvironment_1 = ExecutionEnvironment;
-	return ExecutionEnvironment_1;
+function imageToDisplay(x, y, layout) {
+    return {
+        x: layout.offsetX + x * layout.scale,
+        y: layout.offsetY + y * layout.scale
+    };
 }
-
-/**
- * Copyright 2013-2015, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
- *
- * @providesModule isEventSupported
- */
-
-var isEventSupported_1;
-var hasRequiredIsEventSupported;
-
-function requireIsEventSupported () {
-	if (hasRequiredIsEventSupported) return isEventSupported_1;
-	hasRequiredIsEventSupported = 1;
-
-	var ExecutionEnvironment = requireExecutionEnvironment();
-
-	var useHasFeature;
-	if (ExecutionEnvironment.canUseDOM) {
-	  useHasFeature =
-	    document.implementation &&
-	    document.implementation.hasFeature &&
-	    // always returns true in newer browsers as per the standard.
-	    // @see http://dom.spec.whatwg.org/#dom-domimplementation-hasfeature
-	    document.implementation.hasFeature('', '') !== true;
-	}
-
-	/**
-	 * Checks if an event is supported in the current execution environment.
-	 *
-	 * NOTE: This will not work correctly for non-generic events such as `change`,
-	 * `reset`, `load`, `error`, and `select`.
-	 *
-	 * Borrows from Modernizr.
-	 *
-	 * @param {string} eventNameSuffix Event name, e.g. "click".
-	 * @param {?boolean} capture Check if the capture phase is supported.
-	 * @return {boolean} True if the event is supported.
-	 * @internal
-	 * @license Modernizr 3.0.0pre (Custom Build) | MIT
-	 */
-	function isEventSupported(eventNameSuffix, capture) {
-	  if (!ExecutionEnvironment.canUseDOM ||
-	      capture && !('addEventListener' in document)) {
-	    return false;
-	  }
-
-	  var eventName = 'on' + eventNameSuffix;
-	  var isSupported = eventName in document;
-
-	  if (!isSupported) {
-	    var element = document.createElement('div');
-	    element.setAttribute(eventName, 'return;');
-	    isSupported = typeof element[eventName] === 'function';
-	  }
-
-	  if (!isSupported && useHasFeature && eventNameSuffix === 'wheel') {
-	    // This is the only way to test support for the `wheel` event in IE9+.
-	    isSupported = document.implementation.hasFeature('Events.wheel', '3.0');
-	  }
-
-	  return isSupported;
-	}
-
-	isEventSupported_1 = isEventSupported;
-	return isEventSupported_1;
+function displayToImage(displayX, displayY, layout, clamp) {
+    if (clamp === void 0) { clamp = true; }
+    var x = (displayX - layout.offsetX) / layout.scale;
+    var y = (displayY - layout.offsetY) / layout.scale;
+    if (!clamp) {
+        return { x: x, y: y };
+    }
+    if (x < 0 || y < 0 || x > layout.imageWidth || y > layout.imageHeight) {
+        return null;
+    }
+    return {
+        x: Math.max(0, Math.min(layout.imageWidth, x)),
+        y: Math.max(0, Math.min(layout.imageHeight, y))
+    };
 }
-
-/**
- * Copyright (c) 2015, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
- *
- * @providesModule normalizeWheel
- * @typechecks
- */
-
-var normalizeWheel_1;
-var hasRequiredNormalizeWheel$1;
-
-function requireNormalizeWheel$1 () {
-	if (hasRequiredNormalizeWheel$1) return normalizeWheel_1;
-	hasRequiredNormalizeWheel$1 = 1;
-
-	var UserAgent_DEPRECATED = requireUserAgent_DEPRECATED();
-
-	var isEventSupported = requireIsEventSupported();
-
-
-	// Reasonable defaults
-	var PIXEL_STEP  = 10;
-	var LINE_HEIGHT = 40;
-	var PAGE_HEIGHT = 800;
-
-	/**
-	 * Mouse wheel (and 2-finger trackpad) support on the web sucks.  It is
-	 * complicated, thus this doc is long and (hopefully) detailed enough to answer
-	 * your questions.
-	 *
-	 * If you need to react to the mouse wheel in a predictable way, this code is
-	 * like your bestest friend. * hugs *
-	 *
-	 * As of today, there are 4 DOM event types you can listen to:
-	 *
-	 *   'wheel'                -- Chrome(31+), FF(17+), IE(9+)
-	 *   'mousewheel'           -- Chrome, IE(6+), Opera, Safari
-	 *   'MozMousePixelScroll'  -- FF(3.5 only!) (2010-2013) -- don't bother!
-	 *   'DOMMouseScroll'       -- FF(0.9.7+) since 2003
-	 *
-	 * So what to do?  The is the best:
-	 *
-	 *   normalizeWheel.getEventType();
-	 *
-	 * In your event callback, use this code to get sane interpretation of the
-	 * deltas.  This code will return an object with properties:
-	 *
-	 *   spinX   -- normalized spin speed (use for zoom) - x plane
-	 *   spinY   -- " - y plane
-	 *   pixelX  -- normalized distance (to pixels) - x plane
-	 *   pixelY  -- " - y plane
-	 *
-	 * Wheel values are provided by the browser assuming you are using the wheel to
-	 * scroll a web page by a number of lines or pixels (or pages).  Values can vary
-	 * significantly on different platforms and browsers, forgetting that you can
-	 * scroll at different speeds.  Some devices (like trackpads) emit more events
-	 * at smaller increments with fine granularity, and some emit massive jumps with
-	 * linear speed or acceleration.
-	 *
-	 * This code does its best to normalize the deltas for you:
-	 *
-	 *   - spin is trying to normalize how far the wheel was spun (or trackpad
-	 *     dragged).  This is super useful for zoom support where you want to
-	 *     throw away the chunky scroll steps on the PC and make those equal to
-	 *     the slow and smooth tiny steps on the Mac. Key data: This code tries to
-	 *     resolve a single slow step on a wheel to 1.
-	 *
-	 *   - pixel is normalizing the desired scroll delta in pixel units.  You'll
-	 *     get the crazy differences between browsers, but at least it'll be in
-	 *     pixels!
-	 *
-	 *   - positive value indicates scrolling DOWN/RIGHT, negative UP/LEFT.  This
-	 *     should translate to positive value zooming IN, negative zooming OUT.
-	 *     This matches the newer 'wheel' event.
-	 *
-	 * Why are there spinX, spinY (or pixels)?
-	 *
-	 *   - spinX is a 2-finger side drag on the trackpad, and a shift + wheel turn
-	 *     with a mouse.  It results in side-scrolling in the browser by default.
-	 *
-	 *   - spinY is what you expect -- it's the classic axis of a mouse wheel.
-	 *
-	 *   - I dropped spinZ/pixelZ.  It is supported by the DOM 3 'wheel' event and
-	 *     probably is by browsers in conjunction with fancy 3D controllers .. but
-	 *     you know.
-	 *
-	 * Implementation info:
-	 *
-	 * Examples of 'wheel' event if you scroll slowly (down) by one step with an
-	 * average mouse:
-	 *
-	 *   OS X + Chrome  (mouse)     -    4   pixel delta  (wheelDelta -120)
-	 *   OS X + Safari  (mouse)     -  N/A   pixel delta  (wheelDelta  -12)
-	 *   OS X + Firefox (mouse)     -    0.1 line  delta  (wheelDelta  N/A)
-	 *   Win8 + Chrome  (mouse)     -  100   pixel delta  (wheelDelta -120)
-	 *   Win8 + Firefox (mouse)     -    3   line  delta  (wheelDelta -120)
-	 *
-	 * On the trackpad:
-	 *
-	 *   OS X + Chrome  (trackpad)  -    2   pixel delta  (wheelDelta   -6)
-	 *   OS X + Firefox (trackpad)  -    1   pixel delta  (wheelDelta  N/A)
-	 *
-	 * On other/older browsers.. it's more complicated as there can be multiple and
-	 * also missing delta values.
-	 *
-	 * The 'wheel' event is more standard:
-	 *
-	 * http://www.w3.org/TR/DOM-Level-3-Events/#events-wheelevents
-	 *
-	 * The basics is that it includes a unit, deltaMode (pixels, lines, pages), and
-	 * deltaX, deltaY and deltaZ.  Some browsers provide other values to maintain
-	 * backward compatibility with older events.  Those other values help us
-	 * better normalize spin speed.  Example of what the browsers provide:
-	 *
-	 *                          | event.wheelDelta | event.detail
-	 *        ------------------+------------------+--------------
-	 *          Safari v5/OS X  |       -120       |       0
-	 *          Safari v5/Win7  |       -120       |       0
-	 *         Chrome v17/OS X  |       -120       |       0
-	 *         Chrome v17/Win7  |       -120       |       0
-	 *                IE9/Win7  |       -120       |   undefined
-	 *         Firefox v4/OS X  |     undefined    |       1
-	 *         Firefox v4/Win7  |     undefined    |       3
-	 *
-	 */
-	function normalizeWheel(/*object*/ event) /*object*/ {
-	  var sX = 0, sY = 0,       // spinX, spinY
-	      pX = 0, pY = 0;       // pixelX, pixelY
-
-	  // Legacy
-	  if ('detail'      in event) { sY = event.detail; }
-	  if ('wheelDelta'  in event) { sY = -event.wheelDelta / 120; }
-	  if ('wheelDeltaY' in event) { sY = -event.wheelDeltaY / 120; }
-	  if ('wheelDeltaX' in event) { sX = -event.wheelDeltaX / 120; }
-
-	  // side scrolling on FF with DOMMouseScroll
-	  if ( 'axis' in event && event.axis === event.HORIZONTAL_AXIS ) {
-	    sX = sY;
-	    sY = 0;
-	  }
-
-	  pX = sX * PIXEL_STEP;
-	  pY = sY * PIXEL_STEP;
-
-	  if ('deltaY' in event) { pY = event.deltaY; }
-	  if ('deltaX' in event) { pX = event.deltaX; }
-
-	  if ((pX || pY) && event.deltaMode) {
-	    if (event.deltaMode == 1) {          // delta in LINE units
-	      pX *= LINE_HEIGHT;
-	      pY *= LINE_HEIGHT;
-	    } else {                             // delta in PAGE units
-	      pX *= PAGE_HEIGHT;
-	      pY *= PAGE_HEIGHT;
-	    }
-	  }
-
-	  // Fall-back if spin cannot be determined
-	  if (pX && !sX) { sX = (pX < 1) ? -1 : 1; }
-	  if (pY && !sY) { sY = (pY < 1) ? -1 : 1; }
-
-	  return { spinX  : sX,
-	           spinY  : sY,
-	           pixelX : pX,
-	           pixelY : pY };
-	}
-
-
-	/**
-	 * The best combination if you prefer spinX + spinY normalization.  It favors
-	 * the older DOMMouseScroll for Firefox, as FF does not include wheelDelta with
-	 * 'wheel' event, making spin speed determination impossible.
-	 */
-	normalizeWheel.getEventType = function() /*string*/ {
-	  return (UserAgent_DEPRECATED.firefox())
-	           ? 'DOMMouseScroll'
-	           : (isEventSupported('wheel'))
-	               ? 'wheel'
-	               : 'mousewheel';
-	};
-
-	normalizeWheel_1 = normalizeWheel;
-	return normalizeWheel_1;
+function clientToImage(clientX, clientY, containerRect, layout, clamp) {
+    if (clamp === void 0) { clamp = true; }
+    var displayX = clientX - containerRect.left;
+    var displayY = clientY - containerRect.top;
+    return displayToImage(displayX, displayY, layout, clamp);
 }
-
-var normalizeWheel$1;
-var hasRequiredNormalizeWheel;
-
-function requireNormalizeWheel () {
-	if (hasRequiredNormalizeWheel) return normalizeWheel$1;
-	hasRequiredNormalizeWheel = 1;
-	normalizeWheel$1 = requireNormalizeWheel$1();
-	return normalizeWheel$1;
+function clampCropArea(area, imageWidth, imageHeight, minSize) {
+    if (minSize === void 0) { minSize = 8; }
+    var width = Math.max(minSize, Math.min(area.width, imageWidth));
+    var height = Math.max(minSize, Math.min(area.height, imageHeight));
+    var x = Math.max(0, Math.min(area.x, imageWidth - width));
+    var y = Math.max(0, Math.min(area.y, imageHeight - height));
+    return {
+        x: Math.round(x),
+        y: Math.round(y),
+        width: Math.round(width),
+        height: Math.round(height)
+    };
 }
-
-var normalizeWheelExports = requireNormalizeWheel();
-var normalizeWheel = /*@__PURE__*/getDefaultExportFromCjs(normalizeWheelExports);
-
-//#region \0@oxc-project+runtime@0.134.0/helpers/esm/typeof.js
-function _typeof$1(o) {
-	"@babel/helpers - typeof";
-	return _typeof$1 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(o) {
-		return typeof o;
-	} : function(o) {
-		return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o;
-	}, _typeof$1(o);
+function fullImageCrop(imageWidth, imageHeight) {
+    return { x: 0, y: 0, width: imageWidth, height: imageHeight };
 }
-//#endregion
-//#region \0@oxc-project+runtime@0.134.0/helpers/esm/toPrimitive.js
-function toPrimitive$1(t, r) {
-	if ("object" != _typeof$1(t) || !t) return t;
-	var e = t[Symbol.toPrimitive];
-	if (void 0 !== e) {
-		var i = e.call(t, r);
-		if ("object" != _typeof$1(i)) return i;
-		throw new TypeError("@@toPrimitive must return a primitive value.");
-	}
-	return ("string" === r ? String : Number)(t);
+function cropAreaWithAspect(area, aspect, imageWidth, imageHeight) {
+    if (!aspect) {
+        return clampCropArea(area, imageWidth, imageHeight);
+    }
+    var centerX = area.x + area.width / 2;
+    var centerY = area.y + area.height / 2;
+    var width = area.width;
+    var height = width / aspect;
+    if (height > imageHeight) {
+        height = imageHeight;
+        width = height * aspect;
+    }
+    if (width > imageWidth) {
+        width = imageWidth;
+        height = width / aspect;
+    }
+    var x = centerX - width / 2;
+    var y = centerY - height / 2;
+    return clampCropArea({ x: x, y: y, width: width, height: height }, imageWidth, imageHeight);
 }
-//#endregion
-//#region \0@oxc-project+runtime@0.134.0/helpers/esm/toPropertyKey.js
-function toPropertyKey$1(t) {
-	var i = toPrimitive$1(t, "string");
-	return "symbol" == _typeof$1(i) ? i : i + "";
+function resizeCropToDimensions(area, targetWidth, targetHeight, imageWidth, imageHeight, aspect) {
+    var width = Math.max(8, Math.min(targetWidth, imageWidth));
+    var height = Math.max(8, Math.min(targetHeight, imageHeight));
+    if (aspect) {
+        height = width / aspect;
+        if (height > imageHeight) {
+            height = imageHeight;
+            width = height * aspect;
+        }
+    }
+    var centerX = area.x + area.width / 2;
+    var centerY = area.y + area.height / 2;
+    var x = centerX - width / 2;
+    var y = centerY - height / 2;
+    return clampCropArea({ x: x, y: y, width: width, height: height }, imageWidth, imageHeight);
 }
-//#endregion
-//#region \0@oxc-project+runtime@0.134.0/helpers/esm/defineProperty.js
-function _defineProperty$1(e, r, t) {
-	return (r = toPropertyKey$1(r)) in e ? Object.defineProperty(e, r, {
-		value: t,
-		enumerable: true,
-		configurable: true,
-		writable: true
-	}) : e[r] = t, e;
-}
-//#endregion
-//#region \0@oxc-project+runtime@0.134.0/helpers/esm/objectSpread2.js
-function ownKeys$1(e, r) {
-	var t = Object.keys(e);
-	if (Object.getOwnPropertySymbols) {
-		var o = Object.getOwnPropertySymbols(e);
-		r && (o = o.filter(function(r) {
-			return Object.getOwnPropertyDescriptor(e, r).enumerable;
-		})), t.push.apply(t, o);
-	}
-	return t;
-}
-function _objectSpread2$1(e) {
-	for (var r = 1; r < arguments.length; r++) {
-		var t = null != arguments[r] ? arguments[r] : {};
-		r % 2 ? ownKeys$1(Object(t), true).forEach(function(r) {
-			_defineProperty$1(e, r, t[r]);
-		}) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys$1(Object(t)).forEach(function(r) {
-			Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r));
-		});
-	}
-	return e;
-}
-//#endregion
-//#region src/helpers.ts
-/**
-* Compute the dimension of the crop area based on media size,
-* aspect ratio and optionally rotation
-*/
-function getCropSize(mediaWidth, mediaHeight, containerWidth, containerHeight, aspect, rotation = 0) {
-	const { width, height } = rotateSize$1(mediaWidth, mediaHeight, rotation);
-	const fittingWidth = Math.min(width, containerWidth);
-	const fittingHeight = Math.min(height, containerHeight);
-	if (fittingWidth > fittingHeight * aspect) return {
-		width: fittingHeight * aspect,
-		height: fittingHeight
-	};
-	return {
-		width: fittingWidth,
-		height: fittingWidth / aspect
-	};
-}
-/**
-* Compute media zoom.
-* We fit the media into the container with "max-width: 100%; max-height: 100%;"
-*/
-function getMediaZoom(mediaSize) {
-	return mediaSize.width > mediaSize.height ? mediaSize.width / mediaSize.naturalWidth : mediaSize.height / mediaSize.naturalHeight;
-}
-/**
-* Ensure a new media position stays in the crop area.
-*/
-function restrictPosition(position, mediaSize, cropSize, zoom, rotation = 0) {
-	const { width, height } = rotateSize$1(mediaSize.width, mediaSize.height, rotation);
-	return {
-		x: restrictPositionCoord(position.x, width, cropSize.width, zoom),
-		y: restrictPositionCoord(position.y, height, cropSize.height, zoom)
-	};
-}
-function restrictPositionCoord(position, mediaSize, cropSize, zoom) {
-	const maxPosition = Math.abs(mediaSize * zoom / 2 - cropSize / 2);
-	return clamp(position, -maxPosition, maxPosition);
-}
-function getDistanceBetweenPoints(pointA, pointB) {
-	return Math.sqrt(Math.pow(pointA.y - pointB.y, 2) + Math.pow(pointA.x - pointB.x, 2));
-}
-function getRotationBetweenPoints(pointA, pointB) {
-	return Math.atan2(pointB.y - pointA.y, pointB.x - pointA.x) * 180 / Math.PI;
-}
-/**
-* Compute the output cropped area of the media in percentages and pixels.
-* x/y are the top-left coordinates on the src media
-*/
-function computeCroppedArea(crop, mediaSize, cropSize, aspect, zoom, rotation = 0, restrictPosition = true) {
-	const limitAreaFn = restrictPosition ? limitArea : noOp;
-	const mediaBBoxSize = rotateSize$1(mediaSize.width, mediaSize.height, rotation);
-	const mediaNaturalBBoxSize = rotateSize$1(mediaSize.naturalWidth, mediaSize.naturalHeight, rotation);
-	const croppedAreaPercentages = {
-		x: limitAreaFn(100, ((mediaBBoxSize.width - cropSize.width / zoom) / 2 - crop.x / zoom) / mediaBBoxSize.width * 100),
-		y: limitAreaFn(100, ((mediaBBoxSize.height - cropSize.height / zoom) / 2 - crop.y / zoom) / mediaBBoxSize.height * 100),
-		width: limitAreaFn(100, cropSize.width / mediaBBoxSize.width * 100 / zoom),
-		height: limitAreaFn(100, cropSize.height / mediaBBoxSize.height * 100 / zoom)
-	};
-	const widthInPixels = Math.round(limitAreaFn(mediaNaturalBBoxSize.width, croppedAreaPercentages.width * mediaNaturalBBoxSize.width / 100));
-	const heightInPixels = Math.round(limitAreaFn(mediaNaturalBBoxSize.height, croppedAreaPercentages.height * mediaNaturalBBoxSize.height / 100));
-	const sizePixels = mediaNaturalBBoxSize.width >= mediaNaturalBBoxSize.height * aspect ? {
-		width: Math.round(heightInPixels * aspect),
-		height: heightInPixels
-	} : {
-		width: widthInPixels,
-		height: Math.round(widthInPixels / aspect)
-	};
-	return {
-		croppedAreaPercentages,
-		croppedAreaPixels: _objectSpread2$1(_objectSpread2$1({}, sizePixels), {}, {
-			x: Math.round(limitAreaFn(mediaNaturalBBoxSize.width - sizePixels.width, croppedAreaPercentages.x * mediaNaturalBBoxSize.width / 100)),
-			y: Math.round(limitAreaFn(mediaNaturalBBoxSize.height - sizePixels.height, croppedAreaPercentages.y * mediaNaturalBBoxSize.height / 100))
-		})
-	};
-}
-/**
-* Ensure the returned value is between 0 and max
-*/
-function limitArea(max, value) {
-	return Math.min(max, Math.max(0, value));
-}
-function noOp(_max, value) {
-	return value;
-}
-/**
-* Compute crop and zoom from the croppedAreaPercentages.
-*/
-function getInitialCropFromCroppedAreaPercentages(croppedAreaPercentages, mediaSize, rotation, cropSize, minZoom, maxZoom) {
-	const mediaBBoxSize = rotateSize$1(mediaSize.width, mediaSize.height, rotation);
-	const zoom = clamp(cropSize.width / mediaBBoxSize.width * (100 / croppedAreaPercentages.width), minZoom, maxZoom);
-	return {
-		crop: {
-			x: zoom * mediaBBoxSize.width / 2 - cropSize.width / 2 - mediaBBoxSize.width * zoom * (croppedAreaPercentages.x / 100),
-			y: zoom * mediaBBoxSize.height / 2 - cropSize.height / 2 - mediaBBoxSize.height * zoom * (croppedAreaPercentages.y / 100)
-		},
-		zoom
-	};
-}
-/**
-* Compute zoom from the croppedAreaPixels
-*/
-function getZoomFromCroppedAreaPixels(croppedAreaPixels, mediaSize, cropSize) {
-	const mediaZoom = getMediaZoom(mediaSize);
-	return cropSize.height > cropSize.width ? cropSize.height / (croppedAreaPixels.height * mediaZoom) : cropSize.width / (croppedAreaPixels.width * mediaZoom);
-}
-/**
-* Compute crop and zoom from the croppedAreaPixels
-*/
-function getInitialCropFromCroppedAreaPixels(croppedAreaPixels, mediaSize, rotation = 0, cropSize, minZoom, maxZoom) {
-	const mediaNaturalBBoxSize = rotateSize$1(mediaSize.naturalWidth, mediaSize.naturalHeight, rotation);
-	const zoom = clamp(getZoomFromCroppedAreaPixels(croppedAreaPixels, mediaSize, cropSize), minZoom, maxZoom);
-	const cropZoom = cropSize.height > cropSize.width ? cropSize.height / croppedAreaPixels.height : cropSize.width / croppedAreaPixels.width;
-	return {
-		crop: {
-			x: ((mediaNaturalBBoxSize.width - croppedAreaPixels.width) / 2 - croppedAreaPixels.x) * cropZoom,
-			y: ((mediaNaturalBBoxSize.height - croppedAreaPixels.height) / 2 - croppedAreaPixels.y) * cropZoom
-		},
-		zoom
-	};
-}
-/**
-* Return the point that is the center of point a and b
-*/
-function getCenter(a, b) {
-	return {
-		x: (b.x + a.x) / 2,
-		y: (b.y + a.y) / 2
-	};
-}
-function getRadianAngle$1(degreeValue) {
-	return degreeValue * Math.PI / 180;
-}
-/**
-* Returns the new bounding area of a rotated rectangle.
-*/
-function rotateSize$1(width, height, rotation) {
-	const rotRad = getRadianAngle$1(rotation);
-	return {
-		width: Math.abs(Math.cos(rotRad) * width) + Math.abs(Math.sin(rotRad) * height),
-		height: Math.abs(Math.sin(rotRad) * width) + Math.abs(Math.cos(rotRad) * height)
-	};
-}
-/**
-* Clamp value between min and max
-*/
-function clamp(value, min, max) {
-	return Math.min(Math.max(value, min), max);
-}
-/**
-* Combine multiple class names into a single string.
-*/
-function classNames(...args) {
-	return args.filter((value) => {
-		if (typeof value === "string" && value.length > 0) return true;
-		return false;
-	}).join(" ").trim();
-}
-//#endregion
-//#region src/styles.css?raw
-var styles_default = ".reactEasyCrop_Container {\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  overflow: hidden;\n  user-select: none;\n  touch-action: none;\n  cursor: move;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n}\n\n.reactEasyCrop_Image,\n.reactEasyCrop_Video {\n  will-change: transform; /* this improves performances and prevent painting issues on iOS Chrome */\n  max-width: unset; /* prevent global img/video reset rules from constraining the cropper media */\n}\n\n.reactEasyCrop_Contain {\n  max-width: 100%;\n  max-height: 100%;\n  margin: auto;\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  right: 0;\n}\n.reactEasyCrop_Cover_Horizontal {\n  width: 100%;\n  height: auto;\n}\n.reactEasyCrop_Cover_Vertical {\n  width: auto;\n  height: 100%;\n}\n\n.reactEasyCrop_CropArea {\n  position: absolute;\n  left: 50%;\n  top: 50%;\n  transform: translate(-50%, -50%);\n  border: 1px solid rgba(255, 255, 255, 0.5);\n  box-sizing: border-box;\n  box-shadow: 0 0 0 9999em;\n  color: rgba(0, 0, 0, 0.5);\n  overflow: hidden;\n}\n\n.reactEasyCrop_CropAreaRound {\n  border-radius: 50%;\n}\n\n.reactEasyCrop_CropAreaGrid::before {\n  content: ' ';\n  box-sizing: border-box;\n  position: absolute;\n  border: 1px solid rgba(255, 255, 255, 0.5);\n  top: 0;\n  bottom: 0;\n  left: 33.33%;\n  right: 33.33%;\n  border-top: 0;\n  border-bottom: 0;\n}\n\n.reactEasyCrop_CropAreaGrid::after {\n  content: ' ';\n  box-sizing: border-box;\n  position: absolute;\n  border: 1px solid rgba(255, 255, 255, 0.5);\n  top: 33.33%;\n  bottom: 33.33%;\n  left: 0;\n  right: 0;\n  border-left: 0;\n  border-right: 0;\n}\n";
-//#endregion
-//#region src/Cropper.tsx
-const MIN_ZOOM = 1;
-const MAX_ZOOM = 3;
-const KEYBOARD_STEP = 1;
-var Cropper$1 = class Cropper extends React.Component {
-	constructor(..._args) {
-		super(..._args);
-		this.cropperRef = React.createRef();
-		this.imageRef = React.createRef();
-		this.videoRef = React.createRef();
-		this.containerPosition = {
-			x: 0,
-			y: 0
-		};
-		this.containerRef = null;
-		this.styleRef = null;
-		this.containerRect = null;
-		this.mediaSize = {
-			width: 0,
-			height: 0,
-			naturalWidth: 0,
-			naturalHeight: 0
-		};
-		this.dragStartPosition = {
-			x: 0,
-			y: 0
-		};
-		this.dragStartCrop = {
-			x: 0,
-			y: 0
-		};
-		this.gestureZoomStart = 0;
-		this.gestureRotationStart = 0;
-		this.isTouching = false;
-		this.lastPinchDistance = 0;
-		this.lastPinchRotation = 0;
-		this.rafDragTimeout = null;
-		this.rafPinchTimeout = null;
-		this.wheelTimer = null;
-		this.currentDoc = typeof document !== "undefined" ? document : null;
-		this.currentWindow = typeof window !== "undefined" ? window : null;
-		this.resizeObserver = null;
-		this.previousCropSize = null;
-		this.isInitialized = false;
-		this.state = {
-			cropSize: null,
-			hasWheelJustStarted: false,
-			mediaObjectFit: void 0
-		};
-		this.initResizeObserver = () => {
-			if (typeof window.ResizeObserver === "undefined" || !this.containerRef) return;
-			let isFirstResize = true;
-			this.resizeObserver = new window.ResizeObserver((entries) => {
-				if (isFirstResize) {
-					isFirstResize = false;
-					return;
-				}
-				this.computeSizes();
-			});
-			this.resizeObserver.observe(this.containerRef);
-		};
-		this.preventZoomSafari = (e) => e.preventDefault();
-		this.cleanEvents = () => {
-			if (!this.currentDoc) return;
-			this.currentDoc.removeEventListener("mousemove", this.onMouseMove);
-			this.currentDoc.removeEventListener("mouseup", this.onDragStopped);
-			this.currentDoc.removeEventListener("touchmove", this.onTouchMove);
-			this.currentDoc.removeEventListener("touchend", this.onDragStopped);
-			this.currentDoc.removeEventListener("gesturechange", this.onGestureChange);
-			this.currentDoc.removeEventListener("gestureend", this.onGestureEnd);
-			this.currentDoc.removeEventListener("scroll", this.onScroll);
-		};
-		this.clearScrollEvent = () => {
-			if (this.containerRef) this.containerRef.removeEventListener("wheel", this.onWheel);
-			if (this.wheelTimer) clearTimeout(this.wheelTimer);
-		};
-		this.onMediaLoad = () => {
-			const cropSize = this.computeSizes();
-			if (cropSize) {
-				this.previousCropSize = cropSize;
-				this.emitCropData();
-				this.setInitialCrop(cropSize);
-				this.isInitialized = true;
-			}
-			if (this.props.onMediaLoaded) this.props.onMediaLoaded(this.mediaSize);
-		};
-		this.setInitialCrop = (cropSize) => {
-			if (this.props.initialCroppedAreaPercentages) {
-				const { crop, zoom } = getInitialCropFromCroppedAreaPercentages(this.props.initialCroppedAreaPercentages, this.mediaSize, this.props.rotation, cropSize, this.props.minZoom, this.props.maxZoom);
-				this.props.onCropChange(crop);
-				this.props.onZoomChange && this.props.onZoomChange(zoom);
-			} else if (this.props.initialCroppedAreaPixels) {
-				const { crop, zoom } = getInitialCropFromCroppedAreaPixels(this.props.initialCroppedAreaPixels, this.mediaSize, this.props.rotation, cropSize, this.props.minZoom, this.props.maxZoom);
-				this.props.onCropChange(crop);
-				this.props.onZoomChange && this.props.onZoomChange(zoom);
-			}
-		};
-		this.computeSizes = () => {
-			const mediaRef = this.imageRef.current || this.videoRef.current;
-			if (mediaRef && this.containerRef) {
-				var _this$imageRef$curren, _this$videoRef$curren, _this$imageRef$curren2, _this$videoRef$curren2, _this$state$cropSize, _this$state$cropSize2;
-				this.containerRect = this.containerRef.getBoundingClientRect();
-				this.saveContainerPosition();
-				const containerAspect = this.containerRect.width / this.containerRect.height;
-				const naturalWidth = ((_this$imageRef$curren = this.imageRef.current) === null || _this$imageRef$curren === void 0 ? void 0 : _this$imageRef$curren.naturalWidth) || ((_this$videoRef$curren = this.videoRef.current) === null || _this$videoRef$curren === void 0 ? void 0 : _this$videoRef$curren.videoWidth) || 0;
-				const naturalHeight = ((_this$imageRef$curren2 = this.imageRef.current) === null || _this$imageRef$curren2 === void 0 ? void 0 : _this$imageRef$curren2.naturalHeight) || ((_this$videoRef$curren2 = this.videoRef.current) === null || _this$videoRef$curren2 === void 0 ? void 0 : _this$videoRef$curren2.videoHeight) || 0;
-				const isMediaScaledDown = mediaRef.offsetWidth < naturalWidth || mediaRef.offsetHeight < naturalHeight;
-				const mediaAspect = naturalWidth / naturalHeight;
-				let renderedMediaSize;
-				if (isMediaScaledDown) switch (this.state.mediaObjectFit) {
-					default:
-					case "contain":
-						renderedMediaSize = containerAspect > mediaAspect ? {
-							width: this.containerRect.height * mediaAspect,
-							height: this.containerRect.height
-						} : {
-							width: this.containerRect.width,
-							height: this.containerRect.width / mediaAspect
-						};
-						break;
-					case "horizontal-cover":
-						renderedMediaSize = {
-							width: this.containerRect.width,
-							height: this.containerRect.width / mediaAspect
-						};
-						break;
-					case "vertical-cover":
-						renderedMediaSize = {
-							width: this.containerRect.height * mediaAspect,
-							height: this.containerRect.height
-						};
-						break;
-				}
-				else renderedMediaSize = {
-					width: mediaRef.offsetWidth,
-					height: mediaRef.offsetHeight
-				};
-				this.mediaSize = _objectSpread2$1(_objectSpread2$1({}, renderedMediaSize), {}, {
-					naturalWidth,
-					naturalHeight
-				});
-				if (this.props.setMediaSize) this.props.setMediaSize(this.mediaSize);
-				const cropSize = this.props.cropSize ? this.props.cropSize : getCropSize(this.mediaSize.width, this.mediaSize.height, this.containerRect.width, this.containerRect.height, this.props.aspect, this.props.rotation);
-				if (((_this$state$cropSize = this.state.cropSize) === null || _this$state$cropSize === void 0 ? void 0 : _this$state$cropSize.height) !== cropSize.height || ((_this$state$cropSize2 = this.state.cropSize) === null || _this$state$cropSize2 === void 0 ? void 0 : _this$state$cropSize2.width) !== cropSize.width) this.props.onCropSizeChange && this.props.onCropSizeChange(cropSize);
-				this.setState({ cropSize }, this.recomputeCropPosition);
-				if (this.props.setCropSize) this.props.setCropSize(cropSize);
-				return cropSize;
-			}
-		};
-		this.saveContainerPosition = () => {
-			if (this.containerRef) {
-				const bounds = this.containerRef.getBoundingClientRect();
-				this.containerPosition = {
-					x: bounds.left,
-					y: bounds.top
-				};
-			}
-		};
-		this.onMouseDown = (e) => {
-			if (!this.currentDoc) return;
-			e.preventDefault();
-			this.currentDoc.addEventListener("mousemove", this.onMouseMove);
-			this.currentDoc.addEventListener("mouseup", this.onDragStopped);
-			this.saveContainerPosition();
-			this.onDragStart(Cropper.getMousePoint(e));
-		};
-		this.onMouseMove = (e) => this.onDrag(Cropper.getMousePoint(e));
-		this.onScroll = (e) => {
-			if (!this.currentDoc) return;
-			e.preventDefault();
-			this.saveContainerPosition();
-		};
-		this.onTouchStart = (e) => {
-			if (!this.currentDoc) return;
-			this.isTouching = true;
-			if (this.props.onTouchRequest && !this.props.onTouchRequest(e)) return;
-			this.currentDoc.addEventListener("touchmove", this.onTouchMove, { passive: false });
-			this.currentDoc.addEventListener("touchend", this.onDragStopped);
-			this.saveContainerPosition();
-			if (e.touches.length === 2) this.onPinchStart(e);
-			else if (e.touches.length === 1) this.onDragStart(Cropper.getTouchPoint(e.touches[0]));
-		};
-		this.onTouchMove = (e) => {
-			e.preventDefault();
-			if (e.touches.length === 2) this.onPinchMove(e);
-			else if (e.touches.length === 1) this.onDrag(Cropper.getTouchPoint(e.touches[0]));
-		};
-		this.onGestureStart = (e) => {
-			if (!this.currentDoc) return;
-			e.preventDefault();
-			this.currentDoc.addEventListener("gesturechange", this.onGestureChange);
-			this.currentDoc.addEventListener("gestureend", this.onGestureEnd);
-			this.gestureZoomStart = this.props.zoom;
-			this.gestureRotationStart = this.props.rotation;
-		};
-		this.onGestureChange = (e) => {
-			e.preventDefault();
-			if (this.isTouching) return;
-			const point = Cropper.getMousePoint(e);
-			const newZoom = this.gestureZoomStart - 1 + e.scale;
-			this.setNewZoom(newZoom, point, { shouldUpdatePosition: true });
-			if (this.props.onRotationChange) {
-				const newRotation = this.gestureRotationStart + e.rotation;
-				this.props.onRotationChange(newRotation);
-			}
-		};
-		this.onGestureEnd = (e) => {
-			this.cleanEvents();
-		};
-		this.onDragStart = ({ x, y }) => {
-			var _this$props$onInterac, _this$props;
-			this.dragStartPosition = {
-				x,
-				y
-			};
-			this.dragStartCrop = _objectSpread2$1({}, this.props.crop);
-			(_this$props$onInterac = (_this$props = this.props).onInteractionStart) === null || _this$props$onInterac === void 0 || _this$props$onInterac.call(_this$props);
-		};
-		this.onDrag = ({ x, y }) => {
-			if (!this.currentWindow) return;
-			if (this.rafDragTimeout) this.currentWindow.cancelAnimationFrame(this.rafDragTimeout);
-			this.rafDragTimeout = this.currentWindow.requestAnimationFrame(() => {
-				if (!this.state.cropSize) return;
-				if (x === void 0 || y === void 0) return;
-				const offsetX = x - this.dragStartPosition.x;
-				const offsetY = y - this.dragStartPosition.y;
-				const requestedPosition = {
-					x: this.dragStartCrop.x + offsetX,
-					y: this.dragStartCrop.y + offsetY
-				};
-				const newPosition = this.props.restrictPosition ? restrictPosition(requestedPosition, this.mediaSize, this.state.cropSize, this.props.zoom, this.props.rotation) : requestedPosition;
-				this.props.onCropChange(newPosition);
-			});
-		};
-		this.onDragStopped = () => {
-			var _this$props$onInterac2, _this$props2;
-			this.isTouching = false;
-			this.cleanEvents();
-			this.emitCropData();
-			(_this$props$onInterac2 = (_this$props2 = this.props).onInteractionEnd) === null || _this$props$onInterac2 === void 0 || _this$props$onInterac2.call(_this$props2);
-		};
-		this.onWheel = (e) => {
-			if (!this.currentWindow) return;
-			if (this.props.onWheelRequest && !this.props.onWheelRequest(e)) return;
-			e.preventDefault();
-			const point = Cropper.getMousePoint(e);
-			const { pixelY } = normalizeWheel(e);
-			const newZoom = this.props.zoom - pixelY * this.props.zoomSpeed / 200;
-			this.setNewZoom(newZoom, point, { shouldUpdatePosition: true });
-			if (!this.state.hasWheelJustStarted) this.setState({ hasWheelJustStarted: true }, () => {
-				var _this$props$onInterac3, _this$props3;
-				return (_this$props$onInterac3 = (_this$props3 = this.props).onInteractionStart) === null || _this$props$onInterac3 === void 0 ? void 0 : _this$props$onInterac3.call(_this$props3);
-			});
-			if (this.wheelTimer) clearTimeout(this.wheelTimer);
-			this.wheelTimer = this.currentWindow.setTimeout(() => this.setState({ hasWheelJustStarted: false }, () => {
-				var _this$props$onInterac4, _this$props4;
-				return (_this$props$onInterac4 = (_this$props4 = this.props).onInteractionEnd) === null || _this$props$onInterac4 === void 0 ? void 0 : _this$props$onInterac4.call(_this$props4);
-			}), 250);
-		};
-		this.getPointOnContainer = ({ x, y }, containerTopLeft) => {
-			if (!this.containerRect) throw new Error("The Cropper is not mounted");
-			return {
-				x: this.containerRect.width / 2 - (x - containerTopLeft.x),
-				y: this.containerRect.height / 2 - (y - containerTopLeft.y)
-			};
-		};
-		this.getPointOnMedia = ({ x, y }) => {
-			const { crop, zoom } = this.props;
-			return {
-				x: (x + crop.x) / zoom,
-				y: (y + crop.y) / zoom
-			};
-		};
-		this.setNewZoom = (zoom, point, { shouldUpdatePosition = true } = {}) => {
-			if (!this.state.cropSize || !this.props.onZoomChange) return;
-			const newZoom = clamp(zoom, this.props.minZoom, this.props.maxZoom);
-			if (shouldUpdatePosition) {
-				const zoomPoint = this.getPointOnContainer(point, this.containerPosition);
-				const zoomTarget = this.getPointOnMedia(zoomPoint);
-				const requestedPosition = {
-					x: zoomTarget.x * newZoom - zoomPoint.x,
-					y: zoomTarget.y * newZoom - zoomPoint.y
-				};
-				const newPosition = this.props.restrictPosition ? restrictPosition(requestedPosition, this.mediaSize, this.state.cropSize, newZoom, this.props.rotation) : requestedPosition;
-				this.props.onCropChange(newPosition);
-			}
-			this.props.onZoomChange(newZoom);
-		};
-		this.getCropData = () => {
-			if (!this.state.cropSize) return null;
-			return computeCroppedArea(this.props.restrictPosition ? restrictPosition(this.props.crop, this.mediaSize, this.state.cropSize, this.props.zoom, this.props.rotation) : this.props.crop, this.mediaSize, this.state.cropSize, this.getAspect(), this.props.zoom, this.props.rotation, this.props.restrictPosition);
-		};
-		this.emitCropData = () => {
-			const cropData = this.getCropData();
-			if (!cropData) return;
-			const { croppedAreaPercentages, croppedAreaPixels } = cropData;
-			if (this.props.onCropComplete) this.props.onCropComplete(croppedAreaPercentages, croppedAreaPixels);
-			if (this.props.onCropAreaChange) this.props.onCropAreaChange(croppedAreaPercentages, croppedAreaPixels);
-		};
-		this.emitCropAreaChange = () => {
-			const cropData = this.getCropData();
-			if (!cropData) return;
-			const { croppedAreaPercentages, croppedAreaPixels } = cropData;
-			if (this.props.onCropAreaChange) this.props.onCropAreaChange(croppedAreaPercentages, croppedAreaPixels);
-		};
-		this.recomputeCropPosition = () => {
-			var _this$previousCropSiz, _this$previousCropSiz2;
-			if (!this.state.cropSize) return;
-			let adjustedCrop = this.props.crop;
-			if (this.isInitialized && ((_this$previousCropSiz = this.previousCropSize) === null || _this$previousCropSiz === void 0 ? void 0 : _this$previousCropSiz.width) && ((_this$previousCropSiz2 = this.previousCropSize) === null || _this$previousCropSiz2 === void 0 ? void 0 : _this$previousCropSiz2.height)) {
-				if (Math.abs(this.previousCropSize.width - this.state.cropSize.width) > 1e-6 || Math.abs(this.previousCropSize.height - this.state.cropSize.height) > 1e-6) {
-					const scaleX = this.state.cropSize.width / this.previousCropSize.width;
-					const scaleY = this.state.cropSize.height / this.previousCropSize.height;
-					adjustedCrop = {
-						x: this.props.crop.x * scaleX,
-						y: this.props.crop.y * scaleY
-					};
-				}
-			}
-			const newPosition = this.props.restrictPosition ? restrictPosition(adjustedCrop, this.mediaSize, this.state.cropSize, this.props.zoom, this.props.rotation) : adjustedCrop;
-			this.previousCropSize = this.state.cropSize;
-			this.props.onCropChange(newPosition);
-			this.emitCropData();
-		};
-		this.onKeyDown = (event) => {
-			const { crop, onCropChange, keyboardStep, zoom, rotation } = this.props;
-			let step = keyboardStep;
-			if (!this.state.cropSize) return;
-			if (event.shiftKey) step *= .2;
-			let newCrop = _objectSpread2$1({}, crop);
-			switch (event.key) {
-				case "ArrowUp":
-					newCrop.y -= step;
-					event.preventDefault();
-					break;
-				case "ArrowDown":
-					newCrop.y += step;
-					event.preventDefault();
-					break;
-				case "ArrowLeft":
-					newCrop.x -= step;
-					event.preventDefault();
-					break;
-				case "ArrowRight":
-					newCrop.x += step;
-					event.preventDefault();
-					break;
-				default: return;
-			}
-			if (this.props.restrictPosition) newCrop = restrictPosition(newCrop, this.mediaSize, this.state.cropSize, zoom, rotation);
-			if (!event.repeat) {
-				var _this$props$onInterac5, _this$props5;
-				(_this$props$onInterac5 = (_this$props5 = this.props).onInteractionStart) === null || _this$props$onInterac5 === void 0 || _this$props$onInterac5.call(_this$props5);
-			}
-			onCropChange(newCrop);
-		};
-		this.onKeyUp = (event) => {
-			var _this$props$onInterac6, _this$props6;
-			switch (event.key) {
-				case "ArrowUp":
-				case "ArrowDown":
-				case "ArrowLeft":
-				case "ArrowRight":
-					event.preventDefault();
-					break;
-				default: return;
-			}
-			this.emitCropData();
-			(_this$props$onInterac6 = (_this$props6 = this.props).onInteractionEnd) === null || _this$props$onInterac6 === void 0 || _this$props$onInterac6.call(_this$props6);
-		};
-	}
-	componentDidMount() {
-		if (!this.currentDoc || !this.currentWindow) return;
-		if (this.containerRef) {
-			if (this.containerRef.ownerDocument) this.currentDoc = this.containerRef.ownerDocument;
-			if (this.currentDoc.defaultView) this.currentWindow = this.currentDoc.defaultView;
-			this.initResizeObserver();
-			if (typeof window.ResizeObserver === "undefined") this.currentWindow.addEventListener("resize", this.computeSizes);
-			this.props.zoomWithScroll && this.containerRef.addEventListener("wheel", this.onWheel, { passive: false });
-			this.containerRef.addEventListener("gesturestart", this.onGestureStart);
-		}
-		this.currentDoc.addEventListener("scroll", this.onScroll);
-		if (!this.props.disableAutomaticStylesInjection) {
-			this.styleRef = this.currentDoc.createElement("style");
-			this.styleRef.setAttribute("type", "text/css");
-			if (this.props.nonce) this.styleRef.setAttribute("nonce", this.props.nonce);
-			this.styleRef.innerHTML = styles_default;
-			this.currentDoc.head.appendChild(this.styleRef);
-		}
-		if (this.imageRef.current && this.imageRef.current.complete) this.onMediaLoad();
-		if (this.props.setImageRef) this.props.setImageRef(this.imageRef);
-		if (this.props.setVideoRef) this.props.setVideoRef(this.videoRef);
-		if (this.props.setCropperRef) this.props.setCropperRef(this.cropperRef);
-	}
-	componentWillUnmount() {
-		var _this$resizeObserver;
-		if (!this.currentDoc || !this.currentWindow) return;
-		if (typeof window.ResizeObserver === "undefined") this.currentWindow.removeEventListener("resize", this.computeSizes);
-		(_this$resizeObserver = this.resizeObserver) === null || _this$resizeObserver === void 0 || _this$resizeObserver.disconnect();
-		if (this.containerRef) this.containerRef.removeEventListener("gesturestart", this.preventZoomSafari);
-		if (this.styleRef) {
-			var _this$styleRef$parent;
-			(_this$styleRef$parent = this.styleRef.parentNode) === null || _this$styleRef$parent === void 0 || _this$styleRef$parent.removeChild(this.styleRef);
-		}
-		this.cleanEvents();
-		this.props.zoomWithScroll && this.clearScrollEvent();
-	}
-	componentDidUpdate(prevProps) {
-		var _prevProps$cropSize, _this$props$cropSize, _prevProps$cropSize2, _this$props$cropSize2, _prevProps$crop, _this$props$crop, _prevProps$crop2, _this$props$crop2;
-		if (prevProps.rotation !== this.props.rotation) {
-			this.computeSizes();
-			this.recomputeCropPosition();
-		} else if (prevProps.aspect !== this.props.aspect) this.computeSizes();
-		else if (prevProps.objectFit !== this.props.objectFit) this.computeSizes();
-		else if (prevProps.zoom !== this.props.zoom) this.recomputeCropPosition();
-		else if (((_prevProps$cropSize = prevProps.cropSize) === null || _prevProps$cropSize === void 0 ? void 0 : _prevProps$cropSize.height) !== ((_this$props$cropSize = this.props.cropSize) === null || _this$props$cropSize === void 0 ? void 0 : _this$props$cropSize.height) || ((_prevProps$cropSize2 = prevProps.cropSize) === null || _prevProps$cropSize2 === void 0 ? void 0 : _prevProps$cropSize2.width) !== ((_this$props$cropSize2 = this.props.cropSize) === null || _this$props$cropSize2 === void 0 ? void 0 : _this$props$cropSize2.width)) this.computeSizes();
-		else if (((_prevProps$crop = prevProps.crop) === null || _prevProps$crop === void 0 ? void 0 : _prevProps$crop.x) !== ((_this$props$crop = this.props.crop) === null || _this$props$crop === void 0 ? void 0 : _this$props$crop.x) || ((_prevProps$crop2 = prevProps.crop) === null || _prevProps$crop2 === void 0 ? void 0 : _prevProps$crop2.y) !== ((_this$props$crop2 = this.props.crop) === null || _this$props$crop2 === void 0 ? void 0 : _this$props$crop2.y)) this.emitCropAreaChange();
-		if (prevProps.zoomWithScroll !== this.props.zoomWithScroll && this.containerRef) this.props.zoomWithScroll ? this.containerRef.addEventListener("wheel", this.onWheel, { passive: false }) : this.clearScrollEvent();
-		if (prevProps.video !== this.props.video) {
-			var _this$videoRef$curren3;
-			(_this$videoRef$curren3 = this.videoRef.current) === null || _this$videoRef$curren3 === void 0 || _this$videoRef$curren3.load();
-		}
-		const objectFit = this.getObjectFit();
-		if (objectFit !== this.state.mediaObjectFit) this.setState({ mediaObjectFit: objectFit }, this.computeSizes);
-	}
-	getAspect() {
-		const { cropSize, aspect } = this.props;
-		if (cropSize) return cropSize.width / cropSize.height;
-		return aspect;
-	}
-	getObjectFit() {
-		if (this.props.objectFit === "cover") {
-			if ((this.imageRef.current || this.videoRef.current) && this.containerRef) {
-				var _this$imageRef$curren3, _this$videoRef$curren4, _this$imageRef$curren4, _this$videoRef$curren5;
-				this.containerRect = this.containerRef.getBoundingClientRect();
-				const containerAspect = this.containerRect.width / this.containerRect.height;
-				return (((_this$imageRef$curren3 = this.imageRef.current) === null || _this$imageRef$curren3 === void 0 ? void 0 : _this$imageRef$curren3.naturalWidth) || ((_this$videoRef$curren4 = this.videoRef.current) === null || _this$videoRef$curren4 === void 0 ? void 0 : _this$videoRef$curren4.videoWidth) || 0) / (((_this$imageRef$curren4 = this.imageRef.current) === null || _this$imageRef$curren4 === void 0 ? void 0 : _this$imageRef$curren4.naturalHeight) || ((_this$videoRef$curren5 = this.videoRef.current) === null || _this$videoRef$curren5 === void 0 ? void 0 : _this$videoRef$curren5.videoHeight) || 0) < containerAspect ? "horizontal-cover" : "vertical-cover";
-			}
-			return "horizontal-cover";
-		}
-		return this.props.objectFit;
-	}
-	onPinchStart(e) {
-		const pointA = Cropper.getTouchPoint(e.touches[0]);
-		const pointB = Cropper.getTouchPoint(e.touches[1]);
-		this.lastPinchDistance = getDistanceBetweenPoints(pointA, pointB);
-		this.lastPinchRotation = getRotationBetweenPoints(pointA, pointB);
-		this.onDragStart(getCenter(pointA, pointB));
-	}
-	onPinchMove(e) {
-		if (!this.currentDoc || !this.currentWindow) return;
-		const pointA = Cropper.getTouchPoint(e.touches[0]);
-		const pointB = Cropper.getTouchPoint(e.touches[1]);
-		const center = getCenter(pointA, pointB);
-		this.onDrag(center);
-		if (this.rafPinchTimeout) this.currentWindow.cancelAnimationFrame(this.rafPinchTimeout);
-		this.rafPinchTimeout = this.currentWindow.requestAnimationFrame(() => {
-			const distance = getDistanceBetweenPoints(pointA, pointB);
-			const newZoom = this.props.zoom * (distance / this.lastPinchDistance);
-			this.setNewZoom(newZoom, center, { shouldUpdatePosition: false });
-			this.lastPinchDistance = distance;
-			const rotation = getRotationBetweenPoints(pointA, pointB);
-			const newRotation = this.props.rotation + (rotation - this.lastPinchRotation);
-			this.props.onRotationChange && this.props.onRotationChange(newRotation);
-			this.lastPinchRotation = rotation;
-		});
-	}
-	render() {
-		var _this$state$mediaObje;
-		const { image, video, mediaProps, cropperProps, transform, crop: { x, y }, rotation, zoom, cropShape, showGrid, roundCropAreaPixels, style: { containerStyle, cropAreaStyle, mediaStyle }, classes: { containerClassName, cropAreaClassName, mediaClassName } } = this.props;
-		const objectFit = (_this$state$mediaObje = this.state.mediaObjectFit) !== null && _this$state$mediaObje !== void 0 ? _this$state$mediaObje : this.getObjectFit();
-		return /* @__PURE__ */ React.createElement("div", {
-			onMouseDown: this.onMouseDown,
-			onTouchStart: this.onTouchStart,
-			ref: (el) => this.containerRef = el,
-			"data-testid": "container",
-			style: containerStyle,
-			className: classNames("reactEasyCrop_Container", containerClassName)
-		}, image ? /* @__PURE__ */ React.createElement("img", _objectSpread2$1(_objectSpread2$1({
-			alt: "",
-			className: classNames("reactEasyCrop_Image", objectFit === "contain" && "reactEasyCrop_Contain", objectFit === "horizontal-cover" && "reactEasyCrop_Cover_Horizontal", objectFit === "vertical-cover" && "reactEasyCrop_Cover_Vertical", mediaClassName)
-		}, mediaProps), {}, {
-			src: image,
-			ref: this.imageRef,
-			style: _objectSpread2$1(_objectSpread2$1({}, mediaStyle), {}, { transform: transform || `translate(${x}px, ${y}px) rotate(${rotation}deg) scale(${zoom})` }),
-			onLoad: this.onMediaLoad
-		})) : video && /* @__PURE__ */ React.createElement("video", _objectSpread2$1(_objectSpread2$1({
-			autoPlay: true,
-			playsInline: true,
-			loop: true,
-			muted: true,
-			className: classNames("reactEasyCrop_Video", objectFit === "contain" && "reactEasyCrop_Contain", objectFit === "horizontal-cover" && "reactEasyCrop_Cover_Horizontal", objectFit === "vertical-cover" && "reactEasyCrop_Cover_Vertical", mediaClassName)
-		}, mediaProps), {}, {
-			ref: this.videoRef,
-			onLoadedMetadata: this.onMediaLoad,
-			style: _objectSpread2$1(_objectSpread2$1({}, mediaStyle), {}, { transform: transform || `translate(${x}px, ${y}px) rotate(${rotation}deg) scale(${zoom})` }),
-			controls: false
-		}), (Array.isArray(video) ? video : [{ src: video }]).map((item) => /* @__PURE__ */ React.createElement("source", _objectSpread2$1({ key: item.src }, item)))), this.state.cropSize && /* @__PURE__ */ React.createElement("div", _objectSpread2$1({
-			ref: this.cropperRef,
-			style: _objectSpread2$1(_objectSpread2$1({}, cropAreaStyle), {}, {
-				width: roundCropAreaPixels ? Math.round(this.state.cropSize.width) : this.state.cropSize.width,
-				height: roundCropAreaPixels ? Math.round(this.state.cropSize.height) : this.state.cropSize.height
-			}),
-			tabIndex: 0,
-			onKeyDown: this.onKeyDown,
-			onKeyUp: this.onKeyUp,
-			"data-testid": "cropper",
-			className: classNames("reactEasyCrop_CropArea", cropShape === "round" && "reactEasyCrop_CropAreaRound", showGrid && "reactEasyCrop_CropAreaGrid", cropAreaClassName)
-		}, cropperProps)));
-	}
-};
-Cropper$1.defaultProps = {
-	zoom: 1,
-	rotation: 0,
-	aspect: 4 / 3,
-	maxZoom: MAX_ZOOM,
-	minZoom: MIN_ZOOM,
-	cropShape: "rect",
-	objectFit: "contain",
-	showGrid: true,
-	style: {},
-	classes: {},
-	mediaProps: {},
-	cropperProps: {},
-	zoomSpeed: 1,
-	restrictPosition: true,
-	zoomWithScroll: true,
-	keyboardStep: KEYBOARD_STEP
-};
-Cropper$1.getMousePoint = (e) => ({
-	x: Number(e.clientX),
-	y: Number(e.clientY)
-});
-Cropper$1.getTouchPoint = (touch) => ({
-	x: Number(touch.clientX),
-	y: Number(touch.clientY)
-});
-//#endregion
-//#region src/index.ts
-var src_default = Cropper$1;
 
 /*!
 
@@ -44583,14 +43208,70 @@ function pica(options) {
 /*
  * Copyright (C) 2007-2026 Crafter Software Corporation. All Rights Reserved.
  */
+var EMPTY_DRAW_STATE = { strokes: [], texts: [] };
+var DEFAULT_TEXT_FONT_FAMILY = 'system-ui, sans-serif';
+var DEFAULT_TEXT_FONT_SIZE = 32;
+var TEXT_FONT_OPTIONS = [
+    { label: 'System', value: 'system-ui, sans-serif' },
+    { label: 'Arial', value: 'Arial, sans-serif' },
+    { label: 'Helvetica', value: 'Helvetica, Arial, sans-serif' },
+    { label: 'Georgia', value: 'Georgia, serif' },
+    { label: 'Times New Roman', value: '"Times New Roman", Times, serif' },
+    { label: 'Courier New', value: '"Courier New", Courier, monospace' },
+    { label: 'Impact', value: 'Impact, sans-serif' },
+    { label: 'Comic Sans', value: '"Comic Sans MS", cursive' },
+    { label: 'Verdana', value: 'Verdana, sans-serif' },
+    { label: 'Trebuchet', value: '"Trebuchet MS", sans-serif' }
+];
+var DEFAULT_OUTPUT_BACKGROUND = {
+    mode: 'transparent',
+    color: '#ffffff'
+};
+var OUTPUT_BACKGROUND_SWATCHES = [
+    '#ffffff',
+    '#000000',
+    '#f5f5f5',
+    '#e0e0e0',
+    '#ff3b30',
+    '#007aff',
+    '#34c759',
+    '#ffcc00'
+];
 var DEFAULT_ADJUSTMENTS = {
     brightness: 100,
     contrast: 100,
     saturation: 100,
     rotation: 0,
     flipHorizontal: false,
-    flipVertical: false
+    flipVertical: false,
+    hueRotate: 0,
+    sepia: 0,
+    grayscale: 0,
+    blur: 0,
+    vignette: 0,
+    tintColor: '',
+    tintStrength: 0
 };
+function buildCssFilter(adjustments) {
+    var parts = [
+        "brightness(".concat(adjustments.brightness, "%)"),
+        "contrast(".concat(adjustments.contrast, "%)"),
+        "saturate(".concat(adjustments.saturation, "%)")
+    ];
+    if (adjustments.hueRotate) {
+        parts.push("hue-rotate(".concat(adjustments.hueRotate, "deg)"));
+    }
+    if (adjustments.sepia) {
+        parts.push("sepia(".concat(adjustments.sepia, "%)"));
+    }
+    if (adjustments.grayscale) {
+        parts.push("grayscale(".concat(adjustments.grayscale, "%)"));
+    }
+    if (adjustments.blur) {
+        parts.push("blur(".concat(adjustments.blur, "px)"));
+    }
+    return parts.join(' ');
+}
 function blobToDataUrl(blob) {
     return new Promise(function (resolve, reject) {
         var reader = new FileReader();
@@ -44667,12 +43348,165 @@ function rotateSize(width, height, rotation) {
         height: Math.abs(Math.sin(rotRad) * width) + Math.abs(Math.cos(rotRad) * height)
     };
 }
-/** Apply rotation / flip transforms before cropping (react-easy-crop pattern). */
+function applyTint(ctx, width, height, adjustments) {
+    if (!adjustments.tintStrength || !adjustments.tintColor) {
+        return;
+    }
+    ctx.save();
+    ctx.globalAlpha = adjustments.tintStrength / 100;
+    ctx.globalCompositeOperation = 'multiply';
+    ctx.fillStyle = adjustments.tintColor;
+    ctx.fillRect(0, 0, width, height);
+    ctx.restore();
+}
+/** Apply a vignette (darkened edges) effect to the canvas. */
+function applyVignette(ctx, width, height, strength) {
+    if (!strength) {
+        return;
+    }
+    var cx = width / 2;
+    var cy = height / 2;
+    var radius = Math.max(width, height) * 0.65;
+    var gradient = ctx.createRadialGradient(cx, cy, radius * 0.2, cx, cy, radius);
+    gradient.addColorStop(0, 'rgba(0,0,0,0)');
+    gradient.addColorStop(1, "rgba(0,0,0,".concat((strength / 100) * 0.65, ")"));
+    ctx.save();
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, width, height);
+    ctx.restore();
+}
+function applyDrawLayer(ctx, pixelCrop, sourceWidth, sourceHeight, drawState) {
+    if (!drawState || (!drawState.strokes.length && !drawState.texts.length)) {
+        return;
+    }
+    var toLocal = function (p) { return ({
+        x: p.x - pixelCrop.x,
+        y: p.y - pixelCrop.y
+    }); };
+    for (var _i = 0, _a = drawState.strokes; _i < _a.length; _i++) {
+        var stroke = _a[_i];
+        if (!stroke.points.length) {
+            continue;
+        }
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.lineWidth = stroke.size;
+        if (stroke.tool === 'eraser') {
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.strokeStyle = 'rgba(0,0,0,1)';
+        }
+        else {
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.strokeStyle = stroke.color;
+        }
+        if (stroke.tool === 'line' && stroke.points.length >= 2) {
+            var start = toLocal(stroke.points[0]);
+            var end = toLocal(stroke.points[stroke.points.length - 1]);
+            ctx.beginPath();
+            ctx.moveTo(start.x, start.y);
+            ctx.lineTo(end.x, end.y);
+            ctx.stroke();
+            continue;
+        }
+        if (stroke.tool === 'fillRect' && stroke.points.length >= 2) {
+            var a = toLocal(stroke.points[0]);
+            var b = toLocal(stroke.points[stroke.points.length - 1]);
+            var x = Math.min(a.x, b.x);
+            var y = Math.min(a.y, b.y);
+            var w = Math.abs(b.x - a.x);
+            var h = Math.abs(b.y - a.y);
+            ctx.fillStyle = stroke.color;
+            ctx.fillRect(x, y, w, h);
+            continue;
+        }
+        if (stroke.tool === 'fillEllipse' && stroke.points.length >= 2) {
+            var a = toLocal(stroke.points[0]);
+            var b = toLocal(stroke.points[stroke.points.length - 1]);
+            var x = Math.min(a.x, b.x);
+            var y = Math.min(a.y, b.y);
+            var w = Math.abs(b.x - a.x);
+            var h = Math.abs(b.y - a.y);
+            ctx.fillStyle = stroke.color;
+            ctx.beginPath();
+            ctx.ellipse(x + w / 2, y + h / 2, w / 2, h / 2, 0, 0, Math.PI * 2);
+            ctx.fill();
+            continue;
+        }
+        ctx.beginPath();
+        stroke.points.forEach(function (point, index) {
+            var local = toLocal(point);
+            if (index === 0) {
+                ctx.moveTo(local.x, local.y);
+            }
+            else {
+                ctx.lineTo(local.x, local.y);
+            }
+        });
+        ctx.stroke();
+    }
+    ctx.globalCompositeOperation = 'source-over';
+    for (var _b = 0, _c = drawState.texts; _b < _c.length; _b++) {
+        var text = _c[_b];
+        var pos = toLocal({ x: text.x, y: text.y });
+        ctx.fillStyle = text.color;
+        ctx.font = "".concat(text.fontSize, "px ").concat(text.fontFamily);
+        ctx.textBaseline = 'top';
+        ctx.fillText(text.text, pos.x, pos.y);
+    }
+}
+function composeToOutputSize(sourceCanvas, outputWidth, outputHeight, background, mimeType) {
+    return __awaiter(this, void 0, void 0, function () {
+        var srcW, srcH, scale, drawW, drawH, contentCanvas, scaled, pica_1, final, ctx, useTransparent, x, y;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    srcW = sourceCanvas.width;
+                    srcH = sourceCanvas.height;
+                    scale = Math.min(outputWidth / srcW, outputHeight / srcH);
+                    drawW = Math.max(1, Math.round(srcW * scale));
+                    drawH = Math.max(1, Math.round(srcH * scale));
+                    contentCanvas = sourceCanvas;
+                    if (!(drawW !== srcW || drawH !== srcH)) return [3 /*break*/, 2];
+                    scaled = document.createElement('canvas');
+                    scaled.width = drawW;
+                    scaled.height = drawH;
+                    pica_1 = pica({ features: ['js', 'wasm'] });
+                    return [4 /*yield*/, pica_1.resize(sourceCanvas, scaled, { quality: 3 })];
+                case 1:
+                    _a.sent();
+                    contentCanvas = scaled;
+                    _a.label = 2;
+                case 2:
+                    final = document.createElement('canvas');
+                    final.width = outputWidth;
+                    final.height = outputHeight;
+                    ctx = final.getContext('2d');
+                    if (!ctx) {
+                        throw new Error('Canvas not supported');
+                    }
+                    useTransparent = background.mode === 'transparent' && mimeType !== 'image/jpeg';
+                    if (useTransparent) {
+                        ctx.clearRect(0, 0, outputWidth, outputHeight);
+                    }
+                    else {
+                        ctx.fillStyle = background.mode === 'color' ? background.color : '#ffffff';
+                        ctx.fillRect(0, 0, outputWidth, outputHeight);
+                    }
+                    x = (outputWidth - drawW) / 2;
+                    y = (outputHeight - drawH) / 2;
+                    ctx.drawImage(contentCanvas, x, y, drawW, drawH);
+                    return [2 /*return*/, final];
+            }
+        });
+    });
+}
 function getCroppedImageBlob(imageSrc_1, pixelCrop_1, adjustments_1, outputWidth_1, outputHeight_1) {
-    return __awaiter(this, arguments, void 0, function (imageSrc, pixelCrop, adjustments, outputWidth, outputHeight, mimeType, quality) {
-        var image, canvas, ctx, rotRad, _a, bBoxWidth, bBoxHeight, scaleX, scaleY, croppedCanvas, croppedCtx, resultCanvas, resized, pica_1;
+    return __awaiter(this, arguments, void 0, function (imageSrc, pixelCrop, adjustments, outputWidth, outputHeight, mimeType, quality, drawState, outputBackground) {
+        var image, canvas, ctx, rotRad, _a, bBoxWidth, bBoxHeight, scaleX, scaleY, croppedCanvas, croppedCtx, resultCanvas;
         if (mimeType === void 0) { mimeType = 'image/png'; }
         if (quality === void 0) { quality = 0.92; }
+        if (outputBackground === void 0) { outputBackground = DEFAULT_OUTPUT_BACKGROUND; }
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0: return [4 /*yield*/, createImage(imageSrc)];
@@ -44693,8 +43527,10 @@ function getCroppedImageBlob(imageSrc_1, pixelCrop_1, adjustments_1, outputWidth
                     scaleY = adjustments.flipVertical ? -1 : 1;
                     ctx.scale(scaleX, scaleY);
                     ctx.translate(-image.width / 2, -image.height / 2);
-                    ctx.filter = "brightness(".concat(adjustments.brightness, "%) contrast(").concat(adjustments.contrast, "%) saturate(").concat(adjustments.saturation, "%)");
+                    ctx.filter = buildCssFilter(adjustments);
                     ctx.drawImage(image, 0, 0);
+                    ctx.setTransform(1, 0, 0, 1, 0, 0);
+                    applyTint(ctx, bBoxWidth, bBoxHeight, adjustments);
                     croppedCanvas = document.createElement('canvas');
                     croppedCtx = croppedCanvas.getContext('2d');
                     if (!croppedCtx) {
@@ -44703,16 +43539,13 @@ function getCroppedImageBlob(imageSrc_1, pixelCrop_1, adjustments_1, outputWidth
                     croppedCanvas.width = pixelCrop.width;
                     croppedCanvas.height = pixelCrop.height;
                     croppedCtx.drawImage(canvas, pixelCrop.x, pixelCrop.y, pixelCrop.width, pixelCrop.height, 0, 0, pixelCrop.width, pixelCrop.height);
+                    applyDrawLayer(croppedCtx, pixelCrop, image.width, image.height, drawState);
+                    applyVignette(croppedCtx, pixelCrop.width, pixelCrop.height, adjustments.vignette);
                     resultCanvas = croppedCanvas;
                     if (!(outputWidth && outputHeight && (outputWidth !== pixelCrop.width || outputHeight !== pixelCrop.height))) return [3 /*break*/, 3];
-                    resized = document.createElement('canvas');
-                    resized.width = outputWidth;
-                    resized.height = outputHeight;
-                    pica_1 = pica({ features: ['js', 'wasm'] });
-                    return [4 /*yield*/, pica_1.resize(croppedCanvas, resized, { quality: 3 })];
+                    return [4 /*yield*/, composeToOutputSize(croppedCanvas, outputWidth, outputHeight, outputBackground, mimeType)];
                 case 2:
-                    _b.sent();
-                    resultCanvas = resized;
+                    resultCanvas = _b.sent();
                     _b.label = 3;
                 case 3: return [2 /*return*/, new Promise(function (resolve, reject) {
                         resultCanvas.toBlob(function (blob) {
@@ -44762,25 +43595,6 @@ function suggestVariantFilename(originalPath) {
     var stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
     return "".concat(dir).concat(base, "-variant-").concat(stamp).concat(ext);
 }
-function parseRangeProperty(value) {
-    if (!value) {
-        return {};
-    }
-    try {
-        var parsed = JSON.parse(value);
-        var exact = parsed.exact ? Number(parsed.exact) : undefined;
-        var min = parsed.min ? Number(parsed.min) : undefined;
-        var max = parsed.max ? Number(parsed.max) : undefined;
-        return {
-            exact: Number.isFinite(exact) ? exact : undefined,
-            min: Number.isFinite(min) ? min : undefined,
-            max: Number.isFinite(max) ? max : undefined
-        };
-    }
-    catch (_a) {
-        return {};
-    }
-}
 function formatDimensionSpec(req) {
     var _a, _b, _c, _d;
     var parts = [];
@@ -44812,6 +43626,40 @@ function imageMatchesRequirement(width, height, req) {
     };
     return check(width, req.widthExact, req.widthMin, req.widthMax) && check(height, req.heightExact, req.heightMin, req.heightMax);
 }
+function pickConstraintDimension(exact, min, max) {
+    if (exact != null) {
+        return exact;
+    }
+    if (max != null) {
+        return max;
+    }
+    if (min != null) {
+        return min;
+    }
+    return undefined;
+}
+/** Resolve form constraints into editor targets (exact preferred, else max, else min). */
+function resolveImageConstraints(req) {
+    var outputWidth = pickConstraintDimension(req.widthExact, req.widthMin, req.widthMax);
+    var outputHeight = pickConstraintDimension(req.heightExact, req.heightMin, req.heightMax);
+    if (outputWidth == null && outputHeight == null) {
+        return null;
+    }
+    var resolved = {};
+    if (outputWidth != null) {
+        resolved.outputWidth = outputWidth;
+    }
+    if (outputHeight != null) {
+        resolved.outputHeight = outputHeight;
+    }
+    if (outputWidth != null && outputHeight != null) {
+        resolved.aspect = outputWidth / outputHeight;
+    }
+    return resolved;
+}
+function hasApplicableConstraints(req) {
+    return resolveImageConstraints(req) != null;
+}
 var ASPECT_PRESETS = [
     { label: 'Free', value: undefined },
     { label: '1:1', value: 1 },
@@ -44835,19 +43683,971 @@ function clampFocal(point) {
     };
 }
 
-var Cropper = src_default;
-function ImageStudioEditor(_a) {
-    var imageSrc = _a.imageSrc, tool = _a.tool, adjustments = _a.adjustments, onAdjustmentsChange = _a.onAdjustmentsChange, focal = _a.focal, onFocalChange = _a.onFocalChange, cropPosition = _a.cropPosition, onCropPositionChange = _a.onCropPositionChange, croppedAreaPixels = _a.croppedAreaPixels, onCroppedAreaPixelsChange = _a.onCroppedAreaPixelsChange, aspect = _a.aspect, onAspectChange = _a.onAspectChange, outputWidth = _a.outputWidth, outputHeight = _a.outputHeight, onOutputWidthChange = _a.onOutputWidthChange, onOutputHeightChange = _a.onOutputHeightChange, lockOutputAspect = _a.lockOutputAspect, onLockOutputAspectChange = _a.onLockOutputAspectChange, onReset = _a.onReset;
-    var _b = useState(1), zoom = _b[0], setZoom = _b[1];
+/*
+ * Copyright (C) 2007-2026 Crafter Software Corporation. All Rights Reserved.
+ */
+/** Instagram-inspired looks approximated with CSS filters (no LUT assets). */
+var FILTER_PRESETS = [
+    { id: 'normal', label: 'Normal', adjustments: __assign({}, DEFAULT_ADJUSTMENTS) },
+    {
+        id: 'clarendon',
+        label: 'Clarendon',
+        adjustments: __assign(__assign({}, DEFAULT_ADJUSTMENTS), { brightness: 108, contrast: 118, saturation: 125 })
+    },
+    {
+        id: 'gingham',
+        label: 'Gingham',
+        adjustments: __assign(__assign({}, DEFAULT_ADJUSTMENTS), { brightness: 108, contrast: 95, saturation: 90, hueRotate: -8 })
+    },
+    {
+        id: 'moon',
+        label: 'Moon',
+        adjustments: __assign(__assign({}, DEFAULT_ADJUSTMENTS), { brightness: 112, contrast: 125, saturation: 0, grayscale: 100 })
+    },
+    {
+        id: 'lark',
+        label: 'Lark',
+        adjustments: __assign(__assign({}, DEFAULT_ADJUSTMENTS), { brightness: 115, contrast: 105, saturation: 130 })
+    },
+    {
+        id: 'reyes',
+        label: 'Reyes',
+        adjustments: __assign(__assign({}, DEFAULT_ADJUSTMENTS), { brightness: 112, contrast: 88, saturation: 85, sepia: 22, hueRotate: 12 })
+    },
+    {
+        id: 'juno',
+        label: 'Juno',
+        adjustments: __assign(__assign({}, DEFAULT_ADJUSTMENTS), { brightness: 108, contrast: 112, saturation: 140, hueRotate: 8 })
+    },
+    {
+        id: 'slumber',
+        label: 'Slumber',
+        adjustments: __assign(__assign({}, DEFAULT_ADJUSTMENTS), { brightness: 105, contrast: 95, saturation: 80, hueRotate: -18, sepia: 12 })
+    },
+    {
+        id: 'nashville',
+        label: 'Nashville',
+        adjustments: __assign(__assign({}, DEFAULT_ADJUSTMENTS), { brightness: 110, contrast: 108, saturation: 115, sepia: 18, hueRotate: 15 })
+    },
+    {
+        id: 'walden',
+        label: 'Walden',
+        adjustments: __assign(__assign({}, DEFAULT_ADJUSTMENTS), { brightness: 118, contrast: 102, saturation: 125, sepia: 28, hueRotate: 5 })
+    },
+    {
+        id: 'willow',
+        label: 'Willow',
+        adjustments: __assign(__assign({}, DEFAULT_ADJUSTMENTS), { brightness: 105, contrast: 90, saturation: 0, grayscale: 85 })
+    },
+    {
+        id: 'valencia',
+        label: 'Valencia',
+        adjustments: __assign(__assign({}, DEFAULT_ADJUSTMENTS), { brightness: 112, contrast: 100, saturation: 110, sepia: 15, hueRotate: 6 })
+    },
+    {
+        id: 'hudson',
+        label: 'Hudson',
+        adjustments: __assign(__assign({}, DEFAULT_ADJUSTMENTS), { brightness: 108, contrast: 115, saturation: 95, hueRotate: -22, vignette: 35 })
+    },
+    {
+        id: 'lofi',
+        label: 'Lo-Fi',
+        adjustments: __assign(__assign({}, DEFAULT_ADJUSTMENTS), { brightness: 102, contrast: 135, saturation: 145, vignette: 45 })
+    },
+    {
+        id: 'xpro2',
+        label: 'X-Pro II',
+        adjustments: __assign(__assign({}, DEFAULT_ADJUSTMENTS), { brightness: 105, contrast: 128, saturation: 120, vignette: 55 })
+    },
+    {
+        id: 'sierra',
+        label: 'Sierra',
+        adjustments: __assign(__assign({}, DEFAULT_ADJUSTMENTS), { brightness: 110, contrast: 92, saturation: 88, sepia: 10 })
+    },
+    {
+        id: 'rise',
+        label: 'Rise',
+        adjustments: __assign(__assign({}, DEFAULT_ADJUSTMENTS), { brightness: 118, contrast: 95, saturation: 105, sepia: 20, hueRotate: 10 })
+    },
+    {
+        id: 'inkwell',
+        label: 'Inkwell',
+        adjustments: __assign(__assign({}, DEFAULT_ADJUSTMENTS), { brightness: 108, contrast: 120, saturation: 0, grayscale: 100 })
+    },
+    {
+        id: 'dramatic',
+        label: 'Dramatic',
+        adjustments: __assign(__assign({}, DEFAULT_ADJUSTMENTS), { brightness: 95, contrast: 145, saturation: 110, vignette: 40 })
+    },
+    {
+        id: 'fade',
+        label: 'Fade',
+        adjustments: __assign(__assign({}, DEFAULT_ADJUSTMENTS), { brightness: 115, contrast: 85, saturation: 75 })
+    }
+];
+
+var TINT_COLORS = ['#ff3b30', '#ff9500', '#ffcc00', '#34c759', '#007aff', '#5856d6', '#af52de', '#ff2d55', '#ffffff', '#000000'];
+function ImageStudioFiltersPanel(_a) {
+    var _b;
+    var imageSrc = _a.imageSrc, activePresetId = _a.activePresetId, adjustments = _a.adjustments, onSelectPreset = _a.onSelectPreset, onTintChange = _a.onTintChange;
+    var theme = useTheme();
+    return (jsxs(Box$1, { sx: { display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minHeight: 0 }, children: [jsx(Typography, { variant: "caption", color: "text.secondary", children: "Tap a look, then optionally add a color wash over the effect." }), jsxs(Paper, { elevation: 0, variant: "outlined", sx: { p: 1.5, borderRadius: 2 }, children: [jsx(Typography, { variant: "caption", color: "text.secondary", sx: { fontWeight: 600, display: 'block', mb: 1 }, children: "Color wash" }), jsxs(Stack$1, { direction: "row", spacing: 0.5, flexWrap: "wrap", useFlexGap: true, sx: { mb: 1 }, children: [TINT_COLORS.map(function (color) { return (jsx(IconButton$1, { size: "small", onClick: function () { return onTintChange(color, adjustments.tintStrength || 35); }, sx: {
+                                    width: 26,
+                                    height: 26,
+                                    bgcolor: color,
+                                    border: adjustments.tintColor === color ? "2px solid ".concat(theme.palette.primary.main) : '1px solid',
+                                    borderColor: adjustments.tintColor === color ? 'primary.main' : 'divider'
+                                } }, color)); }), jsx(IconButton$1, { size: "small", onClick: function () { return onTintChange('', 0); }, sx: { width: 26, height: 26, fontSize: 11 }, children: "Off" })] }), jsx(Typography, { variant: "caption", color: "text.secondary", children: "Wash strength" }), jsx(Slider, { size: "small", min: 0, max: 100, value: (_b = adjustments.tintStrength) !== null && _b !== void 0 ? _b : 0, onChange: function (_, v) { return onTintChange(adjustments.tintColor || '#007aff', v); } })] }), jsx(Box$1, { sx: {
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(88px, 1fr))',
+                    gap: 1.5,
+                    flex: 1,
+                    minHeight: 0,
+                    overflow: 'auto',
+                    pb: 1
+                }, children: FILTER_PRESETS.map(function (preset) {
+                    var selected = preset.id === activePresetId;
+                    var previewAdjustments = __assign(__assign({}, preset.adjustments), { tintColor: adjustments.tintColor, tintStrength: adjustments.tintStrength });
+                    return (jsxs(Paper, { elevation: 0, onClick: function () {
+                            return onSelectPreset(preset.id, __assign(__assign({}, preset.adjustments), { tintColor: adjustments.tintColor, tintStrength: adjustments.tintStrength }));
+                        }, sx: {
+                            cursor: 'pointer',
+                            borderRadius: 2,
+                            overflow: 'hidden',
+                            border: selected ? "2px solid ".concat(theme.palette.primary.main) : "1px solid ".concat(theme.palette.divider),
+                            bgcolor: 'background.paper',
+                            transition: 'transform 0.15s, box-shadow 0.15s',
+                            '&:hover': {
+                                transform: 'translateY(-2px)',
+                                boxShadow: 2
+                            }
+                        }, children: [jsxs(Box$1, { sx: { position: 'relative', aspectRatio: '1', bgcolor: '#222' }, children: [jsx(Box$1, { sx: {
+                                            position: 'absolute',
+                                            inset: 0,
+                                            backgroundImage: "url(".concat(imageSrc, ")"),
+                                            backgroundSize: 'cover',
+                                            backgroundPosition: 'center',
+                                            filter: buildCssFilter(previewAdjustments)
+                                        } }), previewAdjustments.tintStrength && previewAdjustments.tintColor && (jsx(Box$1, { sx: {
+                                            position: 'absolute',
+                                            inset: 0,
+                                            bgcolor: previewAdjustments.tintColor,
+                                            opacity: previewAdjustments.tintStrength / 100,
+                                            mixBlendMode: 'multiply',
+                                            pointerEvents: 'none'
+                                        } }))] }), jsx(Typography, { variant: "caption", sx: {
+                                    display: 'block',
+                                    textAlign: 'center',
+                                    py: 0.75,
+                                    fontWeight: selected ? 600 : 400,
+                                    color: selected ? 'primary.main' : 'text.primary'
+                                }, children: preset.label })] }, preset.id));
+                }) })] }));
+}
+
+function ImageCanvasZoomBar(_a) {
+    var view = _a.view, onViewChange = _a.onViewChange, compact = _a.compact;
+    var setZoom = function (zoom) {
+        onViewChange(__assign(__assign({}, view), { zoom: clampCanvasZoom(zoom) }));
+    };
+    return (jsxs(Stack$1, { direction: "row", alignItems: "center", spacing: 1, flexWrap: "wrap", useFlexGap: true, sx: { py: compact ? 0 : 0.5 }, children: [jsx(Tooltip, { title: "Zoom out", children: jsx(IconButton$1, { size: "small", onClick: function () { return setZoom(view.zoom / 1.2); }, children: jsx(ZoomOutRoundedIcon, { fontSize: "small" }) }) }), jsx(Box$1, { sx: { width: compact ? 100 : 140, px: 0.5 }, children: jsx(Slider, { size: "small", min: MIN_CANVAS_ZOOM, max: MAX_CANVAS_ZOOM, step: 0.05, value: view.zoom, onChange: function (_, v) { return setZoom(v); } }) }), jsx(Tooltip, { title: "Zoom in", children: jsx(IconButton$1, { size: "small", onClick: function () { return setZoom(view.zoom * 1.2); }, children: jsx(ZoomInRoundedIcon, { fontSize: "small" }) }) }), jsxs(Typography, { variant: "caption", sx: { fontWeight: 600, minWidth: 40 }, children: [Math.round(view.zoom * 100), "%"] }), jsx(Tooltip, { title: "Fit to view", children: jsx(IconButton$1, { size: "small", onClick: function () { return onViewChange(DEFAULT_CANVAS_VIEW); }, children: jsx(FitScreenRoundedIcon, { fontSize: "small" }) }) }), !compact && (jsx(Typography, { variant: "caption", color: "text.secondary", children: "Scroll to zoom \u00B7 Space + drag to pan" }))] }));
+}
+
+/*
+ * Copyright (C) 2007-2026 Crafter Software Corporation. All Rights Reserved.
+ */
+function useImageCanvasView(containerRef, naturalSize, canvasView, onCanvasViewChange) {
+    var _a = useState(false), spaceDown = _a[0], setSpaceDown = _a[1];
+    var _b = useState(false), isPanning = _b[0], setIsPanning = _b[1];
+    var panDragRef = useRef(null);
+    var viewRef = useRef(canvasView);
+    viewRef.current = canvasView;
+    useEffect(function () {
+        var onKeyDown = function (e) {
+            var _a, _b;
+            if (e.code === 'Space' && !e.repeat) {
+                var tag = (_a = e.target) === null || _a === void 0 ? void 0 : _a.tagName;
+                if (tag === 'INPUT' || tag === 'TEXTAREA' || ((_b = e.target) === null || _b === void 0 ? void 0 : _b.isContentEditable)) {
+                    return;
+                }
+                e.preventDefault();
+                setSpaceDown(true);
+            }
+        };
+        var onKeyUp = function (e) {
+            var _a;
+            if (e.code === 'Space') {
+                setSpaceDown(false);
+                if (((_a = panDragRef.current) === null || _a === void 0 ? void 0 : _a.initiatedBy) === 'space') {
+                    panDragRef.current = null;
+                    setIsPanning(false);
+                }
+            }
+        };
+        window.addEventListener('keydown', onKeyDown);
+        window.addEventListener('keyup', onKeyUp);
+        return function () {
+            window.removeEventListener('keydown', onKeyDown);
+            window.removeEventListener('keyup', onKeyUp);
+        };
+    }, []);
+    var handleWheel = useCallback(function (e) {
+        e.preventDefault();
+        var container = containerRef.current;
+        if (!container || !naturalSize.width) {
+            return;
+        }
+        var rect = container.getBoundingClientRect();
+        var displayX = e.clientX - rect.left;
+        var displayY = e.clientY - rect.top;
+        var factor = e.deltaY > 0 ? 0.9 : 1.1;
+        var view = viewRef.current;
+        var newZoom = clampCanvasZoom(view.zoom * factor);
+        onCanvasViewChange(zoomViewAtPoint(rect.width, rect.height, naturalSize.width, naturalSize.height, view, displayX, displayY, newZoom));
+    }, [containerRef, naturalSize.width, naturalSize.height, onCanvasViewChange]);
+    var tryStartPan = useCallback(function (e) {
+        if (!spaceDown && e.button !== 1) {
+            return false;
+        }
+        e.preventDefault();
+        var view = viewRef.current;
+        panDragRef.current = {
+            startClientX: e.clientX,
+            startClientY: e.clientY,
+            startPanX: view.panX,
+            startPanY: view.panY,
+            initiatedBy: spaceDown ? 'space' : 'middleMouse'
+        };
+        setIsPanning(true);
+        e.target.setPointerCapture(e.pointerId);
+        return true;
+    }, [spaceDown]);
+    var handlePanMove = useCallback(function (e) {
+        var drag = panDragRef.current;
+        if (!drag) {
+            return false;
+        }
+        var dx = e.clientX - drag.startClientX;
+        var dy = e.clientY - drag.startClientY;
+        var view = viewRef.current;
+        onCanvasViewChange(__assign(__assign({}, view), { panX: drag.startPanX + dx, panY: drag.startPanY + dy }));
+        return true;
+    }, [onCanvasViewChange]);
+    var endPan = useCallback(function () {
+        panDragRef.current = null;
+        setIsPanning(false);
+    }, []);
+    var panCursor = isPanning ? 'grabbing' : spaceDown ? 'grab' : undefined;
+    return {
+        spaceDown: spaceDown,
+        panCursor: panCursor,
+        handleWheel: handleWheel,
+        tryStartPan: tryStartPan,
+        handlePanMove: handlePanMove,
+        endPan: endPan
+    };
+}
+
+var BRUSH_COLORS = ['#ffffff', '#000000', '#ff3b30', '#ff9500', '#ffcc00', '#34c759', '#007aff', '#af52de'];
+function newTextId() {
+    return "text-".concat(Date.now(), "-").concat(Math.random().toString(36).slice(2, 8));
+}
+function ImageStudioDrawCanvas(_a) {
+    var _b, _c, _d;
+    var imageSrc = _a.imageSrc, adjustments = _a.adjustments, drawState = _a.drawState, onDrawStateChange = _a.onDrawStateChange, drawTool = _a.drawTool, onDrawToolChange = _a.onDrawToolChange, brushColor = _a.brushColor, onBrushColorChange = _a.onBrushColorChange, brushSize = _a.brushSize, onBrushSizeChange = _a.onBrushSizeChange, textFontFamily = _a.textFontFamily, onTextFontFamilyChange = _a.onTextFontFamilyChange, textFontSize = _a.textFontSize, onTextFontSizeChange = _a.onTextFontSizeChange, canvasView = _a.canvasView, onCanvasViewChange = _a.onCanvasViewChange;
+    var theme = useTheme();
+    var containerRef = useRef(null);
+    var canvasRef = useRef(null);
+    var imageRef = useRef(null);
+    var layoutRef = useRef(null);
+    var _e = useState({ width: 0, height: 0 }), naturalSize = _e[0], setNaturalSize = _e[1];
+    var _f = useState(null), activeStroke = _f[0], setActiveStroke = _f[1];
+    var _g = useState(null), lineStart = _g[0], setLineStart = _g[1];
+    var _h = useState(null), selectedTextId = _h[0], setSelectedTextId = _h[1];
+    var _j = useState(''), editingText = _j[0], setEditingText = _j[1];
+    var dragTextRef = useRef(null);
+    var viewInteraction = useImageCanvasView(containerRef, naturalSize, canvasView, onCanvasViewChange);
+    useEffect(function () {
+        var cancelled = false;
+        createImage(imageSrc).then(function (img) {
+            if (!cancelled) {
+                imageRef.current = img;
+                setNaturalSize({ width: img.naturalWidth, height: img.naturalHeight });
+            }
+        });
+        return function () {
+            cancelled = true;
+        };
+    }, [imageSrc]);
+    var hitTestText = function (ctx, layout, px, py) {
+        for (var i = drawState.texts.length - 1; i >= 0; i--) {
+            var text = drawState.texts[i];
+            var pos = imageToDisplay(text.x, text.y, layout);
+            var fontSize = text.fontSize * layout.scale;
+            ctx.font = "".concat(fontSize, "px ").concat(text.fontFamily);
+            var width = ctx.measureText(text.text).width;
+            var height = fontSize * 1.25;
+            if (px >= pos.x && px <= pos.x + width && py >= pos.y && py <= pos.y + height) {
+                return text;
+            }
+        }
+        return null;
+    };
+    var paintCanvas = useCallback(function () {
+        var canvas = canvasRef.current;
+        var container = containerRef.current;
+        var img = imageRef.current;
+        if (!canvas || !container || !img || !naturalSize.width) {
+            return;
+        }
+        var rect = container.getBoundingClientRect();
+        var displayWidth = Math.max(1, Math.floor(rect.width));
+        var displayHeight = Math.max(1, Math.floor(rect.height));
+        canvas.width = displayWidth;
+        canvas.height = displayHeight;
+        var ctx = canvas.getContext('2d');
+        if (!ctx) {
+            return;
+        }
+        var layout = computeImageLayout(displayWidth, displayHeight, naturalSize.width, naturalSize.height, canvasView);
+        layoutRef.current = layout;
+        var drawWidth = naturalSize.width * layout.scale;
+        var drawHeight = naturalSize.height * layout.scale;
+        ctx.fillStyle = '#141414';
+        ctx.fillRect(0, 0, displayWidth, displayHeight);
+        ctx.save();
+        ctx.filter = buildCssFilter(adjustments);
+        ctx.drawImage(img, layout.offsetX, layout.offsetY, drawWidth, drawHeight);
+        ctx.restore();
+        if (adjustments.tintStrength && adjustments.tintColor) {
+            ctx.save();
+            ctx.globalAlpha = adjustments.tintStrength / 100;
+            ctx.globalCompositeOperation = 'multiply';
+            ctx.fillStyle = adjustments.tintColor;
+            ctx.fillRect(layout.offsetX, layout.offsetY, drawWidth, drawHeight);
+            ctx.restore();
+        }
+        var toDisplay = function (p) { return imageToDisplay(p.x, p.y, layout); };
+        var drawStrokePath = function (stroke) {
+            if (stroke.points.length < 1) {
+                return;
+            }
+            var size = stroke.size * layout.scale;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.lineWidth = size;
+            if (stroke.tool === 'eraser') {
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.strokeStyle = 'rgba(0,0,0,1)';
+            }
+            else {
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.strokeStyle = stroke.color;
+            }
+            if (stroke.tool === 'line' && stroke.points.length >= 2) {
+                var start = toDisplay(stroke.points[0]);
+                var end = toDisplay(stroke.points[stroke.points.length - 1]);
+                ctx.beginPath();
+                ctx.moveTo(start.x, start.y);
+                ctx.lineTo(end.x, end.y);
+                ctx.stroke();
+                ctx.globalCompositeOperation = 'source-over';
+                return;
+            }
+            if (stroke.tool === 'fillRect' && stroke.points.length >= 2) {
+                var a = toDisplay(stroke.points[0]);
+                var b = toDisplay(stroke.points[stroke.points.length - 1]);
+                var x = Math.min(a.x, b.x);
+                var y = Math.min(a.y, b.y);
+                var w = Math.abs(b.x - a.x);
+                var h = Math.abs(b.y - a.y);
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.fillStyle = stroke.color;
+                ctx.fillRect(x, y, w, h);
+                return;
+            }
+            if (stroke.tool === 'fillEllipse' && stroke.points.length >= 2) {
+                var a = toDisplay(stroke.points[0]);
+                var b = toDisplay(stroke.points[stroke.points.length - 1]);
+                var x = Math.min(a.x, b.x);
+                var y = Math.min(a.y, b.y);
+                var w = Math.abs(b.x - a.x);
+                var h = Math.abs(b.y - a.y);
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.fillStyle = stroke.color;
+                ctx.beginPath();
+                ctx.ellipse(x + w / 2, y + h / 2, w / 2, h / 2, 0, 0, Math.PI * 2);
+                ctx.fill();
+                return;
+            }
+            ctx.beginPath();
+            stroke.points.forEach(function (point, index) {
+                var d = toDisplay(point);
+                if (index === 0) {
+                    ctx.moveTo(d.x, d.y);
+                }
+                else {
+                    ctx.lineTo(d.x, d.y);
+                }
+            });
+            ctx.stroke();
+            ctx.globalCompositeOperation = 'source-over';
+        };
+        drawState.strokes.forEach(drawStrokePath);
+        if (activeStroke) {
+            drawStrokePath(activeStroke);
+        }
+        drawState.texts.forEach(function (text) {
+            var pos = toDisplay({ x: text.x, y: text.y });
+            var fontSize = text.fontSize * layout.scale;
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.fillStyle = text.color;
+            ctx.font = "".concat(fontSize, "px ").concat(text.fontFamily);
+            ctx.textBaseline = 'top';
+            ctx.fillText(text.text, pos.x, pos.y);
+            if (text.id === selectedTextId) {
+                var width = ctx.measureText(text.text).width;
+                var height = fontSize * 1.25;
+                ctx.strokeStyle = theme.palette.primary.main;
+                ctx.lineWidth = 2;
+                ctx.strokeRect(pos.x - 2, pos.y - 2, width + 4, height + 4);
+            }
+        });
+    }, [adjustments, activeStroke, canvasView, drawState, naturalSize, selectedTextId, theme.palette.primary.main]);
+    useEffect(function () {
+        paintCanvas();
+    }, [paintCanvas]);
+    useEffect(function () {
+        var container = containerRef.current;
+        if (!container) {
+            return;
+        }
+        var observer = new ResizeObserver(function () { return paintCanvas(); });
+        observer.observe(container);
+        return function () { return observer.disconnect(); };
+    }, [paintCanvas]);
+    useEffect(function () {
+        var _a;
+        var selected = drawState.texts.find(function (t) { return t.id === selectedTextId; });
+        setEditingText((_a = selected === null || selected === void 0 ? void 0 : selected.text) !== null && _a !== void 0 ? _a : '');
+    }, [selectedTextId, drawState.texts]);
+    useEffect(function () {
+        var selected = drawState.texts.find(function (t) { return t.id === selectedTextId; });
+        if (selected) {
+            onTextFontFamilyChange(selected.fontFamily);
+            onTextFontSizeChange(selected.fontSize);
+        }
+    }, [selectedTextId, drawState.texts, onTextFontFamilyChange, onTextFontSizeChange]);
+    var commitStroke = function (stroke) {
+        onDrawStateChange(__assign(__assign({}, drawState), { strokes: __spreadArray(__spreadArray([], drawState.strokes, true), [stroke], false) }));
+    };
+    var updateSelectedText = function (patch) {
+        if (!selectedTextId) {
+            return;
+        }
+        onDrawStateChange(__assign(__assign({}, drawState), { texts: drawState.texts.map(function (t) { return (t.id === selectedTextId ? __assign(__assign({}, t), patch) : t); }) }));
+    };
+    var pointerDown = function (e) {
+        var _a, _b;
+        if (viewInteraction.tryStartPan(e)) {
+            return;
+        }
+        if (!naturalSize.width) {
+            return;
+        }
+        var rect = (_a = containerRef.current) === null || _a === void 0 ? void 0 : _a.getBoundingClientRect();
+        var layout = layoutRef.current;
+        if (!rect || !layout) {
+            return;
+        }
+        var displayX = e.clientX - rect.left;
+        var displayY = e.clientY - rect.top;
+        var ctx = (_b = canvasRef.current) === null || _b === void 0 ? void 0 : _b.getContext('2d');
+        if (ctx) {
+            var hit = hitTestText(ctx, layout, displayX, displayY);
+            if (hit) {
+                var imgPoint = clientToImage(e.clientX, e.clientY, rect, layout);
+                if (!imgPoint) {
+                    return;
+                }
+                setSelectedTextId(hit.id);
+                dragTextRef.current = {
+                    id: hit.id,
+                    offsetX: hit.x - imgPoint.x,
+                    offsetY: hit.y - imgPoint.y
+                };
+                e.target.setPointerCapture(e.pointerId);
+                return;
+            }
+        }
+        var point = clientToImage(e.clientX, e.clientY, rect, layout);
+        if (!point) {
+            setSelectedTextId(null);
+            return;
+        }
+        if (drawTool === 'text') {
+            setSelectedTextId(null);
+            var annotation = {
+                id: newTextId(),
+                x: point.x,
+                y: point.y,
+                text: 'Text',
+                color: brushColor,
+                fontSize: textFontSize,
+                fontFamily: textFontFamily
+            };
+            onDrawStateChange(__assign(__assign({}, drawState), { texts: __spreadArray(__spreadArray([], drawState.texts, true), [annotation], false) }));
+            setSelectedTextId(annotation.id);
+            return;
+        }
+        setSelectedTextId(null);
+        if (drawTool === 'line' || drawTool === 'fillRect' || drawTool === 'fillEllipse') {
+            setLineStart(point);
+            e.target.setPointerCapture(e.pointerId);
+            return;
+        }
+        if (drawTool !== 'brush' && drawTool !== 'eraser') {
+            return;
+        }
+        var stroke = {
+            tool: drawTool,
+            color: brushColor,
+            size: brushSize,
+            points: [point]
+        };
+        setActiveStroke(stroke);
+        e.target.setPointerCapture(e.pointerId);
+    };
+    var pointerMove = function (e) {
+        var _a;
+        if (viewInteraction.handlePanMove(e)) {
+            return;
+        }
+        var rect = (_a = containerRef.current) === null || _a === void 0 ? void 0 : _a.getBoundingClientRect();
+        var layout = layoutRef.current;
+        if (!rect || !layout) {
+            return;
+        }
+        if (dragTextRef.current) {
+            var point = clientToImage(e.clientX, e.clientY, rect, layout);
+            if (!point) {
+                return;
+            }
+            updateSelectedText({
+                x: Math.max(0, Math.min(naturalSize.width, point.x + dragTextRef.current.offsetX)),
+                y: Math.max(0, Math.min(naturalSize.height, point.y + dragTextRef.current.offsetY))
+            });
+            return;
+        }
+        if (activeStroke && drawTool !== 'line' && drawTool !== 'text' && drawTool !== 'fillRect' && drawTool !== 'fillEllipse') {
+            var point = clientToImage(e.clientX, e.clientY, rect, layout);
+            if (!point) {
+                return;
+            }
+            setActiveStroke(__assign(__assign({}, activeStroke), { points: __spreadArray(__spreadArray([], activeStroke.points, true), [point], false) }));
+            return;
+        }
+        if ((drawTool === 'line' || drawTool === 'fillRect' || drawTool === 'fillEllipse') &&
+            lineStart) {
+            var point = clientToImage(e.clientX, e.clientY, rect, layout);
+            if (!point) {
+                return;
+            }
+            setActiveStroke({
+                tool: drawTool,
+                color: brushColor,
+                size: drawTool === 'line' ? brushSize : 0,
+                points: [lineStart, point]
+            });
+        }
+    };
+    var pointerUp = function (e) {
+        var _a, _b;
+        viewInteraction.endPan();
+        dragTextRef.current = null;
+        if (activeStroke && activeStroke.points.length > 0 && drawTool !== 'line' && drawTool !== 'fillRect' && drawTool !== 'fillEllipse') {
+            commitStroke(activeStroke);
+            setActiveStroke(null);
+            return;
+        }
+        if (drawTool === 'line' && lineStart) {
+            var rect = (_a = containerRef.current) === null || _a === void 0 ? void 0 : _a.getBoundingClientRect();
+            var layout = layoutRef.current;
+            if (rect && layout) {
+                var end = clientToImage(e.clientX, e.clientY, rect, layout);
+                if (end) {
+                    commitStroke({
+                        tool: 'line',
+                        color: brushColor,
+                        size: brushSize,
+                        points: [lineStart, end]
+                    });
+                }
+            }
+            setLineStart(null);
+            setActiveStroke(null);
+        }
+        if ((drawTool === 'fillRect' || drawTool === 'fillEllipse') && lineStart) {
+            var rect = (_b = containerRef.current) === null || _b === void 0 ? void 0 : _b.getBoundingClientRect();
+            var layout = layoutRef.current;
+            if (rect && layout) {
+                var end = clientToImage(e.clientX, e.clientY, rect, layout);
+                if (end) {
+                    commitStroke({
+                        tool: drawTool,
+                        color: brushColor,
+                        size: 0,
+                        points: [lineStart, end]
+                    });
+                }
+            }
+            setLineStart(null);
+            setActiveStroke(null);
+        }
+    };
+    var selectedText = drawState.texts.find(function (t) { return t.id === selectedTextId; });
+    var showTextControls = drawTool === 'text' || selectedTextId;
+    var activeFontFamily = (_b = selectedText === null || selectedText === void 0 ? void 0 : selectedText.fontFamily) !== null && _b !== void 0 ? _b : textFontFamily;
+    var activeFontSize = (_c = selectedText === null || selectedText === void 0 ? void 0 : selectedText.fontSize) !== null && _c !== void 0 ? _c : textFontSize;
+    var setActiveFontFamily = function (family) {
+        if (selectedTextId) {
+            updateSelectedText({ fontFamily: family });
+        }
+        else {
+            onTextFontFamilyChange(family);
+        }
+    };
+    var setActiveFontSize = function (size) {
+        var clamped = Math.max(8, Math.min(200, Math.round(size)));
+        if (selectedTextId) {
+            updateSelectedText({ fontSize: clamped });
+        }
+        else {
+            onTextFontSizeChange(clamped);
+        }
+    };
+    var undo = function () {
+        if (drawState.texts.length) {
+            onDrawStateChange(__assign(__assign({}, drawState), { texts: drawState.texts.slice(0, -1) }));
+            setSelectedTextId(null);
+            return;
+        }
+        if (drawState.strokes.length) {
+            onDrawStateChange(__assign(__assign({}, drawState), { strokes: drawState.strokes.slice(0, -1) }));
+        }
+    };
+    var drawCursor = (_d = viewInteraction.panCursor) !== null && _d !== void 0 ? _d : (drawTool === 'text' ? 'text' : 'crosshair');
+    return (jsxs(Box$1, { sx: { display: 'flex', flexDirection: 'column', gap: 1, flex: 1, minHeight: 0 }, children: [jsxs(Paper, { elevation: 0, variant: "outlined", sx: { p: 1.25, borderRadius: 2 }, children: [jsx(ImageCanvasZoomBar, { view: canvasView, onViewChange: onCanvasViewChange, compact: true }), jsxs(Stack$1, { direction: "row", spacing: 1, alignItems: "center", flexWrap: "wrap", useFlexGap: true, sx: { mt: 1 }, children: [jsxs(ToggleButtonGroup, { size: "small", value: drawTool, exclusive: true, onChange: function (_, val) { return val && onDrawToolChange(val); }, children: [jsx(ToggleButton, { value: "brush", children: jsx(Tooltip, { title: "Brush", children: jsx(BrushRoundedIcon, { fontSize: "small" }) }) }), jsx(ToggleButton, { value: "eraser", children: jsx(Tooltip, { title: "Eraser", children: jsx(AutoFixOffRoundedIcon, { fontSize: "small" }) }) }), jsx(ToggleButton, { value: "line", children: jsx(Tooltip, { title: "Line", children: jsx(ShowChartRoundedIcon, { fontSize: "small" }) }) }), jsx(ToggleButton, { value: "text", children: jsx(Tooltip, { title: "Add text", children: jsx(TextFieldsRoundedIcon, { fontSize: "small" }) }) }), jsx(ToggleButton, { value: "fillRect", children: jsx(Tooltip, { title: "Filled rectangle", children: jsx(CropSquareRoundedIcon, { fontSize: "small" }) }) }), jsx(ToggleButton, { value: "fillEllipse", children: jsx(Tooltip, { title: "Filled circle", children: jsx(CircleOutlinedIcon, { fontSize: "small" }) }) })] }), jsx(Box$1, { sx: { display: 'flex', gap: 0.5 }, children: BRUSH_COLORS.map(function (color) { return (jsx(IconButton$1, { size: "small", onClick: function () {
+                                        onBrushColorChange(color);
+                                        if (selectedTextId) {
+                                            updateSelectedText({ color: color });
+                                        }
+                                    }, sx: {
+                                        width: 24,
+                                        height: 24,
+                                        bgcolor: color,
+                                        border: brushColor === color ? "2px solid ".concat(theme.palette.primary.main) : '1px solid',
+                                        borderColor: brushColor === color ? 'primary.main' : 'divider'
+                                    } }, color)); }) }), jsxs(Box$1, { sx: { minWidth: 120, flex: 1, maxWidth: 160 }, children: [jsxs(Typography, { variant: "caption", color: "text.secondary", children: [drawTool === 'text' || drawTool === 'fillRect' || drawTool === 'fillEllipse' ? 'Stroke' : 'Brush', " size"] }), jsx(Slider, { size: "small", min: 2, max: 48, value: brushSize, onChange: function (_, v) { return onBrushSizeChange(v); }, disabled: drawTool === 'text' || drawTool === 'fillRect' || drawTool === 'fillEllipse' })] }), jsx(Button$1, { size: "small", startIcon: jsx(UndoRoundedIcon, {}), onClick: undo, disabled: !drawState.strokes.length && !drawState.texts.length, children: "Undo" })] }), showTextControls && (jsxs(Stack$1, { direction: "row", spacing: 1.5, alignItems: "center", flexWrap: "wrap", useFlexGap: true, sx: { mt: 1 }, children: [jsxs(FormControl, { size: "small", sx: { minWidth: 150 }, children: [jsx(InputLabel, { children: "Font" }), jsx(Select, { label: "Font", value: activeFontFamily, onChange: function (e) { return setActiveFontFamily(e.target.value); }, children: TEXT_FONT_OPTIONS.map(function (opt) { return (jsx(MenuItem$1, { value: opt.value, sx: { fontFamily: opt.value }, children: opt.label }, opt.value)); }) })] }), jsxs(Box$1, { sx: { minWidth: 120, flex: 1, maxWidth: 200 }, children: [jsx(Typography, { variant: "caption", color: "text.secondary", children: "Text size (px)" }), jsx(Slider, { size: "small", min: 8, max: 120, value: activeFontSize, onChange: function (_, v) { return setActiveFontSize(v); } })] }), jsxs(Typography, { variant: "caption", color: "text.secondary", sx: { fontWeight: 600, minWidth: 48 }, children: [activeFontSize, "px"] }), jsx(TextField$1, { size: "small", label: "Size", type: "number", value: activeFontSize, onChange: function (e) {
+                                    var n = Number(e.target.value);
+                                    if (Number.isFinite(n)) {
+                                        setActiveFontSize(n);
+                                    }
+                                }, inputProps: { min: 8, max: 200, step: 1 }, sx: { width: 88 } })] })), selectedTextId && (jsxs(Stack$1, { direction: "row", spacing: 1, sx: { mt: 1 }, alignItems: "center", children: [jsx(TextField$1, { size: "small", fullWidth: true, label: "Text content", value: editingText, onChange: function (e) {
+                                    setEditingText(e.target.value);
+                                    updateSelectedText({ text: e.target.value });
+                                } }), jsx(Typography, { variant: "caption", color: "text.secondary", children: "Drag to move" })] }))] }), jsx(Paper, { ref: containerRef, elevation: 0, onWheel: viewInteraction.handleWheel, sx: {
+                    flex: 1,
+                    minHeight: 0,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    position: 'relative',
+                    borderRadius: 2,
+                    overflow: 'hidden',
+                    bgcolor: '#141414',
+                    border: "1px solid ".concat(alpha(theme.palette.common.white, 0.08)),
+                    touchAction: 'none'
+                }, children: jsx("canvas", { ref: canvasRef, style: {
+                        display: 'block',
+                        width: '100%',
+                        height: '100%',
+                        cursor: drawCursor
+                    }, onPointerDown: pointerDown, onPointerMove: pointerMove, onPointerUp: pointerUp, onPointerLeave: pointerUp }) })] }));
+}
+
+var HANDLE_SIZE = 10;
+function hitHandle(px, py, crop, layout) {
+    var tl = imageToDisplay(crop.x, crop.y, layout);
+    var br = imageToDisplay(crop.x + crop.width, crop.y + crop.height, layout);
+    var cx = (tl.x + br.x) / 2;
+    var cy = (tl.y + br.y) / 2;
+    var hs = HANDLE_SIZE;
+    var checks = [
+        { id: 'nw', x: tl.x, y: tl.y },
+        { id: 'n', x: cx, y: tl.y },
+        { id: 'ne', x: br.x, y: tl.y },
+        { id: 'e', x: br.x, y: cy },
+        { id: 'se', x: br.x, y: br.y },
+        { id: 's', x: cx, y: br.y },
+        { id: 'sw', x: tl.x, y: br.y },
+        { id: 'w', x: tl.x, y: cy }
+    ];
+    for (var _i = 0, checks_1 = checks; _i < checks_1.length; _i++) {
+        var check = checks_1[_i];
+        if (Math.abs(px - check.x) <= hs && Math.abs(py - check.y) <= hs) {
+            return check.id;
+        }
+    }
+    if (px >= tl.x && px <= br.x && py >= tl.y && py <= br.y) {
+        return 'move';
+    }
+    return null;
+}
+function resizeCrop(crop, handle, pointer, startCrop, startPointer, imageWidth, imageHeight, aspect) {
+    var dx = pointer.x - startPointer.x;
+    var dy = pointer.y - startPointer.y;
+    var x = startCrop.x, y = startCrop.y, width = startCrop.width, height = startCrop.height;
+    if (handle === 'move') {
+        x = startCrop.x + dx;
+        y = startCrop.y + dy;
+        return clampCropArea({ x: x, y: y, width: width, height: height }, imageWidth, imageHeight);
+    }
+    if (handle.includes('e')) {
+        width = startCrop.width + dx;
+    }
+    if (handle.includes('w')) {
+        width = startCrop.width - dx;
+        x = startCrop.x + dx;
+    }
+    if (handle.includes('s')) {
+        height = startCrop.height + dy;
+    }
+    if (handle.includes('n')) {
+        height = startCrop.height - dy;
+        y = startCrop.y + dy;
+    }
+    if (aspect) {
+        if (handle === 'e' || handle === 'w' || handle === 'ne' || handle === 'nw' || handle === 'se' || handle === 'sw') {
+            height = width / aspect;
+            if (handle.includes('n')) {
+                y = startCrop.y + startCrop.height - height;
+            }
+        }
+        else {
+            width = height * aspect;
+            if (handle.includes('w')) {
+                x = startCrop.x + startCrop.width - width;
+            }
+        }
+    }
+    return clampCropArea({ x: x, y: y, width: width, height: height }, imageWidth, imageHeight);
+}
+function ImageStudioCropCanvas(_a) {
+    var _b;
+    var imageSrc = _a.imageSrc, cropArea = _a.cropArea, onCropAreaChange = _a.onCropAreaChange, aspect = _a.aspect, onAspectChange = _a.onAspectChange, canvasView = _a.canvasView, onCanvasViewChange = _a.onCanvasViewChange;
+    var theme = useTheme();
+    var containerRef = useRef(null);
+    var canvasRef = useRef(null);
+    var imageRef = useRef(null);
     var _c = useState({ width: 0, height: 0 }), naturalSize = _c[0], setNaturalSize = _c[1];
+    var dragRef = useRef(null);
+    var _d = useState(''), cropWidthInput = _d[0], setCropWidthInput = _d[1];
+    var _e = useState(''), cropHeightInput = _e[0], setCropHeightInput = _e[1];
+    var viewInteraction = useImageCanvasView(containerRef, naturalSize, canvasView, onCanvasViewChange);
+    useEffect(function () {
+        var cancelled = false;
+        createImage(imageSrc)
+            .then(function (img) {
+            if (!cancelled) {
+                imageRef.current = img;
+                setNaturalSize({ width: img.naturalWidth, height: img.naturalHeight });
+                if (!cropArea) {
+                    onCropAreaChange(fullImageCrop(img.naturalWidth, img.naturalHeight));
+                }
+            }
+        })
+            .catch(function (error) {
+            if (!cancelled) {
+                console.error('Failed to load image for crop canvas:', error);
+            }
+        });
+        return function () {
+            cancelled = true;
+        };
+    }, [imageSrc]);
+    useEffect(function () {
+        if (cropArea) {
+            setCropWidthInput(String(cropArea.width));
+            setCropHeightInput(String(cropArea.height));
+        }
+    }, [cropArea === null || cropArea === void 0 ? void 0 : cropArea.width, cropArea === null || cropArea === void 0 ? void 0 : cropArea.height, cropArea === null || cropArea === void 0 ? void 0 : cropArea.x, cropArea === null || cropArea === void 0 ? void 0 : cropArea.y]);
+    var paint = useCallback(function () {
+        var canvas = canvasRef.current;
+        var container = containerRef.current;
+        var img = imageRef.current;
+        if (!canvas || !container || !img || !naturalSize.width || !cropArea) {
+            return;
+        }
+        var rect = container.getBoundingClientRect();
+        var cw = Math.max(1, Math.floor(rect.width));
+        var ch = Math.max(1, Math.floor(rect.height));
+        canvas.width = cw;
+        canvas.height = ch;
+        var ctx = canvas.getContext('2d');
+        if (!ctx) {
+            return;
+        }
+        var layout = computeImageLayout(cw, ch, naturalSize.width, naturalSize.height, canvasView);
+        var tl = imageToDisplay(cropArea.x, cropArea.y, layout);
+        var br = imageToDisplay(cropArea.x + cropArea.width, cropArea.y + cropArea.height, layout);
+        ctx.fillStyle = '#141414';
+        ctx.fillRect(0, 0, cw, ch);
+        var drawW = naturalSize.width * layout.scale;
+        var drawH = naturalSize.height * layout.scale;
+        ctx.drawImage(img, layout.offsetX, layout.offsetY, drawW, drawH);
+        ctx.save();
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
+        ctx.beginPath();
+        ctx.rect(0, 0, cw, ch);
+        ctx.rect(tl.x, tl.y, br.x - tl.x, br.y - tl.y);
+        ctx.fill('evenodd');
+        ctx.restore();
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(tl.x, tl.y, br.x - tl.x, br.y - tl.y);
+        ctx.fillStyle = '#fff';
+        ctx.strokeStyle = '#007aff';
+        ctx.lineWidth = 1;
+        var handles = [
+            [tl.x, tl.y],
+            [(tl.x + br.x) / 2, tl.y],
+            [br.x, tl.y],
+            [br.x, (tl.y + br.y) / 2],
+            [br.x, br.y],
+            [(tl.x + br.x) / 2, br.y],
+            [tl.x, br.y],
+            [tl.x, (tl.y + br.y) / 2]
+        ];
+        handles.forEach(function (_a) {
+            var hx = _a[0], hy = _a[1];
+            ctx.fillRect(hx - HANDLE_SIZE / 2, hy - HANDLE_SIZE / 2, HANDLE_SIZE, HANDLE_SIZE);
+            ctx.strokeRect(hx - HANDLE_SIZE / 2, hy - HANDLE_SIZE / 2, HANDLE_SIZE, HANDLE_SIZE);
+        });
+    }, [cropArea, naturalSize, canvasView]);
+    useEffect(function () {
+        paint();
+    }, [paint]);
+    useEffect(function () {
+        var container = containerRef.current;
+        if (!container) {
+            return;
+        }
+        var observer = new ResizeObserver(function () { return paint(); });
+        observer.observe(container);
+        return function () { return observer.disconnect(); };
+    }, [paint]);
+    var onPointerDown = function (e) {
+        var _a;
+        if (viewInteraction.tryStartPan(e)) {
+            return;
+        }
+        if (!cropArea || !naturalSize.width) {
+            return;
+        }
+        var rect = (_a = containerRef.current) === null || _a === void 0 ? void 0 : _a.getBoundingClientRect();
+        if (!rect) {
+            return;
+        }
+        var layout = computeImageLayout(rect.width, rect.height, naturalSize.width, naturalSize.height, canvasView);
+        var displayX = e.clientX - rect.left;
+        var displayY = e.clientY - rect.top;
+        var handle = hitHandle(displayX, displayY, cropArea, layout);
+        if (!handle) {
+            return;
+        }
+        var pointer = clientToImage(e.clientX, e.clientY, rect, layout, false);
+        if (!pointer) {
+            return;
+        }
+        dragRef.current = { handle: handle, startCrop: cropArea, startPointer: pointer };
+        e.target.setPointerCapture(e.pointerId);
+    };
+    var onPointerMove = function (e) {
+        var _a;
+        if (viewInteraction.handlePanMove(e)) {
+            return;
+        }
+        var drag = dragRef.current;
+        if (!drag || !naturalSize.width) {
+            return;
+        }
+        var rect = (_a = containerRef.current) === null || _a === void 0 ? void 0 : _a.getBoundingClientRect();
+        if (!rect) {
+            return;
+        }
+        var layout = computeImageLayout(rect.width, rect.height, naturalSize.width, naturalSize.height, canvasView);
+        var pointer = clientToImage(e.clientX, e.clientY, rect, layout, false);
+        if (!pointer) {
+            return;
+        }
+        var next = resizeCrop(cropArea, drag.handle, pointer, drag.startCrop, drag.startPointer, naturalSize.width, naturalSize.height, aspect);
+        onCropAreaChange(cropAreaWithAspect(next, aspect, naturalSize.width, naturalSize.height));
+    };
+    var onPointerUp = function () {
+        viewInteraction.endPan();
+        dragRef.current = null;
+    };
+    var applyDimensionInputs = function () {
+        if (!cropArea || !naturalSize.width) {
+            return;
+        }
+        var w = Number(cropWidthInput);
+        var h = Number(cropHeightInput);
+        if (!Number.isFinite(w) || !Number.isFinite(h) || w < 8 || h < 8) {
+            return;
+        }
+        onCropAreaChange(resizeCropToDimensions(cropArea, w, h, naturalSize.width, naturalSize.height, aspect));
+    };
+    return (jsxs(Box$1, { sx: { display: 'flex', flexDirection: 'column', gap: 1, flex: 1, minHeight: 0 }, children: [jsx(Paper, { elevation: 0, variant: "outlined", sx: { p: 1.25, borderRadius: 2 }, children: jsxs(Stack$1, { spacing: 1, children: [jsx(ImageCanvasZoomBar, { view: canvasView, onViewChange: onCanvasViewChange, compact: true }), jsxs(Stack$1, { direction: "row", spacing: 2, alignItems: "center", flexWrap: "wrap", useFlexGap: true, children: [jsx(Typography, { variant: "caption", color: "text.secondary", sx: { fontWeight: 600 }, children: "Aspect" }), jsx(ToggleButtonGroup, { size: "small", value: aspect !== null && aspect !== void 0 ? aspect : 'free', exclusive: true, onChange: function (_, val) {
+                                        if (val === null || !cropArea || !naturalSize.width)
+                                            return;
+                                        var nextAspect = val === 'free' ? undefined : Number(val);
+                                        onAspectChange(nextAspect);
+                                        if (nextAspect) {
+                                            onCropAreaChange(cropAreaWithAspect(cropArea, nextAspect, naturalSize.width, naturalSize.height));
+                                        }
+                                    }, children: ASPECT_PRESETS.map(function (preset) {
+                                        var _a;
+                                        return (jsx(ToggleButton, { value: (_a = preset.value) !== null && _a !== void 0 ? _a : 'free', children: preset.label }, preset.label));
+                                    }) }), jsx(TextField$1, { size: "small", label: "W (px)", type: "number", value: cropWidthInput, onChange: function (e) { return setCropWidthInput(e.target.value); }, onKeyDown: function (e) { return e.key === 'Enter' && applyDimensionInputs(); }, sx: { width: 100 } }), jsx(TextField$1, { size: "small", label: "H (px)", type: "number", value: cropHeightInput, onChange: function (e) { return setCropHeightInput(e.target.value); }, onKeyDown: function (e) { return e.key === 'Enter' && applyDimensionInputs(); }, sx: { width: 100 } })] })] }) }), jsx(Paper, { ref: containerRef, elevation: 0, onWheel: viewInteraction.handleWheel, sx: {
+                    flex: 1,
+                    minHeight: 0,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    position: 'relative',
+                    borderRadius: 2,
+                    overflow: 'hidden',
+                    bgcolor: '#141414',
+                    border: "1px solid ".concat(alpha(theme.palette.common.white, 0.08)),
+                    touchAction: 'none'
+                }, children: jsx("canvas", { ref: canvasRef, style: {
+                        display: 'block',
+                        width: '100%',
+                        height: '100%',
+                        cursor: (_b = viewInteraction.panCursor) !== null && _b !== void 0 ? _b : 'crosshair'
+                    }, onPointerDown: onPointerDown, onPointerMove: onPointerMove, onPointerUp: onPointerUp, onPointerLeave: onPointerUp }) })] }));
+}
+
+function ImageStudioEditor(_a) {
+    var _b, _c;
+    var imageSrc = _a.imageSrc, tool = _a.tool, adjustments = _a.adjustments, onAdjustmentsChange = _a.onAdjustmentsChange, focal = _a.focal, onFocalChange = _a.onFocalChange, croppedAreaPixels = _a.croppedAreaPixels, onCroppedAreaPixelsChange = _a.onCroppedAreaPixelsChange, aspect = _a.aspect, onAspectChange = _a.onAspectChange, outputWidth = _a.outputWidth, outputHeight = _a.outputHeight, onOutputWidthChange = _a.onOutputWidthChange, onOutputHeightChange = _a.onOutputHeightChange, lockOutputAspect = _a.lockOutputAspect, onLockOutputAspectChange = _a.onLockOutputAspectChange, outputBackground = _a.outputBackground, onOutputBackgroundChange = _a.onOutputBackgroundChange, onReset = _a.onReset, filterPresetId = _a.filterPresetId, onSelectFilterPreset = _a.onSelectFilterPreset, onTintChange = _a.onTintChange, drawState = _a.drawState, onDrawStateChange = _a.onDrawStateChange, drawTool = _a.drawTool, onDrawToolChange = _a.onDrawToolChange, brushColor = _a.brushColor, onBrushColorChange = _a.onBrushColorChange, brushSize = _a.brushSize, onBrushSizeChange = _a.onBrushSizeChange, textFontFamily = _a.textFontFamily, onTextFontFamilyChange = _a.onTextFontFamilyChange, textFontSize = _a.textFontSize, onTextFontSizeChange = _a.onTextFontSizeChange, canvasView = _a.canvasView, onCanvasViewChange = _a.onCanvasViewChange;
+    var theme = useTheme();
+    var _d = useState({ width: 0, height: 0 }), naturalSize = _d[0], setNaturalSize = _d[1];
     useEffect(function () {
         var img = new Image();
         img.onload = function () { return setNaturalSize({ width: img.naturalWidth, height: img.naturalHeight }); };
         img.src = imageSrc;
     }, [imageSrc]);
-    var onCropComplete = useCallback(function (_, pixels) {
-        onCroppedAreaPixelsChange(pixels);
-    }, [onCroppedAreaPixelsChange]);
     var focalPreviews = useMemo(function () {
         if (!naturalSize.width || !naturalSize.height) {
             return [];
@@ -44863,142 +44663,182 @@ function ImageStudioEditor(_a) {
     var rotate = function (delta) {
         onAdjustmentsChange(__assign(__assign({}, adjustments), { rotation: (adjustments.rotation + delta) % 360 }));
     };
-    return (jsxs(Box$1, { sx: { display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minHeight: 0 }, children: [jsxs(Paper, { variant: "outlined", sx: { position: 'relative', flex: 1, minHeight: 320, bgcolor: '#1e1e1e' }, children: [tool === 'crop' && (jsx(Cropper, { image: imageSrc, crop: cropPosition, zoom: zoom, aspect: aspect !== null && aspect !== void 0 ? aspect : (naturalSize.width && naturalSize.height ? naturalSize.width / naturalSize.height : 1), rotation: adjustments.rotation, minZoom: 1, maxZoom: 3, cropShape: "rect", zoomSpeed: 1, restrictPosition: true, keyboardStep: 1, style: { containerStyle: { borderRadius: 4 } }, classes: {}, mediaProps: {}, cropperProps: {}, onCropChange: onCropPositionChange, onZoomChange: setZoom, onCropComplete: onCropComplete })), tool === 'focal' && (jsx(Box$1, { sx: {
-                            position: 'absolute',
-                            inset: 0,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            p: 2
-                        }, children: jsxs(Box$1, { onClick: handleFocalClick, sx: {
-                                position: 'relative',
-                                maxWidth: '100%',
-                                maxHeight: '100%',
-                                cursor: 'crosshair',
-                                userSelect: 'none'
-                            }, children: [jsx("img", { src: imageSrc, alt: "Focal point", style: {
-                                        maxWidth: '100%',
-                                        maxHeight: 'calc(100vh - 280px)',
-                                        display: 'block',
-                                        filter: "brightness(".concat(adjustments.brightness, "%) contrast(").concat(adjustments.contrast, "%) saturate(").concat(adjustments.saturation, "%)")
-                                    } }), jsx(Box$1, { sx: {
-                                        position: 'absolute',
-                                        left: "".concat(focal.x, "%"),
-                                        top: "".concat(focal.y, "%"),
-                                        width: 20,
-                                        height: 20,
-                                        borderRadius: '50%',
-                                        border: '2px solid #fff',
-                                        boxShadow: '0 0 0 2px rgba(0,0,0,0.5)',
-                                        transform: 'translate(-50%, -50%)',
-                                        pointerEvents: 'none'
-                                    } })] }) })), (tool === 'adjust' || tool === 'resize') && (jsx(Box$1, { sx: { position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', p: 2 }, children: jsx("img", { src: imageSrc, alt: "Preview", style: {
-                                maxWidth: '100%',
-                                maxHeight: 'calc(100vh - 280px)',
-                                transform: "rotate(".concat(adjustments.rotation, "deg) scaleX(").concat(adjustments.flipHorizontal ? -1 : 1, ") scaleY(").concat(adjustments.flipVertical ? -1 : 1, ")"),
-                                filter: "brightness(".concat(adjustments.brightness, "%) contrast(").concat(adjustments.contrast, "%) saturate(").concat(adjustments.saturation, "%)")
-                            } }) }))] }), tool === 'crop' && (jsxs(Stack$1, { direction: "row", spacing: 1, alignItems: "center", flexWrap: "wrap", useFlexGap: true, children: [jsx(Typography, { variant: "caption", color: "text.secondary", children: "Aspect:" }), jsx(ToggleButtonGroup, { size: "small", value: aspect !== null && aspect !== void 0 ? aspect : 'free', exclusive: true, onChange: function (_, val) {
-                            if (val === null)
-                                return;
-                            onAspectChange(val === 'free' ? undefined : Number(val));
-                        }, children: ASPECT_PRESETS.map(function (preset) {
-                            var _a;
-                            return (jsx(ToggleButton, { value: (_a = preset.value) !== null && _a !== void 0 ? _a : 'free', children: preset.label }, preset.label));
-                        }) }), jsxs(Box$1, { sx: { flex: 1, minWidth: 120, px: 1 }, children: [jsx(Typography, { variant: "caption", children: "Zoom" }), jsx(Slider, { size: "small", min: 1, max: 3, step: 0.05, value: zoom, onChange: function (_, v) { return setZoom(v); } })] })] })), tool === 'focal' && (jsx(Box$1, { sx: { display: 'flex', flexWrap: 'wrap', gap: 1 }, children: focalPreviews.map(function (preview) { return (jsxs(Box$1, { sx: { width: { xs: '48%', sm: '23%' } }, children: [jsxs(Typography, { variant: "caption", display: "block", children: [preview.label, " preview"] }), jsx(Box$1, { sx: {
-                                position: 'relative',
-                                width: '100%',
-                                aspectRatio: "".concat(preview.ratio),
-                                overflow: 'hidden',
-                                bgcolor: '#111',
-                                borderRadius: 1
-                            }, children: jsx("img", { src: imageSrc, alt: preview.label, style: {
+    var canvasBg = '#141414';
+    var showSidePanel = tool === 'adjust' || tool === 'resize';
+    var previewFilter = buildCssFilter(adjustments);
+    var cropW = (_b = croppedAreaPixels === null || croppedAreaPixels === void 0 ? void 0 : croppedAreaPixels.width) !== null && _b !== void 0 ? _b : naturalSize.width;
+    var cropH = (_c = croppedAreaPixels === null || croppedAreaPixels === void 0 ? void 0 : croppedAreaPixels.height) !== null && _c !== void 0 ? _c : naturalSize.height;
+    var outW = outputWidth === '' ? 0 : Number(outputWidth);
+    var outH = outputHeight === '' ? 0 : Number(outputHeight);
+    var outputSizeDiffers = outW > 0 && outH > 0 && cropW > 0 && cropH > 0 && (outW !== cropW || outH !== cropH);
+    if (tool === 'filters') {
+        return (jsx(Box$1, { sx: { display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }, children: jsx(ImageStudioFiltersPanel, { imageSrc: imageSrc, activePresetId: filterPresetId, adjustments: adjustments, onSelectPreset: onSelectFilterPreset, onTintChange: onTintChange }) }));
+    }
+    if (tool === 'crop') {
+        return (jsx(Box$1, { sx: { display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }, children: jsx(ImageStudioCropCanvas, { imageSrc: imageSrc, cropArea: croppedAreaPixels, onCropAreaChange: onCroppedAreaPixelsChange, aspect: aspect, onAspectChange: onAspectChange, canvasView: canvasView, onCanvasViewChange: onCanvasViewChange }) }));
+    }
+    if (tool === 'draw') {
+        return (jsx(Box$1, { sx: { display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }, children: jsx(ImageStudioDrawCanvas, { imageSrc: imageSrc, adjustments: adjustments, drawState: drawState, onDrawStateChange: onDrawStateChange, drawTool: drawTool, onDrawToolChange: onDrawToolChange, brushColor: brushColor, onBrushColorChange: onBrushColorChange, brushSize: brushSize, onBrushSizeChange: onBrushSizeChange, textFontFamily: textFontFamily, onTextFontFamilyChange: onTextFontFamilyChange, textFontSize: textFontSize, onTextFontSizeChange: onTextFontSizeChange, canvasView: canvasView, onCanvasViewChange: onCanvasViewChange }) }));
+    }
+    return (jsxs(Box$1, { sx: { display: 'flex', flexDirection: 'column', gap: 1, flex: 1, minHeight: 0 }, children: [jsxs(Box$1, { sx: { display: 'flex', gap: 2, flex: 1, minHeight: 0, minWidth: 0 }, children: [jsxs(Paper, { elevation: 0, sx: {
+                            flex: 1,
+                            position: 'relative',
+                            minHeight: 0,
+                            borderRadius: 2,
+                            overflow: 'hidden',
+                            bgcolor: canvasBg,
+                            border: "1px solid ".concat(alpha(theme.palette.common.white, 0.08))
+                        }, children: [tool === 'focal' && (jsx(Box$1, { sx: {
                                     position: 'absolute',
-                                    width: "".concat((naturalSize.width / preview.area.width) * 100, "%"),
-                                    height: "".concat((naturalSize.height / preview.area.height) * 100, "%"),
-                                    left: "".concat(-(preview.area.x / preview.area.width) * 100, "%"),
-                                    top: "".concat(-(preview.area.y / preview.area.height) * 100, "%"),
-                                    maxWidth: 'none'
-                                } }) })] }, preview.label)); }) })), tool === 'adjust' && (jsxs(Box$1, { sx: { display: 'flex', flexWrap: 'wrap', gap: 2 }, children: [jsxs(Box$1, { sx: { flex: 1, minWidth: 160 }, children: [jsx(Typography, { variant: "caption", children: "Brightness" }), jsx(Slider, { min: 50, max: 150, value: adjustments.brightness, onChange: function (_, v) { return onAdjustmentsChange(__assign(__assign({}, adjustments), { brightness: v })); } })] }), jsxs(Box$1, { sx: { flex: 1, minWidth: 160 }, children: [jsx(Typography, { variant: "caption", children: "Contrast" }), jsx(Slider, { min: 50, max: 150, value: adjustments.contrast, onChange: function (_, v) { return onAdjustmentsChange(__assign(__assign({}, adjustments), { contrast: v })); } })] }), jsxs(Box$1, { sx: { flex: 1, minWidth: 160 }, children: [jsx(Typography, { variant: "caption", children: "Saturation" }), jsx(Slider, { min: 0, max: 200, value: adjustments.saturation, onChange: function (_, v) { return onAdjustmentsChange(__assign(__assign({}, adjustments), { saturation: v })); } })] })] })), tool === 'resize' && (jsxs(Stack$1, { direction: "row", spacing: 2, alignItems: "center", flexWrap: "wrap", useFlexGap: true, children: [jsx(TextField$1, { size: "small", label: "Output width", type: "number", value: outputWidth, onChange: function (e) {
-                            var val = e.target.value === '' ? '' : Number(e.target.value);
-                            onOutputWidthChange(val);
-                            if (lockOutputAspect && val && croppedAreaPixels) {
-                                var ratio = croppedAreaPixels.height / croppedAreaPixels.width;
-                                onOutputHeightChange(Math.round(Number(val) * ratio));
-                            }
-                        } }), jsx(TextField$1, { size: "small", label: "Output height", type: "number", value: outputHeight, onChange: function (e) {
-                            var val = e.target.value === '' ? '' : Number(e.target.value);
-                            onOutputHeightChange(val);
-                            if (lockOutputAspect && val && croppedAreaPixels) {
-                                var ratio = croppedAreaPixels.width / croppedAreaPixels.height;
-                                onOutputWidthChange(Math.round(Number(val) * ratio));
-                            }
-                        } }), jsx(FormControlLabel, { control: jsx(Switch, { checked: lockOutputAspect, onChange: function (e) { return onLockOutputAspectChange(e.target.checked); } }), label: "Lock aspect" }), croppedAreaPixels && (jsxs(Typography, { variant: "body2", color: "text.secondary", children: ["Crop area: ", croppedAreaPixels.width, " \u00D7 ", croppedAreaPixels.height, "px"] }))] })), jsx(Divider, {}), jsxs(Stack$1, { direction: "row", spacing: 1, alignItems: "center", flexWrap: "wrap", useFlexGap: true, children: [jsxs(ButtonGroup, { size: "small", variant: "outlined", children: [jsx(Button$1, { onClick: function () { return rotate(-90); }, title: "Rotate left", children: jsx(RotateLeftRoundedIcon, { fontSize: "small" }) }), jsx(Button$1, { onClick: function () { return rotate(90); }, title: "Rotate right", children: jsx(RotateRightRoundedIcon, { fontSize: "small" }) }), jsx(Button$1, { onClick: function () { return onAdjustmentsChange(__assign(__assign({}, adjustments), { flipHorizontal: !adjustments.flipHorizontal })); }, title: "Flip horizontal", children: jsx(FlipRoundedIcon, { fontSize: "small" }) })] }), jsx(Button$1, { size: "small", startIcon: jsx(RestartAltRoundedIcon, {}), onClick: onReset, children: "Reset edits" }), naturalSize.width > 0 && (jsxs(Typography, { variant: "caption", color: "text.secondary", children: ["Source: ", naturalSize.width, " \u00D7 ", naturalSize.height, "px"] }))] })] }));
+                                    inset: 0,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    p: 2
+                                }, children: jsxs(Box$1, { onClick: handleFocalClick, sx: {
+                                        position: 'relative',
+                                        maxWidth: '100%',
+                                        maxHeight: '100%',
+                                        cursor: 'crosshair',
+                                        userSelect: 'none',
+                                        borderRadius: 1,
+                                        overflow: 'hidden'
+                                    }, children: [jsx("img", { src: imageSrc, alt: "Focal point", style: {
+                                                maxWidth: '100%',
+                                                maxHeight: '100%',
+                                                display: 'block',
+                                                filter: previewFilter
+                                            } }), jsx(Box$1, { sx: {
+                                                position: 'absolute',
+                                                left: "".concat(focal.x, "%"),
+                                                top: "".concat(focal.y, "%"),
+                                                width: 22,
+                                                height: 22,
+                                                borderRadius: '50%',
+                                                border: '2px solid #fff',
+                                                boxShadow: '0 0 0 2px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.3)',
+                                                transform: 'translate(-50%, -50%)',
+                                                pointerEvents: 'none'
+                                            } })] }) })), (tool === 'adjust' || tool === 'resize') && (jsx(Box$1, { sx: {
+                                    position: 'absolute',
+                                    inset: 0,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    p: 2
+                                }, children: jsx("img", { src: imageSrc, alt: "Preview", style: {
+                                        maxWidth: '100%',
+                                        maxHeight: '100%',
+                                        borderRadius: 4,
+                                        transform: "rotate(".concat(adjustments.rotation, "deg) scaleX(").concat(adjustments.flipHorizontal ? -1 : 1, ") scaleY(").concat(adjustments.flipVertical ? -1 : 1, ")"),
+                                        filter: previewFilter
+                                    } }) }))] }), showSidePanel && (jsxs(Paper, { elevation: 0, variant: "outlined", sx: {
+                            width: { xs: '100%', md: 280 },
+                            flexShrink: 0,
+                            p: 2,
+                            borderRadius: 2,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 2,
+                            minHeight: 0,
+                            overflowY: 'auto'
+                        }, children: [tool === 'adjust' && (jsxs(Fragment, { children: [jsx(Typography, { variant: "subtitle2", sx: { fontWeight: 600 }, children: "Adjustments" }), jsxs(Box$1, { children: [jsx(Typography, { variant: "caption", color: "text.secondary", children: "Brightness" }), jsx(Slider, { size: "small", min: 50, max: 150, value: adjustments.brightness, onChange: function (_, v) { return onAdjustmentsChange(__assign(__assign({}, adjustments), { brightness: v })); } })] }), jsxs(Box$1, { children: [jsx(Typography, { variant: "caption", color: "text.secondary", children: "Contrast" }), jsx(Slider, { size: "small", min: 50, max: 150, value: adjustments.contrast, onChange: function (_, v) { return onAdjustmentsChange(__assign(__assign({}, adjustments), { contrast: v })); } })] }), jsxs(Box$1, { children: [jsx(Typography, { variant: "caption", color: "text.secondary", children: "Saturation" }), jsx(Slider, { size: "small", min: 0, max: 200, value: adjustments.saturation, onChange: function (_, v) { return onAdjustmentsChange(__assign(__assign({}, adjustments), { saturation: v })); } })] }), jsxs(Box$1, { children: [jsx(Typography, { variant: "caption", color: "text.secondary", children: "Hue" }), jsx(Slider, { size: "small", min: -90, max: 90, value: adjustments.hueRotate, onChange: function (_, v) { return onAdjustmentsChange(__assign(__assign({}, adjustments), { hueRotate: v })); } })] }), jsxs(Box$1, { children: [jsx(Typography, { variant: "caption", color: "text.secondary", children: "Vignette" }), jsx(Slider, { size: "small", min: 0, max: 100, value: adjustments.vignette, onChange: function (_, v) { return onAdjustmentsChange(__assign(__assign({}, adjustments), { vignette: v })); } })] }), jsxs(Box$1, { children: [jsx(Typography, { variant: "caption", color: "text.secondary", children: "Blur" }), jsx(Slider, { size: "small", min: 0, max: 8, step: 0.5, value: adjustments.blur, onChange: function (_, v) { return onAdjustmentsChange(__assign(__assign({}, adjustments), { blur: v })); } })] })] })), tool === 'resize' && (jsxs(Fragment, { children: [jsx(Typography, { variant: "subtitle2", sx: { fontWeight: 600 }, children: "Output size" }), jsx(TextField$1, { size: "small", fullWidth: true, label: "Width (px)", type: "number", value: outputWidth, onChange: function (e) {
+                                            var val = e.target.value === '' ? '' : Number(e.target.value);
+                                            onOutputWidthChange(val);
+                                            if (lockOutputAspect && val && croppedAreaPixels) {
+                                                var ratio = croppedAreaPixels.height / croppedAreaPixels.width;
+                                                onOutputHeightChange(Math.round(Number(val) * ratio));
+                                            }
+                                        } }), jsx(TextField$1, { size: "small", fullWidth: true, label: "Height (px)", type: "number", value: outputHeight, onChange: function (e) {
+                                            var val = e.target.value === '' ? '' : Number(e.target.value);
+                                            onOutputHeightChange(val);
+                                            if (lockOutputAspect && val && croppedAreaPixels) {
+                                                var ratio = croppedAreaPixels.width / croppedAreaPixels.height;
+                                                onOutputWidthChange(Math.round(Number(val) * ratio));
+                                            }
+                                        } }), jsx(FormControlLabel, { control: jsx(Switch, { size: "small", checked: lockOutputAspect, onChange: function (e) { return onLockOutputAspectChange(e.target.checked); } }), label: "Lock aspect ratio" }), croppedAreaPixels && (jsxs(Typography, { variant: "body2", color: "text.secondary", children: ["Crop area: ", croppedAreaPixels.width, " \u00D7 ", croppedAreaPixels.height, "px"] })), outputSizeDiffers && (jsxs(Box$1, { sx: { mt: 1 }, children: [jsx(Typography, { variant: "caption", color: "text.secondary", display: "block", sx: { mb: 1 }, children: "Image is scaled to fit and centered. Extra canvas area uses the background below." }), jsxs(ToggleButtonGroup, { size: "small", exclusive: true, value: outputBackground.mode, onChange: function (_, val) {
+                                                    if (val) {
+                                                        onOutputBackgroundChange(__assign(__assign({}, outputBackground), { mode: val }));
+                                                    }
+                                                }, children: [jsx(ToggleButton, { value: "transparent", children: "Transparent" }), jsx(ToggleButton, { value: "color", children: "Color" })] }), outputBackground.mode === 'color' && (jsxs(Stack$1, { direction: "row", spacing: 0.5, sx: { mt: 1 }, flexWrap: "wrap", useFlexGap: true, children: [OUTPUT_BACKGROUND_SWATCHES.map(function (color) { return (jsx(IconButton$1, { size: "small", onClick: function () { return onOutputBackgroundChange(__assign(__assign({}, outputBackground), { color: color })); }, sx: {
+                                                            width: 28,
+                                                            height: 28,
+                                                            bgcolor: color,
+                                                            border: outputBackground.color === color ? "2px solid ".concat(theme.palette.primary.main) : '1px solid',
+                                                            borderColor: outputBackground.color === color ? 'primary.main' : 'divider'
+                                                        } }, color)); }), jsx(TextField$1, { size: "small", label: "Custom", value: outputBackground.color, onChange: function (e) {
+                                                            return onOutputBackgroundChange(__assign(__assign({}, outputBackground), { color: e.target.value }));
+                                                        }, sx: { width: 100 } })] }))] }))] }))] }))] }), tool === 'focal' && (jsxs(Paper, { elevation: 0, variant: "outlined", sx: { p: 2, borderRadius: 2 }, children: [jsx(Typography, { variant: "caption", color: "text.secondary", sx: { fontWeight: 600, display: 'block', mb: 1.5 }, children: "Crop previews at focal point" }), jsx(Box$1, { sx: { display: 'flex', gap: 1.5, overflowX: 'auto', pb: 0.5 }, children: focalPreviews.map(function (preview) { return (jsxs(Box$1, { sx: { flexShrink: 0, width: 120 }, children: [jsx(Typography, { variant: "caption", display: "block", sx: { mb: 0.5 }, children: preview.label }), jsx(Box$1, { sx: {
+                                        position: 'relative',
+                                        width: 120,
+                                        aspectRatio: "".concat(preview.ratio),
+                                        overflow: 'hidden',
+                                        bgcolor: canvasBg,
+                                        borderRadius: 1.5,
+                                        border: "1px solid ".concat(theme.palette.divider)
+                                    }, children: jsx("img", { src: imageSrc, alt: preview.label, style: {
+                                            position: 'absolute',
+                                            width: "".concat((naturalSize.width / preview.area.width) * 100, "%"),
+                                            height: "".concat((naturalSize.height / preview.area.height) * 100, "%"),
+                                            left: "".concat(-(preview.area.x / preview.area.width) * 100, "%"),
+                                            top: "".concat(-(preview.area.y / preview.area.height) * 100, "%"),
+                                            maxWidth: 'none'
+                                        } }) })] }, preview.label)); }) })] })), jsxs(Stack$1, { direction: "row", spacing: 1.5, alignItems: "center", flexWrap: "wrap", useFlexGap: true, sx: {
+                    pt: 0.5,
+                    borderTop: 1,
+                    borderColor: 'divider'
+                }, children: [jsxs(ButtonGroup, { size: "small", variant: "outlined", sx: { borderRadius: 2 }, children: [jsx(Button$1, { onClick: function () { return rotate(-90); }, title: "Rotate left", children: jsx(RotateLeftRoundedIcon, { fontSize: "small" }) }), jsx(Button$1, { onClick: function () { return rotate(90); }, title: "Rotate right", children: jsx(RotateRightRoundedIcon, { fontSize: "small" }) }), jsx(Button$1, { onClick: function () { return onAdjustmentsChange(__assign(__assign({}, adjustments), { flipHorizontal: !adjustments.flipHorizontal })); }, title: "Flip horizontal", children: jsx(FlipRoundedIcon, { fontSize: "small" }) })] }), jsx(Button$1, { size: "small", variant: "text", startIcon: jsx(RestartAltRoundedIcon, {}), onClick: onReset, children: "Reset edits" }), naturalSize.width > 0 && (jsxs(Typography, { variant: "caption", color: "text.secondary", sx: { ml: 'auto' }, children: ["Source: ", naturalSize.width, " \u00D7 ", naturalSize.height, "px"] }))] })] }));
+}
+
+/*
+ * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License version 3 as published by
+ * the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+function useContentTypes() {
+  const dispatch = useDispatch();
+  const site = useActiveSiteId();
+  const { byId, isFetching } = useSelection((state) => state.contentTypes);
+  useEffect(() => {
+    if (!byId && site && isFetching === null) {
+      dispatch(fetchContentTypes());
+    }
+  }, [dispatch, site, byId, isFetching]);
+  return byId;
 }
 
 /*
  * Copyright (C) 2007-2026 Crafter Software Corporation. All Rights Reserved.
  */
-var CONTENT_TYPES_ROOT = '/config/studio/content-types';
-var FETCH_LIMIT = 500;
-function collectFormDefinitionPaths(siteId) {
-    return __awaiter(this, void 0, void 0, function () {
-        var paths, queue, current, response, i, item;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    paths = [];
-                    queue = [CONTENT_TYPES_ROOT];
-                    _a.label = 1;
-                case 1:
-                    if (!(queue.length > 0)) return [3 /*break*/, 3];
-                    current = queue.shift();
-                    return [4 /*yield*/, fetchChildrenByPath(siteId, current, { limit: FETCH_LIMIT }).pipe(take(1)).toPromise()];
-                case 2:
-                    response = _a.sent();
-                    if (!response) {
-                        return [3 /*break*/, 1];
-                    }
-                    for (i = 0; i < response.length; i++) {
-                        item = response[i];
-                        if (!(item === null || item === void 0 ? void 0 : item.path)) {
-                            continue;
-                        }
-                        if (item.path.endsWith('/form-definition.xml')) {
-                            paths.push(item.path);
-                        }
-                        else if (item.systemType === 'folder' || item.path.split('/').length < 8) {
-                            queue.push(item.path);
-                        }
-                    }
-                    return [3 /*break*/, 1];
-                case 3: return [2 /*return*/, paths];
-            }
-        });
-    });
-}
-function getFieldPropertyValue(field, propertyName) {
-    var _a, _b, _c, _d;
-    var properties = field.querySelectorAll('properties > property');
-    for (var i = 0; i < properties.length; i++) {
-        var property = properties[i];
-        var name_1 = (_b = (_a = property.querySelector('name')) === null || _a === void 0 ? void 0 : _a.textContent) === null || _b === void 0 ? void 0 : _b.trim();
-        if (name_1 === propertyName) {
-            return (_d = (_c = property.querySelector('value')) === null || _c === void 0 ? void 0 : _c.textContent) === null || _d === void 0 ? void 0 : _d.trim();
-        }
+function labelFromFormPath(formPath) {
+    var relative = formPath
+        .replace('/config/studio/content-types/', '')
+        .replace('/form-definition.xml', '');
+    var parts = relative.split('/').filter(Boolean);
+    if (parts.length >= 2) {
+        var category = parts[0];
+        var name_1 = parts.slice(1).join(' / ');
+        var categoryLabel = category.charAt(0).toUpperCase() + category.slice(1);
+        return "".concat(name_1, " (").concat(categoryLabel, ")");
     }
-    return undefined;
+    return relative;
 }
-function parseImageRequirementsFromXml(xml, formPath) {
-    var _a, _b, _c, _d;
+function parseImagePickerFieldsFromXml(xml) {
     var results = [];
     var parser = new DOMParser();
     var doc = parser.parseFromString(xml, 'text/xml');
-    var contentTypeNode = doc.querySelector('content-type');
-    var contentType = (_b = (_a = contentTypeNode === null || contentTypeNode === void 0 ? void 0 : contentTypeNode.textContent) === null || _a === void 0 ? void 0 : _a.trim()) !== null && _b !== void 0 ? _b : formPath.replace('/config/studio/content-types/', '').replace('/form-definition.xml', '');
-    var titleNode = doc.querySelector('title');
-    var contentTypeLabel = (_d = (_c = titleNode === null || titleNode === void 0 ? void 0 : titleNode.textContent) === null || _c === void 0 ? void 0 : _c.trim()) !== null && _d !== void 0 ? _d : contentType;
-    var fields = doc.querySelectorAll('field');
-    fields.forEach(function (field) {
+    doc.querySelectorAll('field').forEach(function (field) {
         var _a, _b, _c, _d, _e, _f, _g, _h;
         var type = (_b = (_a = field.querySelector('type')) === null || _a === void 0 ? void 0 : _a.textContent) === null || _b === void 0 ? void 0 : _b.trim();
         if (type !== 'image-picker') {
@@ -45006,29 +44846,107 @@ function parseImageRequirementsFromXml(xml, formPath) {
         }
         var fieldId = (_e = (_d = (_c = field.querySelector('id')) === null || _c === void 0 ? void 0 : _c.textContent) === null || _d === void 0 ? void 0 : _d.trim()) !== null && _e !== void 0 ? _e : '';
         var fieldTitle = (_h = (_g = (_f = field.querySelector('title')) === null || _f === void 0 ? void 0 : _f.textContent) === null || _g === void 0 ? void 0 : _g.trim()) !== null && _h !== void 0 ? _h : fieldId;
-        var widthProp = getFieldPropertyValue(field, 'width');
-        var heightProp = getFieldPropertyValue(field, 'height');
-        var width = parseRangeProperty(widthProp !== null && widthProp !== void 0 ? widthProp : undefined);
-        var height = parseRangeProperty(heightProp !== null && heightProp !== void 0 ? heightProp : undefined);
-        if (width.exact == null &&
-            width.min == null &&
-            width.max == null &&
-            height.exact == null &&
-            height.min == null &&
-            height.max == null) {
-            results.push({
-                contentType: contentType.startsWith('/') ? contentType : "/page/".concat(contentType),
-                contentTypeLabel: contentTypeLabel,
-                fieldId: fieldId,
-                fieldTitle: fieldTitle
-            });
+        if (fieldId) {
+            results.push({ fieldId: fieldId, fieldTitle: fieldTitle });
+        }
+    });
+    return results;
+}
+function contentTypeToFormPath(contentType) {
+    var normalized = contentType.replace(/^\//, '');
+    return "/config/studio/content-types/".concat(normalized, "/form-definition.xml");
+}
+function loadImagePickerFieldsForContent(siteId, contentPath) {
+    return __awaiter(this, void 0, void 0, function () {
+        var xml, parser, doc, contentType, objectId, formPath, formXml, fields;
+        var _a, _b, _c, _d, _e, _f;
+        return __generator(this, function (_g) {
+            switch (_g.label) {
+                case 0: return [4 /*yield*/, fetchContentXML(siteId, contentPath).pipe(take(1)).toPromise()];
+                case 1:
+                    xml = _g.sent();
+                    if (!xml) {
+                        return [2 /*return*/, { objectId: '', contentType: '', fields: [] }];
+                    }
+                    parser = new DOMParser();
+                    doc = parser.parseFromString(xml, 'text/xml');
+                    contentType = (_c = (_b = (_a = doc.querySelector('content-type')) === null || _a === void 0 ? void 0 : _a.textContent) === null || _b === void 0 ? void 0 : _b.trim()) !== null && _c !== void 0 ? _c : '';
+                    objectId = (_f = (_e = (_d = doc.querySelector('objectId')) === null || _d === void 0 ? void 0 : _d.textContent) === null || _e === void 0 ? void 0 : _e.trim()) !== null && _f !== void 0 ? _f : '';
+                    formPath = contentTypeToFormPath(contentType);
+                    return [4 /*yield*/, fetchContentXML(siteId, formPath).pipe(take(1)).toPromise()];
+                case 2:
+                    formXml = _g.sent();
+                    fields = formXml ? parseImagePickerFieldsFromXml(formXml) : [];
+                    return [2 /*return*/, { objectId: objectId, contentType: contentType, fields: fields }];
+            }
+        });
+    });
+}
+function updateContentImageField(siteId, contentPath, objectId, fieldId, imagePath) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, updateField(siteId, objectId, fieldId, null, contentPath, imagePath, false).pipe(take(1)).toPromise()];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+function contentTypeFormOptionsFromCatalog(types) {
+    return types
+        .map(function (ct) {
+        var _a;
+        return ({
+            formPath: contentTypeToFormPath(ct.id),
+            contentType: ct.id,
+            label: ((_a = ct.name) === null || _a === void 0 ? void 0 : _a.trim()) || labelFromFormPath(contentTypeToFormPath(ct.id))
+        });
+    })
+        .sort(function (a, b) { return a.label.localeCompare(b.label); });
+}
+function collectContentTypeFields(fields, acc) {
+    if (acc === void 0) { acc = []; }
+    if (!fields) {
+        return acc;
+    }
+    Object.values(fields).forEach(function (field) {
+        acc.push(field);
+        if (field.fields) {
+            collectContentTypeFields(field.fields, acc);
+        }
+    });
+    return acc;
+}
+function dimensionFromValidation(validations, exactKey, minKey, maxKey) {
+    var _a, _b, _c;
+    var exactVal = (_a = validations[exactKey]) === null || _a === void 0 ? void 0 : _a.value;
+    if (exactVal != null && exactVal !== '' && Number.isFinite(Number(exactVal))) {
+        return { exact: Number(exactVal) };
+    }
+    var min = (_b = validations[minKey]) === null || _b === void 0 ? void 0 : _b.value;
+    var max = (_c = validations[maxKey]) === null || _c === void 0 ? void 0 : _c.value;
+    return {
+        min: min != null && min !== '' && Number.isFinite(Number(min)) ? Number(min) : undefined,
+        max: max != null && max !== '' && Number.isFinite(Number(max)) ? Number(max) : undefined
+    };
+}
+/** Build image-picker requirements from an in-memory ContentType (no extra API call). */
+function parseImageRequirementsFromContentType(contentType) {
+    var fields = collectContentTypeFields(contentType.fields);
+    var results = [];
+    fields.forEach(function (field) {
+        if (field.type !== 'image') {
             return;
         }
+        var width = dimensionFromValidation(field.validations, 'width', 'minWidth', 'maxWidth');
+        var height = dimensionFromValidation(field.validations, 'height', 'minHeight', 'maxHeight');
         results.push({
-            contentType: contentType.startsWith('/') ? contentType : contentType.includes('/') ? contentType : "/component/".concat(contentType),
-            contentTypeLabel: contentTypeLabel,
-            fieldId: fieldId,
-            fieldTitle: fieldTitle,
+            contentType: contentType.id,
+            contentTypeLabel: contentType.name,
+            fieldId: field.id,
+            fieldTitle: field.name || field.id,
             widthMin: width.min,
             widthMax: width.max,
             widthExact: width.exact,
@@ -45037,103 +44955,432 @@ function parseImageRequirementsFromXml(xml, formPath) {
             heightExact: height.exact
         });
     });
-    return results;
-}
-function scanImageSizeRequirements(siteId) {
-    return __awaiter(this, void 0, void 0, function () {
-        var formPaths, all, _i, formPaths_1, path, xml;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
-                case 0: return [4 /*yield*/, collectFormDefinitionPaths(siteId)];
-                case 1:
-                    formPaths = _b.sent();
-                    all = [];
-                    _i = 0, formPaths_1 = formPaths;
-                    _b.label = 2;
-                case 2:
-                    if (!(_i < formPaths_1.length)) return [3 /*break*/, 7];
-                    path = formPaths_1[_i];
-                    _b.label = 3;
-                case 3:
-                    _b.trys.push([3, 5, , 6]);
-                    return [4 /*yield*/, fetchContentXML(siteId, path).pipe(take(1)).toPromise()];
-                case 4:
-                    xml = _b.sent();
-                    if (!xml) {
-                        return [3 /*break*/, 6];
-                    }
-                    all.push.apply(all, parseImageRequirementsFromXml(xml, path));
-                    return [3 /*break*/, 6];
-                case 5:
-                    _b.sent();
-                    return [3 /*break*/, 6];
-                case 6:
-                    _i++;
-                    return [3 /*break*/, 2];
-                case 7: return [2 /*return*/, all.sort(function (a, b) {
-                        var labelCmp = a.contentTypeLabel.localeCompare(b.contentTypeLabel);
-                        return labelCmp !== 0 ? labelCmp : a.fieldTitle.localeCompare(b.fieldTitle);
-                    })];
-            }
-        });
-    });
+    return results.sort(function (a, b) { return a.fieldTitle.localeCompare(b.fieldTitle); });
 }
 
 function ImageSizeRequirementsPanel(_a) {
-    var currentWidth = _a.currentWidth, currentHeight = _a.currentHeight;
+    var _b;
+    var currentWidth = _a.currentWidth, currentHeight = _a.currentHeight, _c = _a.active, active = _c === void 0 ? true : _c, appliedFieldId = _a.appliedFieldId, onApplyConstraints = _a.onApplyConstraints;
+    var dispatch = useDispatch();
     var siteId = useActiveSiteId();
-    var _b = useState(false), loading = _b[0], setLoading = _b[1];
-    var _c = useState([]), requirements = _c[0], setRequirements = _c[1];
-    var _d = useState(''), filter = _d[0], setFilter = _d[1];
-    var _e = useState(null), error = _e[0], setError = _e[1];
+    var contentTypesById = useContentTypes();
+    var contentTypesFetching = useSelector(function (state) { var _a; return (_a = state.contentTypes) === null || _a === void 0 ? void 0 : _a.isFetching; });
+    var _d = useState(false), loadingTypes = _d[0], setLoadingTypes = _d[1];
+    var _e = useState(null), selectedType = _e[0], setSelectedType = _e[1];
+    var _f = useState([]), requirements = _f[0], setRequirements = _f[1];
+    var _g = useState(''), filter = _g[0], setFilter = _g[1];
+    var _h = useState(null), error = _h[0], setError = _h[1];
+    var _j = useState(null), selectedFieldId = _j[0], setSelectedFieldId = _j[1];
     useEffect(function () {
-        if (!siteId) {
+        setSelectedFieldId(null);
+    }, [selectedType === null || selectedType === void 0 ? void 0 : selectedType.formPath]);
+    useEffect(function () {
+        if (!siteId || !active) {
             return;
         }
-        setLoading(true);
+        if (!contentTypesById && contentTypesFetching === null) {
+            dispatch(fetchContentTypes());
+        }
+    }, [siteId, active, contentTypesById, contentTypesFetching, dispatch]);
+    var contentTypes = useMemo(function () {
+        if (!contentTypesById) {
+            return [];
+        }
+        return contentTypeFormOptionsFromCatalog(Object.values(contentTypesById));
+    }, [contentTypesById]);
+    useEffect(function () {
+        setLoadingTypes(Boolean(active && siteId && !contentTypesById && contentTypesFetching));
+    }, [active, siteId, contentTypesById, contentTypesFetching]);
+    useEffect(function () {
+        if (!selectedType || !contentTypesById) {
+            setRequirements([]);
+            return;
+        }
+        var contentType = contentTypesById[selectedType.contentType];
+        if (!contentType) {
+            setRequirements([]);
+            return;
+        }
         setError(null);
-        scanImageSizeRequirements(siteId)
-            .then(setRequirements)
-            .catch(function (e) { return setError(e.message); })
-            .finally(function () { return setLoading(false); });
-    }, [siteId]);
+        setRequirements(parseImageRequirementsFromContentType(contentType));
+    }, [selectedType, contentTypesById]);
     var filtered = useMemo(function () {
         var q = filter.trim().toLowerCase();
         if (!q) {
             return requirements;
         }
         return requirements.filter(function (req) {
-            return req.contentTypeLabel.toLowerCase().includes(q) ||
-                req.contentType.toLowerCase().includes(q) ||
-                req.fieldId.toLowerCase().includes(q) ||
-                req.fieldTitle.toLowerCase().includes(q);
+            return req.fieldId.toLowerCase().includes(q) ||
+                req.fieldTitle.toLowerCase().includes(q) ||
+                formatDimensionSpec(req).toLowerCase().includes(q);
         });
     }, [requirements, filter]);
-    return (jsxs(Paper, { variant: "outlined", sx: { p: 2, height: '100%' }, children: [jsx(Typography, { variant: "subtitle1", gutterBottom: true, children: "Image size requirements" }), jsx(Typography, { variant: "body2", color: "text.secondary", sx: { mb: 2 }, children: "Scans content type form definitions for image-picker width and height constraints." }), currentWidth && currentHeight && (jsx(Box$1, { sx: { mb: 2 }, children: jsxs(Typography, { variant: "body2", children: ["Current image: ", jsxs("strong", { children: [currentWidth, " \u00D7 ", currentHeight, "px"] })] }) })), jsx(TextField$1, { size: "small", fullWidth: true, placeholder: "Filter by content type or field\u2026", value: filter, onChange: function (e) { return setFilter(e.target.value); }, sx: { mb: 2 }, InputProps: {
-                    startAdornment: (jsx(InputAdornment, { position: "start", children: jsx(SearchRoundedIcon, { fontSize: "small" }) }))
-                } }), loading && (jsx(Box$1, { sx: { display: 'flex', justifyContent: 'center', py: 4 }, children: jsx(CircularProgress, { size: 28 }) })), error && (jsx(Typography, { color: "error", variant: "body2", children: error })), !loading && !error && (jsx(Box$1, { sx: { maxHeight: 360, overflow: 'auto' }, children: jsxs(Table, { size: "small", stickyHeader: true, children: [jsx(TableHead, { children: jsxs(TableRow, { children: [jsx(TableCell, { children: "Content type" }), jsx(TableCell, { children: "Field" }), jsx(TableCell, { children: "Requirements" }), currentWidth && currentHeight ? jsx(TableCell, { children: "Match" }) : null] }) }), jsxs(TableBody, { children: [filtered.map(function (req) {
+    var selectedRequirement = (_b = requirements.find(function (r) { return r.fieldId === selectedFieldId; })) !== null && _b !== void 0 ? _b : null;
+    var applyEnabled = Boolean(selectedRequirement && hasApplicableConstraints(selectedRequirement));
+    return (jsxs(Paper, { variant: "outlined", sx: {
+            p: 2,
+            height: '100%',
+            minHeight: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden'
+        }, children: [jsx(Typography, { variant: "subtitle1", gutterBottom: true, children: "Image size requirements" }), jsx(Typography, { variant: "body2", color: "text.secondary", sx: { mb: 2 }, children: "Choose a content type to see image-picker width and height constraints for its fields." }), currentWidth && currentHeight && (jsx(Box$1, { sx: { mb: 2 }, children: jsxs(Typography, { variant: "body2", children: ["Current image: ", jsxs("strong", { children: [currentWidth, " \u00D7 ", currentHeight, "px"] })] }) })), jsx(Autocomplete, { size: "small", options: contentTypes, value: selectedType, onChange: function (_, value) { return setSelectedType(value); }, getOptionLabel: function (opt) { return opt.label; }, isOptionEqualToValue: function (a, b) { return a.formPath === b.formPath; }, loading: loadingTypes, disabled: loadingTypes || !contentTypes.length, renderInput: function (params) { return (jsx(TextField$1, __assign({}, params, { label: "Content type", placeholder: "Search content types\u2026", InputProps: __assign(__assign({}, params.InputProps), { endAdornment: (jsxs(Fragment, { children: [loadingTypes ? jsx(CircularProgress, { color: "inherit", size: 18 }) : null, params.InputProps.endAdornment] })) }) }))); }, sx: { mb: 2 } }), selectedType && (jsx(Typography, { variant: "caption", color: "text.secondary", display: "block", sx: { mb: 1 }, children: selectedType.contentType })), selectedType && (jsxs(Stack$1, { direction: "row", spacing: 1, alignItems: "center", sx: { mb: 2 }, flexWrap: "wrap", useFlexGap: true, children: [jsx(TextField$1, { size: "small", fullWidth: true, placeholder: "Filter image fields\u2026", value: filter, onChange: function (e) { return setFilter(e.target.value); }, sx: { flex: 1, minWidth: 200 }, InputProps: {
+                            startAdornment: (jsx(InputAdornment, { position: "start", children: jsx(SearchRoundedIcon, { fontSize: "small" }) }))
+                        } }), onApplyConstraints && (jsx(Button$1, { size: "small", variant: "contained", startIcon: jsx(CheckRounded, {}), disabled: !applyEnabled, onClick: function () { return selectedRequirement && onApplyConstraints(selectedRequirement); }, children: "Apply constraints" }))] })), selectedType && selectedRequirement && !hasApplicableConstraints(selectedRequirement) && (jsx(Typography, { variant: "caption", color: "text.secondary", display: "block", sx: { mb: 1 }, children: "Selected field has no width or height constraints to apply." })), selectedType && !selectedRequirement && requirements.length > 0 && (jsx(Typography, { variant: "caption", color: "text.secondary", display: "block", sx: { mb: 1 }, children: "Click a field row, then apply constraints to crop, resize, and output size." })), error && (jsx(Typography, { color: "error", variant: "body2", children: error })), !loadingTypes && !error && !contentTypes.length && (jsx(Typography, { variant: "body2", color: "text.secondary", children: "No content types found in this site." })), !selectedType && !loadingTypes && contentTypes.length > 0 && (jsx(Typography, { variant: "body2", color: "text.secondary", sx: { py: 2 }, children: "Select a content type above to load its image field requirements." })), selectedType && !error && (jsx(Box$1, { sx: { flex: 1, minHeight: 0, overflow: 'auto' }, children: jsxs(Table, { size: "small", stickyHeader: true, children: [jsx(TableHead, { children: jsxs(TableRow, { children: [jsx(TableCell, { children: "Field" }), jsx(TableCell, { children: "Requirements" }), currentWidth && currentHeight ? jsx(TableCell, { children: "Match" }) : null] }) }), jsxs(TableBody, { children: [filtered.map(function (req) {
                                     var matches = currentWidth && currentHeight
                                         ? imageMatchesRequirement(currentWidth, currentHeight, req)
                                         : null;
-                                    return (jsxs(TableRow, { hover: true, children: [jsxs(TableCell, { children: [jsx(Typography, { variant: "body2", children: req.contentTypeLabel }), jsx(Typography, { variant: "caption", color: "text.secondary", children: req.contentType })] }), jsxs(TableCell, { children: [jsx(Typography, { variant: "body2", children: req.fieldTitle }), jsx(Typography, { variant: "caption", color: "text.secondary", children: req.fieldId })] }), jsx(TableCell, { children: jsx(Typography, { variant: "body2", children: formatDimensionSpec(req) }) }), currentWidth && currentHeight ? (jsx(TableCell, { children: jsx(Chip, { size: "small", label: matches ? 'OK' : 'Mismatch', color: matches ? 'success' : 'warning', variant: matches ? 'filled' : 'outlined' }) })) : null] }, "".concat(req.contentType, "-").concat(req.fieldId)));
-                                }), !filtered.length && (jsx(TableRow, { children: jsx(TableCell, { colSpan: currentWidth ? 4 : 3, children: jsx(Typography, { variant: "body2", color: "text.secondary", children: "No image-picker fields found." }) }) }))] })] }) }))] }));
+                                    return (jsxs(TableRow, { hover: true, selected: selectedFieldId === req.fieldId, onClick: function () { return setSelectedFieldId(req.fieldId); }, sx: { cursor: 'pointer' }, children: [jsxs(TableCell, { children: [jsx(Typography, { variant: "body2", children: req.fieldTitle }), jsx(Typography, { variant: "caption", color: "text.secondary", children: req.fieldId }), appliedFieldId === req.fieldId && (jsx(Chip, { size: "small", label: "Applied", color: "primary", variant: "outlined", sx: { mt: 0.5 } }))] }), jsx(TableCell, { children: jsx(Typography, { variant: "body2", children: formatDimensionSpec(req) }) }), currentWidth && currentHeight ? (jsx(TableCell, { children: jsx(Chip, { size: "small", label: matches ? 'OK' : 'Mismatch', color: matches ? 'success' : 'warning', variant: matches ? 'filled' : 'outlined' }) })) : null] }, req.fieldId));
+                                }), !filtered.length && (jsx(TableRow, { children: jsx(TableCell, { colSpan: currentWidth && currentHeight ? 3 : 2, children: jsx(Typography, { variant: "body2", color: "text.secondary", children: "No image-picker fields on this content type." }) }) }))] })] }) }))] }));
+}
+
+/*
+ * Copyright (C) 2007-2026 Crafter Software Corporation. All Rights Reserved.
+ */
+var FEED_LIMIT = 50;
+var RECENT_ACTIVITY_ACTIONS = ['CREATE', 'UPDATE', 'MOVE'];
+function formatDateTime(value) {
+    try {
+        return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
+    }
+    catch (_a) {
+        return value;
+    }
+}
+function activityActionLabel(actionType) {
+    switch (actionType) {
+        case 'CREATE':
+            return 'Created';
+        case 'UPDATE':
+            return 'Updated';
+        case 'MOVE':
+            return 'Moved';
+        default:
+            return actionType.replace(/_/g, ' ').toLowerCase();
+    }
+}
+function isValidContentPath(path) {
+    if (!path || !path.trim()) {
+        return false;
+    }
+    var trimmed = path.trim();
+    return trimmed !== 'undefined' && trimmed !== 'null';
+}
+function isSelectableContentPath(path) {
+    if (!isValidContentPath(path)) {
+        return false;
+    }
+    var trimmed = path.trim();
+    if (trimmed.includes('level.xml')) {
+        return false;
+    }
+    return trimmed.startsWith('/site/website/') || trimmed.startsWith('/site/components/');
+}
+function dedupeRecentActivity(activities) {
+    var seen = new Set();
+    var entries = [];
+    activities.forEach(function (activity) {
+        var _a, _b, _c, _d;
+        var path = (_b = (_a = activity.item) === null || _a === void 0 ? void 0 : _a.path) === null || _b === void 0 ? void 0 : _b.trim();
+        if (!path || !isSelectableContentPath(path) || seen.has(path)) {
+            return;
+        }
+        seen.add(path);
+        var action = activityActionLabel(activity.actionType);
+        var when = activity.actionTimestamp ? formatDateTime(activity.actionTimestamp) : '';
+        entries.push({
+            path: path,
+            label: (_c = activity.item) === null || _c === void 0 ? void 0 : _c.label,
+            systemType: (_d = activity.item) === null || _d === void 0 ? void 0 : _d.systemType,
+            subtitle: when ? "".concat(action, " \u00B7 ").concat(when) : action
+        });
+    });
+    return entries;
+}
+function loadMyRecentActivityFeed(siteId) {
+    return fetchMyActivity(siteId, {
+        limit: FEED_LIMIT,
+        offset: 0,
+        actions: __spreadArray([], RECENT_ACTIVITY_ACTIONS, true)
+    }).pipe(map(function (activities) { return dedupeRecentActivity(activities); }), catchError(function () { return of([]); }));
+}
+function loadUnpublishedWorkFeed(siteId) {
+    return fetchUnpublished(siteId, {
+        limit: FEED_LIMIT,
+        offset: 0,
+        sortBy: 'dateModified',
+        sortOrder: 'desc'
+    }).pipe(map(function (items) {
+        return items
+            .filter(function (item) { return isSelectableContentPath(item.path); })
+            .map(function (item) { return ({
+            path: item.path.trim(),
+            label: item.label,
+            systemType: item.systemType,
+            subtitle: item.dateModified ? "Modified \u00B7 ".concat(formatDateTime(item.dateModified)) : 'Unpublished'
+        }); });
+    }), catchError(function () { return of([]); }));
+}
+
+var NAVIGATOR_ID = 'imageStudioSaveContentBrowse';
+function isFolderItem(item) {
+    return (item === null || item === void 0 ? void 0 : item.systemType) === 'folder';
+}
+function ImageStudioContentBrowsePanel(_a) {
+    var selectedPath = _a.selectedPath, onSelect = _a.onSelect;
+    var dispatch = useDispatch();
+    var onItemClicked = function (item) {
+        if (isFolderItem(item)) {
+            dispatch(pathNavigatorFetchPath({
+                id: NAVIGATOR_ID,
+                path: item.path
+            }));
+            return;
+        }
+        if (isSelectableContentPath(item.path)) {
+            onSelect(item.path, item.label);
+        }
+    };
+    return (jsxs(Box$1, { sx: { flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }, children: [jsxs(Box$1, { sx: { px: 2, py: 1.25, borderBottom: 1, borderColor: 'divider' }, children: [jsx(Typography, { variant: "subtitle2", fontWeight: 600, children: "Browse repository" }), jsx(Typography, { variant: "caption", color: "text.secondary", children: "Open folders to find pages and components under /site" }), selectedPath ? (jsxs(Typography, { variant: "caption", display: "block", sx: { mt: 0.5 }, color: "primary.main", children: ["Selected: ", selectedPath] })) : null] }), jsx(Box$1, { sx: { flex: 1, minHeight: 0, overflow: 'auto', px: 1 }, children: jsx(PathNavigator$1, { id: NAVIGATOR_ID, label: "Site content", rootPath: "/site", limit: 50, initialCollapsed: false, excludes: ['level\\.xml$'], onItemClicked: onItemClicked }) })] }));
+}
+
+function ImageStudioContentFeedPanel(_a) {
+    var title = _a.title, description = _a.description, entries = _a.entries, loading = _a.loading, error = _a.error, selectedPath = _a.selectedPath, onSelect = _a.onSelect, onRefresh = _a.onRefresh;
+    var siteId = useActiveSiteId();
+    var _b = useState({}), itemsByPath = _b[0], setItemsByPath = _b[1];
+    var pathsKey = useMemo(function () { return entries.map(function (entry) { return entry.path; }).join('\0'); }, [entries]);
+    useEffect(function () {
+        if (!siteId || entries.length === 0) {
+            setItemsByPath({});
+            return;
+        }
+        var paths = entries.map(function (entry) { return entry.path; }).filter(Boolean);
+        if (paths.length === 0) {
+            setItemsByPath({});
+            return;
+        }
+        fetchItemsByPath(siteId, paths, { castAsDetailedItem: true }).subscribe({
+            next: function (items) {
+                var nextMap = {};
+                items.forEach(function (item) {
+                    if (item === null || item === void 0 ? void 0 : item.path) {
+                        nextMap[item.path] = item;
+                    }
+                });
+                setItemsByPath(nextMap);
+            },
+            error: function () {
+                setItemsByPath({});
+            }
+        });
+    }, [pathsKey, siteId]);
+    return (jsxs(Box$1, { sx: { flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }, children: [jsxs(Stack$1, { direction: "row", alignItems: "flex-start", justifyContent: "space-between", sx: { px: 2, py: 1.25, borderBottom: 1, borderColor: 'divider' }, children: [jsxs(Box$1, { sx: { minWidth: 0, pr: 1 }, children: [jsx(Typography, { variant: "subtitle2", fontWeight: 600, children: title }), jsx(Typography, { variant: "caption", color: "text.secondary", children: description })] }), onRefresh ? (jsx(Tooltip, { title: "Refresh", children: jsx("span", { children: jsx(IconButton$1, { size: "small", "aria-label": "Refresh", onClick: onRefresh, disabled: loading, children: jsx(RefreshRoundedIcon, { fontSize: "small" }) }) }) })) : null] }), jsx(Box$1, { sx: { flex: 1, minHeight: 0, overflowY: 'auto' }, children: loading ? (jsx(Box$1, { sx: { display: 'flex', justifyContent: 'center', py: 4 }, children: jsx(CircularProgress, { size: 28 }) })) : error ? (jsx(Typography, { variant: "body2", color: "error", sx: { px: 2, py: 2 }, children: error })) : entries.length === 0 ? (jsx(Typography, { variant: "body2", color: "text.secondary", sx: { px: 2, py: 2 }, children: "Nothing to show in this feed right now." })) : (entries.map(function (entry, index) {
+                    var _a, _b, _c;
+                    var item = itemsByPath[entry.path];
+                    var label = (_b = (_a = item === null || item === void 0 ? void 0 : item.label) !== null && _a !== void 0 ? _a : entry.label) !== null && _b !== void 0 ? _b : entry.path;
+                    var selected = selectedPath === entry.path;
+                    return (jsxs(React__default.Fragment, { children: [index > 0 ? jsx(Divider, {}) : null, jsxs(ListItemButton, { selected: selected, onClick: function () { return onSelect(entry.path, label); }, sx: { alignItems: 'flex-start', py: 1 }, children: [jsx(Box$1, { sx: { mr: 1, mt: 0.25, display: 'flex', '& svg': { fontSize: '1.1rem' } }, children: jsx(ItemTypeIcon, { item: item !== null && item !== void 0 ? item : { path: entry.path, systemType: entry.systemType } }) }), jsx(ListItemText, { primary: label, secondary: (_c = entry.subtitle) !== null && _c !== void 0 ? _c : entry.path, primaryTypographyProps: { variant: 'body2', fontWeight: selected ? 600 : 400 }, secondaryTypographyProps: { variant: 'caption', noWrap: true } })] })] }, entry.path));
+                })) })] }));
+}
+
+function ImageStudioContentPickerDialog(_a) {
+    var open = _a.open, onClose = _a.onClose, onSelect = _a.onSelect, initialPath = _a.initialPath;
+    var siteId = useActiveSiteId();
+    var _b = useState('recent'), activeTab = _b[0], setActiveTab = _b[1];
+    var _c = useState(null), selectedPath = _c[0], setSelectedPath = _c[1];
+    var _d = useState(''), selectedLabel = _d[0], setSelectedLabel = _d[1];
+    var _e = useState([]), recentEntries = _e[0], setRecentEntries = _e[1];
+    var _f = useState(false), recentLoading = _f[0], setRecentLoading = _f[1];
+    var _g = useState(null), recentError = _g[0], setRecentError = _g[1];
+    var _h = useState([]), unpublishedEntries = _h[0], setUnpublishedEntries = _h[1];
+    var _j = useState(false), unpublishedLoading = _j[0], setUnpublishedLoading = _j[1];
+    var _k = useState(null), unpublishedError = _k[0], setUnpublishedError = _k[1];
+    var handleClose = useCallback(function () {
+        setSelectedPath(null);
+        setSelectedLabel('');
+        setActiveTab('recent');
+        onClose();
+    }, [onClose]);
+    var pickPath = useCallback(function (path, label) {
+        setSelectedPath(path);
+        setSelectedLabel((label === null || label === void 0 ? void 0 : label.trim()) || path);
+    }, []);
+    var handleSearchSelect = useCallback(function (path, selected) {
+        if (selected) {
+            pickPath(path);
+        }
+    }, [pickPath]);
+    var handleConfirm = useCallback(function () {
+        if (!selectedPath) {
+            return;
+        }
+        onSelect({ path: selectedPath, label: selectedLabel || selectedPath });
+        setSelectedPath(null);
+        setSelectedLabel('');
+        setActiveTab('recent');
+    }, [onSelect, selectedLabel, selectedPath]);
+    var loadRecentFeed = useCallback(function () {
+        if (!siteId) {
+            setRecentEntries([]);
+            return undefined;
+        }
+        setRecentLoading(true);
+        setRecentError(null);
+        return loadMyRecentActivityFeed(siteId).subscribe({
+            next: function (entries) {
+                setRecentEntries(entries);
+                setRecentLoading(false);
+            },
+            error: function () {
+                setRecentError('Unable to load your recent activity.');
+                setRecentEntries([]);
+                setRecentLoading(false);
+            }
+        });
+    }, [siteId]);
+    var loadUnpublishedFeed = useCallback(function () {
+        if (!siteId) {
+            setUnpublishedEntries([]);
+            return undefined;
+        }
+        setUnpublishedLoading(true);
+        setUnpublishedError(null);
+        return loadUnpublishedWorkFeed(siteId).subscribe({
+            next: function (entries) {
+                setUnpublishedEntries(entries);
+                setUnpublishedLoading(false);
+            },
+            error: function () {
+                setUnpublishedError('Unable to load unpublished work.');
+                setUnpublishedEntries([]);
+                setUnpublishedLoading(false);
+            }
+        });
+    }, [siteId]);
+    useEffect(function () {
+        if (!open) {
+            return;
+        }
+        setSelectedPath(initialPath !== null && initialPath !== void 0 ? initialPath : null);
+        setSelectedLabel(initialPath !== null && initialPath !== void 0 ? initialPath : '');
+    }, [open, initialPath]);
+    useEffect(function () {
+        if (!open) {
+            return;
+        }
+        if (activeTab === 'recent') {
+            var subscription_1 = loadRecentFeed();
+            return function () { return subscription_1 === null || subscription_1 === void 0 ? void 0 : subscription_1.unsubscribe(); };
+        }
+        if (activeTab === 'unpublished') {
+            var subscription_2 = loadUnpublishedFeed();
+            return function () { return subscription_2 === null || subscription_2 === void 0 ? void 0 : subscription_2.unsubscribe(); };
+        }
+    }, [activeTab, loadRecentFeed, loadUnpublishedFeed, open]);
+    return (jsxs(Dialog, { open: open, onClose: handleClose, fullWidth: true, maxWidth: false, scroll: "paper", disableRestoreFocus: true, PaperProps: {
+            sx: function (theme) { return ({
+                width: 'min(96vw, 1100px)',
+                maxWidth: "min(".concat(theme.breakpoints.values.lg, "px, calc(100vw - ").concat(theme.spacing(4), "))"),
+                height: 'min(85vh, 880px)',
+                maxHeight: '85vh',
+                display: 'flex',
+                flexDirection: 'column'
+            }); }
+        }, children: [jsx(DialogTitle, { sx: { pb: 0 }, children: "Choose content item" }), jsxs(DialogContent, { sx: {
+                    p: 0,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    minHeight: 0,
+                    flex: 1,
+                    overflow: 'hidden'
+                }, children: [jsxs(Tabs, { value: activeTab, onChange: function (_, value) { return setActiveTab(value); }, variant: "scrollable", scrollButtons: "auto", sx: { px: 2, borderBottom: 1, borderColor: 'divider', flexShrink: 0 }, children: [jsx(Tab, { value: "browse", label: "Browse" }), jsx(Tab, { value: "recent", label: "My recent activity" }), jsx(Tab, { value: "unpublished", label: "Unpublished work" }), jsx(Tab, { value: "search", label: "Search" })] }), jsxs(Box$1, { sx: { flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }, children: [open && activeTab === 'browse' ? (jsx(ImageStudioContentBrowsePanel, { selectedPath: selectedPath, onSelect: pickPath })) : null, open ? (jsx(Box$1, { hidden: activeTab !== 'search', sx: {
+                                    flex: 1,
+                                    minHeight: 0,
+                                    minWidth: 0,
+                                    width: '100%',
+                                    display: activeTab === 'search' ? 'block' : 'none',
+                                    overflow: 'hidden',
+                                    '& > section': {
+                                        width: '100%',
+                                        height: '100%',
+                                        minHeight: 0,
+                                        minWidth: 0
+                                    },
+                                    '& > section > section:last-of-type': {
+                                        display: 'none'
+                                    }
+                                }, children: jsx(Search, { embedded: true, mode: "select", onClose: handleClose, onSelect: handleSearchSelect }) })) : null, activeTab === 'recent' ? (jsx(ImageStudioContentFeedPanel, { title: "My recent activity", description: "Pages and components you created or edited recently", entries: recentEntries, loading: recentLoading, error: recentError, selectedPath: selectedPath, onSelect: pickPath, onRefresh: loadRecentFeed })) : null, activeTab === 'unpublished' ? (jsx(ImageStudioContentFeedPanel, { title: "Unpublished work", description: "Sandbox items not yet published", entries: unpublishedEntries, loading: unpublishedLoading, error: unpublishedError, selectedPath: selectedPath, onSelect: pickPath, onRefresh: loadUnpublishedFeed })) : null] })] }), jsxs(DialogActions, { sx: { px: 2, py: 1.5, flexWrap: 'wrap', gap: 1 }, children: [jsx(Box$1, { sx: { flex: 1, minWidth: 200 }, children: selectedPath ? (jsxs(Typography, { variant: "body2", color: "text.secondary", noWrap: true, children: [selectedLabel, jsx(Typography, { component: "span", variant: "caption", color: "text.disabled", sx: { ml: 1 }, children: selectedPath })] })) : (jsx(Typography, { variant: "body2", color: "text.secondary", children: "Select a page or component" })) }), jsx(Button$1, { onClick: handleClose, children: "Cancel" }), jsx(Button$1, { variant: "contained", disabled: !selectedPath, onClick: handleConfirm, children: "Use this content" })] })] }));
 }
 
 function ImageStudioSaveDialog(_a) {
+    var _b;
     var open = _a.open, onClose = _a.onClose, onSave = _a.onSave, saving = _a.saving, defaultFolder = _a.defaultFolder, sourcePath = _a.sourcePath, suggestedName = _a.suggestedName;
     var dispatch = useDispatch();
-    var _b = useState(defaultFolder), folder = _b[0], setFolder = _b[1];
-    var _c = useState(suggestedName !== null && suggestedName !== void 0 ? suggestedName : 'image.png'), fileName = _c[0], setFileName = _c[1];
-    var _d = useState(sourcePath ? 'variant' : 'new'), mode = _d[0], setMode = _d[1];
-    var _e = useState('image/png'), mimeType = _e[0], setMimeType = _e[1];
-    var _f = useState(0.92), quality = _f[0], setQuality = _f[1];
+    var siteId = useActiveSiteId();
+    var _c = useState(defaultFolder), folder = _c[0], setFolder = _c[1];
+    var _d = useState(suggestedName !== null && suggestedName !== void 0 ? suggestedName : 'image.png'), fileName = _d[0], setFileName = _d[1];
+    var _e = useState(sourcePath ? 'variant' : 'new'), mode = _e[0], setMode = _e[1];
+    var _f = useState('image/png'), mimeType = _f[0], setMimeType = _f[1];
+    var _g = useState(0.92), quality = _g[0], setQuality = _g[1];
+    var _h = useState(false), linkEnabled = _h[0], setLinkEnabled = _h[1];
+    var _j = useState(false), contentPickerOpen = _j[0], setContentPickerOpen = _j[1];
+    var _k = useState(null), selectedContent = _k[0], setSelectedContent = _k[1];
+    var _l = useState([]), imageFields = _l[0], setImageFields = _l[1];
+    var _m = useState(false), fieldsLoading = _m[0], setFieldsLoading = _m[1];
+    var _o = useState(null), fieldsError = _o[0], setFieldsError = _o[1];
+    var _p = useState(null), selectedField = _p[0], setSelectedField = _p[1];
+    var _q = useState(''), contentObjectId = _q[0], setContentObjectId = _q[1];
     useEffect(function () {
         if (open) {
             setFolder(defaultFolder);
             setFileName(suggestedName !== null && suggestedName !== void 0 ? suggestedName : 'image.png');
             setMode(sourcePath ? 'variant' : 'new');
+            setLinkEnabled(false);
+            setContentPickerOpen(false);
+            setSelectedContent(null);
+            setImageFields([]);
+            setSelectedField(null);
+            setContentObjectId('');
+            setFieldsError(null);
         }
     }, [open, defaultFolder, suggestedName, sourcePath]);
+    useEffect(function () {
+        if (!open || !linkEnabled || !siteId || !selectedContent) {
+            setImageFields([]);
+            setSelectedField(null);
+            setContentObjectId('');
+            setFieldsError(null);
+            return;
+        }
+        var cancelled = false;
+        setFieldsLoading(true);
+        setFieldsError(null);
+        loadImagePickerFieldsForContent(siteId, selectedContent.path)
+            .then(function (result) {
+            var _a;
+            if (!cancelled) {
+                setImageFields(result.fields);
+                setContentObjectId(result.objectId);
+                setSelectedField((_a = result.fields[0]) !== null && _a !== void 0 ? _a : null);
+            }
+        })
+            .catch(function () {
+            if (!cancelled) {
+                setImageFields([]);
+                setSelectedField(null);
+                setContentObjectId('');
+                setFieldsError('Unable to load image fields for this content item.');
+            }
+        })
+            .finally(function () {
+            if (!cancelled) {
+                setFieldsLoading(false);
+            }
+        });
+        return function () {
+            cancelled = true;
+        };
+    }, [open, linkEnabled, siteId, selectedContent]);
     var fullPath = useMemo(function () {
         var normalizedFolder = folder.replace(/\/$/, '');
         var name = fileName.replace(/^\//, '');
@@ -45175,57 +45422,323 @@ function ImageStudioSaveDialog(_a) {
             }
         });
     };
+    var contentFieldLink = linkEnabled && selectedContent && selectedField && contentObjectId
+        ? {
+            contentPath: selectedContent.path,
+            objectId: contentObjectId,
+            fieldId: selectedField.fieldId,
+            fieldTitle: selectedField.fieldTitle
+        }
+        : null;
     var handleSubmit = function () {
         onSave({
             fullPath: mode === 'replace' && sourcePath ? sourcePath : fullPath,
             mode: mode,
             mimeType: mimeType,
-            quality: quality
+            quality: quality,
+            contentFieldLink: contentFieldLink
         });
     };
-    return (jsxs(Dialog, { open: open, onClose: onClose, maxWidth: "sm", fullWidth: true, children: [jsx(DialogTitle, { children: "Save image" }), jsxs(DialogContent, { children: [sourcePath && (jsxs(Box$1, { sx: { mb: 2 }, children: [jsx(Typography, { variant: "subtitle2", gutterBottom: true, children: "Save as" }), jsxs(RadioGroup, { value: mode, onChange: function (e) { return handleModeChange(e.target.value); }, children: [jsx(FormControlLabel, { value: "replace", control: jsx(Radio, {}), label: "Replace original image" }), jsx(FormControlLabel, { value: "variant", control: jsx(Radio, {}), label: "Save as new variant (recommended)" }), jsx(FormControlLabel, { value: "new", control: jsx(Radio, {}), label: "Save to a new path" })] })] })), mode !== 'replace' && (jsxs(Box$1, { sx: { display: 'flex', gap: 1, alignItems: 'flex-start', mb: 2 }, children: [jsx(TextField$1, { label: "Folder", fullWidth: true, value: folder, onChange: function (e) { return setFolder(e.target.value); }, helperText: "Repository folder under /static-assets" }), jsx(Button$1, { variant: "outlined", onClick: handleSelectFolder, sx: { mt: 1, minWidth: 120 }, children: "Browse" })] })), mode !== 'replace' && (jsx(TextField$1, { label: "File name", fullWidth: true, value: fileName, onChange: function (e) { return setFileName(e.target.value); }, sx: { mb: 2 }, helperText: "Use letters, numbers, dots, dashes, and underscores" })), jsxs(FormControl, { fullWidth: true, sx: { mb: 2 }, children: [jsx(InputLabel, { children: "Format" }), jsxs(Select, { label: "Format", value: mimeType, onChange: function (e) { return setMimeType(e.target.value); }, children: [jsx(MenuItem$1, { value: "image/png", children: "PNG (lossless)" }), jsx(MenuItem$1, { value: "image/jpeg", children: "JPEG" }), jsx(MenuItem$1, { value: "image/webp", children: "WebP" })] })] }), mimeType !== 'image/png' && (jsx(TextField$1, { label: "Quality", type: "number", fullWidth: true, inputProps: { min: 0.1, max: 1, step: 0.05 }, value: quality, onChange: function (e) { return setQuality(Number(e.target.value)); }, sx: { mb: 1 } })), jsxs(FormHelperText, { children: ["Destination: ", jsx("strong", { children: mode === 'replace' && sourcePath ? sourcePath : fullPath })] })] }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: onClose, disabled: saving, children: "Cancel" }), jsx(Button$1, { onClick: handleSubmit, variant: "contained", disabled: saving || !fileName.trim(), children: saving ? 'Saving…' : 'Save' })] })] }));
+    return (jsxs(Dialog, { open: open, onClose: onClose, maxWidth: "md", fullWidth: true, children: [jsx(DialogTitle, { children: "Save image" }), jsxs(DialogContent, { sx: { display: 'flex', flexDirection: 'column', gap: 2 }, children: [sourcePath && (jsxs(Box$1, { children: [jsx(Typography, { variant: "subtitle2", gutterBottom: true, children: "Save as" }), jsxs(RadioGroup, { value: mode, onChange: function (e) { return handleModeChange(e.target.value); }, children: [jsx(FormControlLabel, { value: "replace", control: jsx(Radio, {}), label: "Replace original image" }), jsx(FormControlLabel, { value: "variant", control: jsx(Radio, {}), label: "Save as new variant (recommended)" }), jsx(FormControlLabel, { value: "new", control: jsx(Radio, {}), label: "Save to a new path" })] })] })), mode !== 'replace' && (jsxs(Stack$1, { direction: "row", spacing: 1, alignItems: "flex-start", children: [jsx(TextField$1, { label: "Folder", fullWidth: true, size: "small", value: folder, onChange: function (e) { return setFolder(e.target.value); }, helperText: "Repository folder under /static-assets" }), jsx(Button$1, { variant: "outlined", onClick: handleSelectFolder, sx: { mt: 1, minWidth: 100 }, children: "Browse" })] })), mode !== 'replace' && (jsx(TextField$1, { label: "File name", fullWidth: true, size: "small", value: fileName, onChange: function (e) { return setFileName(e.target.value); }, helperText: "Use letters, numbers, dots, dashes, and underscores" })), jsxs(Stack$1, { direction: { xs: 'column', sm: 'row' }, spacing: 2, children: [jsxs(FormControl, { fullWidth: true, size: "small", children: [jsx(InputLabel, { children: "Format" }), jsxs(Select, { label: "Format", value: mimeType, onChange: function (e) { return setMimeType(e.target.value); }, children: [jsx(MenuItem$1, { value: "image/png", children: "PNG (lossless)" }), jsx(MenuItem$1, { value: "image/jpeg", children: "JPEG" }), jsx(MenuItem$1, { value: "image/webp", children: "WebP" })] })] }), mimeType !== 'image/png' && (jsx(TextField$1, { label: "Quality", type: "number", size: "small", fullWidth: true, inputProps: { min: 0.1, max: 1, step: 0.05 }, value: quality, onChange: function (e) { return setQuality(Number(e.target.value)); } }))] }), jsxs(FormHelperText, { sx: { mt: 0 }, children: ["Destination: ", jsx("strong", { children: mode === 'replace' && sourcePath ? sourcePath : fullPath })] }), jsxs(Box$1, { sx: { borderTop: 1, borderColor: 'divider', pt: 2 }, children: [jsx(FormControlLabel, { control: jsx(Checkbox, { checked: linkEnabled, onChange: function (e) { return setLinkEnabled(e.target.checked); } }), label: "Update a content item image field after save" }), jsx(Collapse$1, { in: linkEnabled, children: jsxs(Stack$1, { spacing: 1.5, sx: { mt: 1 }, children: [jsxs(Stack$1, { direction: "row", spacing: 1, alignItems: "center", flexWrap: "wrap", useFlexGap: true, children: [jsx(Button$1, { variant: "outlined", size: "small", onClick: function () { return setContentPickerOpen(true); }, children: selectedContent ? 'Change content…' : 'Choose content…' }), selectedContent ? (jsxs(Box$1, { sx: { minWidth: 0, flex: 1 }, children: [jsx(Typography, { variant: "body2", noWrap: true, fontWeight: 500, children: selectedContent.label }), jsx(Typography, { variant: "caption", color: "text.secondary", noWrap: true, display: "block", children: selectedContent.path })] })) : (jsx(Typography, { variant: "body2", color: "text.secondary", children: "Browse, pick recent or unpublished items, or search" }))] }), selectedContent && (jsxs(FormControl, { fullWidth: true, size: "small", disabled: fieldsLoading || !imageFields.length, children: [jsx(InputLabel, { children: "Image field" }), jsx(Select, { label: "Image field", value: (_b = selectedField === null || selectedField === void 0 ? void 0 : selectedField.fieldId) !== null && _b !== void 0 ? _b : '', onChange: function (e) {
+                                                        var field = imageFields.find(function (f) { return f.fieldId === e.target.value; });
+                                                        setSelectedField(field !== null && field !== void 0 ? field : null);
+                                                    }, children: imageFields.map(function (field) { return (jsxs(MenuItem$1, { value: field.fieldId, children: [field.fieldTitle, " (", field.fieldId, ")"] }, field.fieldId)); }) }), !fieldsLoading && fieldsError && (jsx(FormHelperText, { error: true, children: fieldsError })), !fieldsLoading && !fieldsError && imageFields.length === 0 && (jsx(FormHelperText, { children: "No image-picker fields on this content type." })), fieldsLoading ? (jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', gap: 1, py: 0.5 }, children: [jsx(CircularProgress, { size: 16 }), jsx(Typography, { variant: "caption", color: "text.secondary", children: "Loading fields\u2026" })] })) : null] }))] }) })] })] }), jsx(ImageStudioContentPickerDialog, { open: contentPickerOpen, onClose: function () { return setContentPickerOpen(false); }, initialPath: selectedContent === null || selectedContent === void 0 ? void 0 : selectedContent.path, onSelect: function (selection) {
+                    setSelectedContent(selection);
+                    setContentPickerOpen(false);
+                } }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: onClose, disabled: saving, children: "Cancel" }), jsx(Button$1, { onClick: handleSubmit, variant: "contained", disabled: saving || !fileName.trim(), children: saving ? 'Saving…' : linkEnabled && contentFieldLink ? 'Save & update content' : 'Save' })] })] }));
 }
 
+function ImageStudioWelcome(_a) {
+    var onFile = _a.onFile, onBrowseRequest = _a.onBrowseRequest;
+    var theme = useTheme();
+    var fileInputRef = useRef(null);
+    var _b = useState(false), dragOver = _b[0], setDragOver = _b[1];
+    useEffect(function () {
+        var handlePaste = function (e) {
+            var _a;
+            var items = (_a = e.clipboardData) === null || _a === void 0 ? void 0 : _a.items;
+            if (!items) {
+                return;
+            }
+            for (var i = 0; i < items.length; i++) {
+                if (items[i].type.startsWith('image/')) {
+                    var file = items[i].getAsFile();
+                    if (file) {
+                        onFile(file);
+                        break;
+                    }
+                }
+            }
+        };
+        window.addEventListener('paste', handlePaste);
+        return function () { return window.removeEventListener('paste', handlePaste); };
+    }, [onFile]);
+    var onDrop = function (e) {
+        var _a;
+        e.preventDefault();
+        setDragOver(false);
+        var file = (_a = e.dataTransfer.files) === null || _a === void 0 ? void 0 : _a[0];
+        if (file === null || file === void 0 ? void 0 : file.type.startsWith('image/')) {
+            onFile(file);
+        }
+    };
+    return (jsx(Box$1, { sx: {
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            p: 3,
+            minHeight: 420
+        }, children: jsxs(Box$1, { onDragOver: function (e) {
+                e.preventDefault();
+                setDragOver(true);
+            }, onDragLeave: function () { return setDragOver(false); }, onDrop: onDrop, sx: {
+                width: '100%',
+                maxWidth: 520,
+                textAlign: 'center',
+                p: 4,
+                borderRadius: 3,
+                border: "2px dashed ".concat(dragOver ? theme.palette.primary.main : alpha(theme.palette.divider, 0.9)),
+                bgcolor: dragOver ? alpha(theme.palette.primary.main, 0.06) : alpha(theme.palette.background.paper, 0.8),
+                transition: 'border-color 0.2s, background-color 0.2s, box-shadow 0.2s',
+                boxShadow: dragOver ? "0 8px 32px ".concat(alpha(theme.palette.primary.main, 0.15)) : 'none'
+            }, children: [jsx(Box$1, { sx: {
+                        width: 72,
+                        height: 72,
+                        mx: 'auto',
+                        mb: 2,
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        color: 'primary.main'
+                    }, children: jsx(CloudUploadRoundedIcon, { sx: { fontSize: 36 } }) }), jsx(Typography, { variant: "h5", sx: { fontWeight: 600, mb: 0.5 }, children: "Start with an image" }), jsx(Typography, { variant: "body2", color: "text.secondary", sx: { mb: 3 }, children: "Drag and drop here, or choose an option below" }), jsxs(Stack$1, { direction: { xs: 'column', sm: 'row' }, spacing: 1.5, justifyContent: "center", sx: { mb: 2 }, children: [jsx(Button$1, { variant: "contained", size: "large", startIcon: jsx(CloudUploadRoundedIcon, {}), onClick: function () { var _a; return (_a = fileInputRef.current) === null || _a === void 0 ? void 0 : _a.click(); }, children: "Upload file" }), jsx(Button$1, { variant: "outlined", size: "large", startIcon: jsx(PhotoLibraryRoundedIcon, {}), onClick: onBrowseRequest, children: "Browse repository" })] }), jsxs(Stack$1, { direction: "row", spacing: 0.75, alignItems: "center", justifyContent: "center", children: [jsx(ContentPasteRoundedIcon, { sx: { fontSize: 18, color: 'text.secondary' } }), jsx(Typography, { variant: "caption", color: "text.secondary", children: "You can also paste an image from your clipboard" })] }), jsx("input", { ref: fileInputRef, type: "file", accept: "image/*", hidden: true, onChange: function (e) {
+                        var _a;
+                        var file = (_a = e.target.files) === null || _a === void 0 ? void 0 : _a[0];
+                        if (file) {
+                            onFile(file);
+                        }
+                        e.target.value = '';
+                    } })] }) }));
+}
+
+function isImageAsset(item) {
+    var _a;
+    return item.systemType === 'asset' && ((_a = item.mimeType) === null || _a === void 0 ? void 0 : _a.startsWith('image/'));
+}
+function pathSegments(path) {
+    var parts = path.replace(/\/$/, '').split('/').filter(Boolean);
+    var segments = [];
+    var current = '';
+    for (var _i = 0, parts_1 = parts; _i < parts_1.length; _i++) {
+        var part = parts_1[_i];
+        current += "/".concat(part);
+        segments.push(current);
+    }
+    return segments;
+}
+function ImageRepoBrowserDialog(_a) {
+    var _this = this;
+    var open = _a.open, onClose = _a.onClose, defaultPath = _a.defaultPath, onImageSelected = _a.onImageSelected, onError = _a.onError, loadRepoImage = _a.loadRepoImage;
+    var siteId = useActiveSiteId();
+    var _b = useState(defaultPath), browsePath = _b[0], setBrowsePath = _b[1];
+    var _c = useState([]), items = _c[0], setItems = _c[1];
+    var _d = useState(false), loading = _d[0], setLoading = _d[1];
+    var _e = useState(false), loadingImage = _e[0], setLoadingImage = _e[1];
+    var loadFolder = useCallback(function (path) { return __awaiter(_this, void 0, void 0, function () {
+        var response, list, i, item, e_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    if (!siteId) {
+                        return [2 /*return*/];
+                    }
+                    setLoading(true);
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 3, 4, 5]);
+                    return [4 /*yield*/, firstValueFrom(fetchChildrenByPath(siteId, path, { limit: 200 }).pipe(take(1)))];
+                case 2:
+                    response = _a.sent();
+                    list = [];
+                    if (response) {
+                        for (i = 0; i < response.length; i++) {
+                            item = response[i];
+                            if (item === null || item === void 0 ? void 0 : item.path) {
+                                list.push(item);
+                            }
+                        }
+                    }
+                    setItems(list);
+                    setBrowsePath(path);
+                    return [3 /*break*/, 5];
+                case 3:
+                    e_1 = _a.sent();
+                    onError(e_1.message);
+                    return [3 /*break*/, 5];
+                case 4:
+                    setLoading(false);
+                    return [7 /*endfinally*/];
+                case 5: return [2 /*return*/];
+            }
+        });
+    }); }, [siteId, onError]);
+    useEffect(function () {
+        if (open) {
+            setBrowsePath(defaultPath);
+            loadFolder(defaultPath);
+        }
+    }, [open, defaultPath, loadFolder]);
+    var folders = useMemo(function () { return items.filter(function (item) { return item.systemType === 'folder'; }); }, [items]);
+    var images = useMemo(function () { return items.filter(isImageAsset); }, [items]);
+    var crumbs = useMemo(function () { return pathSegments(browsePath); }, [browsePath]);
+    var openRepoImage = function (path, name) { return __awaiter(_this, void 0, void 0, function () {
+        var dataUrl, e_2;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    setLoadingImage(true);
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 3, 4, 5]);
+                    return [4 /*yield*/, loadRepoImage(path)];
+                case 2:
+                    dataUrl = _a.sent();
+                    onImageSelected({ dataUrl: dataUrl, sourcePath: path, name: name });
+                    onClose();
+                    return [3 /*break*/, 5];
+                case 3:
+                    e_2 = _a.sent();
+                    onError(e_2.message);
+                    return [3 /*break*/, 5];
+                case 4:
+                    setLoadingImage(false);
+                    return [7 /*endfinally*/];
+                case 5: return [2 /*return*/];
+            }
+        });
+    }); };
+    return (jsxs(Dialog, { open: open, onClose: onClose, maxWidth: "sm", fullWidth: true, children: [jsxs(DialogTitle, { sx: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', pb: 1 }, children: [jsx(Typography, { variant: "h6", component: "span", children: "Browse images" }), jsx(IconButton$1, { size: "small", onClick: onClose, "aria-label": "Close", children: jsx(CloseRoundedIcon, {}) })] }), jsxs(DialogContent, { sx: { pt: 0 }, children: [jsx(Breadcrumbs, { sx: { mb: 1.5, flexWrap: 'wrap' }, children: crumbs.map(function (segment, index) {
+                            var label = segment.split('/').pop() || '/';
+                            var isLast = index === crumbs.length - 1;
+                            return isLast ? (jsx(Typography, { variant: "body2", color: "text.primary", children: label }, segment)) : (jsx(Link, { component: "button", variant: "body2", underline: "hover", onClick: function () { return loadFolder(segment); }, children: label }, segment));
+                        }) }), jsx(TextField$1, { size: "small", fullWidth: true, label: "Folder path", value: browsePath, onChange: function (e) { return setBrowsePath(e.target.value); }, onKeyDown: function (e) {
+                            if (e.key === 'Enter') {
+                                loadFolder(browsePath);
+                            }
+                        }, sx: { mb: 1.5 } }), jsxs(Box$1, { sx: { position: 'relative', minHeight: 280, maxHeight: 360, overflow: 'auto', borderRadius: 1, bgcolor: 'action.hover' }, children: [(loading || loadingImage) && (jsx(Box$1, { sx: {
+                                    position: 'absolute',
+                                    inset: 0,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    bgcolor: 'rgba(255,255,255,0.6)',
+                                    zIndex: 1
+                                }, children: jsx(CircularProgress, { size: 28 }) })), jsxs(List, { dense: true, disablePadding: true, children: [folders.map(function (folder) { return (jsxs(ListItemButton, { onClick: function () { return loadFolder(folder.path); }, children: [jsx(ListItemIcon, { sx: { minWidth: 36 }, children: jsx(FolderRoundedIcon, { fontSize: "small", color: "action" }) }), jsx(ListItemText, { primary: folder.label || folder.path.split('/').pop() })] }, folder.path)); }), images.map(function (image) { return (jsxs(ListItemButton, { onClick: function () {
+                                            return openRepoImage(image.path, image.label || image.path.split('/').pop() || image.path);
+                                        }, children: [jsx(ListItemIcon, { sx: { minWidth: 36 }, children: jsx(ImageRoundedIcon, { fontSize: "small", color: "primary" }) }), jsx(ListItemText, { primary: image.label || image.path.split('/').pop(), secondary: image.path, secondaryTypographyProps: { noWrap: true } })] }, image.path)); }), !loading && !folders.length && !images.length && (jsx(Box$1, { sx: { p: 3, textAlign: 'center' }, children: jsx(Typography, { variant: "body2", color: "text.secondary", children: "No images in this folder." }) }))] })] })] })] }));
+}
+
+var TOOL_OPTIONS = [
+    { value: 'crop', label: 'Crop', icon: jsx(CropRoundedIcon, { fontSize: "small" }) },
+    { value: 'focal', label: 'Focal', icon: jsx(CenterFocusStrongRoundedIcon, { fontSize: "small" }) },
+    { value: 'filters', label: 'Filters', icon: jsx(AutoAwesomeRoundedIcon, { fontSize: "small" }) },
+    { value: 'adjust', label: 'Adjust', icon: jsx(TuneRoundedIcon, { fontSize: "small" }) },
+    { value: 'draw', label: 'Draw', icon: jsx(BrushRoundedIcon, { fontSize: "small" }) },
+    { value: 'resize', label: 'Resize', icon: jsx(PhotoSizeSelectLargeRoundedIcon, { fontSize: "small" }) }
+];
 function ImageStudio(_a) {
     var _this = this;
     var _b;
     var _c = _a.defaultPath, defaultPath = _c === void 0 ? '/static-assets/images' : _c;
+    var theme = useTheme();
     var siteId = useActiveSiteId();
     var dispatch = useDispatch();
     var guestOrigin = useSelector(function (state) { var _a, _b; return (_b = (_a = state.preview) === null || _a === void 0 ? void 0 : _a.guest) === null || _b === void 0 ? void 0 : _b.origin; });
+    var isFullScreen = useSelector(function (state) { var _a, _b, _c; return (_c = (_b = (_a = state.dialogs) === null || _a === void 0 ? void 0 : _a.widget) === null || _b === void 0 ? void 0 : _b.isFullScreen) !== null && _c !== void 0 ? _c : false; });
     var _d = useState('studio'), mainTab = _d[0], setMainTab = _d[1];
     var _e = useState(null), loaded = _e[0], setLoaded = _e[1];
     var _f = useState('crop'), tool = _f[0], setTool = _f[1];
     var _g = useState(DEFAULT_ADJUSTMENTS), adjustments = _g[0], setAdjustments = _g[1];
     var _h = useState(DEFAULT_FOCAL), focal = _h[0], setFocal = _h[1];
-    var _j = useState({ x: 0, y: 0 }), cropPosition = _j[0], setCropPosition = _j[1];
-    var _k = useState(null), croppedAreaPixels = _k[0], setCroppedAreaPixels = _k[1];
-    var _l = useState(undefined), aspect = _l[0], setAspect = _l[1];
-    var _m = useState(''), outputWidth = _m[0], setOutputWidth = _m[1];
-    var _o = useState(''), outputHeight = _o[0], setOutputHeight = _o[1];
-    var _p = useState(true), lockOutputAspect = _p[0], setLockOutputAspect = _p[1];
+    var _j = useState(null), croppedAreaPixels = _j[0], setCroppedAreaPixels = _j[1];
+    var _k = useState(undefined), aspect = _k[0], setAspect = _k[1];
+    var _l = useState(''), outputWidth = _l[0], setOutputWidth = _l[1];
+    var _m = useState(''), outputHeight = _m[0], setOutputHeight = _m[1];
+    var _o = useState(true), lockOutputAspect = _o[0], setLockOutputAspect = _o[1];
+    var _p = useState(DEFAULT_OUTPUT_BACKGROUND), outputBackground = _p[0], setOutputBackground = _p[1];
     var _q = useState(false), saveOpen = _q[0], setSaveOpen = _q[1];
-    var _r = useState(false), saving = _r[0], setSaving = _r[1];
+    var _r = useState(false), browseOpen = _r[0], setBrowseOpen = _r[1];
+    var _s = useState(false), saving = _s[0], setSaving = _s[1];
+    var _t = useState('normal'), filterPresetId = _t[0], setFilterPresetId = _t[1];
+    var _u = useState(EMPTY_DRAW_STATE), drawState = _u[0], setDrawState = _u[1];
+    var _v = useState('brush'), drawTool = _v[0], setDrawTool = _v[1];
+    var _w = useState('#ffffff'), brushColor = _w[0], setBrushColor = _w[1];
+    var _x = useState(8), brushSize = _x[0], setBrushSize = _x[1];
+    var _y = useState(DEFAULT_TEXT_FONT_FAMILY), textFontFamily = _y[0], setTextFontFamily = _y[1];
+    var _z = useState(DEFAULT_TEXT_FONT_SIZE), textFontSize = _z[0], setTextFontSize = _z[1];
+    var _0 = useState(DEFAULT_CANVAS_VIEW), canvasView = _0[0], setCanvasView = _0[1];
+    var _1 = useState(null), appliedFieldId = _1[0], setAppliedFieldId = _1[1];
     var loadRepoImage = useCallback(function (path) { return loadRepoImageAsDataUrl(siteId, path, guestOrigin); }, [siteId, guestOrigin]);
     var resetEdits = useCallback(function () {
         setAdjustments(DEFAULT_ADJUSTMENTS);
         setFocal(DEFAULT_FOCAL);
-        setCropPosition({ x: 0, y: 0 });
         setCroppedAreaPixels(null);
         setAspect(undefined);
         setOutputWidth('');
         setOutputHeight('');
+        setOutputBackground(DEFAULT_OUTPUT_BACKGROUND);
+        setFilterPresetId('normal');
+        setDrawState(EMPTY_DRAW_STATE);
+        setDrawTool('brush');
+        setBrushColor('#ffffff');
+        setBrushSize(8);
+        setTextFontFamily(DEFAULT_TEXT_FONT_FAMILY);
+        setTextFontSize(DEFAULT_TEXT_FONT_SIZE);
+        setCanvasView(DEFAULT_CANVAS_VIEW);
+        setAppliedFieldId(null);
     }, []);
-    var handleImageSelected = function (payload) {
+    var handleAdjustmentsChange = useCallback(function (next) {
+        setAdjustments(next);
+        setFilterPresetId('custom');
+    }, []);
+    var handleSelectFilterPreset = useCallback(function (presetId, presetAdjustments) {
+        setFilterPresetId(presetId);
+        setAdjustments(presetAdjustments);
+    }, []);
+    var handleTintChange = useCallback(function (tintColor, tintStrength) {
+        setAdjustments(function (prev) { return (__assign(__assign({}, prev), { tintColor: tintColor, tintStrength: tintStrength })); });
+        setFilterPresetId('custom');
+    }, []);
+    var handleImageSelected = useCallback(function (payload) {
         setLoaded(payload);
         resetEdits();
         setMainTab('studio');
         setTool('crop');
-    };
-    var handleError = function (message) {
+    }, [resetEdits]);
+    var handleError = useCallback(function (message) {
         dispatch(showSystemNotification({ message: message, options: { variant: 'error' } }));
-    };
-    // Clipboard paste support
+    }, [dispatch]);
+    var handleLocalFile = useCallback(function (file) { return __awaiter(_this, void 0, void 0, function () {
+        var dataUrl, e_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 2, , 3]);
+                    return [4 /*yield*/, blobToDataUrl(file)];
+                case 1:
+                    dataUrl = _a.sent();
+                    handleImageSelected({ dataUrl: dataUrl, name: file.name });
+                    return [3 /*break*/, 3];
+                case 2:
+                    e_1 = _a.sent();
+                    handleError(e_1.message);
+                    return [3 /*break*/, 3];
+                case 3: return [2 /*return*/];
+            }
+        });
+    }); }, [handleImageSelected, handleError]);
     useEffect(function () {
         var onPaste = function (e) {
             var _a;
@@ -45253,13 +45766,51 @@ function ImageStudio(_a) {
         };
         window.addEventListener('paste', onPaste);
         return function () { return window.removeEventListener('paste', onPaste); };
-    }, []);
-    var openSave = function () {
-        if (!loaded) {
-            return;
-        }
-        setSaveOpen(true);
-    };
+    }, [handleImageSelected]);
+    var handleApplyConstraints = useCallback(function (req) { return __awaiter(_this, void 0, void 0, function () {
+        var resolved, img, crop;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    resolved = resolveImageConstraints(req);
+                    if (!resolved) {
+                        handleError('This field has no size constraints to apply.');
+                        return [2 /*return*/];
+                    }
+                    setAppliedFieldId(req.fieldId);
+                    if (resolved.outputWidth != null) {
+                        setOutputWidth(resolved.outputWidth);
+                    }
+                    if (resolved.outputHeight != null) {
+                        setOutputHeight(resolved.outputHeight);
+                    }
+                    setLockOutputAspect(true);
+                    if (!(resolved.aspect != null)) return [3 /*break*/, 4];
+                    setAspect(resolved.aspect);
+                    if (!loaded) return [3 /*break*/, 4];
+                    _b.label = 1;
+                case 1:
+                    _b.trys.push([1, 3, , 4]);
+                    return [4 /*yield*/, createImage(loaded.dataUrl)];
+                case 2:
+                    img = _b.sent();
+                    crop = croppedAreaPixels !== null && croppedAreaPixels !== void 0 ? croppedAreaPixels : fullImageCrop(img.naturalWidth, img.naturalHeight);
+                    setCroppedAreaPixels(cropAreaWithAspect(crop, resolved.aspect, img.naturalWidth, img.naturalHeight));
+                    return [3 /*break*/, 4];
+                case 3:
+                    _b.sent();
+                    return [3 /*break*/, 4];
+                case 4:
+                    setMainTab('studio');
+                    setTool('resize');
+                    dispatch(showSystemNotification({
+                        message: "Applied ".concat(req.fieldTitle, ": ").concat(formatDimensionSpec(req)),
+                        options: { variant: 'success' }
+                    }));
+                    return [2 /*return*/];
+            }
+        });
+    }); }, [croppedAreaPixels, dispatch, handleError, loaded]);
     var previewDimensions = useMemo(function () {
         if (croppedAreaPixels) {
             return { width: croppedAreaPixels.width, height: croppedAreaPixels.height };
@@ -45267,7 +45818,7 @@ function ImageStudio(_a) {
         return null;
     }, [croppedAreaPixels]);
     var handleSave = function (options) { return __awaiter(_this, void 0, void 0, function () {
-        var cropArea, img, ratio, outW, outH, blob, ext, targetPath, fileName, savedDataUrl, file, e_1;
+        var cropArea, img, ratio, outW, outH, blob, ext, targetPath, fileName, savedDataUrl, file, e_2;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -45277,7 +45828,7 @@ function ImageStudio(_a) {
                     setSaving(true);
                     _a.label = 1;
                 case 1:
-                    _a.trys.push([1, 6, 7, 8]);
+                    _a.trys.push([1, 8, 9, 10]);
                     cropArea = croppedAreaPixels;
                     return [4 /*yield*/, new Promise(function (resolve, reject) {
                             var image = new Image();
@@ -45301,7 +45852,7 @@ function ImageStudio(_a) {
                     }
                     outW = outputWidth === '' ? undefined : Number(outputWidth);
                     outH = outputHeight === '' ? undefined : Number(outputHeight);
-                    return [4 /*yield*/, getCroppedImageBlob(loaded.dataUrl, cropArea, adjustments, outW, outH, options.mimeType, options.quality)];
+                    return [4 /*yield*/, getCroppedImageBlob(loaded.dataUrl, cropArea, adjustments, outW, outH, options.mimeType, options.quality, drawState, outputBackground)];
                 case 3:
                     blob = _a.sent();
                     ext = options.mimeType === 'image/jpeg'
@@ -45318,8 +45869,16 @@ function ImageStudio(_a) {
                     return [4 /*yield*/, uploadDataUrl(siteId, file, targetPath, '_csrf').pipe(take(1)).toPromise()];
                 case 5:
                     _a.sent();
+                    if (!(options.contentFieldLink && siteId)) return [3 /*break*/, 7];
+                    return [4 /*yield*/, updateContentImageField(siteId, options.contentFieldLink.contentPath, options.contentFieldLink.objectId, options.contentFieldLink.fieldId, targetPath)];
+                case 6:
+                    _a.sent();
+                    _a.label = 7;
+                case 7:
                     dispatch(showSystemNotification({
-                        message: "Image saved to ".concat(targetPath),
+                        message: options.contentFieldLink
+                            ? "Image saved and ".concat(options.contentFieldLink.fieldTitle, " updated")
+                            : "Image saved to ".concat(targetPath),
                         options: { variant: 'success' }
                     }));
                     setSaveOpen(false);
@@ -45329,15 +45888,15 @@ function ImageStudio(_a) {
                     else {
                         setLoaded({ dataUrl: savedDataUrl, sourcePath: targetPath, name: file.name });
                     }
-                    return [3 /*break*/, 8];
-                case 6:
-                    e_1 = _a.sent();
-                    handleError("Save failed: ".concat(e_1.message));
-                    return [3 /*break*/, 8];
-                case 7:
+                    return [3 /*break*/, 10];
+                case 8:
+                    e_2 = _a.sent();
+                    handleError("Save failed: ".concat(e_2.message));
+                    return [3 /*break*/, 10];
+                case 9:
                     setSaving(false);
                     return [7 /*endfinally*/];
-                case 8: return [2 /*return*/];
+                case 10: return [2 /*return*/];
             }
         });
     }); };
@@ -45346,16 +45905,39 @@ function ImageStudio(_a) {
             ? (_b = suggestVariantFilename(loaded.sourcePath).split('/').pop()) !== null && _b !== void 0 ? _b : loaded.name
             : loaded.name
         : 'image.png';
-    return (jsxs(Fragment, { children: [jsxs(DialogBody, { sx: { p: 2, display: 'flex', flexDirection: 'column', minHeight: 480 }, children: [jsxs(Tabs, { value: mainTab, onChange: function (_, v) { return setMainTab(v); }, sx: { mb: 2 }, children: [jsx(Tab, { value: "studio", label: "Image Studio" }), jsx(Tab, { value: "requirements", label: "Size requirements" })] }), mainTab === 'requirements' && (jsx(ImageSizeRequirementsPanel, { currentWidth: previewDimensions === null || previewDimensions === void 0 ? void 0 : previewDimensions.width, currentHeight: previewDimensions === null || previewDimensions === void 0 ? void 0 : previewDimensions.height })), mainTab === 'studio' && (jsxs(Box$1, { sx: { display: 'flex', gap: 2, flex: 1, minHeight: 0, flexWrap: { xs: 'wrap', md: 'nowrap' } }, children: [jsx(ImageSourcePicker, { defaultPath: defaultPath, onImageSelected: handleImageSelected, onError: handleError, loadRepoImage: loadRepoImage }), jsx(Box$1, { sx: { flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }, children: !loaded ? (jsx(Box$1, { sx: {
-                                        flex: 1,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        border: '1px dashed',
-                                        borderColor: 'divider',
-                                        borderRadius: 1,
-                                        p: 4
-                                    }, children: jsx(Typography, { color: "text.secondary", align: "center", children: "Select an existing image, drag one in, paste from clipboard, or upload to start editing." }) })) : (jsxs(Fragment, { children: [jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2 }, children: [jsxs(Box$1, { children: [jsx(Typography, { variant: "subtitle1", children: loaded.name }), loaded.sourcePath && (jsx(Typography, { variant: "caption", color: "text.secondary", children: loaded.sourcePath }))] }), jsxs(ToggleButtonGroup, { size: "small", value: tool, exclusive: true, onChange: function (_, val) { return val && setTool(val); }, children: [jsxs(ToggleButton, { value: "crop", children: [jsx(CropRoundedIcon, { fontSize: "small", sx: { mr: 0.5 } }), " Crop"] }), jsxs(ToggleButton, { value: "focal", children: [jsx(CenterFocusStrongRoundedIcon, { fontSize: "small", sx: { mr: 0.5 } }), " Focal"] }), jsxs(ToggleButton, { value: "adjust", children: [jsx(TuneRoundedIcon, { fontSize: "small", sx: { mr: 0.5 } }), " Adjust"] }), jsxs(ToggleButton, { value: "resize", children: [jsx(PhotoSizeSelectLargeRoundedIcon, { fontSize: "small", sx: { mr: 0.5 } }), " Resize"] })] })] }), jsx(ImageStudioEditor, { imageSrc: loaded.dataUrl, tool: tool, adjustments: adjustments, onAdjustmentsChange: setAdjustments, focal: focal, onFocalChange: setFocal, cropPosition: cropPosition, onCropPositionChange: setCropPosition, croppedAreaPixels: croppedAreaPixels, onCroppedAreaPixelsChange: setCroppedAreaPixels, aspect: aspect, onAspectChange: setAspect, outputWidth: outputWidth, outputHeight: outputHeight, onOutputWidthChange: setOutputWidth, onOutputHeightChange: setOutputHeight, lockOutputAspect: lockOutputAspect, onLockOutputAspectChange: setLockOutputAspect, onReset: resetEdits })] })) })] }))] }), jsx(Divider, {}), jsx(DialogFooter$1, { children: jsx(MyLoadingButton, { variant: "contained", startIcon: jsx(SaveRoundedIcon, {}), disabled: !loaded, loading: saving, onClick: openSave, children: "Save image\u2026" }) }), jsx(ImageStudioSaveDialog, { open: saveOpen, onClose: function () { return setSaveOpen(false); }, onSave: handleSave, saving: saving, defaultFolder: (loaded === null || loaded === void 0 ? void 0 : loaded.sourcePath) ? loaded.sourcePath.substring(0, loaded.sourcePath.lastIndexOf('/')) : defaultPath, sourcePath: loaded === null || loaded === void 0 ? void 0 : loaded.sourcePath, suggestedName: suggestedSaveName })] }));
+    return (jsxs(Box$1, { sx: { display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }, children: [jsxs(DialogBody, { sx: {
+                    p: 0,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    flex: 1,
+                    minHeight: 0,
+                    overflow: 'hidden',
+                    bgcolor: alpha(theme.palette.background.default, 0.4)
+                }, children: [jsxs(Box$1, { sx: {
+                            px: 2.5,
+                            pt: 1.5,
+                            pb: 0,
+                            borderBottom: 1,
+                            borderColor: 'divider',
+                            bgcolor: 'background.paper'
+                        }, children: [jsxs(Stack$1, { direction: "row", alignItems: "center", justifyContent: "space-between", sx: { mb: 1 }, children: [jsxs(Tabs, { value: mainTab, onChange: function (_, v) { return setMainTab(v); }, sx: {
+                                            minHeight: 40,
+                                            '& .MuiTab-root': { minHeight: 40, py: 0.5, fontWeight: 500 }
+                                        }, children: [jsx(Tab, { value: "studio", label: "Editor" }), jsx(Tab, { value: "requirements", label: "Size requirements", icon: jsx(InfoOutlinedIcon, { sx: { fontSize: 18 } }), iconPosition: "start" })] }), loaded && mainTab === 'studio' && (jsxs(Stack$1, { direction: "row", alignItems: "center", spacing: 0.5, children: [jsx(Tooltip, { title: isFullScreen ? 'Exit full screen' : 'Full screen', children: jsx(IconButton$1, { size: "small", onClick: function () { return dispatch(updateWidgetDialog({ isFullScreen: !isFullScreen })); }, children: isFullScreen ? (jsx(FullscreenExitRoundedIcon, { fontSize: "small" })) : (jsx(FullscreenRoundedIcon, { fontSize: "small" })) }) }), jsx(Tooltip, { title: "Load a different image", children: jsx(IconButton$1, { size: "small", onClick: function () { return setBrowseOpen(true); }, children: jsx(SwapHorizRoundedIcon, { fontSize: "small" }) }) })] }))] }), loaded && mainTab === 'studio' && (jsxs(Stack$1, { direction: { xs: 'column', sm: 'row' }, alignItems: { xs: 'stretch', sm: 'center' }, justifyContent: "space-between", gap: 1.5, sx: { pb: 1.5 }, children: [jsxs(Box$1, { sx: { minWidth: 0 }, children: [jsx(Typography, { variant: "subtitle2", noWrap: true, sx: { fontWeight: 600 }, children: loaded.name }), loaded.sourcePath && (jsx(Typography, { variant: "caption", color: "text.secondary", noWrap: true, display: "block", children: loaded.sourcePath }))] }), jsx(ToggleButtonGroup, { size: "small", value: tool, exclusive: true, onChange: function (_, val) { return val && setTool(val); }, sx: {
+                                            flexWrap: 'wrap',
+                                            maxWidth: { xs: '100%', sm: 520 },
+                                            '& .MuiToggleButton-root': {
+                                                px: 1.5,
+                                                gap: 0.5,
+                                                borderRadius: 2,
+                                                mx: 0.25,
+                                                border: 0,
+                                                '&.Mui-selected': {
+                                                    bgcolor: alpha(theme.palette.primary.main, 0.12),
+                                                    color: 'primary.main'
+                                                }
+                                            }
+                                        }, children: TOOL_OPTIONS.map(function (opt) { return (jsxs(ToggleButton, { value: opt.value, children: [opt.icon, opt.label] }, opt.value)); }) })] }))] }), jsxs(Box$1, { sx: { flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }, children: [mainTab === 'requirements' && (jsx(Box$1, { sx: { flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', p: 1.5, overflow: 'hidden' }, children: jsx(ImageSizeRequirementsPanel, { active: mainTab === 'requirements', appliedFieldId: appliedFieldId, onApplyConstraints: handleApplyConstraints, currentWidth: previewDimensions === null || previewDimensions === void 0 ? void 0 : previewDimensions.width, currentHeight: previewDimensions === null || previewDimensions === void 0 ? void 0 : previewDimensions.height }) })), mainTab === 'studio' && !loaded && (jsx(ImageStudioWelcome, { onFile: handleLocalFile, onBrowseRequest: function () { return setBrowseOpen(true); } })), mainTab === 'studio' && loaded && (jsx(Box$1, { sx: { flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', px: 1.5, py: 1 }, children: jsx(ImageStudioEditor, { imageSrc: loaded.dataUrl, tool: tool, adjustments: adjustments, onAdjustmentsChange: handleAdjustmentsChange, focal: focal, onFocalChange: setFocal, croppedAreaPixels: croppedAreaPixels, onCroppedAreaPixelsChange: setCroppedAreaPixels, aspect: aspect, onAspectChange: setAspect, outputWidth: outputWidth, outputHeight: outputHeight, onOutputWidthChange: setOutputWidth, onOutputHeightChange: setOutputHeight, lockOutputAspect: lockOutputAspect, onLockOutputAspectChange: setLockOutputAspect, outputBackground: outputBackground, onOutputBackgroundChange: setOutputBackground, onReset: resetEdits, filterPresetId: filterPresetId, onSelectFilterPreset: handleSelectFilterPreset, onTintChange: handleTintChange, drawState: drawState, onDrawStateChange: setDrawState, drawTool: drawTool, onDrawToolChange: setDrawTool, brushColor: brushColor, onBrushColorChange: setBrushColor, brushSize: brushSize, onBrushSizeChange: setBrushSize, textFontFamily: textFontFamily, onTextFontFamilyChange: setTextFontFamily, textFontSize: textFontSize, onTextFontSizeChange: setTextFontSize, canvasView: canvasView, onCanvasViewChange: setCanvasView }) }))] })] }), jsx(Divider, {}), jsx(DialogFooter$1, { sx: { px: 2.5, py: 1.5, bgcolor: 'background.paper' }, children: jsxs(Stack$1, { direction: "row", alignItems: "center", justifyContent: "space-between", width: "100%", children: [loaded && previewDimensions ? (jsx(Chip, { size: "small", variant: "outlined", label: "".concat(previewDimensions.width, " \u00D7 ").concat(previewDimensions.height, "px"), sx: { fontWeight: 500 } })) : (jsx(Box$1, {})), jsx(MyLoadingButton, { variant: "contained", startIcon: jsx(SaveRoundedIcon, {}), disabled: !loaded, loading: saving, onClick: function () { return loaded && setSaveOpen(true); }, children: "Save image" })] }) }), jsx(ImageRepoBrowserDialog, { open: browseOpen, onClose: function () { return setBrowseOpen(false); }, defaultPath: defaultPath, onImageSelected: handleImageSelected, onError: handleError, loadRepoImage: loadRepoImage }), jsx(ImageStudioSaveDialog, { open: saveOpen, onClose: function () { return setSaveOpen(false); }, onSave: handleSave, saving: saving, defaultFolder: (loaded === null || loaded === void 0 ? void 0 : loaded.sourcePath) ? loaded.sourcePath.substring(0, loaded.sourcePath.lastIndexOf('/')) : defaultPath, sourcePath: loaded === null || loaded === void 0 ? void 0 : loaded.sourcePath, suggestedName: suggestedSaveName })] }));
 }
 
 function OpenImageStudioPanelButton(props) {

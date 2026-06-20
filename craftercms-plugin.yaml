@@ -13,7 +13,7 @@ plugin:
   version:
     major: 1
     minor: 0
-    patch: 14
+    patch: 15
   description: A plugin to adds some UI goodies to your studio
   documentation: "https://raw.githubusercontent.com/russdanner/plugin-studio-uigoodies/master/README.md"
   website:
@@ -223,28 +223,32 @@ installation:
     parentXpath: //widget[@id='craftercms.components.ToolsPanel']
     elementXpath: //widget[@id='org.rd.plugin.uigoodies.openImageStudioPanelButton']
     element:
-      name: widget
-      attributes:
-        - name: id
-          value: org.rd.plugin.uigoodies.openImageStudioPanelButton
+      name: configuration
       children:
-        - name: plugin
-          attributes:
-            - name: id
-              value: org.rd.plugin.uigoodies
-            - name: type
-              value: apps
-            - name: name
-              value: uigoodies
-            - name: file
-              value: index.js
-        - name: configuration
+        - name: widgets
           children:
-            - name: title
-              value: Image Studio
-            - name: icon
+            - name: widget
               attributes:
                 - name: id
-                  value: "@mui/icons-material/PhotoLibraryRounded"
-            - name: defaultPath
-              value: /static-assets/images
+                  value: org.rd.plugin.uigoodies.openImageStudioPanelButton
+              children:
+                - name: plugin
+                  attributes:
+                    - name: id
+                      value: org.rd.plugin.uigoodies
+                    - name: type
+                      value: apps
+                    - name: name
+                      value: uigoodies
+                    - name: file
+                      value: index.js
+                - name: configuration
+                  children:
+                    - name: title
+                      value: Image Studio
+                    - name: icon
+                      attributes:
+                        - name: id
+                          value: "@mui/icons-material/PhotoLibraryRounded"
+                    - name: defaultPath
+                      value: /static-assets/images
