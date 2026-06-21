@@ -24,7 +24,7 @@ const PublishIcon = craftercms.utils.constants.components.get('@mui/icons-materi
 const Snackbar = craftercms.libs.MaterialUI.Snackbar && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Snackbar, 'default') ? craftercms.libs.MaterialUI.Snackbar['default'] : craftercms.libs.MaterialUI.Snackbar;
 const { FormattedMessage } = craftercms.libs.ReactIntl;
 const { of, from, concatMap: concatMap$1, forkJoin, Subject, firstValueFrom } = craftercms.libs.rxjs;
-const { concatMap, expand, toArray, catchError, switchMap, takeUntil, map, take, debounceTime, distinctUntilChanged } = craftercms.libs.rxjs;
+const { concatMap, expand, toArray, catchError, switchMap, takeUntil, map, take, debounceTime, distinctUntilChanged, mergeMap } = craftercms.libs.rxjs;
 const { fetchUnpublished, fetchMyActivity } = craftercms.services.dashboard;
 const { nou } = craftercms.utils.object;
 const { lookupItemByPath } = craftercms.utils.content;
@@ -48,7 +48,7 @@ const ArrowDropDownRoundedIcon = craftercms.utils.constants.components.get('@mui
 const { withoutIndex, getRootPath, getIndividualPaths, withoutFile, withIndex } = craftercms.utils.path;
 const Collapse = craftercms.libs.MaterialUI.Collapse && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Collapse, 'default') ? craftercms.libs.MaterialUI.Collapse['default'] : craftercms.libs.MaterialUI.Collapse;
 const Checkbox$1 = craftercms.libs.MaterialUI.Checkbox && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Checkbox, 'default') ? craftercms.libs.MaterialUI.Checkbox['default'] : craftercms.libs.MaterialUI.Checkbox;
-const { postJSON, getGlobalHeaders, get: get$1 } = craftercms.utils.ajax;
+const { postJSON, getGlobalHeaders, get: get$1, post } = craftercms.utils.ajax;
 const Popover = craftercms.libs.MaterialUI.Popover && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Popover, 'default') ? craftercms.libs.MaterialUI.Popover['default'] : craftercms.libs.MaterialUI.Popover;
 const Paper$1 = craftercms.libs.MaterialUI.Paper && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Paper, 'default') ? craftercms.libs.MaterialUI.Paper['default'] : craftercms.libs.MaterialUI.Paper;
 const Typography$1 = craftercms.libs.MaterialUI.Typography && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Typography, 'default') ? craftercms.libs.MaterialUI.Typography['default'] : craftercms.libs.MaterialUI.Typography;
@@ -128,6 +128,24 @@ const CleaningServicesRoundedIcon = craftercms.utils.constants.components.get('@
 const PlaylistAddCheckRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/PlaylistAddCheckRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/PlaylistAddCheckRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/PlaylistAddCheckRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/PlaylistAddCheckRounded');
 const CommitRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/CommitRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/CommitRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/CommitRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/CommitRounded');
 const InsertDriveFileRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/InsertDriveFileRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/InsertDriveFileRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/InsertDriveFileRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/InsertDriveFileRounded');
+const Divider$1 = craftercms.libs.MaterialUI.Divider && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Divider, 'default') ? craftercms.libs.MaterialUI.Divider['default'] : craftercms.libs.MaterialUI.Divider;
+const Stack$2 = craftercms.libs.MaterialUI.Stack && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Stack, 'default') ? craftercms.libs.MaterialUI.Stack['default'] : craftercms.libs.MaterialUI.Stack;
+const Card = craftercms.libs.MaterialUI.Card && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Card, 'default') ? craftercms.libs.MaterialUI.Card['default'] : craftercms.libs.MaterialUI.Card;
+const CardContent = craftercms.libs.MaterialUI.CardContent && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.CardContent, 'default') ? craftercms.libs.MaterialUI.CardContent['default'] : craftercms.libs.MaterialUI.CardContent;
+const CardHeader = craftercms.libs.MaterialUI.CardHeader && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.CardHeader, 'default') ? craftercms.libs.MaterialUI.CardHeader['default'] : craftercms.libs.MaterialUI.CardHeader;
+const Chip$1 = craftercms.libs.MaterialUI.Chip && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Chip, 'default') ? craftercms.libs.MaterialUI.Chip['default'] : craftercms.libs.MaterialUI.Chip;
+const ContentCopyOutlinedIcon = craftercms.utils.constants.components.get('@mui/icons-material/ContentCopyOutlined') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ContentCopyOutlined'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ContentCopyOutlined')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ContentCopyOutlined');
+const CircularProgress$1 = craftercms.libs.MaterialUI.CircularProgress && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.CircularProgress, 'default') ? craftercms.libs.MaterialUI.CircularProgress['default'] : craftercms.libs.MaterialUI.CircularProgress;
+const FormControl$1 = craftercms.libs.MaterialUI.FormControl && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.FormControl, 'default') ? craftercms.libs.MaterialUI.FormControl['default'] : craftercms.libs.MaterialUI.FormControl;
+const InputLabel$1 = craftercms.libs.MaterialUI.InputLabel && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.InputLabel, 'default') ? craftercms.libs.MaterialUI.InputLabel['default'] : craftercms.libs.MaterialUI.InputLabel;
+const Select$1 = craftercms.libs.MaterialUI.Select && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Select, 'default') ? craftercms.libs.MaterialUI.Select['default'] : craftercms.libs.MaterialUI.Select;
+const RefreshOutlinedIcon = craftercms.utils.constants.components.get('@mui/icons-material/RefreshOutlined') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/RefreshOutlined'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/RefreshOutlined')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/RefreshOutlined');
+const HomeWorkOutlinedIcon = craftercms.utils.constants.components.get('@mui/icons-material/HomeWorkOutlined') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/HomeWorkOutlined'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/HomeWorkOutlined')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/HomeWorkOutlined');
+const Dialog$1 = craftercms.libs.MaterialUI.Dialog && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Dialog, 'default') ? craftercms.libs.MaterialUI.Dialog['default'] : craftercms.libs.MaterialUI.Dialog;
+const DialogActions$1 = craftercms.libs.MaterialUI.DialogActions && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.DialogActions, 'default') ? craftercms.libs.MaterialUI.DialogActions['default'] : craftercms.libs.MaterialUI.DialogActions;
+const DialogContent$1 = craftercms.libs.MaterialUI.DialogContent && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.DialogContent, 'default') ? craftercms.libs.MaterialUI.DialogContent['default'] : craftercms.libs.MaterialUI.DialogContent;
+const DialogTitle$1 = craftercms.libs.MaterialUI.DialogTitle && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.DialogTitle, 'default') ? craftercms.libs.MaterialUI.DialogTitle['default'] : craftercms.libs.MaterialUI.DialogTitle;
+const FormControlLabel$1 = craftercms.libs.MaterialUI.FormControlLabel && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.FormControlLabel, 'default') ? craftercms.libs.MaterialUI.FormControlLabel['default'] : craftercms.libs.MaterialUI.FormControlLabel;
 
 /*
  * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
@@ -1180,6 +1198,7 @@ const pathSelectionDialogClosed = /*#__PURE__*/ createAction('PATH_SELECTION_CLO
 // endregion
 // region Widget Dialog
 const showWidgetDialog = /*#__PURE__*/ createAction('SHOW_WIDGET_DIALOG');
+const closeWidgetDialog = /*#__PURE__*/ createAction('CLOSE_WIDGET_DIALOG');
 const updateWidgetDialog = /*#__PURE__*/ createAction('UPDATE_WIDGET_DIALOG');
 // endregion
 
@@ -2083,6 +2102,9 @@ const CHANGE_CURRENT_URL = 'CHANGE_CURRENT_URL';
 const fetchContentTypes = /*#__PURE__*/ createAction(FETCH_CONTENT_TYPES);
 const changeCurrentUrl = /*#__PURE__*/ createAction(CHANGE_CURRENT_URL);
 /*#__PURE__*/ createAction(contentTypeDropTargetsResponse.type);
+// endregion
+// region Navigation stack
+const goToLastPage = /*#__PURE__*/ createAction('GO_TO_LAST_PAGE');
 
 var ComponentPreviewPathNavigator = function (props) {
     var _a, _b;
@@ -50317,6 +50339,3051 @@ function DevContentOpsTools() {
                 }, children: [jsx(Tab, { value: "git-log", label: "Git log" }), jsx(Tab, { value: "working-tree", label: "Working tree" }), jsx(Tab, { value: "branches", label: "Branches" }), jsx(Tab, { value: "database", label: "Database" }), jsx(Tab, { value: "repo-health", label: "Repository health" }), jsx(Tab, { value: "site-items", label: "Site items" }), jsx(Tab, { value: "blob-stores", label: "Blob stores" })] }), jsx(Box$1, { sx: { flex: 1, minHeight: 0, p: 2.5, display: 'flex', flexDirection: 'column', overflow: 'hidden' }, children: !siteId ? (jsx(Box$1, { sx: { flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 240 }, children: jsx(Typography, { color: "text.secondary", variant: "body1", children: sitesLoading ? 'Loading projects…' : 'Select a project to continue.' }) })) : (jsxs(Fragment, { children: [tab === 'git-log' && (jsx(GitLogTab, { siteId: siteId, siteName: selectedSite.name, sites: sites }, siteId)), tab === 'working-tree' && (jsx(WorkingTreeTab, { siteId: siteId, siteName: selectedSite.name }, siteId)), tab === 'branches' && (jsx(BranchesTab, { siteId: siteId, siteName: selectedSite.name }, siteId)), tab === 'database' && (jsx(DatabaseTab, { siteId: siteId, siteName: selectedSite.name }, siteId)), tab === 'repo-health' && (jsx(RepoHealthTab, { siteId: siteId, siteName: selectedSite.name }, siteId)), tab === 'site-items' && (jsx(SiteItemsTab, { siteId: siteId, siteName: selectedSite.name }, siteId)), tab === 'blob-stores' && (jsx(BlobStoreTab, { siteId: siteId, siteName: selectedSite.name }, siteId))] })) })] }));
 }
 
+/*
+ * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License version 3 as published by
+ * the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+function useItemsByPath() {
+  return useSelection((state) => state.content.itemsByPath);
+}
+
+/*
+ * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License version 3 as published by
+ * the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+function usePreviewGuest() {
+  return useSelector((state) => state.preview.guest);
+}
+
+/*
+ * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License version 3 as published by
+ * the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+function useCurrentPreviewItem() {
+  const { path } = usePreviewGuest() ?? {};
+  const items = useItemsByPath();
+  return items?.[path];
+}
+
+var SourceItemTable = function (_a) {
+    var sourceItem = _a.sourceItem, _b = _a.subheader, subheader = _b === void 0 ? 'Item selected in preview' : _b;
+    return (jsxs(Card, { variant: "outlined", sx: {
+            mx: 2.5,
+            mb: 2,
+            borderRadius: 2,
+            boxShadow: function (theme) {
+                return theme.palette.mode === 'dark' ? 'none' : '0 1px 2px rgba(15, 23, 42, 0.06)';
+            }
+        }, children: [jsx(CardHeader, { avatar: jsx(ContentCopyOutlinedIcon, { color: "primary", sx: { opacity: 0.9 }, "aria-hidden": true }), title: "Source", titleTypographyProps: { variant: 'subtitle1', fontWeight: 600 }, subheader: subheader, subheaderTypographyProps: { variant: 'caption', color: 'text.secondary' } }), jsx(CardContent, { sx: { pt: 0 }, children: sourceItem ? (jsxs(Stack$2, { spacing: 1.25, children: [jsxs("div", { children: [jsx(Typography$1, { variant: "caption", color: "text.secondary", display: "block", gutterBottom: true, children: "Name" }), jsx(Typography$1, { variant: "body2", sx: { fontWeight: 500 }, children: sourceItem.name })] }), jsxs("div", { children: [jsx(Typography$1, { variant: "caption", color: "text.secondary", display: "block", gutterBottom: true, children: "Path" }), jsx(Typography$1, { variant: "body2", component: "code", sx: {
+                                        display: 'block',
+                                        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+                                        fontSize: '0.8125rem',
+                                        wordBreak: 'break-all',
+                                        bgcolor: function (theme) {
+                                            return theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.06)' : theme.palette.grey[100];
+                                        },
+                                        px: 1,
+                                        py: 0.75,
+                                        borderRadius: 1
+                                    }, children: sourceItem.path })] })] })) : (jsxs(Stack$2, { direction: "row", alignItems: "center", spacing: 1, sx: { py: 0.5 }, children: [jsx(Chip$1, { size: "small", label: "No selection", color: "default", variant: "outlined" }), jsx(Typography$1, { variant: "body2", color: "text.secondary", children: "Select an item in preview to copy it." })] })) })] }));
+};
+
+/*
+ * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 3 as published by
+ * the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+var MAX_CONCURRENT_GETS = 3;
+var getQueue = [];
+var activeGets = 0;
+function pumpGetQueue() {
+    var _loop_1 = function () {
+        var job = getQueue.shift();
+        activeGets += 1;
+        get$1(job.url).subscribe({
+            next: function (response) {
+                activeGets -= 1;
+                job.resolve(response);
+                pumpGetQueue();
+            },
+            error: function (e) {
+                activeGets -= 1;
+                job.reject(e);
+                pumpGetQueue();
+            }
+        });
+    };
+    while (activeGets < MAX_CONCURRENT_GETS && getQueue.length > 0) {
+        _loop_1();
+    }
+}
+var HttpUtils = {
+    get: function (url) {
+        return new Promise(function (resolve, reject) {
+            getQueue.push({ url: url, resolve: resolve, reject: reject });
+            pumpGetQueue();
+        });
+    },
+    post: function (url, body, headers) {
+        return new Promise(function (resolve, reject) {
+            post(url, body, headers).subscribe({
+                next: function (response) {
+                    resolve(response);
+                },
+                error: function (e) {
+                    reject(e);
+                }
+            });
+        });
+    }
+};
+
+/**
+ * Multi–locale folder layout under paths like /site/website and /site/components.
+ * Adjust for your site (folder names must match repo locale roots).
+ */
+var MULTI_LOCALE_BASE_LOCALE = 'en';
+/** Locales to show in translation mode (order = UI order). Must match folder names under the root. */
+var MULTI_LOCALE_CODES = ['en', 'es', 'ja', 'zh'];
+var LOCALE_META = {
+    en: { label: 'English', flag: '🇺🇸' },
+    es: { label: 'Spanish', flag: '🇪🇸' },
+    ja: { label: 'Japanese', flag: '🇯🇵' },
+    zh: { label: 'Chinese', flag: '🇨🇳' },
+    de: { label: 'German', flag: '🇩🇪' },
+    ar: { label: 'Arabic', flag: '🇸🇦' }
+};
+/**
+ * Fallback map for locale flags. Supports 2-char and common 5-char codes.
+ * Users should not need to configure flags in site-config.xml.
+ */
+var LOCALE_FLAG_BY_CODE = {
+    en: '🇺🇸',
+    'en-us': '🇺🇸',
+    'en-gb': '🇬🇧',
+    es: '🇪🇸',
+    'es-es': '🇪🇸',
+    de: '🇩🇪',
+    'de-de': '🇩🇪',
+    zh: '🇨🇳',
+    cn: '🇨🇳',
+    'zh-cn': '🇨🇳',
+    'zh-tw': '🇹🇼',
+    ja: '🇯🇵',
+    'ja-jp': '🇯🇵',
+    fr: '🇫🇷',
+    'fr-fr': '🇫🇷',
+    it: '🇮🇹',
+    'it-it': '🇮🇹',
+    pt: '🇵🇹',
+    'pt-pt': '🇵🇹',
+    'pt-br': '🇧🇷',
+    ko: '🇰🇷',
+    'ko-kr': '🇰🇷',
+    /** Arabic (language code); flag is Saudi Arabia — common default for `ar` in path folders. */
+    ar: '🇸🇦',
+    'ar-sa': '🇸🇦',
+    'ar-ae': '🇦🇪',
+    'ar-eg': '🇪🇬'
+};
+function getFlagForLocale(localeCode) {
+    var _a, _b;
+    var k = String(localeCode || '').toLowerCase();
+    if (!k)
+        return '🌐';
+    return (_b = (_a = LOCALE_FLAG_BY_CODE[k]) !== null && _a !== void 0 ? _a : LOCALE_FLAG_BY_CODE[k.slice(0, 2)]) !== null && _b !== void 0 ? _b : '🌐';
+}
+/** Avoid redundant `setTranslationConfig` when API returns a new object with the same locale list (prevents load/effect loops). */
+function translationConfigsEqual(a, b) {
+    var _a, _b;
+    if (a === b) {
+        return true;
+    }
+    if (!a || !b) {
+        return false;
+    }
+    if (a.baseLanguage !== b.baseLanguage) {
+        return false;
+    }
+    if (a.languages.length !== b.languages.length) {
+        return false;
+    }
+    for (var i = 0; i < a.languages.length; i += 1) {
+        var x = a.languages[i];
+        var y = b.languages[i];
+        if (x.locale !== y.locale || x.label !== y.label) {
+            return false;
+        }
+        var xf = (_a = x.flag) !== null && _a !== void 0 ? _a : '';
+        var yf = (_b = y.flag) !== null && _b !== void 0 ? _b : '';
+        if (xf !== yf) {
+            return false;
+        }
+    }
+    return true;
+}
+/** True when translation-config.xml defines at least a base locale and one target (two or more entries). */
+function hasConfiguredTranslationLocales(config) {
+    var _a, _b;
+    return ((_b = (_a = config === null || config === void 0 ? void 0 : config.languages) === null || _a === void 0 ? void 0 : _a.filter(function (l) { return Boolean(l.locale); }).length) !== null && _b !== void 0 ? _b : 0) >= 2;
+}
+
+/*
+ * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 3 as published by
+ * the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+/**
+ * Same GET transport as `translation-versions` `studioAjaxGet`: `craftercms.utils.ajax` when present (preview/auth),
+ * otherwise `@craftercms/studio-ui/utils/ajax` via HttpUtils.
+ */
+function studioPluginScriptGet(url) {
+    var _a, _b;
+    try {
+        var ajax_1 = typeof window !== 'undefined' ? (_b = (_a = window.craftercms) === null || _a === void 0 ? void 0 : _a.utils) === null || _b === void 0 ? void 0 : _b.ajax : null;
+        if (ajax_1 && typeof ajax_1.get === 'function') {
+            return new Promise(function (resolve, reject) {
+                ajax_1.get(url).subscribe({
+                    next: function (r) { return resolve(r); },
+                    error: function (e) { return reject(e); }
+                });
+            });
+        }
+    }
+    catch (_c) {
+        /* ignore */
+    }
+    return HttpUtils.get(url);
+}
+/** Same unwrap + nested `result` as `translation-versions` (`unwrapAjaxResponse` + `fetchTranslationConfig` / `extractPathsFromPluginResult`). */
+function parsePluginScriptPayload(res) {
+    var _a, _b;
+    if (res == null) {
+        return null;
+    }
+    var body = res.response !== undefined ? res.response : res;
+    if (body == null || typeof body !== 'object') {
+        return null;
+    }
+    var p = body.result !== undefined ? body.result : body;
+    if (p && typeof p === 'object' && p.result != null && p.ok === undefined) {
+        p = p.result;
+    }
+    if (!p || typeof p !== 'object' || p.ok === undefined) {
+        p = (_b = (_a = body.response) === null || _a === void 0 ? void 0 : _a.result) !== null && _b !== void 0 ? _b : p;
+    }
+    return p;
+}
+var API_GET_ITEM_TREE = '/api/1/services/api/1/content/get-items-tree.json';
+var API_GET_CONTENT = '/api/1/services/api/1/content/get-content.json';
+var API_CONTENT_EXISTS = '/api/1/services/api/1/content/content-exists.json';
+var API_CREATE_FOLDER = '/api/1/services/api/1/content/create-folder.json';
+var API_RENAME_FOLDER = '/api/1/services/api/1/content/rename-folder.json';
+var API_TRANSLATION_SERVER_COPY = '/api/2/plugin/script/plugins/org/rd/plugin/uigoodies/translation-copy.post';
+var API_TRANSLATION_REMOVE_CANDIDATES = '/api/2/plugin/script/plugins/org/rd/plugin/uigoodies/translation-remove-candidates.post';
+var API_TRANSLATION_REMOVE = '/api/2/plugin/script/plugins/org/rd/plugin/uigoodies/translation-remove.post';
+var API_TRANSLATION_CONFIG = '/api/2/plugin/script/plugins/org/rd/plugin/uigoodies/translation-config.get';
+/** Same as Studio `fetchConfigurationXML` — path under `module=studio` (file: `config/studio/translation-config.xml`). */
+var API_GET_CONFIGURATION = '/api/2/configuration/get_configuration';
+var CONFIG_STUDIO_TRANSLATION_XML_PATH = '/translation-config.xml';
+function extractConfigurationXmlContent(res) {
+    var _a;
+    if (res == null) {
+        return null;
+    }
+    var inner = res.response !== undefined ? res.response : res;
+    if (typeof (inner === null || inner === void 0 ? void 0 : inner.content) === 'string' && inner.content.trim()) {
+        return inner.content;
+    }
+    if (typeof ((_a = inner === null || inner === void 0 ? void 0 : inner.response) === null || _a === void 0 ? void 0 : _a.content) === 'string' && inner.response.content.trim()) {
+        return inner.response.content;
+    }
+    return null;
+}
+function normalizeLookupKey$1(code) {
+    return String(code || '')
+        .trim()
+        .toLowerCase()
+        .replace(/_/g, '-');
+}
+/** Same as Groovy {@code folderLocaleFromKey}: full normalized tag (e.g. zh-cn, ar-sa). */
+function folderLocaleFromKey$1(key) {
+    var k = String(key || '')
+        .trim()
+        .toLowerCase()
+        .replace(/_/g, '-');
+    return k || '';
+}
+function lookupLocaleMetaForUi(key) {
+    var k = normalizeLookupKey$1(key);
+    var direct = LOCALE_META[k];
+    if (direct) {
+        return { label: direct.label, flag: direct.flag };
+    }
+    if (k.length > 2) {
+        var two = k.substring(0, 2);
+        var fromTwo = LOCALE_META[two];
+        if (fromTwo) {
+            return { label: fromTwo.label, flag: fromTwo.flag };
+        }
+    }
+    return null;
+}
+/**
+ * Parse `translation-config.xml` the same way as `translation-config.get.groovy`
+ * (2-char folder locales, default falls back to first listed).
+ */
+function parseTranslationConfigFromXml(xml) {
+    var _a;
+    var trimmed = String(xml || '').trim();
+    if (!trimmed) {
+        return null;
+    }
+    var doc;
+    try {
+        doc = new DOMParser().parseFromString(trimmed, 'text/xml');
+    }
+    catch (_b) {
+        return null;
+    }
+    if (doc.querySelector('parsererror')) {
+        return null;
+    }
+    var root = doc.querySelector('translation-config');
+    if (!root) {
+        return null;
+    }
+    var codesParent = root.querySelector('localeCodes');
+    if (!codesParent) {
+        return null;
+    }
+    var seen = new Set();
+    var languages = [];
+    codesParent.querySelectorAll('localeCode').forEach(function (codeElm) {
+        var _a, _b;
+        var rawCode = (codeElm.textContent || '').trim();
+        if (!rawCode) {
+            return;
+        }
+        var key = normalizeLookupKey$1(rawCode);
+        if (!key) {
+            return;
+        }
+        var norm = folderLocaleFromKey$1(key);
+        if (!norm) {
+            return;
+        }
+        if (seen.has(norm)) {
+            return;
+        }
+        seen.add(norm);
+        var meta = lookupLocaleMetaForUi(key) || lookupLocaleMetaForUi(norm);
+        var label = (_a = meta === null || meta === void 0 ? void 0 : meta.label) !== null && _a !== void 0 ? _a : norm;
+        var flag = (_b = meta === null || meta === void 0 ? void 0 : meta.flag) !== null && _b !== void 0 ? _b : getFlagForLocale(norm);
+        languages.push({ locale: norm, label: label, flag: flag });
+    });
+    if (languages.length === 0) {
+        return null;
+    }
+    var defaultCodeRaw = (((_a = root.querySelector('defaultLocaleCode')) === null || _a === void 0 ? void 0 : _a.textContent) || '').trim();
+    var defaultKey = normalizeLookupKey$1(defaultCodeRaw);
+    var normalizedDefault = defaultKey ? folderLocaleFromKey$1(defaultKey) : '';
+    if (!normalizedDefault || !seen.has(normalizedDefault)) {
+        normalizedDefault = languages[0].locale;
+    }
+    return { baseLanguage: normalizedDefault, languages: languages };
+}
+function getTranslationConfigFromStudioConfigurationApi(base, siteId) {
+    return __awaiter(this, void 0, void 0, function () {
+        var qs, url, res, status_1, xml;
+        var _b;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
+                case 0:
+                    qs = [
+                        "siteId=".concat(encodeURIComponent(siteId)),
+                        "module=".concat(encodeURIComponent('studio')),
+                        "path=".concat(encodeURIComponent(CONFIG_STUDIO_TRANSLATION_XML_PATH)),
+                        "environment=".concat(encodeURIComponent('default'))
+                    ].join('&');
+                    url = "".concat(base).concat(API_GET_CONFIGURATION, "?").concat(qs);
+                    _c.label = 1;
+                case 1:
+                    _c.trys.push([1, 3, , 4]);
+                    return [4 /*yield*/, studioPluginScriptGet(url)];
+                case 2:
+                    res = _c.sent();
+                    status_1 = (_b = res === null || res === void 0 ? void 0 : res.status) !== null && _b !== void 0 ? _b : res === null || res === void 0 ? void 0 : res.statusCode;
+                    if (status_1 != null && status_1 !== 200) {
+                        return [2 /*return*/, null];
+                    }
+                    xml = extractConfigurationXmlContent(res);
+                    if (!xml) {
+                        return [2 /*return*/, null];
+                    }
+                    return [2 /*return*/, parseTranslationConfigFromXml(xml)];
+                case 3:
+                    _c.sent();
+                    return [2 /*return*/, null];
+                case 4: return [2 /*return*/];
+            }
+        });
+    });
+}
+function extractContentXmlString(body) {
+    var _a, _b, _c, _d, _e;
+    if (body == null) {
+        return null;
+    }
+    if (typeof body === 'string' && body.includes('<')) {
+        return body;
+    }
+    var inner = (_a = body.response) !== null && _a !== void 0 ? _a : body;
+    if (typeof inner === 'string' && inner.includes('<')) {
+        return inner;
+    }
+    var c = (_e = (_d = (_b = inner === null || inner === void 0 ? void 0 : inner.content) !== null && _b !== void 0 ? _b : (_c = inner === null || inner === void 0 ? void 0 : inner.item) === null || _c === void 0 ? void 0 : _c.content) !== null && _d !== void 0 ? _d : inner === null || inner === void 0 ? void 0 : inner.text) !== null && _e !== void 0 ? _e : inner === null || inner === void 0 ? void 0 : inner.xml;
+    if (typeof c === 'string' && c.includes('<')) {
+        return c;
+    }
+    return null;
+}
+function parseTranslationLocaleHintsFromXml(xml) {
+    var pick = function (tag) {
+        var re = new RegExp("<".concat(tag, "\\s*>([\\s\\S]*?)<\\/").concat(tag, "\\s*>"), 'i');
+        var m = xml.match(re);
+        if (!m) {
+            return '';
+        }
+        var inner = String(m[1]).trim();
+        var cdata = inner.match(/^<!\[CDATA\[([\s\S]*)\]\]>$/);
+        if (cdata) {
+            inner = String(cdata[1]).trim();
+        }
+        return inner
+            .replace(/<[^>]+>/g, '')
+            .trim()
+            .toLowerCase();
+    };
+    return {
+        sourceLocaleCode: pick('sourceLocaleCode_s'),
+        localeCode: pick('localeCode_s')
+    };
+}
+function parseTimestampMs(input) {
+    if (input == null) {
+        return null;
+    }
+    if (typeof input === 'number' && Number.isFinite(input)) {
+        return input;
+    }
+    var asNum = Number(input);
+    if (Number.isFinite(asNum) && asNum > 0) {
+        return asNum;
+    }
+    var parsed = Date.parse(String(input));
+    return Number.isFinite(parsed) ? parsed : null;
+}
+var StudioAPI = {
+    /** Store path for the item currently shown in preview (toolbar / XB context). */
+    getPreviewItem: function (previewItem) {
+        var p = previewItem !== null && previewItem !== void 0 ? previewItem : {};
+        var path = (typeof p.path === 'string' && p.path.trim()) ||
+            (typeof p.storeUrl === 'string' && p.storeUrl.trim()) ||
+            (p.item && typeof p.item.path === 'string' && p.item.path.trim()) ||
+            '';
+        var name = (typeof p.label === 'string' && p.label) ||
+            (typeof p.internalName === 'string' && p.internalName) ||
+            (path ? path.replace(/^.*\//, '') : '');
+        var contentType = (typeof p.contentTypeId === 'string' && p.contentTypeId) ||
+            (typeof p.contentType === 'string' && p.contentType) ||
+            '';
+        return { name: name, path: path, contentType: contentType };
+    },
+    contentExists: function (authoringBase, siteId, path) {
+        return __awaiter(this, void 0, void 0, function () {
+            var url, res, body, flag;
+            var _a, _b;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
+                    case 0:
+                        url = "".concat(authoringBase).concat(API_CONTENT_EXISTS, "?site_id=").concat(encodeURIComponent(siteId), "&path=").concat(encodeURIComponent(path));
+                        _c.label = 1;
+                    case 1:
+                        _c.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, HttpUtils.get(url)];
+                    case 2:
+                        res = _c.sent();
+                        if (res.status === 200 && res.response) {
+                            body = res.response;
+                            flag = (_a = body.content) !== null && _a !== void 0 ? _a : (_b = body.response) === null || _b === void 0 ? void 0 : _b.content;
+                            if (flag != null) {
+                                return [2 /*return*/, Boolean(flag)];
+                            }
+                        }
+                        return [2 /*return*/, false];
+                    case 3:
+                        _c.sent();
+                        return [2 /*return*/, false];
+                    case 4: return [2 /*return*/];
+                }
+            });
+        });
+    },
+    getChildrenPaths: function (authoringBase, siteId, path) {
+        return __awaiter(this, void 0, void 0, function () {
+            var url, res, raw, list;
+            var _a, _b;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
+                    case 0:
+                        url = "".concat(authoringBase).concat(API_GET_ITEM_TREE, "?site=").concat(siteId, "&path=").concat(path, "&depth=1");
+                        _c.label = 1;
+                    case 1:
+                        _c.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, HttpUtils.get(url)];
+                    case 2:
+                        res = _c.sent();
+                        if (res.status === 200) {
+                            raw = (_b = (_a = res.response) === null || _a === void 0 ? void 0 : _a.item) === null || _b === void 0 ? void 0 : _b.children;
+                            list = Array.isArray(raw) ? raw : [];
+                            return [2 /*return*/, list
+                                    .filter(function (child) { return child && child.path && child.path !== path; })
+                                    .map(function (child) { return child.path; })];
+                        }
+                        return [2 /*return*/, []];
+                    case 3:
+                        _c.sent();
+                        return [2 /*return*/, []];
+                    case 4: return [2 /*return*/];
+                }
+            });
+        });
+    },
+    getContentXml: function (authoringBase, siteId, path) {
+        return __awaiter(this, void 0, void 0, function () {
+            var url, res, body;
+            var _b;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
+                    case 0:
+                        url = "".concat(authoringBase).concat(API_GET_CONTENT, "?site_id=").concat(encodeURIComponent(siteId), "&path=").concat(encodeURIComponent(path));
+                        _c.label = 1;
+                    case 1:
+                        _c.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, HttpUtils.get(url)];
+                    case 2:
+                        res = _c.sent();
+                        if (res.status !== 200) {
+                            return [2 /*return*/, null];
+                        }
+                        body = (_b = res.response) !== null && _b !== void 0 ? _b : res;
+                        return [2 /*return*/, extractContentXmlString(body)];
+                    case 3:
+                        _c.sent();
+                        return [2 /*return*/, null];
+                    case 4: return [2 /*return*/];
+                }
+            });
+        });
+    },
+    /** Reads Translation locale fields from item XML (same semantics as translation-versions form `sourceLocaleCode_s`). */
+    getTranslationLocaleHints: function (authoringBase, siteId, path) {
+        return __awaiter(this, void 0, void 0, function () {
+            var xml;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.getContentXml(authoringBase, siteId, path)];
+                    case 1:
+                        xml = _a.sent();
+                        if (!xml) {
+                            return [2 /*return*/, { sourceLocaleCode: '', localeCode: '' }];
+                        }
+                        return [2 /*return*/, parseTranslationLocaleHintsFromXml(xml)];
+                }
+            });
+        });
+    },
+    getItemModifiedTimestamp: function (authoringBase, siteId, path) {
+        return __awaiter(this, void 0, void 0, function () {
+            var url, res, item;
+            var _a, _b, _c, _d, _e, _f;
+            return __generator(this, function (_g) {
+                switch (_g.label) {
+                    case 0:
+                        url = "".concat(authoringBase).concat(API_GET_ITEM_TREE, "?site=").concat(encodeURIComponent(siteId), "&path=").concat(encodeURIComponent(path), "&depth=0");
+                        _g.label = 1;
+                    case 1:
+                        _g.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, HttpUtils.get(url)];
+                    case 2:
+                        res = _g.sent();
+                        if (res.status !== 200) {
+                            return [2 /*return*/, null];
+                        }
+                        item = (_a = res.response) === null || _a === void 0 ? void 0 : _a.item;
+                        if (!item) {
+                            return [2 /*return*/, null];
+                        }
+                        return [2 /*return*/, ((_f = (_e = (_d = (_c = (_b = parseTimestampMs(item.lastModifiedDate_dt)) !== null && _b !== void 0 ? _b : parseTimestampMs(item.lastModifiedDate)) !== null && _c !== void 0 ? _c : parseTimestampMs(item.lastEditDate)) !== null && _d !== void 0 ? _d : parseTimestampMs(item.modifiedDate)) !== null && _e !== void 0 ? _e : parseTimestampMs(item.dateModified)) !== null && _f !== void 0 ? _f : null)];
+                    case 3:
+                        _g.sent();
+                        return [2 /*return*/, null];
+                    case 4: return [2 /*return*/];
+                }
+            });
+        });
+    },
+    copyItem: function (authoringBase, siteId, path, destinationPath, expectedTargetPath) {
+        return __awaiter(this, void 0, void 0, function () {
+            var url, body, res, p;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        url = "".concat(authoringBase).concat(API_TRANSLATION_SERVER_COPY, "?siteId=").concat(encodeURIComponent(siteId));
+                        body = {
+                            sourcePath: path,
+                            targetParentPath: destinationPath,
+                            expectedTargetPath: expectedTargetPath || ''
+                        };
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, HttpUtils.post(url, body)];
+                    case 2:
+                        res = _a.sent();
+                        if (res.status !== 200) {
+                            return [2 /*return*/, null];
+                        }
+                        p = parsePluginScriptPayload(res);
+                        return [2 /*return*/, p && typeof p === 'object' ? p : null];
+                    case 3:
+                        _a.sent();
+                        return [2 /*return*/, null];
+                    case 4: return [2 /*return*/];
+                }
+            });
+        });
+    },
+    fetchTranslationRemoveCandidates: function (authoringBase, siteId, pagePath) {
+        return __awaiter(this, void 0, void 0, function () {
+            var url, res, p;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        url = "".concat(authoringBase).concat(API_TRANSLATION_REMOVE_CANDIDATES, "?siteId=").concat(encodeURIComponent(siteId));
+                        _b.label = 1;
+                    case 1:
+                        _b.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, HttpUtils.post(url, { pagePath: pagePath })];
+                    case 2:
+                        res = _b.sent();
+                        if (res.status !== 200) {
+                            return [2 /*return*/, { ok: false, candidates: [], message: "HTTP ".concat(res.status) }];
+                        }
+                        p = parsePluginScriptPayload(res);
+                        if (!p || typeof p !== 'object') {
+                            return [2 /*return*/, { ok: false, candidates: [], message: 'Empty response' }];
+                        }
+                        return [2 /*return*/, {
+                                ok: Boolean(p.ok),
+                                message: typeof p.message === 'string' ? p.message : undefined,
+                                candidates: Array.isArray(p.candidates) ? p.candidates : [],
+                                pagePath: typeof p.pagePath === 'string' ? p.pagePath : pagePath
+                            }];
+                    case 3:
+                        _b.sent();
+                        return [2 /*return*/, { ok: false, candidates: [], message: 'Request failed' }];
+                    case 4: return [2 /*return*/];
+                }
+            });
+        });
+    },
+    postTranslationRemove: function (authoringBase_1, siteId_1, pagePath_1, componentPaths_1) {
+        return __awaiter(this, arguments, void 0, function (authoringBase, siteId, pagePath, componentPaths, deletePage) {
+            var url, res, p;
+            if (deletePage === void 0) { deletePage = true; }
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        url = "".concat(authoringBase).concat(API_TRANSLATION_REMOVE, "?siteId=").concat(encodeURIComponent(siteId));
+                        _b.label = 1;
+                    case 1:
+                        _b.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, HttpUtils.post(url, {
+                                pagePath: pagePath,
+                                componentPaths: componentPaths !== null && componentPaths !== void 0 ? componentPaths : [],
+                                deletePage: deletePage
+                            })];
+                    case 2:
+                        res = _b.sent();
+                        if (res.status !== 200) {
+                            return [2 /*return*/, { ok: false, deleted: [], failed: [{ message: "HTTP ".concat(res.status) }] }];
+                        }
+                        p = parsePluginScriptPayload(res);
+                        if (!p || typeof p !== 'object') {
+                            return [2 /*return*/, { ok: false, deleted: [], failed: [{ message: 'Empty response' }] }];
+                        }
+                        return [2 /*return*/, {
+                                ok: Boolean(p.ok),
+                                deleted: Array.isArray(p.deleted) ? p.deleted : [],
+                                failed: Array.isArray(p.failed) ? p.failed : []
+                            }];
+                    case 3:
+                        _b.sent();
+                        return [2 /*return*/, { ok: false, deleted: [], failed: [{ message: 'Request failed' }] }];
+                    case 4: return [2 /*return*/];
+                }
+            });
+        });
+    },
+    createFolder: function (authoringBase, siteId, path, name) {
+        return __awaiter(this, void 0, void 0, function () {
+            var url, body, res;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        url = "".concat(authoringBase).concat(API_CREATE_FOLDER, "?site=").concat(siteId, "&path=").concat(path, "&name=").concat(name);
+                        body = '';
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, HttpUtils.post(url, body)];
+                    case 2:
+                        res = _a.sent();
+                        if (res.status === 200) {
+                            return [2 /*return*/, res.response];
+                        }
+                        return [2 /*return*/, false];
+                    case 3:
+                        _a.sent();
+                        return [2 /*return*/, false];
+                    case 4: return [2 /*return*/];
+                }
+            });
+        });
+    },
+    renameFolder: function (authoringBase, siteId, path, name) {
+        return __awaiter(this, void 0, void 0, function () {
+            var url, body, res;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        url = "".concat(authoringBase).concat(API_RENAME_FOLDER, "?site=").concat(siteId, "&path=").concat(path, "&name=").concat(name);
+                        body = '';
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, HttpUtils.post(url, body)];
+                    case 2:
+                        res = _a.sent();
+                        if (res.status === 200) {
+                            return [2 /*return*/, res.response];
+                        }
+                        return [2 /*return*/, false];
+                    case 3:
+                        _a.sent();
+                        return [2 /*return*/, false];
+                    case 4: return [2 /*return*/];
+                }
+            });
+        });
+    },
+    getTranslationConfig: function (authoringBase_1, siteId_1) {
+        return __awaiter(this, arguments, void 0, function (authoringBase, siteId, _ensureDefault) {
+            var base, fromConfiguration, url, res, status_2, p, languages, baseLanguage;
+            var _a;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        base = String(authoringBase || '').replace(/\/$/, '');
+                        if (!base || !siteId) {
+                            return [2 /*return*/, null];
+                        }
+                        return [4 /*yield*/, getTranslationConfigFromStudioConfigurationApi(base, siteId)];
+                    case 1:
+                        fromConfiguration = _b.sent();
+                        if (fromConfiguration && fromConfiguration.languages.length > 0) {
+                            return [2 /*return*/, fromConfiguration];
+                        }
+                        url = "".concat(base).concat(API_TRANSLATION_CONFIG, "?siteId=").concat(encodeURIComponent(siteId));
+                        _b.label = 2;
+                    case 2:
+                        _b.trys.push([2, 4, , 5]);
+                        return [4 /*yield*/, studioPluginScriptGet(url)];
+                    case 3:
+                        res = _b.sent();
+                        status_2 = (_a = res === null || res === void 0 ? void 0 : res.status) !== null && _a !== void 0 ? _a : res === null || res === void 0 ? void 0 : res.statusCode;
+                        if (status_2 != null && status_2 !== 200) {
+                            return [2 /*return*/, null];
+                        }
+                        p = parsePluginScriptPayload(res);
+                        if (!p || !p.ok || !p.baseLanguage || !Array.isArray(p.languages)) {
+                            return [2 /*return*/, null];
+                        }
+                        languages = p.languages
+                            .map(function (row) { return (__assign({ locale: String((row === null || row === void 0 ? void 0 : row.locale) || '').toLowerCase(), label: String((row === null || row === void 0 ? void 0 : row.label) || (row === null || row === void 0 ? void 0 : row.locale) || '') }, ((row === null || row === void 0 ? void 0 : row.flag) != null && String(row.flag).trim() !== '' ? { flag: String(row.flag) } : {}))); })
+                            .filter(function (row) { return row.locale; });
+                        if (languages.length === 0) {
+                            return [2 /*return*/, null];
+                        }
+                        baseLanguage = String(p.baseLanguage).toLowerCase();
+                        return [2 /*return*/, { baseLanguage: baseLanguage, languages: languages }];
+                    case 4:
+                        _b.sent();
+                        return [2 /*return*/, null];
+                    case 5: return [2 /*return*/];
+                }
+            });
+        });
+    }
+};
+
+/** True if a repo locale folder segment matches a configured locale code (exact or zh ↔ zh-cn style). */
+function localeSegmentsCompatible(a, b) {
+    var s = String(a || '')
+        .trim()
+        .toLowerCase()
+        .replace(/_/g, '-');
+    var c = String(b || '')
+        .trim()
+        .toLowerCase()
+        .replace(/_/g, '-');
+    if (!s || !c) {
+        return false;
+    }
+    if (s === c) {
+        return true;
+    }
+    if (s.startsWith("".concat(c, "-"))) {
+        return true;
+    }
+    if (c.startsWith("".concat(s, "-"))) {
+        return true;
+    }
+    return false;
+}
+function pathLastSegment(path) {
+    var parts = path.split('/').filter(Boolean);
+    return parts[parts.length - 1] || path;
+}
+var DEFAULT_WEBSITE_PATH = '/site/website';
+var DEFAULT_COMPONENT_PATH = '/site/components';
+/** Repo root for locale folders from a full content path. */
+function getWebsiteComponentsRootDir(fullPath) {
+    if (!fullPath) {
+        return null;
+    }
+    var withSite = fullPath.match(/^(\/site\/[^/]+\/(?:website|components))(?=\/|$)/i);
+    if (withSite) {
+        return withSite[1];
+    }
+    if (fullPath.startsWith(DEFAULT_WEBSITE_PATH)) {
+        return DEFAULT_WEBSITE_PATH;
+    }
+    if (fullPath.startsWith(DEFAULT_COMPONENT_PATH)) {
+        return DEFAULT_COMPONENT_PATH;
+    }
+    var bare = fullPath.match(/^(\/site\/(?:website|components))(?=\/|$)/i);
+    return bare ? bare[1] : null;
+}
+/**
+ * Returns locale folder names found as direct children of rootDir (e.g. en, es under /site/website).
+ * @param allowedLocaleCodes When set (e.g. from `translation-config.xml`), only these folder names count;
+ *   otherwise falls back to `MULTI_LOCALE_CODES` from the plugin bundle.
+ */
+function detectLocaleFolderNames(childPaths, rootDir, allowedLocaleCodes) {
+    var codes = allowedLocaleCodes && allowedLocaleCodes.length > 0 ? allowedLocaleCodes : __spreadArray([], MULTI_LOCALE_CODES, true);
+    var prefix = rootDir.endsWith('/') ? rootDir : "".concat(rootDir, "/");
+    var names = [];
+    var _loop_1 = function (p) {
+        if (!p.startsWith(prefix)) {
+            return "continue";
+        }
+        var rest = p.slice(prefix.length);
+        var seg = rest.split('/').filter(Boolean)[0];
+        if (seg && codes.some(function (code) { return localeSegmentsCompatible(seg, code); })) {
+            names.push(seg);
+        }
+    };
+    for (var _i = 0, childPaths_1 = childPaths; _i < childPaths_1.length; _i++) {
+        var p = childPaths_1[_i];
+        _loop_1(p);
+    }
+    return Array.from(new Set(names));
+}
+/** At least two configured locale folders on disk, including the site default locale (from config or `en`). */
+function isMultiLocaleLayout(localeFolders, baseLocale) {
+    if (localeFolders.length < 2) {
+        return false;
+    }
+    var base = (baseLocale || MULTI_LOCALE_BASE_LOCALE).toLowerCase();
+    var lower = localeFolders.map(function (s) { return s.toLowerCase(); });
+    return lower.includes(base);
+}
+/**
+ * Full repo path for the same relative path in another locale folder.
+ */
+function pathForLocale(rootDir, relativeUnderBase, locale) {
+    var r = rootDir.replace(/\/$/, '');
+    var suffix = relativeUnderBase === '' ? '' : relativeUnderBase.startsWith('/') ? relativeUnderBase : "/".concat(relativeUnderBase);
+    return "".concat(r, "/").concat(locale).concat(suffix);
+}
+function parentFolderPath(fileOrFolderPath) {
+    var i = fileOrFolderPath.lastIndexOf('/');
+    if (i <= 0) {
+        return '/';
+    }
+    return fileOrFolderPath.slice(0, i) || '/';
+}
+/**
+ * Parse `fullPath` under `rootDir` when the first segment is a locale folder (e.g. en, es).
+ * @returns locale folder name and path under that locale (starts with `/`, or empty if path is the locale root).
+ */
+function parseLocaleRelative(fullPath, rootDir, localeFolderNames) {
+    var rd = rootDir.replace(/\/$/, '');
+    var norm = fullPath.replace(/\/$/, '');
+    if (!norm.startsWith("".concat(rd, "/")) && norm !== rd) {
+        return null;
+    }
+    var rest = norm === rd ? '' : norm.slice(rd.length + 1);
+    if (!rest) {
+        return null;
+    }
+    var parts = rest.split('/').filter(Boolean);
+    var first = parts[0];
+    var match = localeFolderNames.find(function (l) { return localeSegmentsCompatible(first, l); });
+    if (!match) {
+        return null;
+    }
+    var tail = parts.slice(1);
+    var relativeUnderLocale = tail.length ? "/".concat(tail.join('/')) : '';
+    return { locale: match, relativeUnderLocale: relativeUnderLocale };
+}
+
+/** Opens Studio form editor for `path` (same action as other Translation widgets). */
+function openEditFormStudioDispatch(dispatch, siteId, path, authoringBase) {
+    dispatch(showEditDialog({
+        site: siteId,
+        path: path,
+        authoringBase: authoringBase
+    }));
+}
+
+/**
+ * Ordered locale segments for mirrored paths.
+ *
+ * With `translation-config.xml` codes: at least two configured locales; every code is returned in order
+ * (disk folder casing when present). Without site config codes, falls back to legacy detection: at least
+ * two matching locale folders on disk including the default locale.
+ *
+ * Targets: every configured locale code is included in order. Missing folders still appear as targets
+ * so authors can translate after creating `/site/website/{locale}/…`.
+ */
+function resolveLocaleFoldersOnSite(authoringBase, siteId, rootDir, configuredLocaleCodes, defaultLocaleCode) {
+    return __awaiter(this, void 0, void 0, function () {
+        var configured, paths, detected, base, fromSiteConfig, primary_1, _loop_1, _i, configured_1, code, extra_1, primary, _loop_2, _a, configured_2, code, extra;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    configured = (configuredLocaleCodes && configuredLocaleCodes.length > 0
+                        ? configuredLocaleCodes
+                        : __spreadArray([], MULTI_LOCALE_CODES, true)).map(function (s) { return String(s).toLowerCase(); });
+                    return [4 /*yield*/, StudioAPI.getChildrenPaths(authoringBase, siteId, rootDir)];
+                case 1:
+                    paths = _b.sent();
+                    detected = detectLocaleFolderNames(paths, rootDir, configured);
+                    base = (defaultLocaleCode && String(defaultLocaleCode).trim()) || undefined;
+                    fromSiteConfig = Boolean(configuredLocaleCodes && configuredLocaleCodes.length > 0);
+                    // When locales come from translation-config.xml, list every configured code (e.g. `de`)
+                    // even if that folder is not created yet — translate flow prompts to create it.
+                    if (fromSiteConfig) {
+                        if (configured.length < 2) {
+                            return [2 /*return*/, null];
+                        }
+                        primary_1 = [];
+                        _loop_1 = function (code) {
+                            var match = detected.find(function (d) { return localeSegmentsCompatible(d, code); });
+                            primary_1.push(match !== null && match !== void 0 ? match : code);
+                        };
+                        for (_i = 0, configured_1 = configured; _i < configured_1.length; _i++) {
+                            code = configured_1[_i];
+                            _loop_1(code);
+                        }
+                        extra_1 = detected.filter(function (d) { return !configured.some(function (c) { return localeSegmentsCompatible(d, c); }); });
+                        return [2 /*return*/, __spreadArray(__spreadArray([], primary_1, true), extra_1, true)];
+                    }
+                    if (!isMultiLocaleLayout(detected, base)) {
+                        return [2 /*return*/, null];
+                    }
+                    primary = [];
+                    _loop_2 = function (code) {
+                        var match = detected.find(function (d) { return localeSegmentsCompatible(d, code); });
+                        primary.push(match !== null && match !== void 0 ? match : code);
+                    };
+                    for (_a = 0, configured_2 = configured; _a < configured_2.length; _a++) {
+                        code = configured_2[_a];
+                        _loop_2(code);
+                    }
+                    extra = detected.filter(function (d) { return !configured.some(function (c) { return localeSegmentsCompatible(d, c); }); });
+                    return [2 /*return*/, __spreadArray(__spreadArray([], primary, true), extra, true)];
+            }
+        });
+    });
+}
+/**
+ * All mirrored locale targets except the source locale (same paths as {@link listMissingLocaleTargets}),
+ * including locales where the target file already exists (`exists: true`).
+ */
+function listAllLocaleTargets(authoringBase, siteId, sourcePath, rootDir, localeFolders, localeMetaOverride) {
+    return __awaiter(this, void 0, void 0, function () {
+        var parsed, sourceLocale, relativeUnderLocale, out, _i, localeFolders_2, loc, targetFilePath, exists, meta;
+        var _a, _b;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
+                case 0:
+                    parsed = parseLocaleRelative(sourcePath, rootDir, localeFolders);
+                    if (!parsed) {
+                        return [2 /*return*/, []];
+                    }
+                    sourceLocale = parsed.locale, relativeUnderLocale = parsed.relativeUnderLocale;
+                    out = [];
+                    _i = 0, localeFolders_2 = localeFolders;
+                    _c.label = 1;
+                case 1:
+                    if (!(_i < localeFolders_2.length)) return [3 /*break*/, 4];
+                    loc = localeFolders_2[_i];
+                    if (localeSegmentsCompatible(loc, sourceLocale)) {
+                        return [3 /*break*/, 3];
+                    }
+                    targetFilePath = pathForLocale(rootDir, relativeUnderLocale, loc);
+                    return [4 /*yield*/, StudioAPI.contentExists(authoringBase, siteId, targetFilePath)];
+                case 2:
+                    exists = _c.sent();
+                    meta = (_b = (_a = localeMetaOverride === null || localeMetaOverride === void 0 ? void 0 : localeMetaOverride[loc.toLowerCase()]) !== null && _a !== void 0 ? _a : LOCALE_META[loc.toLowerCase()]) !== null && _b !== void 0 ? _b : { label: loc, flag: '🌐' };
+                    out.push({
+                        locale: loc,
+                        label: meta.label,
+                        flag: meta.flag,
+                        targetFilePath: targetFilePath,
+                        destinationParentPath: parentFolderPath(targetFilePath),
+                        exists: exists
+                    });
+                    _c.label = 3;
+                case 3:
+                    _i++;
+                    return [3 /*break*/, 1];
+                case 4: return [2 /*return*/, out];
+            }
+        });
+    });
+}
+
+function TranslateToLocalePicker(props) {
+    var _this = this;
+    var _a;
+    var _b = props.variant, variant = _b === void 0 ? 'dialog' : _b, translationFormPath = props.translationFormPath, translationFormName = props.translationFormName, translationFormContentType = props.translationFormContentType, translationAuthoringBase = props.translationAuthoringBase, _c = props.closeDialogOnSuccess, closeDialogOnSuccess = _c === void 0 ? false : _c;
+    var dispatch = useDispatch();
+    var siteId = useActiveSiteId();
+    var envAuthoringBase = useEnv().authoringBase;
+    var currentPreviewItem = useCurrentPreviewItem();
+    var previewDerived = currentPreviewItem ? StudioAPI.getPreviewItem(currentPreviewItem) : null;
+    var authoringBase = (translationAuthoringBase === null || translationAuthoringBase === void 0 ? void 0 : translationAuthoringBase.trim()) || envAuthoringBase || '';
+    var sourceItem = useMemo(function () {
+        var trimmed = typeof translationFormPath === 'string' ? translationFormPath.trim() : '';
+        if (trimmed !== '') {
+            return {
+                name: (typeof translationFormName === 'string' && translationFormName.trim()) || pathLastSegment(trimmed),
+                path: trimmed,
+                contentType: (typeof translationFormContentType === 'string' && translationFormContentType) || ''
+            };
+        }
+        return previewDerived;
+    }, [translationFormPath, translationFormName, translationFormContentType, previewDerived]);
+    var _d = useState([]), options = _d[0], setOptions = _d[1];
+    var _e = useState(false), loading = _e[0], setLoading = _e[1];
+    var _f = useState(''), selectedLocale = _f[0], setSelectedLocale = _f[1];
+    var _g = useState(false), copyBusy = _g[0], setCopyBusy = _g[1];
+    var _h = useState(null), translationConfig = _h[0], setTranslationConfig = _h[1];
+    var translationConfigRef = useRef(null);
+    translationConfigRef.current = translationConfig;
+    useEffect(function () {
+        var cancelled = false;
+        (function () { return __awaiter(_this, void 0, void 0, function () {
+            var cfg;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!siteId || !authoringBase) {
+                            setTranslationConfig(null);
+                            return [2 /*return*/];
+                        }
+                        return [4 /*yield*/, StudioAPI.getTranslationConfig(authoringBase, siteId, true)];
+                    case 1:
+                        cfg = _a.sent();
+                        if (!cancelled) {
+                            setTranslationConfig(cfg);
+                        }
+                        return [2 /*return*/];
+                }
+            });
+        }); })();
+        return function () {
+            cancelled = true;
+        };
+    }, [siteId, authoringBase]);
+    var loadTargets = useCallback(function () { return __awaiter(_this, void 0, void 0, function () {
+        var rootDir, liveConfig_1, effectiveConfig_1, localeCodes, localeMeta, folders, targets;
+        var _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    setLoading(true);
+                    setSelectedLocale('');
+                    _b.label = 1;
+                case 1:
+                    _b.trys.push([1, , 5, 6]);
+                    if (!siteId || !authoringBase || !(sourceItem === null || sourceItem === void 0 ? void 0 : sourceItem.path)) {
+                        setOptions([]);
+                        return [2 /*return*/];
+                    }
+                    rootDir = getWebsiteComponentsRootDir(sourceItem.path);
+                    if (!rootDir) {
+                        setOptions([]);
+                        return [2 /*return*/];
+                    }
+                    return [4 /*yield*/, StudioAPI.getTranslationConfig(authoringBase, siteId, true)];
+                case 2:
+                    liveConfig_1 = _b.sent();
+                    if (liveConfig_1) {
+                        setTranslationConfig(function (prev) {
+                            return translationConfigsEqual(prev, liveConfig_1) ? prev : liveConfig_1;
+                        });
+                    }
+                    effectiveConfig_1 = liveConfig_1 !== null && liveConfig_1 !== void 0 ? liveConfig_1 : translationConfigRef.current;
+                    localeCodes = ((_a = effectiveConfig_1 === null || effectiveConfig_1 === void 0 ? void 0 : effectiveConfig_1.languages) !== null && _a !== void 0 ? _a : [])
+                        .map(function (l) { return l.locale; })
+                        .filter(function (c) { return Boolean(c); });
+                    if (localeCodes.length < 2) {
+                        setOptions([]);
+                        return [2 /*return*/];
+                    }
+                    localeMeta = localeCodes.reduce(function (acc, code) {
+                        var _a;
+                        var row = (_a = effectiveConfig_1 === null || effectiveConfig_1 === void 0 ? void 0 : effectiveConfig_1.languages) === null || _a === void 0 ? void 0 : _a.find(function (l) { return l.locale.toLowerCase() === code.toLowerCase(); });
+                        var label = (row === null || row === void 0 ? void 0 : row.label) || code;
+                        var flag = ((row === null || row === void 0 ? void 0 : row.flag) && String(row.flag).trim()) || getFlagForLocale(code);
+                        acc[code.toLowerCase()] = { label: label, flag: flag };
+                        return acc;
+                    }, {});
+                    return [4 /*yield*/, resolveLocaleFoldersOnSite(authoringBase, siteId, rootDir, localeCodes, effectiveConfig_1 === null || effectiveConfig_1 === void 0 ? void 0 : effectiveConfig_1.baseLanguage)];
+                case 3:
+                    folders = _b.sent();
+                    if (!folders) {
+                        setOptions([]);
+                        return [2 /*return*/];
+                    }
+                    return [4 /*yield*/, listAllLocaleTargets(authoringBase, siteId, sourceItem.path, rootDir, folders, localeMeta)];
+                case 4:
+                    targets = _b.sent();
+                    setOptions(targets);
+                    return [3 /*break*/, 6];
+                case 5:
+                    setLoading(false);
+                    return [7 /*endfinally*/];
+                case 6: return [2 /*return*/];
+            }
+        });
+    }); }, [siteId, authoringBase, sourceItem === null || sourceItem === void 0 ? void 0 : sourceItem.path]);
+    useEffect(function () {
+        void loadTargets();
+    }, [loadTargets]);
+    var selected = (_a = options.find(function (o) { return o.locale === selectedLocale; })) !== null && _a !== void 0 ? _a : null;
+    var runCopy = function (copyAndEdit) { return __awaiter(_this, void 0, void 0, function () {
+        var res, pastedPath;
+        var _b;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
+                case 0:
+                    if (!selected || !(sourceItem === null || sourceItem === void 0 ? void 0 : sourceItem.path) || !siteId || !authoringBase || copyBusy) {
+                        return [2 /*return*/];
+                    }
+                    if (selected.exists) {
+                        dispatch(showSystemNotification({
+                            message: "A file already exists for ".concat(selected.label, " (").concat(selected.locale, ").")
+                        }));
+                        return [2 /*return*/];
+                    }
+                    setCopyBusy(true);
+                    _c.label = 1;
+                case 1:
+                    _c.trys.push([1, 4, 5, 6]);
+                    return [4 /*yield*/, StudioAPI.copyItem(authoringBase, siteId, sourceItem.path, selected.destinationParentPath, selected.targetFilePath)];
+                case 2:
+                    res = _c.sent();
+                    pastedPath = ((res === null || res === void 0 ? void 0 : res.pastedPath) || ((_b = res === null || res === void 0 ? void 0 : res.items) === null || _b === void 0 ? void 0 : _b[0]));
+                    if (!(res === null || res === void 0 ? void 0 : res.ok) || !pastedPath) {
+                        dispatch(showSystemNotification({
+                            message: (res === null || res === void 0 ? void 0 : res.message) || "Could not copy to ".concat(selected.label, ".")
+                        }));
+                        return [2 /*return*/];
+                    }
+                    dispatch(showSystemNotification({
+                        message: "Copied to ".concat(selected.label, ": ").concat(pastedPath)
+                    }));
+                    if (copyAndEdit && pastedPath) {
+                        openEditFormStudioDispatch(dispatch, siteId, pastedPath, authoringBase);
+                    }
+                    return [4 /*yield*/, loadTargets()];
+                case 3:
+                    _c.sent();
+                    if (closeDialogOnSuccess && variant === 'dialog') {
+                        dispatch(closeWidgetDialog());
+                    }
+                    return [3 /*break*/, 6];
+                case 4:
+                    _c.sent();
+                    dispatch(showSystemNotification({
+                        message: "Could not copy to ".concat(selected.label, ".")
+                    }));
+                    return [3 /*break*/, 6];
+                case 5:
+                    setCopyBusy(false);
+                    return [7 /*endfinally*/];
+                case 6: return [2 /*return*/];
+            }
+        });
+    }); };
+    var onSelectChange = function (e) {
+        setSelectedLocale(e.target.value);
+    };
+    var disabledCore = !siteId || !authoringBase || !(sourceItem === null || sourceItem === void 0 ? void 0 : sourceItem.path);
+    var hint = disabledCore
+        ? variant === 'toolbar'
+            ? 'Select an item in preview or open a form.'
+            : 'No source path — open from preview or a content form.'
+        : !getWebsiteComponentsRootDir(sourceItem.path)
+            ? 'Path must be under /site/…/website or …/components.'
+            : options.length === 0 && !loading
+                ? 'No target locales: ensure /config/studio/translation-config.xml lists at least two localeCodes, the plugin script returns them, and this path is under /site/…/website or …/components.'
+                : options.length > 0 && options.every(function (o) { return o.exists; }) && !loading
+                    ? 'All configured locales already have a file at this path.'
+                    : null;
+    var isToolbar = variant === 'toolbar';
+    var labelId = 'translation-locale-select-label';
+    var controls = (jsxs(Stack$2, { direction: isToolbar ? 'row' : 'column', spacing: isToolbar ? 1 : 1.5, alignItems: isToolbar ? 'center' : 'stretch', sx: { width: isToolbar ? 'auto' : '100%', minWidth: 0 }, children: [jsxs(FormControl$1, { size: "small", disabled: disabledCore || loading || options.length === 0, sx: { minWidth: isToolbar ? 140 : '100%', flex: isToolbar ? '0 1 auto' : undefined }, children: [jsx(InputLabel$1, { id: labelId, children: "Locale" }), jsxs(Select$1, { labelId: labelId, label: "Locale", value: selectedLocale, onChange: onSelectChange, displayEmpty: true, renderValue: function (v) {
+                            if (!v) {
+                                return loading ? '…' : options.length === 0 ? '—' : 'Choose locale…';
+                            }
+                            var o = options.find(function (x) { return x.locale === v; });
+                            return o ? "".concat(o.flag, " ").concat(o.label) : v;
+                        }, children: [jsx(MenuItem, { value: "", disabled: true, children: jsx("em", { children: "Choose locale\u2026" }) }), options.map(function (o) { return (jsxs(MenuItem, { value: o.locale, disabled: o.exists, children: [o.flag, " ", o.label, " (", o.locale, ")", o.exists ? ' — exists' : ''] }, o.locale)); })] })] }), jsxs(Stack$2, { direction: "row", spacing: 1, alignItems: "center", flexWrap: "wrap", children: [jsx(Tooltip$1, { title: "Reload locale list and content-exists checks", children: jsx("span", { children: jsx(IconButton, { size: "small", "aria-label": "Refresh locales", onClick: function () { return void loadTargets(); }, disabled: disabledCore || loading || copyBusy, children: loading ? jsx(CircularProgress$1, { size: 18 }) : jsx(RefreshOutlinedIcon, { fontSize: "small" }) }) }) }), jsx(Button, { size: "small", variant: "contained", disabled: !selected || !!(selected === null || selected === void 0 ? void 0 : selected.exists) || copyBusy || loading, onClick: function () { return void runCopy(false); }, children: "Copy" }), jsx(Button, { size: "small", variant: "outlined", disabled: !selected || !!(selected === null || selected === void 0 ? void 0 : selected.exists) || copyBusy || loading, onClick: function () { return void runCopy(true); }, children: "Copy & edit" })] })] }));
+    if (isToolbar) {
+        return (jsx(Box, { sx: { display: 'inline-flex', alignItems: 'center', maxWidth: '100%' }, children: hint ? (jsx(Tooltip$1, { title: hint, children: jsx("span", { style: { display: 'inline-flex' }, children: controls }) })) : (controls) }));
+    }
+    return (jsxs(Box, { sx: { width: '100%', minWidth: 0 }, children: [hint ? (jsx(Typography$1, { variant: "body2", color: "text.secondary", sx: { mb: 1.5 }, children: hint })) : null, (sourceItem === null || sourceItem === void 0 ? void 0 : sourceItem.path) ? (jsx(Typography$1, { variant: "caption", color: "text.secondary", component: "div", sx: { mb: 1, fontFamily: 'ui-monospace, monospace', wordBreak: 'break-all' }, children: sourceItem.path })) : null, controls] }));
+}
+
+function TranslationDialog(props) {
+    if (props === void 0) { props = {}; }
+    var currentPreviewItem = useCurrentPreviewItem();
+    var previewDerived = currentPreviewItem ? StudioAPI.getPreviewItem(currentPreviewItem) : null;
+    var trimmedPath = typeof props.translationFormPath === 'string' ? props.translationFormPath.trim() : '';
+    var sourceItemFromForm = trimmedPath !== ''
+        ? {
+            name: (typeof props.translationFormName === 'string' && props.translationFormName.trim()) ||
+                pathLastSegment(trimmedPath),
+            path: trimmedPath,
+            contentType: (typeof props.translationFormContentType === 'string' && props.translationFormContentType) || ''
+        }
+        : null;
+    var sourceItem = sourceItemFromForm !== null && sourceItemFromForm !== void 0 ? sourceItemFromForm : previewDerived;
+    var sourceItemFromFormFlag = Boolean(sourceItemFromForm);
+    return (jsxs(Box, { sx: {
+            display: 'flex',
+            flexDirection: 'column',
+            minHeight: 0,
+            maxHeight: '100%',
+            overflow: 'auto',
+            bgcolor: 'background.default',
+            pb: 2
+        }, children: [jsxs(Box, { sx: { flexShrink: 0, px: 2.5, pt: 2.5, pb: 1 }, children: [jsx(Typography$1, { variant: "overline", color: "text.secondary", sx: { letterSpacing: 0.5 }, children: "Smart copy" }), jsx(Typography$1, { variant: "h6", component: "h1", sx: { fontWeight: 600, mt: 0.25 }, children: "Add translation" }), jsx(Typography$1, { variant: "body2", color: "text.secondary", sx: { mt: 0.5, maxWidth: 520 }, children: "Pick a locale that does not have this item yet. The copy uses the same path under that locale folder." })] }), jsx(Box, { sx: { flexShrink: 0, px: 2.5 }, children: jsx(SourceItemTable, { sourceItem: sourceItem, subheader: sourceItemFromFormFlag ? 'Current form item' : 'Item selected in preview' }) }), jsx(Divider$1, { sx: { mx: 2.5, my: 2, flexShrink: 0 } }), jsxs(Stack$2, { spacing: 1.5, sx: { px: 2.5, flexShrink: 0 }, children: [jsx(Typography$1, { variant: "subtitle2", sx: { fontWeight: 600 }, children: "Target locale" }), jsx(TranslateToLocalePicker, { variant: "dialog", translationFormPath: props.translationFormPath, translationFormName: props.translationFormName, translationFormContentType: props.translationFormContentType, translationAuthoringBase: props.translationAuthoringBase })] })] }));
+}
+
+var TRANSLATION_CONFIG_PATH = '/translation-config.xml';
+var TRANSLATION_CONFIG_MODULE = 'studio';
+var UIGOODIES_PLUGIN_ID = 'org.rd.plugin.uigoodies';
+/** Human-readable labels for each required piece of the Translation form definition. */
+var TRANSLATION_FORM_REQUIREMENTS = [
+    { id: 'translation-section', label: 'Translation section' },
+    { id: 'localeCode_s', label: 'localeCode_s (readonly input)' },
+    { id: 'sourceLocaleCode_s', label: 'sourceLocaleCode_s (readonly input)' },
+    { id: 'localeSourceId_s', label: 'localeSourceId_s (custom-locale control)' },
+    { id: 'translations', label: 'translations (translation-versions control)' }
+];
+function normalizeLookupKey(code) {
+    return String(code || '')
+        .trim()
+        .toLowerCase()
+        .replace(/_/g, '-');
+}
+function folderLocaleFromKey(key) {
+    return normalizeLookupKey(key);
+}
+function lookupMeta(code) {
+    var _a;
+    var k = normalizeLookupKey(code);
+    var fromMeta = (_a = LOCALE_META[k]) !== null && _a !== void 0 ? _a : LOCALE_META[k.slice(0, 2)];
+    if (fromMeta) {
+        return { label: fromMeta.label, flag: fromMeta.flag };
+    }
+    return { label: k, flag: '🌐' };
+}
+function contentTypeFormPath(contentTypeId) {
+    var id = contentTypeId.startsWith('/') ? contentTypeId : "/".concat(contentTypeId);
+    return "/content-types".concat(id, "/form-definition.xml").replace(/\/{2,}/g, '/');
+}
+function parseTranslationConfigXml(xml) {
+    var _a;
+    var trimmed = String(xml || '').trim();
+    if (!trimmed) {
+        return null;
+    }
+    var doc = new DOMParser().parseFromString(trimmed, 'application/xml');
+    if (doc.querySelector('parsererror')) {
+        return null;
+    }
+    var root = doc.querySelector('translation-config');
+    if (!root) {
+        return null;
+    }
+    var codesParent = root.querySelector('localeCodes');
+    if (!codesParent) {
+        return null;
+    }
+    var seen = new Set();
+    var languages = [];
+    codesParent.querySelectorAll('localeCode').forEach(function (codeElm) {
+        var rawCode = (codeElm.textContent || '').trim();
+        if (!rawCode) {
+            return;
+        }
+        var norm = folderLocaleFromKey(rawCode);
+        if (!norm || seen.has(norm)) {
+            return;
+        }
+        seen.add(norm);
+        var meta = lookupMeta(norm);
+        languages.push({ locale: norm, label: meta.label, flag: meta.flag });
+    });
+    if (languages.length === 0) {
+        return null;
+    }
+    var defaultRaw = (((_a = root.querySelector('defaultLocaleCode')) === null || _a === void 0 ? void 0 : _a.textContent) || '').trim();
+    var baseLanguage = folderLocaleFromKey(defaultRaw);
+    if (!baseLanguage || !seen.has(baseLanguage)) {
+        baseLanguage = languages[0].locale;
+    }
+    return { baseLanguage: baseLanguage, languages: languages };
+}
+function buildTranslationConfigXml(model) {
+    var languages = model.languages
+        .map(function (row) { return folderLocaleFromKey(row.locale); })
+        .filter(Boolean)
+        .filter(function (code, index, all) { return all.indexOf(code) === index; });
+    if (languages.length === 0) {
+        throw new Error('At least one locale is required.');
+    }
+    var baseLanguage = folderLocaleFromKey(model.baseLanguage);
+    if (!baseLanguage || !languages.includes(baseLanguage)) {
+        baseLanguage = languages[0];
+    }
+    var lines = languages.map(function (code) { return "    <localeCode>".concat(escapeXmlText(code), "</localeCode>"); });
+    return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<translation-config>\n  <defaultLocaleCode>".concat(escapeXmlText(baseLanguage), "</defaultLocaleCode>\n  <localeCodes>\n").concat(lines.join('\n'), "\n  </localeCodes>\n</translation-config>\n");
+}
+function defaultTranslationConfigModel() {
+    return {
+        baseLanguage: 'en',
+        languages: [
+            { locale: 'en', label: 'English', flag: '🇺🇸' },
+            { locale: 'es', label: 'Spanish', flag: '🇪🇸' }
+        ]
+    };
+}
+function suggestedLocaleOptions() {
+    return Object.entries(LOCALE_META)
+        .map(function (_a) {
+        var code = _a[0], meta = _a[1];
+        return ({ code: code, label: meta.label, flag: meta.flag });
+    })
+        .sort(function (a, b) { return a.label.localeCompare(b.label); });
+}
+function escapeXmlText(value) {
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+function pluginName(field, name) {
+    var plugin = field.querySelector(':scope > plugin');
+    if (!plugin) {
+        return false;
+    }
+    var pluginNameNode = plugin.querySelector('name');
+    var pluginIdNode = plugin.querySelector('pluginId');
+    var pluginNameVal = ((pluginNameNode === null || pluginNameNode === void 0 ? void 0 : pluginNameNode.textContent) || '').trim();
+    var pluginIdVal = ((pluginIdNode === null || pluginIdNode === void 0 ? void 0 : pluginIdNode.textContent) || '').trim();
+    return pluginNameVal === name && (!pluginIdVal || pluginIdVal === UIGOODIES_PLUGIN_ID);
+}
+function fieldId(field) {
+    var _a;
+    return (((_a = field.querySelector(':scope > id')) === null || _a === void 0 ? void 0 : _a.textContent) || '').trim();
+}
+function fieldType(field) {
+    var _a;
+    return (((_a = field.querySelector(':scope > type')) === null || _a === void 0 ? void 0 : _a.textContent) || '').trim();
+}
+function fieldPropertyValue(field, propName) {
+    var _a, _b;
+    var properties = field.querySelectorAll(':scope > properties > property');
+    for (var _i = 0, properties_1 = properties; _i < properties_1.length; _i++) {
+        var property = properties_1[_i];
+        var name_1 = (((_a = property.querySelector('name')) === null || _a === void 0 ? void 0 : _a.textContent) || '').trim();
+        if (name_1 === propName) {
+            return (((_b = property.querySelector('value')) === null || _b === void 0 ? void 0 : _b.textContent) || '').trim();
+        }
+    }
+    return null;
+}
+function isReadonlyInputField(field) {
+    var _a;
+    if (!field) {
+        return false;
+    }
+    if (fieldType(field) !== 'input') {
+        return false;
+    }
+    return ((_a = fieldPropertyValue(field, 'readonly')) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === 'true';
+}
+function allFormFields(doc) {
+    return Array.from(doc.querySelectorAll('form sections section fields field'));
+}
+function fieldById(fields, id) {
+    return fields.find(function (field) { return fieldId(field) === id; });
+}
+function analyzeFormDefinition(xml) {
+    var doc = new DOMParser().parseFromString(String(xml || ''), 'application/xml');
+    if (doc.querySelector('parsererror')) {
+        return {
+            hasTranslationSection: false,
+            hasLocaleCode: false,
+            hasSourceLocaleCode: false,
+            hasLocaleSourceId: false,
+            hasCustomLocaleControl: false,
+            hasTranslationVersions: false,
+            hasTranslationsField: false,
+            complete: false,
+            missing: ['Invalid form-definition XML']
+        };
+    }
+    var hasTranslationSection = findTranslationSection(doc) !== null;
+    var fields = allFormFields(doc);
+    var localeCodeField = fieldById(fields, 'localeCode_s');
+    var sourceLocaleCodeField = fieldById(fields, 'sourceLocaleCode_s');
+    var localeSourceIdField = fieldById(fields, 'localeSourceId_s');
+    var translationsField = fieldById(fields, 'translations');
+    var hasLocaleCode = isReadonlyInputField(localeCodeField);
+    var hasSourceLocaleCode = isReadonlyInputField(sourceLocaleCodeField);
+    var hasLocaleSourceId = Boolean(localeSourceIdField);
+    var hasCustomLocaleControl = Boolean(localeSourceIdField) && fieldType(localeSourceIdField) === 'custom-locale' && pluginName(localeSourceIdField, 'custom-locale');
+    var hasTranslationsField = Boolean(translationsField);
+    var hasTranslationVersions = Boolean(translationsField) && fieldType(translationsField) === 'translation-versions' && pluginName(translationsField, 'translation-versions');
+    var missing = [];
+    if (!hasTranslationSection) {
+        missing.push('Translation section');
+    }
+    if (!localeCodeField) {
+        missing.push('localeCode_s (readonly input)');
+    }
+    else if (!hasLocaleCode) {
+        missing.push('localeCode_s (must be readonly input)');
+    }
+    if (!sourceLocaleCodeField) {
+        missing.push('sourceLocaleCode_s (readonly input)');
+    }
+    else if (!hasSourceLocaleCode) {
+        missing.push('sourceLocaleCode_s (must be readonly input)');
+    }
+    if (!localeSourceIdField) {
+        missing.push('localeSourceId_s (custom-locale control)');
+    }
+    else if (!hasCustomLocaleControl) {
+        missing.push('localeSourceId_s (must use custom-locale control)');
+    }
+    if (!translationsField) {
+        missing.push('translations (translation-versions control)');
+    }
+    else if (!hasTranslationVersions) {
+        missing.push('translations (must use translation-versions control)');
+    }
+    return {
+        hasTranslationSection: hasTranslationSection,
+        hasLocaleCode: hasLocaleCode,
+        hasSourceLocaleCode: hasSourceLocaleCode,
+        hasLocaleSourceId: hasLocaleSourceId,
+        hasCustomLocaleControl: hasCustomLocaleControl,
+        hasTranslationVersions: hasTranslationVersions,
+        hasTranslationsField: hasTranslationsField,
+        complete: missing.length === 0,
+        missing: missing
+    };
+}
+var READONLY_INPUT_FIELD = function (id, title) { return "\n\t\t\t\t<field>\n\t\t\t\t\t<type>input</type>\n\t\t\t\t\t<id>".concat(id, "</id>\n\t\t\t\t\t<iceId></iceId>\n\t\t\t\t\t<title>").concat(title, "</title>\n\t\t\t\t\t<description></description>\n\t\t\t\t\t<defaultValue></defaultValue>\n\t\t\t\t\t<help></help>\n\t\t\t\t\t<properties>\n\t\t\t\t\t\t<property>\n\t\t\t\t\t\t\t<name>size</name>\n\t\t\t\t\t\t\t<value>50</value>\n\t\t\t\t\t\t\t<type>int</type>\n\t\t\t\t\t\t</property>\n\t\t\t\t\t\t<property>\n\t\t\t\t\t\t\t<name>maxlength</name>\n\t\t\t\t\t\t\t<value>50</value>\n\t\t\t\t\t\t\t<type>int</type>\n\t\t\t\t\t\t</property>\n\t\t\t\t\t\t<property>\n\t\t\t\t\t\t\t<name>readonly</name>\n\t\t\t\t\t\t\t<value>true</value>\n\t\t\t\t\t\t\t<type>boolean</type>\n\t\t\t\t\t\t</property>\n\t\t\t\t\t\t<property>\n\t\t\t\t\t\t\t<name>tokenize</name>\n\t\t\t\t\t\t\t<value>false</value>\n\t\t\t\t\t\t\t<type>boolean</type>\n\t\t\t\t\t\t</property>\n\t\t\t\t\t\t<property>\n\t\t\t\t\t\t\t<name>escapeContent</name>\n\t\t\t\t\t\t\t<value>false</value>\n\t\t\t\t\t\t\t<type>boolean</type>\n\t\t\t\t\t\t</property>\n\t\t\t\t\t</properties>\n\t\t\t\t\t<constraints>\n\t\t\t\t\t</constraints>\n\t\t\t\t</field>"); };
+var CUSTOM_LOCALE_FIELD = "\n\t\t\t\t<field>\n\t\t\t\t\t<type>custom-locale</type>\n\t\t\t\t\t<id>localeSourceId_s</id>\n\t\t\t\t\t<iceId></iceId>\n\t\t\t\t\t<title>Locale Source ID</title>\n\t\t\t\t\t<description></description>\n\t\t\t\t\t<defaultValue></defaultValue>\n\t\t\t\t\t<help></help>\n\t\t\t\t\t<plugin>\n\t\t\t\t\t\t<pluginId>".concat(UIGOODIES_PLUGIN_ID, "</pluginId>\n\t\t\t\t\t\t<type>control</type>\n\t\t\t\t\t\t<name>custom-locale</name>\n\t\t\t\t\t\t<filename>main.js</filename>\n\t\t\t\t\t</plugin>\n\t\t\t\t\t<properties>\n\t\t\t\t\t</properties>\n\t\t\t\t\t<constraints>\n\t\t\t\t\t</constraints>\n\t\t\t\t</field>");
+var TRANSLATION_VERSIONS_FIELD = "\n\t\t\t\t<field>\n\t\t\t\t\t<type>translation-versions</type>\n\t\t\t\t\t<id>translations</id>\n\t\t\t\t\t<iceId></iceId>\n\t\t\t\t\t<title>Translations</title>\n\t\t\t\t\t<description></description>\n\t\t\t\t\t<defaultValue></defaultValue>\n\t\t\t\t\t<help></help>\n\t\t\t\t\t<plugin>\n\t\t\t\t\t\t<pluginId>".concat(UIGOODIES_PLUGIN_ID, "</pluginId>\n\t\t\t\t\t\t<type>control</type>\n\t\t\t\t\t\t<name>translation-versions</name>\n\t\t\t\t\t\t<filename>main.js</filename>\n\t\t\t\t\t</plugin>\n\t\t\t\t\t<properties>\n\t\t\t\t\t</properties>\n\t\t\t\t\t<constraints>\n\t\t\t\t\t</constraints>\n\t\t\t\t</field>");
+function parseFieldFragment(fragment) {
+    var doc = new DOMParser().parseFromString("<fields>".concat(fragment, "</fields>"), 'application/xml');
+    if (doc.querySelector('parsererror') || !doc.documentElement.firstElementChild) {
+        throw new Error('Unable to build translation field fragment.');
+    }
+    return doc.documentElement.firstElementChild;
+}
+function ensureTranslationSection(doc) {
+    var sections = doc.querySelector('form > sections');
+    if (!sections) {
+        throw new Error('form-definition.xml has no <sections> element.');
+    }
+    var existing = findTranslationSection(doc);
+    if (existing) {
+        var fields_1 = existing.querySelector(':scope > fields');
+        if (!fields_1) {
+            fields_1 = doc.createElement('fields');
+            existing.appendChild(fields_1);
+        }
+        return fields_1;
+    }
+    var section = doc.createElement('section');
+    section.innerHTML = "\n\t\t\t<title>Translation</title>\n\t\t\t<description></description>\n\t\t\t<defaultOpen>true</defaultOpen>\n\t\t\t<fields>\n\t\t\t</fields>";
+    var firstSection = sections.querySelector(':scope > section');
+    if (firstSection) {
+        sections.insertBefore(section, firstSection);
+    }
+    else {
+        sections.appendChild(section);
+    }
+    var fields = section.querySelector('fields');
+    if (!fields) {
+        throw new Error('Unable to create Translation section.');
+    }
+    return fields;
+}
+function findTranslationSection(doc) {
+    var _a;
+    var sections = doc.querySelector('form > sections');
+    if (!sections) {
+        return null;
+    }
+    return (_a = Array.from(sections.querySelectorAll(':scope > section')).find(function (section) {
+        var _a;
+        var title = (((_a = section.querySelector(':scope > title')) === null || _a === void 0 ? void 0 : _a.textContent) || '').trim().toLowerCase();
+        return title === 'translation';
+    })) !== null && _a !== void 0 ? _a : null;
+}
+/** Move Translation section to the top and put translation-versions first inside it. */
+function ensureTranslationFormLayout(doc) {
+    var sections = doc.querySelector('form > sections');
+    if (!sections) {
+        return false;
+    }
+    var translationSection = findTranslationSection(doc);
+    if (!translationSection) {
+        return false;
+    }
+    var changed = false;
+    var firstSection = sections.querySelector(':scope > section');
+    if (firstSection && firstSection !== translationSection) {
+        sections.insertBefore(translationSection, firstSection);
+        changed = true;
+    }
+    var fields = translationSection.querySelector(':scope > fields');
+    if (fields) {
+        var translationField = Array.from(fields.querySelectorAll(':scope > field')).find(function (field) {
+            return pluginName(field, 'translation-versions');
+        });
+        var firstField = fields.querySelector(':scope > field');
+        if (translationField && firstField && translationField !== firstField) {
+            fields.insertBefore(translationField, firstField);
+            changed = true;
+        }
+    }
+    return changed;
+}
+function patchFormDefinitionWithTranslationFields(xml) {
+    var doc = new DOMParser().parseFromString(String(xml || ''), 'application/xml');
+    if (doc.querySelector('parsererror')) {
+        throw new Error('Unable to parse form-definition.xml.');
+    }
+    var status = analyzeFormDefinition(xml);
+    var layoutChanged = ensureTranslationFormLayout(doc);
+    if (status.complete) {
+        var serialized = new XMLSerializer().serializeToString(doc);
+        return {
+            xml: serialized,
+            added: layoutChanged ? ['Translation section moved to top of form'] : []
+        };
+    }
+    var fieldsContainer = ensureTranslationSection(doc);
+    var added = [];
+    var appendIfMissing = function (fragment, label, present) {
+        if (present) {
+            return;
+        }
+        fieldsContainer.appendChild(doc.importNode(parseFieldFragment(fragment), true));
+        added.push(label);
+    };
+    appendIfMissing(CUSTOM_LOCALE_FIELD, 'localeSourceId_s (custom-locale)', status.hasCustomLocaleControl);
+    appendIfMissing(READONLY_INPUT_FIELD('localeCode_s', 'Locale Code'), 'localeCode_s', status.hasLocaleCode);
+    appendIfMissing(READONLY_INPUT_FIELD('sourceLocaleCode_s', 'Source Locale Code'), 'sourceLocaleCode_s', status.hasSourceLocaleCode);
+    appendIfMissing(TRANSLATION_VERSIONS_FIELD, 'translations (translation-versions)', status.hasTranslationVersions);
+    ensureTranslationFormLayout(doc);
+    return { xml: new XMLSerializer().serializeToString(doc), added: added };
+}
+
+var GLOBAL_HOME_PATH = '/site/website/index.xml';
+var WEBSITE_ROOT = '/site/website';
+var COMPONENTS_ROOT = '/site/components';
+var GLOBAL_HOME_INTERNAL_NAME = 'Global Home';
+function newObjectId() {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+        return crypto.randomUUID();
+    }
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = (Math.random() * 16) | 0;
+        var v = c === 'x' ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+    });
+}
+function getXmlElementText(xml, localName) {
+    var doc = new DOMParser().parseFromString(xml, 'application/xml');
+    if (doc.querySelector('parsererror')) {
+        return '';
+    }
+    var el = doc.documentElement.querySelector(":scope > ".concat(localName));
+    return ((el === null || el === void 0 ? void 0 : el.textContent) || '').trim();
+}
+function objectGroupIdFrom(objectId) {
+    var id = String(objectId || '').trim();
+    return id.length >= 4 ? id.substring(0, 4) : id;
+}
+function applyXmlFieldPatches(xml, patches, options) {
+    var next = xml;
+    for (var _i = 0, _a = Object.entries(patches); _i < _a.length; _i++) {
+        var _b = _a[_i], tag = _b[0], value = _b[1];
+        next = upsertXmlElementText(next, tag, value);
+    }
+    if (options === null || options === void 0 ? void 0 : options.objectId) {
+        next = upsertXmlElementText(next, 'objectId', options.objectId);
+        next = upsertXmlElementText(next, 'objectGroupId', objectGroupIdFrom(options.objectId));
+    }
+    return next;
+}
+function upsertXmlElementText(xml, localName, value) {
+    var doc = new DOMParser().parseFromString(xml, 'application/xml');
+    if (doc.querySelector('parsererror')) {
+        throw new Error('Invalid content XML');
+    }
+    var root = doc.documentElement;
+    var el = root.querySelector(":scope > ".concat(localName));
+    if (!el) {
+        el = doc.createElement(localName);
+        var anchor = root.querySelector(':scope > objectId') ||
+            root.querySelector(':scope > merge-strategy') ||
+            root.querySelector(':scope > file-name');
+        if (anchor === null || anchor === void 0 ? void 0 : anchor.nextSibling) {
+            root.insertBefore(el, anchor.nextSibling);
+        }
+        else if (anchor) {
+            root.appendChild(el);
+        }
+        else {
+            root.insertBefore(el, root.firstChild);
+        }
+    }
+    el.textContent = value;
+    var body = new XMLSerializer().serializeToString(doc);
+    if (xml.trimStart().startsWith('<?xml') && !body.trimStart().startsWith('<?xml')) {
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n".concat(body);
+    }
+    return body;
+}
+function localeHomeInternalName(locale) {
+    return "Home (".concat(String(locale || '').trim().toUpperCase(), ")");
+}
+function localeFolderName(locale, configuredLocales) {
+    var key = String(locale || '')
+        .trim()
+        .toLowerCase();
+    var match = configuredLocales.find(function (c) { return c.toLowerCase() === key; });
+    return match !== null && match !== void 0 ? match : key;
+}
+function writeStoreContent(siteId, path, xml) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, firstValueFrom(writeContent(siteId, path, xml))];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+function patchStoreContent(siteId, path, patches, options) {
+    return __awaiter(this, void 0, void 0, function () {
+        var current, next;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, firstValueFrom(fetchContentXML(siteId, path))];
+                case 1:
+                    current = _a.sent();
+                    if (!(current === null || current === void 0 ? void 0 : current.trim())) {
+                        return [2 /*return*/, false];
+                    }
+                    next = applyXmlFieldPatches(current, patches, options);
+                    if (next === current) {
+                        return [2 /*return*/, false];
+                    }
+                    return [4 /*yield*/, writeStoreContent(siteId, path, next)];
+                case 2:
+                    _a.sent();
+                    return [2 /*return*/, true];
+            }
+        });
+    });
+}
+function localeHomeUsesLocaleSourceId(siteId, authoringBase, configuredCodes, localeSourceId) {
+    return __awaiter(this, void 0, void 0, function () {
+        var _i, configuredCodes_1, locale, folder, path, exists, xml;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    if (!localeSourceId) {
+                        return [2 /*return*/, false];
+                    }
+                    _i = 0, configuredCodes_1 = configuredCodes;
+                    _a.label = 1;
+                case 1:
+                    if (!(_i < configuredCodes_1.length)) return [3 /*break*/, 5];
+                    locale = configuredCodes_1[_i];
+                    folder = localeFolderName(locale, configuredCodes);
+                    path = "".concat(WEBSITE_ROOT, "/").concat(folder, "/index.xml");
+                    return [4 /*yield*/, StudioAPI.contentExists(authoringBase, siteId, path)];
+                case 2:
+                    exists = _a.sent();
+                    if (!exists) {
+                        return [3 /*break*/, 4];
+                    }
+                    return [4 /*yield*/, firstValueFrom(fetchContentXML(siteId, path))];
+                case 3:
+                    xml = _a.sent();
+                    if (getXmlElementText(xml, 'localeSourceId_s') === localeSourceId) {
+                        return [2 /*return*/, true];
+                    }
+                    _a.label = 4;
+                case 4:
+                    _i++;
+                    return [3 /*break*/, 1];
+                case 5: return [2 /*return*/, false];
+            }
+        });
+    });
+}
+function readLocaleHomeLineageId(siteId_1, authoringBase_1, configuredCodes_2) {
+    return __awaiter(this, arguments, void 0, function (siteId, authoringBase, configuredCodes, excludeLocaleSourceIds) {
+        var excluded, _i, configuredCodes_3, locale, folder, path, exists, xml, lineageId;
+        if (excludeLocaleSourceIds === void 0) { excludeLocaleSourceIds = []; }
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    excluded = new Set(excludeLocaleSourceIds.filter(Boolean));
+                    _i = 0, configuredCodes_3 = configuredCodes;
+                    _a.label = 1;
+                case 1:
+                    if (!(_i < configuredCodes_3.length)) return [3 /*break*/, 5];
+                    locale = configuredCodes_3[_i];
+                    folder = localeFolderName(locale, configuredCodes);
+                    path = "".concat(WEBSITE_ROOT, "/").concat(folder, "/index.xml");
+                    return [4 /*yield*/, StudioAPI.contentExists(authoringBase, siteId, path)];
+                case 2:
+                    exists = _a.sent();
+                    if (!exists) {
+                        return [3 /*break*/, 4];
+                    }
+                    return [4 /*yield*/, firstValueFrom(fetchContentXML(siteId, path))];
+                case 3:
+                    xml = _a.sent();
+                    lineageId = getXmlElementText(xml, 'localeSourceId_s');
+                    if (lineageId && !excluded.has(lineageId)) {
+                        return [2 /*return*/, lineageId];
+                    }
+                    _a.label = 4;
+                case 4:
+                    _i++;
+                    return [3 /*break*/, 1];
+                case 5: return [2 /*return*/, null];
+            }
+        });
+    });
+}
+function ensureComponentLocaleFolders(authoringBase, siteId, locales, configuredLocales) {
+    return __awaiter(this, void 0, void 0, function () {
+        var created, componentsExists, _i, locales_1, locale, folder, folderPath, exists, res;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    created = [];
+                    return [4 /*yield*/, StudioAPI.contentExists(authoringBase, siteId, COMPONENTS_ROOT)];
+                case 1:
+                    componentsExists = _a.sent();
+                    if (!componentsExists) {
+                        return [2 /*return*/, created];
+                    }
+                    _i = 0, locales_1 = locales;
+                    _a.label = 2;
+                case 2:
+                    if (!(_i < locales_1.length)) return [3 /*break*/, 6];
+                    locale = locales_1[_i];
+                    folder = localeFolderName(locale, configuredLocales);
+                    folderPath = "".concat(COMPONENTS_ROOT, "/").concat(folder);
+                    return [4 /*yield*/, StudioAPI.contentExists(authoringBase, siteId, folderPath)];
+                case 3:
+                    exists = _a.sent();
+                    if (exists) {
+                        return [3 /*break*/, 5];
+                    }
+                    return [4 /*yield*/, StudioAPI.createFolder(authoringBase, siteId, COMPONENTS_ROOT, folder)];
+                case 4:
+                    res = _a.sent();
+                    if (res) {
+                        created.push(folderPath);
+                    }
+                    _a.label = 5;
+                case 5:
+                    _i++;
+                    return [3 /*break*/, 2];
+                case 6: return [2 /*return*/, created];
+            }
+        });
+    });
+}
+/**
+ * Copies the global home page into each configured locale folder and renames items for translation layout.
+ *
+ * - `/site/website/index.xml` → internal-name **Global Home** (standalone; not in the locale-home translation set)
+ * - `/site/website/{locale}/index.xml` → internal-name **Home (LOCALE)** sharing one `localeSourceId_s` among locales
+ * - Each locale home gets a unique `objectId` when created (via translation-copy); duplicates vs global are fixed on update
+ * - Creates empty `/site/components/{locale}/` folders when `/site/components` exists
+ */
+function scaffoldLocaleSiteStructure(siteId, authoringBase, config) {
+    return __awaiter(this, void 0, void 0, function () {
+        var errors, locales, configuredCodes, globalExists, globalHomeUpdated, baseLanguage, globalObjectId, globalLocaleSourceId, localeHomeLineageId, globalXml, globalLsidFromXml, existingLocaleLineageId, patchedGlobal, error_1, msg, componentFoldersCreated, error_2, _i, configuredCodes_2, locale, folder, targetPath, targetParent, displayName, targetExists, localeXml, localeObjectId, needsNewObjectId, updated, copyRes, pastedPath, error_3, msg, createdCount, updatedCount, ok, parts, message;
+        var _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    errors = [];
+                    locales = [];
+                    configuredCodes = config.languages.map(function (row) { return row.locale; });
+                    if (!siteId || !authoringBase) {
+                        return [2 /*return*/, { ok: false, message: 'Site and authoring context are required.', globalHomeUpdated: false, componentFoldersCreated: [], locales: locales, errors: errors }];
+                    }
+                    if (configuredCodes.length < 2) {
+                        return [2 /*return*/, {
+                                ok: false,
+                                message: 'Save at least two locales in translation-config.xml first.',
+                                globalHomeUpdated: false,
+                                componentFoldersCreated: [],
+                                locales: locales,
+                                errors: errors
+                            }];
+                    }
+                    return [4 /*yield*/, StudioAPI.contentExists(authoringBase, siteId, GLOBAL_HOME_PATH)];
+                case 1:
+                    globalExists = _b.sent();
+                    if (!globalExists) {
+                        return [2 /*return*/, {
+                                ok: false,
+                                message: "Global home not found at ".concat(GLOBAL_HOME_PATH, ". Create a site home page there first."),
+                                globalHomeUpdated: false,
+                                componentFoldersCreated: [],
+                                locales: locales,
+                                errors: errors
+                            }];
+                    }
+                    globalHomeUpdated = false;
+                    baseLanguage = config.baseLanguage || configuredCodes[0];
+                    globalObjectId = '';
+                    globalLocaleSourceId = '';
+                    localeHomeLineageId = '';
+                    _b.label = 2;
+                case 2:
+                    _b.trys.push([2, 8, , 9]);
+                    return [4 /*yield*/, firstValueFrom(fetchContentXML(siteId, GLOBAL_HOME_PATH))];
+                case 3:
+                    globalXml = _b.sent();
+                    if (!(globalXml === null || globalXml === void 0 ? void 0 : globalXml.trim())) {
+                        throw new Error("Could not read ".concat(GLOBAL_HOME_PATH));
+                    }
+                    globalObjectId = getXmlElementText(globalXml, 'objectId') || newObjectId();
+                    globalLsidFromXml = getXmlElementText(globalXml, 'localeSourceId_s');
+                    globalLocaleSourceId = globalLsidFromXml || newObjectId();
+                    return [4 /*yield*/, readLocaleHomeLineageId(siteId, authoringBase, configuredCodes, [
+                            globalLsidFromXml,
+                            globalObjectId
+                        ])];
+                case 4:
+                    existingLocaleLineageId = _b.sent();
+                    localeHomeLineageId = existingLocaleLineageId || newObjectId();
+                    // Global home is not a translation sibling of locale homes — keep lineage ids separate.
+                    if (globalLocaleSourceId === localeHomeLineageId) {
+                        globalLocaleSourceId = newObjectId();
+                    }
+                    return [4 /*yield*/, localeHomeUsesLocaleSourceId(siteId, authoringBase, configuredCodes, globalLocaleSourceId)];
+                case 5:
+                    if (_b.sent()) {
+                        globalLocaleSourceId = newObjectId();
+                    }
+                    patchedGlobal = applyXmlFieldPatches(globalXml, {
+                        'internal-name': GLOBAL_HOME_INTERNAL_NAME,
+                        localeSourceId_s: globalLocaleSourceId,
+                        localeCode_s: baseLanguage,
+                        sourceLocaleCode_s: baseLanguage
+                    });
+                    if (!(patchedGlobal !== globalXml)) return [3 /*break*/, 7];
+                    return [4 /*yield*/, writeStoreContent(siteId, GLOBAL_HOME_PATH, patchedGlobal)];
+                case 6:
+                    _b.sent();
+                    globalHomeUpdated = true;
+                    _b.label = 7;
+                case 7: return [3 /*break*/, 9];
+                case 8:
+                    error_1 = _b.sent();
+                    msg = error_1 instanceof Error ? error_1.message : String(error_1);
+                    errors.push("Global home: ".concat(msg));
+                    return [2 /*return*/, {
+                            ok: false,
+                            message: "Failed to update global home: ".concat(msg),
+                            globalHomeUpdated: false,
+                            componentFoldersCreated: [],
+                            locales: locales,
+                            errors: errors
+                        }];
+                case 9:
+                    componentFoldersCreated = [];
+                    _b.label = 10;
+                case 10:
+                    _b.trys.push([10, 12, , 13]);
+                    return [4 /*yield*/, ensureComponentLocaleFolders(authoringBase, siteId, configuredCodes, configuredCodes)];
+                case 11:
+                    componentFoldersCreated = _b.sent();
+                    return [3 /*break*/, 13];
+                case 12:
+                    error_2 = _b.sent();
+                    errors.push(error_2 instanceof Error ? error_2.message : String(error_2));
+                    return [3 /*break*/, 13];
+                case 13:
+                    _i = 0, configuredCodes_2 = configuredCodes;
+                    _b.label = 14;
+                case 14:
+                    if (!(_i < configuredCodes_2.length)) return [3 /*break*/, 24];
+                    locale = configuredCodes_2[_i];
+                    folder = localeFolderName(locale, configuredCodes);
+                    targetPath = "".concat(WEBSITE_ROOT, "/").concat(folder, "/index.xml");
+                    targetParent = "".concat(WEBSITE_ROOT, "/").concat(folder);
+                    displayName = localeHomeInternalName(folder);
+                    _b.label = 15;
+                case 15:
+                    _b.trys.push([15, 22, , 23]);
+                    return [4 /*yield*/, StudioAPI.contentExists(authoringBase, siteId, targetPath)];
+                case 16:
+                    targetExists = _b.sent();
+                    if (!targetExists) return [3 /*break*/, 19];
+                    return [4 /*yield*/, firstValueFrom(fetchContentXML(siteId, targetPath))];
+                case 17:
+                    localeXml = _b.sent();
+                    localeObjectId = getXmlElementText(localeXml, 'objectId');
+                    needsNewObjectId = Boolean(globalObjectId && localeObjectId && localeObjectId === globalObjectId);
+                    return [4 /*yield*/, patchStoreContent(siteId, targetPath, {
+                            'internal-name': displayName,
+                            localeSourceId_s: localeHomeLineageId,
+                            localeCode_s: folder.toLowerCase(),
+                            sourceLocaleCode_s: baseLanguage,
+                            'folder-name': folder
+                        }, needsNewObjectId ? { objectId: newObjectId() } : undefined)];
+                case 18:
+                    updated = _b.sent();
+                    locales.push({
+                        locale: folder,
+                        path: targetPath,
+                        action: updated ? 'updated' : 'skipped',
+                        message: updated
+                            ? needsNewObjectId
+                                ? 'Updated metadata and assigned a new objectId'
+                                : 'Updated labels and locale metadata'
+                            : 'Already present'
+                    });
+                    return [3 /*break*/, 23];
+                case 19: return [4 /*yield*/, StudioAPI.copyItem(authoringBase, siteId, GLOBAL_HOME_PATH, targetParent, targetPath)];
+                case 20:
+                    copyRes = _b.sent();
+                    pastedPath = ((copyRes === null || copyRes === void 0 ? void 0 : copyRes.pastedPath) || ((_a = copyRes === null || copyRes === void 0 ? void 0 : copyRes.items) === null || _a === void 0 ? void 0 : _a[0]));
+                    if (!(copyRes === null || copyRes === void 0 ? void 0 : copyRes.ok) || !pastedPath) {
+                        errors.push("".concat(folder, ": ").concat((copyRes === null || copyRes === void 0 ? void 0 : copyRes.message) || 'Copy failed'));
+                        locales.push({
+                            locale: folder,
+                            path: targetPath,
+                            action: 'skipped',
+                            message: (copyRes === null || copyRes === void 0 ? void 0 : copyRes.message) || 'Copy failed'
+                        });
+                        return [3 /*break*/, 23];
+                    }
+                    return [4 /*yield*/, patchStoreContent(siteId, pastedPath, {
+                            'internal-name': displayName,
+                            localeSourceId_s: localeHomeLineageId,
+                            localeCode_s: folder.toLowerCase(),
+                            sourceLocaleCode_s: baseLanguage,
+                            'folder-name': folder
+                        })];
+                case 21:
+                    _b.sent();
+                    locales.push({
+                        locale: folder,
+                        path: pastedPath,
+                        action: 'created',
+                        message: 'Copied from global home'
+                    });
+                    return [3 /*break*/, 23];
+                case 22:
+                    error_3 = _b.sent();
+                    msg = error_3 instanceof Error ? error_3.message : String(error_3);
+                    errors.push("".concat(folder, ": ").concat(msg));
+                    locales.push({ locale: folder, path: targetPath, action: 'skipped', message: msg });
+                    return [3 /*break*/, 23];
+                case 23:
+                    _i++;
+                    return [3 /*break*/, 14];
+                case 24:
+                    createdCount = locales.filter(function (row) { return row.action === 'created'; }).length;
+                    updatedCount = locales.filter(function (row) { return row.action === 'updated'; }).length;
+                    ok = errors.length === 0;
+                    parts = [];
+                    if (globalHomeUpdated) {
+                        parts.push('global home renamed to Global Home');
+                    }
+                    if (createdCount) {
+                        parts.push("".concat(createdCount, " locale home page(s) created"));
+                    }
+                    if (updatedCount) {
+                        parts.push("".concat(updatedCount, " locale home page(s) updated"));
+                    }
+                    if (componentFoldersCreated.length) {
+                        parts.push("".concat(componentFoldersCreated.length, " component locale folder(s) created"));
+                    }
+                    message = ok
+                        ? parts.length
+                            ? parts.join('; ')
+                            : 'Locale site structure is already in place.'
+                        : "Completed with ".concat(errors.length, " error(s). ").concat(parts.join('; '));
+                    return [2 /*return*/, {
+                            ok: ok,
+                            message: message,
+                            globalHomeUpdated: globalHomeUpdated,
+                            componentFoldersCreated: componentFoldersCreated,
+                            locales: locales,
+                            errors: errors
+                        }];
+            }
+        });
+    });
+}
+
+function statusColor(complete, missingCount) {
+    if (complete) {
+        return 'success';
+    }
+    if (missingCount > 0) {
+        return 'warning';
+    }
+    return 'default';
+}
+function TranslationConfigTools() {
+    var _this = this;
+    var _a;
+    var dispatch = useDispatch();
+    var siteId = useActiveSiteId();
+    var authoringBase = useEnv().authoringBase;
+    var _b = useState('locales'), tab = _b[0], setTab = _b[1];
+    var _c = useState(true), configLoading = _c[0], setConfigLoading = _c[1];
+    var _d = useState(false), configSaving = _d[0], setConfigSaving = _d[1];
+    var _e = useState(false), configExists = _e[0], setConfigExists = _e[1];
+    var _f = useState(''), configError = _f[0], setConfigError = _f[1];
+    var _g = useState(defaultTranslationConfigModel()), configModel = _g[0], setConfigModel = _g[1];
+    var _h = useState(null), newLocaleCode = _h[0], setNewLocaleCode = _h[1];
+    var _j = useState(false), typesLoading = _j[0], setTypesLoading = _j[1];
+    var _k = useState(''), typesError = _k[0], setTypesError = _k[1];
+    var _l = useState([]), typeRows = _l[0], setTypeRows = _l[1];
+    var _m = useState(new Set()), selectedTypeIds = _m[0], setSelectedTypeIds = _m[1];
+    var _o = useState(false), applyLoading = _o[0], setApplyLoading = _o[1];
+    var _p = useState(false), scaffoldOpen = _p[0], setScaffoldOpen = _p[1];
+    var _q = useState(false), scaffoldLoading = _q[0], setScaffoldLoading = _q[1];
+    var localeSuggestions = useMemo(function () { return suggestedLocaleOptions(); }, []);
+    var localePreview = useMemo(function () {
+        return configModel.languages
+            .map(function (row) { return "".concat(WEBSITE_ROOT, "/").concat(row.locale, "/index.xml \u2192 ").concat(localeHomeInternalName(row.locale)); })
+            .join('\n');
+    }, [configModel.languages]);
+    var loadConfig = useCallback(function () {
+        if (!siteId) {
+            setConfigLoading(false);
+            return;
+        }
+        setConfigLoading(true);
+        setConfigError('');
+        var sub = fetchConfigurationXML(siteId, TRANSLATION_CONFIG_PATH, TRANSLATION_CONFIG_MODULE).subscribe({
+            next: function (xml) {
+                var parsed = parseTranslationConfigXml(xml);
+                if (parsed) {
+                    setConfigModel(parsed);
+                    setConfigExists(true);
+                }
+                else {
+                    setConfigModel(defaultTranslationConfigModel());
+                    setConfigExists(false);
+                    setConfigError('translation-config.xml is missing or invalid. Save below to create it.');
+                }
+                setConfigLoading(false);
+            },
+            error: function () {
+                setConfigModel(defaultTranslationConfigModel());
+                setConfigExists(false);
+                setConfigError('translation-config.xml is not configured yet. Save below to create it.');
+                setConfigLoading(false);
+            }
+        });
+        return function () { return sub.unsubscribe(); };
+    }, [siteId]);
+    useEffect(function () {
+        var cleanup = loadConfig();
+        return cleanup;
+    }, [loadConfig]);
+    var scanContentTypes = useCallback(function () {
+        if (!siteId) {
+            return;
+        }
+        setTypesLoading(true);
+        setTypesError('');
+        setTypeRows([]);
+        setSelectedTypeIds(new Set());
+        var sub = fetchContentTypes$1(siteId)
+            .pipe(mergeMap(function (types) { return from(types !== null && types !== void 0 ? types : []); }), map(function (type) {
+            var _a, _b, _c;
+            return ({
+                id: ((_a = type.id) !== null && _a !== void 0 ? _a : '').trim(),
+                name: ((_c = (_b = type.name) !== null && _b !== void 0 ? _b : type.id) !== null && _c !== void 0 ? _c : '').trim()
+            });
+        }), mergeMap(function (type) {
+            if (!type.id) {
+                return of(null);
+            }
+            var formPath = contentTypeFormPath(type.id);
+            return fetchConfigurationXML(siteId, formPath, TRANSLATION_CONFIG_MODULE).pipe(map(function (xml) { return ({
+                id: type.id,
+                name: type.name || type.id,
+                formPath: formPath,
+                status: analyzeFormDefinition(xml)
+            }); }), catchError(function () {
+                return of({
+                    id: type.id,
+                    name: type.name || type.id,
+                    formPath: formPath,
+                    status: {
+                        hasTranslationSection: false,
+                        hasLocaleCode: false,
+                        hasSourceLocaleCode: false,
+                        hasLocaleSourceId: false,
+                        hasCustomLocaleControl: false,
+                        hasTranslationVersions: false,
+                        hasTranslationsField: false,
+                        complete: false,
+                        missing: ['Unable to load form-definition.xml']
+                    }
+                });
+            }));
+        }), toArray(), map(function (rows) {
+            return rows
+                .filter(Boolean)
+                .sort(function (a, b) { return a.id.localeCompare(b.id); });
+        }))
+            .subscribe({
+            next: function (rows) {
+                setTypeRows(rows);
+                var missing = rows.filter(function (row) { return !row.status.complete; }).map(function (row) { return row.id; });
+                setSelectedTypeIds(new Set(missing));
+                setTypesLoading(false);
+            },
+            error: function (error) {
+                setTypesError(error instanceof Error ? error.message : String(error));
+                setTypesLoading(false);
+            }
+        });
+        return function () { return sub.unsubscribe(); };
+    }, [siteId]);
+    useEffect(function () {
+        if (tab === 'content-types' && siteId && typeRows.length === 0 && !typesLoading) {
+            scanContentTypes();
+        }
+    }, [tab, siteId, typeRows.length, typesLoading, scanContentTypes]);
+    var saveConfig = function () {
+        if (!siteId) {
+            return;
+        }
+        if (configModel.languages.length < 2) {
+            dispatch(showSystemNotification({
+                message: 'Add at least two locales for translation workflows.',
+                options: { variant: 'warning' }
+            }));
+            return;
+        }
+        setConfigSaving(true);
+        var xml = '';
+        try {
+            xml = buildTranslationConfigXml(configModel);
+        }
+        catch (error) {
+            setConfigSaving(false);
+            dispatch(showSystemNotification({
+                message: error instanceof Error ? error.message : String(error),
+                options: { variant: 'error' }
+            }));
+            return;
+        }
+        writeConfiguration(siteId, TRANSLATION_CONFIG_PATH, TRANSLATION_CONFIG_MODULE, xml).subscribe({
+            next: function () {
+                setConfigSaving(false);
+                setConfigExists(true);
+                setConfigError('');
+                dispatch(showSystemNotification({
+                    message: 'Saved translation-config.xml',
+                    options: { variant: 'success' }
+                }));
+            },
+            error: function (error) {
+                setConfigSaving(false);
+                dispatch(showSystemNotification({
+                    message: error instanceof Error ? error.message : String(error),
+                    options: { variant: 'error' }
+                }));
+            }
+        });
+    };
+    var addLocale = function () {
+        var code = (newLocaleCode || '').trim().toLowerCase().replace(/_/g, '-');
+        if (!code) {
+            return;
+        }
+        if (configModel.languages.some(function (row) { return row.locale === code; })) {
+            return;
+        }
+        var suggestion = localeSuggestions.find(function (row) { return row.code === code; });
+        setConfigModel(function (prev) {
+            var _a, _b;
+            return (__assign(__assign({}, prev), { languages: __spreadArray(__spreadArray([], prev.languages, true), [
+                    {
+                        locale: code,
+                        label: (_a = suggestion === null || suggestion === void 0 ? void 0 : suggestion.label) !== null && _a !== void 0 ? _a : code,
+                        flag: (_b = suggestion === null || suggestion === void 0 ? void 0 : suggestion.flag) !== null && _b !== void 0 ? _b : '🌐'
+                    }
+                ], false) }));
+        });
+        setNewLocaleCode(null);
+    };
+    var removeLocale = function (locale) {
+        setConfigModel(function (prev) {
+            var _a, _b;
+            var languages = prev.languages.filter(function (row) { return row.locale !== locale; });
+            var baseLanguage = prev.baseLanguage;
+            if (baseLanguage === locale) {
+                baseLanguage = (_b = (_a = languages[0]) === null || _a === void 0 ? void 0 : _a.locale) !== null && _b !== void 0 ? _b : '';
+            }
+            return { baseLanguage: baseLanguage, languages: languages };
+        });
+    };
+    var applyTranslationFields = function () {
+        if (!siteId || selectedTypeIds.size === 0) {
+            return;
+        }
+        var targets = typeRows.filter(function (row) { return selectedTypeIds.has(row.id) && !row.status.complete; });
+        if (targets.length === 0) {
+            dispatch(showSystemNotification({
+                message: 'No incomplete content types selected.',
+                options: { variant: 'info' }
+            }));
+            return;
+        }
+        setApplyLoading(true);
+        from(targets)
+            .pipe(concatMap(function (row) {
+            return fetchConfigurationXML(siteId, row.formPath, TRANSLATION_CONFIG_MODULE).pipe(mergeMap(function (xml) {
+                var patched = patchFormDefinitionWithTranslationFields(xml);
+                if (patched.added.length === 0) {
+                    return of({ id: row.id, skipped: true });
+                }
+                return writeConfiguration(siteId, row.formPath, TRANSLATION_CONFIG_MODULE, patched.xml).pipe(map(function () { return ({ id: row.id, skipped: false, added: patched.added.length }); }));
+            }));
+        }), toArray())
+            .subscribe({
+            next: function (results) {
+                setApplyLoading(false);
+                var updated = results.filter(function (result) { return !result.skipped; }).length;
+                dispatch(showSystemNotification({
+                    message: updated
+                        ? "Added translation fields to ".concat(updated, " content type(s).")
+                        : 'Selected content types already had translation fields.',
+                    options: { variant: 'success' }
+                }));
+                scanContentTypes();
+            },
+            error: function (error) {
+                setApplyLoading(false);
+                dispatch(showSystemNotification({
+                    message: error instanceof Error ? error.message : String(error),
+                    options: { variant: 'error' }
+                }));
+            }
+        });
+    };
+    var runScaffold = function () { return __awaiter(_this, void 0, void 0, function () {
+        var result, error_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    if (!siteId || !authoringBase) {
+                        return [2 /*return*/];
+                    }
+                    if (configModel.languages.length < 2) {
+                        dispatch(showSystemNotification({
+                            message: 'Save at least two locales before creating locale home pages.',
+                            options: { variant: 'warning' }
+                        }));
+                        return [2 /*return*/];
+                    }
+                    setScaffoldLoading(true);
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 3, 4, 5]);
+                    return [4 /*yield*/, scaffoldLocaleSiteStructure(siteId, authoringBase, configModel)];
+                case 2:
+                    result = _a.sent();
+                    dispatch(showSystemNotification({
+                        message: result.message,
+                        options: { variant: result.ok ? 'success' : 'warning' }
+                    }));
+                    if (result.ok) {
+                        setScaffoldOpen(false);
+                    }
+                    return [3 /*break*/, 5];
+                case 3:
+                    error_1 = _a.sent();
+                    dispatch(showSystemNotification({
+                        message: error_1 instanceof Error ? error_1.message : String(error_1),
+                        options: { variant: 'error' }
+                    }));
+                    return [3 /*break*/, 5];
+                case 4:
+                    setScaffoldLoading(false);
+                    return [7 /*endfinally*/];
+                case 5: return [2 /*return*/];
+            }
+        });
+    }); };
+    var incompleteCount = typeRows.filter(function (row) { return !row.status.complete; }).length;
+    return (jsxs(Box$1, { sx: { height: '100%', minHeight: 0, display: 'flex', flexDirection: 'column', p: 2, gap: 2 }, children: [jsxs(Box$1, { children: [jsx(Typography, { variant: "h5", sx: { fontWeight: 700 }, children: "Translation" }), jsxs(Typography, { variant: "body2", color: "text.secondary", children: ["Configure site locales and add Translation form controls to content types for project", ' ', jsx(Box$1, { component: "span", sx: { fontFamily: 'monospace' }, children: siteId || '—' }), "."] })] }), jsxs(Tabs, { value: tab, onChange: function (_, value) { return setTab(value); }, children: [jsx(Tab, { value: "locales", label: "Locales" }), jsx(Tab, { value: "content-types", label: "Content types".concat(incompleteCount ? " (".concat(incompleteCount, ")") : '') })] }), tab === 'locales' && (jsx(Paper, { sx: { p: 2, display: 'flex', flexDirection: 'column', gap: 2 }, children: configLoading ? (jsx(Box$1, { sx: { display: 'flex', justifyContent: 'center', py: 4 }, children: jsx(CircularProgress, { size: 28 }) })) : (jsxs(Fragment, { children: [configError && (jsx(Alert, { severity: configExists ? 'warning' : 'info', onClose: function () { return setConfigError(''); }, children: configError })), jsxs(Typography, { variant: "subtitle2", color: "text.secondary", children: ["File: ", jsx(Box$1, { component: "code", children: "/config/studio/translation-config.xml" })] }), jsx(TextField$1, { select: true, SelectProps: { native: true }, label: "Default locale", value: configModel.baseLanguage, onChange: function (event) {
+                                return setConfigModel(function (prev) { return (__assign(__assign({}, prev), { baseLanguage: event.target.value })); });
+                            }, size: "small", sx: { maxWidth: 280 }, children: configModel.languages.map(function (row) { return (jsxs("option", { value: row.locale, children: [row.flag, " ", row.label, " (", row.locale, ")"] }, row.locale)); }) }), jsx(Box$1, { sx: { display: 'flex', flexWrap: 'wrap', gap: 1 }, children: configModel.languages.map(function (row) { return (jsx(Chip, { label: "".concat(row.flag, " ").concat(row.label, " (").concat(row.locale, ")"), color: row.locale === configModel.baseLanguage ? 'primary' : 'default', onDelete: configModel.languages.length > 1 ? function () { return removeLocale(row.locale); } : undefined }, row.locale)); }) }), jsxs(Box$1, { sx: { display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }, children: [jsx(Autocomplete, { size: "small", sx: { minWidth: 280 }, options: localeSuggestions, getOptionLabel: function (option) { return "".concat(option.flag, " ").concat(option.label, " (").concat(option.code, ")"); }, value: (_a = localeSuggestions.find(function (row) { return row.code === newLocaleCode; })) !== null && _a !== void 0 ? _a : null, onChange: function (_, value) { var _a; return setNewLocaleCode((_a = value === null || value === void 0 ? void 0 : value.code) !== null && _a !== void 0 ? _a : null); }, renderInput: function (params) { return jsx(TextField$1, __assign({}, params, { label: "Add locale", placeholder: "Search locales" })); } }), jsx(Button$1, { variant: "outlined", onClick: addLocale, disabled: !newLocaleCode, children: "Add locale" })] }), jsxs(Box$1, { sx: { display: 'flex', gap: 1, flexWrap: 'wrap' }, children: [jsx(Button$1, { variant: "contained", startIcon: configSaving ? jsx(CircularProgress, { size: 16, color: "inherit" }) : jsx(SaveRoundedIcon, {}), onClick: saveConfig, disabled: configSaving, children: "Save locale config" }), jsx(Button$1, { variant: "outlined", startIcon: jsx(HomeWorkOutlinedIcon, {}), onClick: function () { return setScaffoldOpen(true); }, disabled: configLoading || configModel.languages.length < 2 || !siteId, children: "Create locale site structure" }), jsx(Button$1, { variant: "text", startIcon: jsx(RefreshRoundedIcon, {}), onClick: loadConfig, children: "Reload" })] }), jsxs(Typography, { variant: "caption", color: "text.secondary", sx: { display: 'block', maxWidth: 720 }, children: [jsx("strong", { children: "Create locale site structure" }), " copies", ' ', jsx(Box$1, { component: "code", children: GLOBAL_HOME_PATH }), " into each configured locale folder, renames the global page to ", jsx("strong", { children: GLOBAL_HOME_INTERNAL_NAME }), ", and creates locale home pages named", ' ', jsx("strong", { children: localeHomeInternalName('en') }), ", etc. Empty", ' ', jsx(Box$1, { component: "code", children: "/site/components/<locale>/" }), " folders are added when", ' ', jsx(Box$1, { component: "code", children: "/site/components" }), " exists."] })] })) })), jsxs(Dialog, { open: scaffoldOpen, onClose: scaffoldLoading ? undefined : function () { return setScaffoldOpen(false); }, maxWidth: "sm", fullWidth: true, children: [jsx(DialogTitle, { children: "Create locale site structure" }), jsxs(DialogContent, { dividers: true, children: [jsxs(Typography, { variant: "body2", sx: { mb: 2 }, children: ["This will update ", jsx(Box$1, { component: "code", children: GLOBAL_HOME_PATH }), " to internal-name", ' ', jsx("strong", { children: GLOBAL_HOME_INTERNAL_NAME }), " (standalone \u2014 not grouped with locale homes), then copy it into each locale folder below. Locale homes share one translation lineage and each gets its own", ' ', jsx(Box$1, { component: "code", children: "objectId" }), ". Existing locale home pages are updated, not overwritten."] }), jsx(Typography, { variant: "subtitle2", sx: { mb: 1 }, children: "Planned locale home pages" }), jsx(Box$1, { component: "pre", sx: {
+                                    m: 0,
+                                    p: 1.5,
+                                    bgcolor: 'action.hover',
+                                    borderRadius: 1,
+                                    fontSize: '0.75rem',
+                                    overflow: 'auto',
+                                    whiteSpace: 'pre-wrap'
+                                }, children: localePreview || 'Add locales and save the config first.' })] }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: function () { return setScaffoldOpen(false); }, disabled: scaffoldLoading, children: "Cancel" }), jsx(Button$1, { variant: "contained", onClick: function () { return void runScaffold(); }, disabled: scaffoldLoading || configModel.languages.length < 2, startIcon: scaffoldLoading ? jsx(CircularProgress, { size: 16, color: "inherit" }) : jsx(HomeWorkOutlinedIcon, {}), children: scaffoldLoading ? 'Creating…' : 'Create structure' })] })] }), tab === 'content-types' && (jsxs(Paper, { sx: { p: 2, display: 'flex', flexDirection: 'column', gap: 2, minHeight: 0, flex: 1 }, children: [jsxs(Box$1, { sx: { display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }, children: [jsx(Button$1, { variant: "outlined", startIcon: typesLoading ? jsx(CircularProgress, { size: 16 }) : jsx(RefreshRoundedIcon, {}), onClick: scanContentTypes, disabled: typesLoading || !siteId, children: "Scan content types" }), jsx(Button$1, { variant: "contained", startIcon: applyLoading ? jsx(CircularProgress, { size: 16, color: "inherit" }) : jsx(PlaylistAddRoundedIcon, {}), onClick: applyTranslationFields, disabled: applyLoading || selectedTypeIds.size === 0, children: "Add translation fields to selected" }), jsx(FormControlLabel, { control: jsx(Checkbox, { checked: typeRows.length > 0 && selectedTypeIds.size === typeRows.filter(function (row) { return !row.status.complete; }).length, indeterminate: selectedTypeIds.size > 0 &&
+                                        selectedTypeIds.size < typeRows.filter(function (row) { return !row.status.complete; }).length, onChange: function (event) {
+                                        if (event.target.checked) {
+                                            setSelectedTypeIds(new Set(typeRows.filter(function (row) { return !row.status.complete; }).map(function (row) { return row.id; })));
+                                        }
+                                        else {
+                                            setSelectedTypeIds(new Set());
+                                        }
+                                    } }), label: "Select incomplete" })] }), typesError && jsx(Alert, { severity: "error", children: typesError }), jsxs(Alert, { severity: "info", sx: { mb: 2 }, children: ["Each content type must include:", ' ', TRANSLATION_FORM_REQUIREMENTS.map(function (req) { return req.label; }).join('; '), "."] }), !typesLoading && typeRows.length === 0 && !typesError && (jsx(Alert, { severity: "info", children: "Scan content types to see which definitions need Translation fields." })), typeRows.length > 0 && (jsx(Box$1, { sx: { overflow: 'auto' }, children: jsxs(Table, { size: "small", stickyHeader: true, children: [jsx(TableHead, { children: jsxs(TableRow, { children: [jsx(TableCell, { padding: "checkbox" }), jsx(TableCell, { children: "Content type" }), jsx(TableCell, { children: "Status" }), jsx(TableCell, { children: "Missing" })] }) }), jsx(TableBody, { children: typeRows.map(function (row) {
+                                        var checked = selectedTypeIds.has(row.id);
+                                        return (jsxs(TableRow, { hover: true, selected: checked, children: [jsx(TableCell, { padding: "checkbox", children: jsx(Checkbox, { checked: checked, disabled: row.status.complete, onChange: function (event) {
+                                                            setSelectedTypeIds(function (prev) {
+                                                                var next = new Set(prev);
+                                                                if (event.target.checked) {
+                                                                    next.add(row.id);
+                                                                }
+                                                                else {
+                                                                    next.delete(row.id);
+                                                                }
+                                                                return next;
+                                                            });
+                                                        } }) }), jsxs(TableCell, { children: [jsx(Typography, { variant: "body2", sx: { fontFamily: 'monospace' }, children: row.id }), jsx(Typography, { variant: "caption", color: "text.secondary", children: row.name })] }), jsx(TableCell, { children: jsx(Chip, { size: "small", label: row.status.complete ? 'Ready' : 'Incomplete', color: statusColor(row.status.complete, row.status.missing.length) }) }), jsx(TableCell, { children: row.status.complete ? (jsx(Typography, { variant: "caption", color: "text.secondary", children: "\u2014" })) : (row.status.missing.join(', ')) })] }, row.id));
+                                    }) })] }) }))] }))] }));
+}
+
+/**
+ * Tools panel: full-width locale picker + copy actions (no dialog).
+ */
+function OpenTranslationPanelButton(props) {
+    var _a = props.title, title = _a === void 0 ? 'Add translation' : _a;
+    return (jsxs(Box, { sx: { width: '100%', px: 1.5, py: 1.5, boxSizing: 'border-box' }, children: [jsx(Typography$1, { variant: "subtitle2", sx: { fontWeight: 600, mb: 1 }, children: title }), jsx(TranslateToLocalePicker, { variant: "panel" })] }));
+}
+
+/** Match `translation-versions` form control row pills (Source / Outdated / Current). */
+var pillBase = {
+    display: 'inline-block',
+    fontSize: '10px',
+    fontWeight: 700,
+    letterSpacing: '0.04em',
+    textTransform: 'uppercase',
+    px: 1,
+    py: '2px',
+    borderRadius: '999px',
+    lineHeight: 1.3
+};
+var translationIndicatorSx = {
+    source: __assign(__assign({}, pillBase), { backgroundColor: '#e8f1ff', color: '#0d4ea6', border: '1px solid #b6d4fe' }),
+    outdated: __assign(__assign({}, pillBase), { backgroundColor: '#fff7e6', color: '#ad6800', border: '1px solid #ffd591' }),
+    current: __assign(__assign({}, pillBase), { backgroundColor: '#f6ffed', color: '#237804', border: '1px solid #b7eb8f' })
+};
+
+function TranslationSourceBadge() {
+    return jsx(Box, { component: "span", sx: translationIndicatorSx.source, title: "Source translation (authoritative)", children: "Source" });
+}
+function TranslationOutdatedBadge() {
+    return (jsx(Box, { component: "span", sx: translationIndicatorSx.outdated, title: "Outdated translation", children: "\uD83D\uDEA9 Outdated" }));
+}
+function TranslationCurrentBadge() {
+    return (jsx(Box, { component: "span", sx: translationIndicatorSx.current, title: "This is the item you have open", children: "Current" }));
+}
+
+function normalizeRepoPath(p) {
+    return String(p !== null && p !== void 0 ? p : '')
+        .replace(/\\/g, '/')
+        .replace(/\/+$/, '');
+}
+/** Same rule as translation-versions form control: pages under website only. */
+function isPageRepoPath(p) {
+    var n = normalizeRepoPath(p).toLowerCase();
+    return n.includes('/website/') && n.endsWith('.xml');
+}
+function storePathToPreviewPath(storePath) {
+    var m = String(storePath || '').match(/^\/site\/[^/]+\/website\/([^/]+)(\/.*)?$/i);
+    if (!m) {
+        return null;
+    }
+    var locale = m[1];
+    var rest = m[2] || '';
+    var clean = rest.replace(/\/index\.xml$/i, '/').replace(/\.xml$/i, '');
+    if (!clean.startsWith('/')) {
+        clean = "/".concat(clean);
+    }
+    clean = clean.replace(/\/+/g, '/');
+    return "/".concat(locale).concat(clean);
+}
+/**
+ * One level up in the website tree: .../website/{locale}/.../child/index.xml -> .../parent/index.xml.
+ * Returns null when already at locale root (.../website/{locale}/index.xml).
+ */
+function parentWebsiteIndexStorePath(storePath) {
+    var n = normalizeRepoPath(storePath);
+    if (!n.toLowerCase().endsWith('/index.xml')) {
+        return null;
+    }
+    var folder = n.replace(/\/index\.xml$/i, '');
+    var parentFolder = folder.replace(/\/[^/]+$/, '');
+    if (!parentFolder || parentFolder === folder) {
+        return null;
+    }
+    var localeRoot = /\/website\/[^/]+$/i.test(parentFolder);
+    var hasSegmentUnderLocale = /\/website\/[^/]+\/[^/]+/i.test("".concat(parentFolder, "/"));
+    if (!localeRoot && !hasSegmentUnderLocale) {
+        return null;
+    }
+    return "".concat(parentFolder, "/index.xml");
+}
+/**
+ * Preview toolbar: icon opens a menu of locales to add this item under (mirrored path, copy + form).
+ */
+function OpenTranslationToolbarButton(props) {
+    var _this = this;
+    var _a = props.tooltip, tooltip = _a === void 0 ? 'Add to Scope' : _a, _b = props.icon, icon = _b === void 0 ? { id: '@mui/icons-material/TranslateOutlined' } : _b, _c = props.buttonSize, buttonSize = _c === void 0 ? 'small' : _c;
+    var dispatch = useDispatch();
+    var siteId = useActiveSiteId();
+    var authoringBase = useEnv().authoringBase;
+    var currentPreviewItem = useCurrentPreviewItem();
+    var sourceItem = useMemo(function () { return (currentPreviewItem ? StudioAPI.getPreviewItem(currentPreviewItem) : null); }, [currentPreviewItem]);
+    var _d = useState(null), anchorEl = _d[0], setAnchorEl = _d[1];
+    var _e = useState([]), rows = _e[0], setRows = _e[1];
+    var _f = useState(false), loading = _f[0], setLoading = _f[1];
+    var _g = useState(false), copyBusy = _g[0], setCopyBusy = _g[1];
+    var _h = useState(null), translationConfig = _h[0], setTranslationConfig = _h[1];
+    var translationConfigRef = useRef(null);
+    translationConfigRef.current = translationConfig;
+    /** Last resolved locale folder list + path context for copy-from-base and remove flows. */
+    var foldersRef = useRef([]);
+    var copyCtxRef = useRef(null);
+    var _j = useState(null), removeDialog = _j[0], setRemoveDialog = _j[1];
+    useEffect(function () {
+        var cancelled = false;
+        (function () { return __awaiter(_this, void 0, void 0, function () {
+            var cfg;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!siteId || !authoringBase) {
+                            setTranslationConfig(null);
+                            return [2 /*return*/];
+                        }
+                        return [4 /*yield*/, StudioAPI.getTranslationConfig(authoringBase, siteId, true)];
+                    case 1:
+                        cfg = _a.sent();
+                        if (!cancelled)
+                            setTranslationConfig(cfg);
+                        return [2 /*return*/];
+                }
+            });
+        }); })();
+        return function () {
+            cancelled = true;
+        };
+    }, [siteId, authoringBase]);
+    var loadTargets = useCallback(function () { return __awaiter(_this, void 0, void 0, function () {
+        var clearCopyRefs, base_1, rootDir_1, liveConfig_1, effectiveConfig_1, localeCodes, folders, parsed, relativeUnderLocale_1, metaForFolderLoc_1, hints, sourceKey_1, sourceFolder, sourcePathForStale, sourceModifiedMs_1, previewNorm_1, allRows;
+        var _this = this;
+        var _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    setLoading(true);
+                    clearCopyRefs = function () {
+                        foldersRef.current = [];
+                        copyCtxRef.current = null;
+                    };
+                    _b.label = 1;
+                case 1:
+                    _b.trys.push([1, , 7, 8]);
+                    base_1 = authoringBase || '';
+                    if (!siteId || !base_1 || !(sourceItem === null || sourceItem === void 0 ? void 0 : sourceItem.path)) {
+                        setRows([]);
+                        clearCopyRefs();
+                        return [2 /*return*/];
+                    }
+                    rootDir_1 = getWebsiteComponentsRootDir(sourceItem.path);
+                    if (!rootDir_1) {
+                        setRows([]);
+                        clearCopyRefs();
+                        return [2 /*return*/];
+                    }
+                    return [4 /*yield*/, StudioAPI.getTranslationConfig(base_1, siteId, true)];
+                case 2:
+                    liveConfig_1 = _b.sent();
+                    if (liveConfig_1) {
+                        setTranslationConfig(function (prev) {
+                            return translationConfigsEqual(prev, liveConfig_1) ? prev : liveConfig_1;
+                        });
+                    }
+                    effectiveConfig_1 = liveConfig_1 !== null && liveConfig_1 !== void 0 ? liveConfig_1 : translationConfigRef.current;
+                    localeCodes = ((_a = effectiveConfig_1 === null || effectiveConfig_1 === void 0 ? void 0 : effectiveConfig_1.languages) !== null && _a !== void 0 ? _a : [])
+                        .map(function (l) { return l.locale; })
+                        .filter(function (c) { return Boolean(c); });
+                    if (localeCodes.length < 2) {
+                        setRows([]);
+                        clearCopyRefs();
+                        return [2 /*return*/];
+                    }
+                    return [4 /*yield*/, resolveLocaleFoldersOnSite(base_1, siteId, rootDir_1, localeCodes, effectiveConfig_1 === null || effectiveConfig_1 === void 0 ? void 0 : effectiveConfig_1.baseLanguage)];
+                case 3:
+                    folders = _b.sent();
+                    if (!folders) {
+                        setRows([]);
+                        clearCopyRefs();
+                        return [2 /*return*/];
+                    }
+                    parsed = parseLocaleRelative(sourceItem.path, rootDir_1, folders);
+                    relativeUnderLocale_1 = parsed
+                        ? parsed.relativeUnderLocale
+                        : (function () {
+                            var prefix = "".concat(rootDir_1.replace(/\/$/, ''), "/");
+                            if (!sourceItem.path.startsWith(prefix)) {
+                                return null;
+                            }
+                            var rest = sourceItem.path.slice(prefix.length);
+                            if (!rest || rest.startsWith('/')) {
+                                return null;
+                            }
+                            return "/".concat(rest);
+                        })();
+                    if (!relativeUnderLocale_1) {
+                        setRows([]);
+                        clearCopyRefs();
+                        return [2 /*return*/];
+                    }
+                    foldersRef.current = folders;
+                    copyCtxRef.current = { rootDir: rootDir_1, relativeUnderLocale: relativeUnderLocale_1 };
+                    metaForFolderLoc_1 = function (loc) {
+                        var _a;
+                        var row = (_a = effectiveConfig_1 === null || effectiveConfig_1 === void 0 ? void 0 : effectiveConfig_1.languages) === null || _a === void 0 ? void 0 : _a.find(function (l) { return localeSegmentsCompatible(l.locale, loc); });
+                        return {
+                            label: (row === null || row === void 0 ? void 0 : row.label) || loc,
+                            flag: ((row === null || row === void 0 ? void 0 : row.flag) && String(row.flag).trim()) || getFlagForLocale(loc)
+                        };
+                    };
+                    return [4 /*yield*/, StudioAPI.getTranslationLocaleHints(base_1, siteId, sourceItem.path)];
+                case 4:
+                    hints = _b.sent();
+                    sourceKey_1 = hints.sourceLocaleCode;
+                    sourceFolder = sourceKey_1 !== '' ? folders.find(function (f) { return localeSegmentsCompatible(f, sourceKey_1); }) : undefined;
+                    sourcePathForStale = sourceFolder != null ? pathForLocale(rootDir_1, relativeUnderLocale_1, sourceFolder) : sourceItem.path;
+                    return [4 /*yield*/, StudioAPI.getItemModifiedTimestamp(base_1, siteId, sourcePathForStale)];
+                case 5:
+                    sourceModifiedMs_1 = _b.sent();
+                    previewNorm_1 = normalizeRepoPath(sourceItem.path);
+                    return [4 /*yield*/, Promise.all(folders.map(function (loc) { return __awaiter(_this, void 0, void 0, function () {
+                            var targetFilePath, exists, meta, targetModifiedMs, _a, isSource, isOutdated, isCurrentPreview;
+                            return __generator(this, function (_b) {
+                                switch (_b.label) {
+                                    case 0:
+                                        targetFilePath = pathForLocale(rootDir_1, relativeUnderLocale_1, loc);
+                                        return [4 /*yield*/, StudioAPI.contentExists(base_1, siteId, targetFilePath)];
+                                    case 1:
+                                        exists = _b.sent();
+                                        meta = metaForFolderLoc_1(loc);
+                                        if (!exists) return [3 /*break*/, 3];
+                                        return [4 /*yield*/, StudioAPI.getItemModifiedTimestamp(base_1, siteId, targetFilePath)];
+                                    case 2:
+                                        _a = _b.sent();
+                                        return [3 /*break*/, 4];
+                                    case 3:
+                                        _a = null;
+                                        _b.label = 4;
+                                    case 4:
+                                        targetModifiedMs = _a;
+                                        isSource = Boolean(sourceKey_1 && localeSegmentsCompatible(loc, sourceKey_1));
+                                        isOutdated = Boolean(exists) &&
+                                            !isSource &&
+                                            sourceModifiedMs_1 != null &&
+                                            targetModifiedMs != null &&
+                                            targetModifiedMs < sourceModifiedMs_1;
+                                        isCurrentPreview = normalizeRepoPath(targetFilePath) === previewNorm_1;
+                                        return [2 /*return*/, {
+                                                locale: loc,
+                                                label: meta.label,
+                                                flag: meta.flag,
+                                                targetFilePath: targetFilePath,
+                                                destinationParentPath: parentFolderPath(targetFilePath),
+                                                exists: exists,
+                                                isOutdated: isOutdated,
+                                                isSource: isSource,
+                                                isCurrentPreview: isCurrentPreview
+                                            }];
+                                }
+                            });
+                        }); }))];
+                case 6:
+                    allRows = _b.sent();
+                    setRows(allRows);
+                    return [3 /*break*/, 8];
+                case 7:
+                    setLoading(false);
+                    return [7 /*endfinally*/];
+                case 8: return [2 /*return*/];
+            }
+        });
+    }); }, [siteId, authoringBase, sourceItem === null || sourceItem === void 0 ? void 0 : sourceItem.path]);
+    var openRemoveDialog = function (row) { return __awaiter(_this, void 0, void 0, function () {
+        var res, selected_1;
+        var _b, _c, _d;
+        return __generator(this, function (_e) {
+            switch (_e.label) {
+                case 0:
+                    if (!siteId || !authoringBase) {
+                        return [2 /*return*/];
+                    }
+                    setAnchorEl(null);
+                    setRemoveDialog({
+                        pagePath: row.targetFilePath,
+                        label: row.label,
+                        loading: true,
+                        candidates: [],
+                        selected: {}
+                    });
+                    _e.label = 1;
+                case 1:
+                    _e.trys.push([1, 3, , 4]);
+                    return [4 /*yield*/, StudioAPI.fetchTranslationRemoveCandidates(authoringBase, siteId, row.targetFilePath)];
+                case 2:
+                    res = _e.sent();
+                    selected_1 = {};
+                    ((_b = res.candidates) !== null && _b !== void 0 ? _b : []).forEach(function (c) {
+                        if (c.path) {
+                            selected_1[c.path] = true;
+                        }
+                    });
+                    setRemoveDialog({
+                        pagePath: row.targetFilePath,
+                        label: row.label,
+                        loading: false,
+                        candidates: (_c = res.candidates) !== null && _c !== void 0 ? _c : [],
+                        selected: selected_1,
+                        error: res.ok ? undefined : (_d = res.message) !== null && _d !== void 0 ? _d : 'Could not load removable components.'
+                    });
+                    return [3 /*break*/, 4];
+                case 3:
+                    _e.sent();
+                    setRemoveDialog({
+                        pagePath: row.targetFilePath,
+                        label: row.label,
+                        loading: false,
+                        candidates: [],
+                        selected: {},
+                        error: 'Network error loading removable components.'
+                    });
+                    return [3 /*break*/, 4];
+                case 4: return [2 /*return*/];
+            }
+        });
+    }); };
+    var closeRemoveDialog = function () {
+        setRemoveDialog(null);
+    };
+    var confirmRemoveTranslation = function () { return __awaiter(_this, void 0, void 0, function () {
+        var pagePath, label, paths, currentPreviewNorm, res, failed, deletedList, pageRemoved, removedWhatWeWerePreviewing, parentCandidate, previewUrl;
+        var _b, _c, _d;
+        return __generator(this, function (_e) {
+            switch (_e.label) {
+                case 0:
+                    if (!removeDialog || removeDialog.loading || removeDialog.submitting || !siteId || !authoringBase) {
+                        return [2 /*return*/];
+                    }
+                    pagePath = removeDialog.pagePath;
+                    label = removeDialog.label;
+                    paths = Object.keys(removeDialog.selected).filter(function (p) { return removeDialog.selected[p]; });
+                    currentPreviewNorm = normalizeRepoPath((_b = sourceItem === null || sourceItem === void 0 ? void 0 : sourceItem.path) !== null && _b !== void 0 ? _b : '');
+                    setRemoveDialog(function (prev) { return (prev ? __assign(__assign({}, prev), { submitting: true, error: undefined }) : prev); });
+                    _e.label = 1;
+                case 1:
+                    _e.trys.push([1, 11, , 12]);
+                    return [4 /*yield*/, StudioAPI.postTranslationRemove(authoringBase, siteId, pagePath, paths, true)];
+                case 2:
+                    res = _e.sent();
+                    failed = (_c = res.failed) !== null && _c !== void 0 ? _c : [];
+                    deletedList = (_d = res.deleted) !== null && _d !== void 0 ? _d : [];
+                    pageRemoved = deletedList.some(function (p) { return normalizeRepoPath(p) === normalizeRepoPath(pagePath); });
+                    removedWhatWeWerePreviewing = pageRemoved && currentPreviewNorm && currentPreviewNorm === normalizeRepoPath(pagePath);
+                    if (failed.length) {
+                        dispatch(showSystemNotification({
+                            message: "Remove finished with issues: ".concat(failed.map(function (f) { var _a, _b; return "".concat((_a = f.path) !== null && _a !== void 0 ? _a : '', " ").concat((_b = f.message) !== null && _b !== void 0 ? _b : '').trim(); }).join('; '))
+                        }));
+                    }
+                    else {
+                        dispatch(showSystemNotification({
+                            message: "Removed translation: ".concat(label)
+                        }));
+                    }
+                    closeRemoveDialog();
+                    if (!removedWhatWeWerePreviewing) return [3 /*break*/, 9];
+                    parentCandidate = parentWebsiteIndexStorePath(pagePath);
+                    _e.label = 3;
+                case 3:
+                    if (!parentCandidate) return [3 /*break*/, 7];
+                    return [4 /*yield*/, StudioAPI.contentExists(authoringBase, siteId, parentCandidate)];
+                case 4:
+                    if (!_e.sent()) return [3 /*break*/, 6];
+                    previewUrl = storePathToPreviewPath(parentCandidate);
+                    if (previewUrl) {
+                        dispatch(changeCurrentUrl(previewUrl));
+                    }
+                    else {
+                        dispatch(goToLastPage());
+                    }
+                    return [4 /*yield*/, loadTargets()];
+                case 5:
+                    _e.sent();
+                    return [2 /*return*/];
+                case 6:
+                    parentCandidate = parentWebsiteIndexStorePath(parentCandidate);
+                    return [3 /*break*/, 3];
+                case 7:
+                    dispatch(goToLastPage());
+                    return [4 /*yield*/, loadTargets()];
+                case 8:
+                    _e.sent();
+                    return [2 /*return*/];
+                case 9: return [4 /*yield*/, loadTargets()];
+                case 10:
+                    _e.sent();
+                    return [3 /*break*/, 12];
+                case 11:
+                    _e.sent();
+                    dispatch(showSystemNotification({
+                        message: 'Remove translation failed (network).'
+                    }));
+                    setRemoveDialog(function (prev) { return (prev ? __assign(__assign({}, prev), { submitting: false }) : prev); });
+                    return [3 /*break*/, 12];
+                case 12: return [2 /*return*/];
+            }
+        });
+    }); };
+    useEffect(function () {
+        void loadTargets();
+    }, [loadTargets]);
+    var openMenu = function (event) {
+        setAnchorEl(event.currentTarget);
+        void loadTargets();
+    };
+    var closeMenu = function () {
+        setAnchorEl(null);
+    };
+    var handleTranslateTo = function (target) { return __awaiter(_this, void 0, void 0, function () {
+        var ctx, cfg_1, folders, copySource, baseFolder, candidate, existsBase, res, pastedPath;
+        var _b;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
+                case 0:
+                    if (!(sourceItem === null || sourceItem === void 0 ? void 0 : sourceItem.path) || !siteId || !authoringBase || copyBusy) {
+                        return [2 /*return*/];
+                    }
+                    setCopyBusy(true);
+                    _c.label = 1;
+                case 1:
+                    _c.trys.push([1, 6, 7, 8]);
+                    ctx = copyCtxRef.current;
+                    cfg_1 = translationConfigRef.current;
+                    folders = foldersRef.current;
+                    copySource = sourceItem.path;
+                    if (!(ctx && folders.length && (cfg_1 === null || cfg_1 === void 0 ? void 0 : cfg_1.baseLanguage))) return [3 /*break*/, 3];
+                    baseFolder = folders.find(function (f) { return localeSegmentsCompatible(f, cfg_1.baseLanguage); });
+                    if (!baseFolder) return [3 /*break*/, 3];
+                    candidate = pathForLocale(ctx.rootDir, ctx.relativeUnderLocale, baseFolder);
+                    return [4 /*yield*/, StudioAPI.contentExists(authoringBase, siteId, candidate)];
+                case 2:
+                    existsBase = _c.sent();
+                    if (existsBase) {
+                        copySource = candidate;
+                    }
+                    _c.label = 3;
+                case 3: return [4 /*yield*/, StudioAPI.copyItem(authoringBase, siteId, copySource, target.destinationParentPath, target.targetFilePath)];
+                case 4:
+                    res = _c.sent();
+                    pastedPath = ((res === null || res === void 0 ? void 0 : res.pastedPath) || ((_b = res === null || res === void 0 ? void 0 : res.items) === null || _b === void 0 ? void 0 : _b[0]));
+                    if (!(res === null || res === void 0 ? void 0 : res.ok) || !pastedPath) {
+                        dispatch(showSystemNotification({
+                            message: (res === null || res === void 0 ? void 0 : res.message) || "Could not translate to ".concat(target.label, ".")
+                        }));
+                        return [2 /*return*/];
+                    }
+                    dispatch(showSystemNotification({
+                        message: "Copied to ".concat(target.label, ": ").concat(pastedPath)
+                    }));
+                    openEditFormStudioDispatch(dispatch, siteId, pastedPath, authoringBase);
+                    return [4 /*yield*/, loadTargets()];
+                case 5:
+                    _c.sent();
+                    return [3 /*break*/, 8];
+                case 6:
+                    _c.sent();
+                    dispatch(showSystemNotification({
+                        message: "Could not translate to ".concat(target.label, ".")
+                    }));
+                    return [3 /*break*/, 8];
+                case 7:
+                    setCopyBusy(false);
+                    return [7 /*endfinally*/];
+                case 8: return [2 /*return*/];
+            }
+        });
+    }); };
+    var disabledCore = !siteId || !authoringBase || !(sourceItem === null || sourceItem === void 0 ? void 0 : sourceItem.path);
+    var menuOpen = Boolean(anchorEl);
+    var openPreview = function (targetPath) {
+        var previewPath = storePathToPreviewPath(targetPath);
+        closeMenu();
+        if (previewPath) {
+            var sep = previewPath.includes('?') ? '&' : '?';
+            window.location.assign("".concat(previewPath).concat(sep, "crafterSite=").concat(encodeURIComponent(siteId)));
+            return;
+        }
+        openEditFormStudioDispatch(dispatch, siteId, targetPath, authoringBase);
+    };
+    var showStudioItemMegaMenu = function (event, path) {
+        event.preventDefault();
+        event.stopPropagation();
+        dispatch({
+            type: 'SHOW_ITEM_MEGA_MENU',
+            payload: {
+                path: path,
+                anchorReference: 'anchorPosition',
+                anchorPosition: {
+                    top: typeof event.clientY === 'number' ? event.clientY : 0,
+                    left: typeof event.clientX === 'number' ? event.clientX : 0
+                }
+            }
+        });
+    };
+    var tooltipText = disabledCore
+        ? 'Select an item in preview'
+        : loading && menuOpen
+            ? 'Loading locales…'
+            : tooltip;
+    if (!hasConfiguredTranslationLocales(translationConfig)) {
+        return null;
+    }
+    return (jsxs(Fragment, { children: [jsx(Tooltip$1, { title: tooltipText, children: jsx("span", { children: jsx(IconButton, { size: buttonSize, onClick: openMenu, disabled: disabledCore || copyBusy, "aria-label": tooltip, "aria-haspopup": "true", "aria-expanded": menuOpen ? 'true' : undefined, children: jsx(SystemIcon, { icon: icon }) }) }) }), jsx(Menu, { anchorEl: anchorEl, open: menuOpen, onClose: closeMenu, anchorOrigin: { vertical: 'bottom', horizontal: 'right' }, transformOrigin: { vertical: 'top', horizontal: 'right' }, PaperProps: { sx: { minWidth: 220 } }, children: loading ? (jsx(MenuItem, { disabled: true, dense: true, children: jsx(Box, { sx: { display: 'flex', alignItems: 'center', gap: 1, py: 0.5 }, children: "Loading\u2026" }) })) : rows.length === 0 ? (jsx(MenuItem, { disabled: true, dense: true, sx: { bgcolor: 'background.paper', alignItems: 'flex-start' }, children: jsxs(Box, { component: "div", sx: {
+                            whiteSpace: 'normal',
+                            py: 0.75,
+                            fontSize: '0.8125rem',
+                            lineHeight: 1.45,
+                            maxWidth: 320,
+                            color: 'text.primary'
+                        }, children: ["No locales loaded. The menu only uses ", jsx(Box, { component: "code", children: "translation-config.xml" }), " (via the plugin REST script). Fix the script response or XML, confirm the plugin is installed for this site, and use a preview item under ", jsx(Box, { component: "code", children: "/site/\u2026/website" }), " or ", jsx(Box, { component: "code", children: "/site/\u2026/components" }), "."] }) })) : (rows.map(function (o) {
+                    var showRemove = o.exists && !o.isSource && isPageRepoPath(o.targetFilePath);
+                    return (jsxs(MenuItem, { dense: true, disabled: copyBusy, onClick: o.exists ? function () { return openPreview(o.targetFilePath); } : undefined, sx: { py: 1 }, children: [jsxs(Box, { component: "span", sx: {
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: 1,
+                                    flexWrap: 'wrap',
+                                    typography: 'body2',
+                                    flex: 1,
+                                    minWidth: 0
+                                }, children: [jsx(Box, { component: "span", sx: { fontSize: '1.25rem', lineHeight: 1 }, "aria-hidden": true, children: o.flag }), jsx(Box, { component: "span", sx: { minWidth: 100 }, children: o.label }), jsxs(Box, { component: "span", sx: { display: 'inline-flex', flexWrap: 'wrap', gap: 0.5, alignItems: 'center' }, children: [o.isSource ? jsx(TranslationSourceBadge, {}) : null, o.isOutdated ? jsx(TranslationOutdatedBadge, {}) : null, o.isCurrentPreview ? jsx(TranslationCurrentBadge, {}) : null] })] }), jsx(Box, { sx: { ml: 'auto', display: 'inline-flex', alignItems: 'center', gap: 0.5 }, children: o.exists ? (jsxs(Fragment, { children: [showRemove ? (jsx(Tooltip$1, { title: o.isCurrentPreview
+                                                ? 'Remove this translation (preview moves to the parent page, or back if there is no parent)'
+                                                : 'Remove this translated page (and optional locale-only components)', children: jsx(IconButton, { size: "small", color: "error", onClick: function (e) {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    void openRemoveDialog(o);
+                                                }, "aria-label": "Remove translation ".concat(o.label), children: jsx(DeleteOutlineIcon, { fontSize: "small" }) }) })) : null, jsx(IconButton, { size: "small", onClick: function (e) {
+                                                e.stopPropagation();
+                                                showStudioItemMegaMenu(e, o.targetFilePath);
+                                            }, "aria-label": "Options for ".concat(o.label), children: "\u22EE" })] })) : (jsx(Box, { component: "button", type: "button", onClick: function (e) {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        void handleTranslateTo(o);
+                                    }, disabled: copyBusy, sx: {
+                                        border: 'none',
+                                        borderRadius: 1,
+                                        px: 1,
+                                        py: 0.25,
+                                        fontSize: '0.75rem',
+                                        color: 'white',
+                                        bgcolor: copyBusy ? 'grey.400' : 'primary.main',
+                                        cursor: copyBusy ? 'not-allowed' : 'pointer'
+                                    }, children: "Add to Scope" })) })] }, o.locale));
+                })) }), jsx(Dialog$1, { open: Boolean(removeDialog), onClose: (removeDialog === null || removeDialog === void 0 ? void 0 : removeDialog.submitting) ? undefined : closeRemoveDialog, maxWidth: "sm", fullWidth: true, children: removeDialog ? (jsxs(Fragment, { children: [jsx(DialogTitle$1, { children: "Remove translation" }), jsxs(DialogContent$1, { dividers: true, children: [removeDialog.loading ? (jsx(Typography$1, { variant: "body2", color: "text.secondary", children: "Loading removable components\u2026" })) : null, removeDialog.error ? (jsx(Typography$1, { variant: "body2", color: "error", sx: { mb: 1 }, children: removeDialog.error })) : null, !removeDialog.loading && !removeDialog.error && removeDialog.candidates.length === 0 ? (jsx(Typography$1, { variant: "body2", color: "text.secondary", sx: { mb: 1 }, children: "No locale-only components were found that are safe to delete automatically. The translated page will still be removed." })) : null, removeDialog.candidates.length > 0 ? (jsxs(Fragment, { children: [jsx(Typography$1, { variant: "subtitle2", sx: { mb: 1 }, children: "Also delete these components (checked by default)" }), jsxs(Box, { sx: { display: 'flex', gap: 1, mb: 1 }, children: [jsx(Button, { size: "small", onClick: function () {
+                                                        return setRemoveDialog(function (prev) {
+                                                            if (!prev || prev.loading) {
+                                                                return prev;
+                                                            }
+                                                            var next = {};
+                                                            prev.candidates.forEach(function (c) {
+                                                                if (c.path) {
+                                                                    next[c.path] = true;
+                                                                }
+                                                            });
+                                                            return __assign(__assign({}, prev), { selected: next });
+                                                        });
+                                                    }, children: "Select all" }), jsx(Button, { size: "small", onClick: function () {
+                                                        return setRemoveDialog(function (prev) {
+                                                            if (!prev || prev.loading) {
+                                                                return prev;
+                                                            }
+                                                            var next = {};
+                                                            prev.candidates.forEach(function (c) {
+                                                                if (c.path) {
+                                                                    next[c.path] = false;
+                                                                }
+                                                            });
+                                                            return __assign(__assign({}, prev), { selected: next });
+                                                        });
+                                                    }, children: "Select none" })] }), removeDialog.candidates.map(function (c) { return (jsx(FormControlLabel$1, { control: jsx(Checkbox$1, { size: "small", checked: Boolean(removeDialog.selected[c.path]), disabled: Boolean(removeDialog.submitting), onChange: function (ev) {
+                                                    var checked = ev.target.checked;
+                                                    setRemoveDialog(function (prev) {
+                                                        var _a;
+                                                        if (!prev) {
+                                                            return prev;
+                                                        }
+                                                        return __assign(__assign({}, prev), { selected: __assign(__assign({}, prev.selected), (_a = {}, _a[c.path] = checked, _a)) });
+                                                    });
+                                                } }), label: jsxs(Box, { children: [jsx(Typography$1, { variant: "body2", children: c.internalName || '(no internal name)' }), jsx(Typography$1, { variant: "caption", color: "text.secondary", sx: { wordBreak: 'break-all' }, children: c.path })] }), sx: { alignItems: 'flex-start', ml: 0, display: 'flex' } }, c.path)); })] })) : null, jsx(Typography$1, { variant: "caption", color: "warning.main", sx: { display: 'block', mt: 2 }, children: "The translated page will be deleted. This cannot be undone." })] }), jsxs(DialogActions$1, { children: [jsx(Button, { onClick: closeRemoveDialog, disabled: Boolean(removeDialog.submitting), children: "Cancel" }), jsx(Button, { color: "error", variant: "contained", disabled: Boolean(removeDialog.loading || removeDialog.submitting), onClick: function () { return void confirmRemoveTranslation(); }, children: removeDialog.submitting ? 'Removing…' : 'Remove translation' })] })] })) : null })] }));
+}
+
 var plugin = {
     locales: undefined,
     scripts: undefined,
@@ -50345,8 +53412,12 @@ var plugin = {
         'org.rd.plugin.uigoodies.LogTail': LogTail,
         'org.rd.plugin.uigoodies.ImageStudio': ImageStudio,
         'org.rd.plugin.uigoodies.openImageStudioPanelButton': OpenImageStudioPanelButton,
-        'org.rd.plugin.uigoodies.DevContentOpsTools': DevContentOpsTools
+        'org.rd.plugin.uigoodies.DevContentOpsTools': DevContentOpsTools,
+        'org.rd.plugin.uigoodies.TranslationConfigTools': TranslationConfigTools,
+        'org.rd.plugin.uigoodies.TranslationDialog': TranslationDialog,
+        'org.rd.plugin.uigoodies.openTranslationPanelButton': OpenTranslationPanelButton,
+        'org.rd.plugin.uigoodies.openTranslationToolbarButton': OpenTranslationToolbarButton
     }
 };
 
-export { AudienceTargetingFlyoutToolbarButton, BulkPublishView, ComponentPreviewPathNavigator, ContentUpload, CopyCurrentPageUrl, CrossSiteContentCopy, CrossSiteContentTypeCopy, DevContentOpsTools, DeviceSimulatorFlyoutToolbarButton, EditOrViewCurrent, ImageStudio, LogTail, OpenBulkPublishPanelButton, OpenBulkPublishToolbarButton, OpenCannedSearchPanelButton, OpenCannedSearchToolbarButton, OpenContentUploadPanelButton, OpenContentUploadToolbarButton, OpenImageStudioPanelButton, OpenSearchPlayground, PublishOrRequestPublish, PullPushRemoteButtons, ToolPanelAccordion, plugin as default };
+export { AudienceTargetingFlyoutToolbarButton, BulkPublishView, ComponentPreviewPathNavigator, ContentUpload, CopyCurrentPageUrl, CrossSiteContentCopy, CrossSiteContentTypeCopy, DevContentOpsTools, DeviceSimulatorFlyoutToolbarButton, EditOrViewCurrent, ImageStudio, LogTail, OpenBulkPublishPanelButton, OpenBulkPublishToolbarButton, OpenCannedSearchPanelButton, OpenCannedSearchToolbarButton, OpenContentUploadPanelButton, OpenContentUploadToolbarButton, OpenImageStudioPanelButton, OpenSearchPlayground, OpenTranslationPanelButton, OpenTranslationToolbarButton, PublishOrRequestPublish, PullPushRemoteButtons, ToolPanelAccordion, TranslationConfigTools, TranslationDialog, plugin as default };

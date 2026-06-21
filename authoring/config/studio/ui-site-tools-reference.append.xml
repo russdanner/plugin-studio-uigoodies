@@ -1,0 +1,68 @@
+        <reference id="craftercms.siteTools">
+            <tools>
+                <tool>
+                    <title id="dropTargetsMessages.contentTypes" defaultMessage="Content Types"/>
+                    <icon id="@mui/icons-material/WidgetsOutlined"/>
+                    <url>content-types</url>
+                    <widget id="craftercms.components.ContentTypeManagement"/>
+                </tool>
+                <tool>
+                    <title id="GlobalMenu.EncryptionToolEntryLabel" defaultMessage="Encryption Tool"/>
+                    <icon id="@mui/icons-material/LockOutlined"/>
+                    <url>encrypt-tool</url>
+                    <widget id="craftercms.components.SiteEncryptTool"/>
+                </tool>
+                <tool>
+                    <title id="words.configuration" defaultMessage="Configuration"/>
+                    <icon id="@mui/icons-material/SettingsApplicationsOutlined"/>
+                    <url>configuration</url>
+                    <widget id="craftercms.components.SiteConfigurationManagement"/>
+                </tool>
+                <tool>
+                    <title id="GlobalMenu.AuditEntryLabel" defaultMessage="Audit"/>
+                    <icon id="@mui/icons-material/SubjectRounded"/>
+                    <url>audit</url>
+                    <widget id="craftercms.components.SiteAuditManagement"/>
+                </tool>
+                <tool>
+                    <title id="workflowStates.title" defaultMessage="Workflow States"/>
+                    <icon id="@mui/icons-material/SettingsOutlined"/>
+                    <url>item-states</url>
+                    <widget id="craftercms.components.WorkflowStateManagement"/>
+                </tool>
+                <tool>
+                    <title id="GlobalMenu.LogConsoleEntryLabel" defaultMessage="Log Console"/>
+                    <icon id="@mui/icons-material/FormatAlignCenterRounded"/>
+                    <url>log</url>
+                    <widget id="craftercms.components.LogConsole">
+                        <configuration>
+                            <logType>preview</logType>
+                        </configuration>
+                    </widget>
+                </tool>
+                <tool>
+                    <title id="words.publishing" defaultMessage="Publishing"/>
+                    <icon id="@mui/icons-material/CloudUploadOutlined"/>
+                    <url>publishing</url>
+                    <widget id="craftercms.components.PublishingDashboard"/>
+                </tool>
+                <tool>
+                    <title id="words.git" defaultMessage="Git"/>
+                    <icon id="craftercms.icons.Git"/>
+                    <url>git</url>
+                    <widget id="craftercms.components.GitManagement"/>
+                </tool>
+                <tool>
+                    <title>GraphQL</title>
+                    <icon id="craftercms.icons.GraphQL"/>
+                    <url>graphiql</url>
+                    <widget id="craftercms.components.SiteGraphiQL"/>
+                </tool>
+                <tool>
+                    <title id="PluginManagement.title" defaultMessage="Plugin Management"/>
+                    <icon id="@mui/icons-material/ExtensionOutlined"/>
+                    <url>plugins</url>
+                    <widget id="craftercms.components.PluginManagement"/>
+                </tool>
+            </tools>
+        </reference>

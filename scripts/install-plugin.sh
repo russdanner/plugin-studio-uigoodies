@@ -21,7 +21,7 @@ if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
   echo "  SKIP_YARN_DIST=1       Skip UI build (bundle must already exist)." >&2
   echo "  SKIP_SCRIPT_RELOAD=1   Skip Groovy script reload after copy." >&2
   echo "  SKIP_WHITELIST=1       Do not merge sandbox whitelist fragment (default: skip)." >&2
-  echo "  SKIP_UI_XML=1          Do not merge Image Studio / DevContentOps into config/studio/ui.xml." >&2
+  echo "  SKIP_UI_XML=1          Do not merge Image Studio / DevContentOps / Translation into config/studio/ui.xml." >&2
   echo "" >&2
   echo "IMPORTANT: marketplace/copy reads 'path' from the Studio server's filesystem." >&2
   echo "  Run this script ON the Studio host (or set path to a clone on that host)." >&2
@@ -40,7 +40,13 @@ WHITELIST_APPEND="${PLUGIN_PATH}/authoring/config/studio/extension/groovy/uigood
 UI_XML_FRAGMENT="${PLUGIN_PATH}/authoring/config/studio/ui-image-studio-widget.append.xml"
 IMAGE_STUDIO_WIDGET_ID="org.rd.plugin.uigoodies.openImageStudioPanelButton"
 UI_SITE_TOOLS_FRAGMENT="${PLUGIN_PATH}/authoring/config/studio/ui-dev-content-ops-tools.append.xml"
+UI_TRANSLATION_CONFIG_TOOLS_FRAGMENT="${PLUGIN_PATH}/authoring/config/studio/ui-translation-config-tools.append.xml"
+UI_TRANSLATION_TOOLBAR_FRAGMENT="${PLUGIN_PATH}/authoring/config/studio/ui-translation-toolbar.append.xml"
+UI_SITE_TOOLS_REFERENCE_FRAGMENT="${PLUGIN_PATH}/authoring/config/studio/ui-site-tools-reference.append.xml"
 DEV_CONTENT_OPS_TOOL_ID="org.rd.plugin.uigoodies.DevContentOpsTools"
+TRANSLATION_CONFIG_TOOL_ID="org.rd.plugin.uigoodies.TranslationConfigTools"
+TRANSLATION_TOOLBAR_WIDGET_ID="org.rd.plugin.uigoodies.openTranslationToolbarButton"
+SITE_TOOLS_REFERENCE_ID="craftercms.siteTools"
 MARKER="# Studio UI Goodies plugin (org.rd.plugin.uigoodies)"
 
 if ! studio_require_token; then
@@ -49,6 +55,15 @@ fi
 if ! studio_verify_token "${STUDIO_URL}"; then
   exit 2
 fi
+
+run_yarn_dist() {
+  local pkg_dir="$1"
+  (
+    cd "${pkg_dir}"
+    yarn install
+    yarn dist
+  )
+}
 
 build_ui() {
   if [[ "${SKIP_YARN_DIST:-}" == "1" ]]; then
@@ -63,11 +78,10 @@ build_ui() {
   major="$(node -p "parseInt(process.versions.node,10)||0" 2>/dev/null || echo 0)"
   if [[ "${major}" -ge 18 ]]; then
     echo "Building UI bundle (Node ${major})..."
-    (
-      cd "${PLUGIN_PATH}/src/packages/uigoodies-components"
-      yarn install
-      yarn dist
-    )
+    run_yarn_dist "${PLUGIN_PATH}/src/packages/uigoodies-components"
+    echo "Building translation form controls..."
+    run_yarn_dist "${PLUGIN_PATH}/src/packages/custom-locale"
+    run_yarn_dist "${PLUGIN_PATH}/src/packages/translation-versions"
     return 0
   fi
   if command -v docker >/dev/null 2>&1; then
@@ -76,6 +90,16 @@ build_ui() {
     docker run --rm \
       -v "${PLUGIN_PATH}:/work" \
       -w /work/src/packages/uigoodies-components \
+      "${img}" \
+      bash -lc "corepack enable && yarn install && yarn dist"
+    docker run --rm \
+      -v "${PLUGIN_PATH}:/work" \
+      -w /work/src/packages/custom-locale \
+      "${img}" \
+      bash -lc "corepack enable && yarn install && yarn dist"
+    docker run --rm \
+      -v "${PLUGIN_PATH}:/work" \
+      -w /work/src/packages/translation-versions \
       "${img}" \
       bash -lc "corepack enable && yarn install && yarn dist"
     return 0
@@ -240,6 +264,52 @@ elif [[ "${SKIP_UI_XML:-}" != "1" && ! -f "${SITE_UI_XML}" ]]; then
   echo "Note: site ui.xml not found at ${SITE_UI_XML} — merge Image Studio widget manually."
 fi
 
+if [[ "${SKIP_UI_XML:-}" != "1" && -f "${SITE_UI_XML}" && -f "${UI_SITE_TOOLS_REFERENCE_FRAGMENT}" ]]; then
+  if grep -qF "reference id=\"${SITE_TOOLS_REFERENCE_ID}\"" "${SITE_UI_XML}" 2>/dev/null; then
+    echo "Project Tools reference (craftercms.siteTools) already present in ui.xml."
+  else
+    echo "Merging craftercms.siteTools reference into config/studio/ui.xml..."
+    python3 - "${SITE_UI_XML}" "${UI_SITE_TOOLS_REFERENCE_FRAGMENT}" "${SITE_TOOLS_REFERENCE_ID}" <<'PY'
+import re
+import sys
+from pathlib import Path
+
+ui_path = Path(sys.argv[1])
+fragment_path = Path(sys.argv[2])
+reference_id = sys.argv[3]
+
+def normalize_fragment(raw: str) -> str:
+    raw = re.sub(r"^\s*<\?xml[^?]*\?>\s*", "", raw, count=1)
+    raw = re.sub(r"<!--.*?-->", "", raw, flags=re.DOTALL)
+    return raw.strip() + "\n"
+
+text = ui_path.read_text(encoding="utf-8")
+fragment = normalize_fragment(fragment_path.read_text(encoding="utf-8"))
+if f'reference id="{reference_id}"' in text:
+    sys.exit(0)
+refs_open = text.find("<references>")
+if refs_open == -1:
+    refs_close = text.rfind("</siteUi>")
+    if refs_close == -1:
+        print("Warning: <references> and </siteUi> not found — add craftercms.siteTools manually.", file=sys.stderr)
+        sys.exit(0)
+    insert = "    <references>\n" + fragment + "    </references>\n"
+    updated = text[:refs_close] + insert + text[refs_close:]
+else:
+    refs_close = text.find("</references>", refs_open)
+    if refs_close == -1:
+        print("Warning: </references> not found — add craftercms.siteTools manually.", file=sys.stderr)
+        sys.exit(0)
+    updated = text[:refs_close] + fragment + text[refs_close:]
+ui_path.write_text(updated, encoding="utf-8")
+print("craftercms.siteTools reference merged into ui.xml.")
+PY
+    if git -C "${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+      git -C "${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox" add "config/studio/ui.xml" 2>/dev/null || true
+    fi
+  fi
+fi
+
 if [[ "${SKIP_UI_XML:-}" != "1" && -f "${SITE_UI_XML}" && -f "${UI_SITE_TOOLS_FRAGMENT}" ]]; then
   if grep -qF "${DEV_CONTENT_OPS_TOOL_ID}" "${SITE_UI_XML}" 2>/dev/null; then
     echo "DevContentOps Tools already present in ui.xml."
@@ -282,6 +352,124 @@ PY
   fi
 elif [[ "${SKIP_UI_XML:-}" != "1" && ! -f "${SITE_UI_XML}" ]]; then
   echo "Note: site ui.xml not found — merge DevContentOps Tools manually (see docs/widgets/dev-content-ops-tools.md)."
+fi
+
+if [[ "${SKIP_UI_XML:-}" != "1" && -f "${SITE_UI_XML}" && -f "${UI_TRANSLATION_CONFIG_TOOLS_FRAGMENT}" ]]; then
+  if grep -qF "${TRANSLATION_CONFIG_TOOL_ID}" "${SITE_UI_XML}" 2>/dev/null; then
+    echo "Translation tool already present in ui.xml — syncing title from plugin fragment..."
+    python3 - "${SITE_UI_XML}" "${UI_TRANSLATION_CONFIG_TOOLS_FRAGMENT}" "${TRANSLATION_CONFIG_TOOL_ID}" <<'PY'
+import re
+import sys
+from pathlib import Path
+
+ui_path = Path(sys.argv[1])
+fragment_path = Path(sys.argv[2])
+widget_id = sys.argv[3]
+text = ui_path.read_text(encoding="utf-8")
+fragment = fragment_path.read_text(encoding="utf-8")
+title_match = re.search(r'<title\s+id="uigoodies\.translationConfigTools\.title"\s+defaultMessage="([^"]*)"', fragment)
+desired_title = title_match.group(1) if title_match else "Translation"
+updated, n = re.subn(
+    r'(<title\s+id="uigoodies\.translationConfigTools\.title"\s+defaultMessage=")[^"]*(")',
+    rf'\1{desired_title}\2',
+    text,
+    count=1,
+)
+if n:
+    ui_path.write_text(updated, encoding="utf-8")
+    print(f"Translation tool title updated to \"{desired_title}\".")
+else:
+    print("Warning: Translation tool title not found in ui.xml — update manually.", file=sys.stderr)
+PY
+  else
+    echo "Merging Translation tool into config/studio/ui.xml..."
+    python3 - "${SITE_UI_XML}" "${UI_TRANSLATION_CONFIG_TOOLS_FRAGMENT}" "${TRANSLATION_CONFIG_TOOL_ID}" <<'PY'
+import sys
+from pathlib import Path
+
+ui_path = Path(sys.argv[1])
+fragment_path = Path(sys.argv[2])
+widget_id = sys.argv[3]
+text = ui_path.read_text(encoding="utf-8")
+fragment = fragment_path.read_text(encoding="utf-8")
+if widget_id in text:
+    sys.exit(0)
+needle = '<reference id="craftercms.siteTools">'
+start = text.find(needle)
+if start == -1:
+    needle = "id='craftercms.siteTools'"
+    start = text.find(needle)
+if start == -1:
+    print("Warning: craftercms.siteTools reference not found in ui.xml — add Translation tool manually.", file=sys.stderr)
+    sys.exit(0)
+tools_open = text.find("<tools>", start)
+if tools_open == -1:
+    print("Warning: siteTools <tools> not found — add Translation tool manually.", file=sys.stderr)
+    sys.exit(0)
+tools_close = text.find("</tools>", tools_open)
+if tools_close == -1:
+    print("Warning: siteTools </tools> not found — add Translation tool manually.", file=sys.stderr)
+    sys.exit(0)
+updated = text[:tools_close] + fragment + text[tools_close:]
+ui_path.write_text(updated, encoding="utf-8")
+print("Translation tool merged into Project Tools.")
+PY
+  fi
+  if git -C "${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    git -C "${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox" add "config/studio/ui.xml" 2>/dev/null || true
+  fi
+fi
+
+if [[ "${SKIP_UI_XML:-}" != "1" && -f "${SITE_UI_XML}" && -f "${UI_TRANSLATION_TOOLBAR_FRAGMENT}" ]]; then
+  if grep -qF "${TRANSLATION_TOOLBAR_WIDGET_ID}" "${SITE_UI_XML}" 2>/dev/null; then
+    echo "Translation toolbar widget already present in ui.xml."
+  else
+    echo "Merging Translation toolbar widget into config/studio/ui.xml..."
+    python3 - "${SITE_UI_XML}" "${UI_TRANSLATION_TOOLBAR_FRAGMENT}" "${TRANSLATION_TOOLBAR_WIDGET_ID}" <<'PY'
+import re
+import sys
+from pathlib import Path
+
+ui_path = Path(sys.argv[1])
+fragment_path = Path(sys.argv[2])
+widget_id = sys.argv[3]
+
+def normalize_fragment(raw: str) -> str:
+    raw = re.sub(r"^\s*<\?xml[^?]*\?>\s*", "", raw, count=1)
+    raw = re.sub(r"<!--.*?-->", "", raw, flags=re.DOTALL)
+    return raw.strip() + "\n"
+
+text = ui_path.read_text(encoding="utf-8")
+fragment = normalize_fragment(fragment_path.read_text(encoding="utf-8"))
+if widget_id in text:
+    sys.exit(0)
+needle = '<widget id="craftercms.components.PreviewToolbar">'
+start = text.find(needle)
+if start == -1:
+    print("Warning: PreviewToolbar widget not found in ui.xml — add Translation toolbar manually.", file=sys.stderr)
+    sys.exit(0)
+right_open = text.find("<rightSection>", start)
+if right_open == -1:
+    print("Warning: PreviewToolbar rightSection not found — add Translation toolbar manually.", file=sys.stderr)
+    sys.exit(0)
+widgets_open = text.find("<widgets>", right_open)
+if widgets_open == -1:
+    print("Warning: PreviewToolbar rightSection <widgets> not found — add Translation toolbar manually.", file=sys.stderr)
+    sys.exit(0)
+widgets_close = text.find("</widgets>", widgets_open)
+if widgets_close == -1:
+    print("Warning: PreviewToolbar </widgets> not found — add Translation toolbar manually.", file=sys.stderr)
+    sys.exit(0)
+updated = text[:widgets_close] + fragment + text[widgets_close:]
+ui_path.write_text(updated, encoding="utf-8")
+print("Translation toolbar widget merged into Preview toolbar.")
+PY
+    if git -C "${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+      git -C "${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox" add "config/studio/ui.xml" 2>/dev/null || true
+    fi
+  fi
+elif [[ "${SKIP_UI_XML:-}" != "1" && ! -f "${SITE_UI_XML}" ]]; then
+  echo "Note: site ui.xml not found — merge Translation toolbar manually (see docs/widgets/translation-tools.md)."
 fi
 
 if [[ -f "${SITE_PLUGIN}" ]]; then

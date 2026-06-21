@@ -13,7 +13,7 @@ plugin:
   version:
     major: 1
     minor: 0
-    patch: 68
+    patch: 73
   description: A plugin to adds some UI goodies to your studio
   documentation: "https://raw.githubusercontent.com/russdanner/plugin-studio-uigoodies/master/README.md"
   website:
@@ -253,6 +253,41 @@ installation:
                       value: uigoodies
                     - name: file
                       value: index.js
+  - type: preview-app
+    parentXpath: //reference[@id='craftercms.siteTools']
+    elementXpath: //reference[@id='craftercms.siteTools']//widget[@id='org.rd.plugin.uigoodies.TranslationConfigTools']
+    element:
+      name: tools
+      children:
+        - name: tool
+          children:
+            - name: title
+              attributes:
+                - name: id
+                  value: uigoodies.translationConfigTools.title
+                - name: defaultMessage
+                  value: Translation
+            - name: icon
+              attributes:
+                - name: id
+                  value: "@mui/icons-material/TranslateRounded"
+            - name: url
+              value: uigoodies-translation-config
+            - name: widget
+              attributes:
+                - name: id
+                  value: org.rd.plugin.uigoodies.TranslationConfigTools
+              children:
+                - name: plugin
+                  attributes:
+                    - name: id
+                      value: org.rd.plugin.uigoodies
+                    - name: type
+                      value: apps
+                    - name: name
+                      value: uigoodies
+                    - name: file
+                      value: index.js
   # Tools Panel (sidebar) — Image Studio
   - type: preview-app
     parentXpath: //widget[@id='craftercms.components.ToolsPanel']
@@ -287,3 +322,85 @@ installation:
                           value: "@mui/icons-material/PhotoLibraryRounded"
                     - name: defaultPath
                       value: /static-assets/images
+  # Preview toolbar — Translation (locale copy)
+  - type: preview-app
+    elementXpath: //widget[@id='org.rd.plugin.uigoodies.openTranslationToolbarButton']
+    parentXpath: //widget[@id='craftercms.components.PreviewToolbar']
+    element:
+      name: configuration
+      children:
+        - name: rightSection
+          children:
+            - name: widgets
+              children:
+                - name: widget
+                  attributes:
+                    - name: id
+                      value: org.rd.plugin.uigoodies.openTranslationToolbarButton
+                  children:
+                    - name: plugin
+                      attributes:
+                        - name: id
+                          value: org.rd.plugin.uigoodies
+                        - name: site
+                          value: "{site}"
+                        - name: type
+                          value: apps
+                        - name: name
+                          value: uigoodies
+                        - name: file
+                          value: index.js
+                    - name: configuration
+                      children:
+                        - name: title
+                          value: Add to Scope
+                        - name: tooltip
+                          value: "Translation — pick a locale to add this page under (mirrored path)"
+                        - name: useIcon
+                          value: "false"
+                        - name: useIconWithText
+                          value: "true"
+                        - name: dialogTitle
+                          value: Translation
+                        - name: icon
+                          attributes:
+                            - name: id
+                              value: "@mui/icons-material/TranslateRounded"
+  - type: form-control
+    elementXpath: //control/plugin[pluginId='org.rd.plugin.uigoodies' and name='custom-locale']
+    element:
+      name: control
+      children:
+        - name: plugin
+          children:
+            - name: pluginId
+              value: org.rd.plugin.uigoodies
+            - name: type
+              value: control
+            - name: name
+              value: custom-locale
+            - name: filename
+              value: main.js
+        - name: icon
+          children:
+            - name: class
+              value: fa-language
+  - type: form-control
+    elementXpath: //control/plugin[pluginId='org.rd.plugin.uigoodies' and name='translation-versions']
+    element:
+      name: control
+      children:
+        - name: plugin
+          children:
+            - name: pluginId
+              value: org.rd.plugin.uigoodies
+            - name: type
+              value: control
+            - name: name
+              value: translation-versions
+            - name: filename
+              value: main.js
+        - name: icon
+          children:
+            - name: class
+              value: fa-globe

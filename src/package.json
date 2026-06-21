@@ -8,7 +8,9 @@
   "private": true,
   "packageManager": "yarn@3.2.2",
   "workspaces": [
-    "packages/uigoodies-components"
+    "packages/uigoodies-components",
+    "packages/custom-locale",
+    "packages/translation-versions"
   ],
   "scripts": {
     "w:prettier": "yarn prettier --write './packages/**/*.{ts,tsx}'"

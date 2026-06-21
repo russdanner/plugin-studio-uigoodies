@@ -9,6 +9,8 @@ possible.
 If you see a widget that helps you here, install it and be happy. If not, make the world a better
 place by doing a bit of programming and send us pull request :)
 
+**Full documentation:** [docs/README.md](docs/README.md) — installation, requirements, Translation setup, and per-widget configuration.
+
 # Installation
 
 [//]: # (## Install via CrafterCMS Marketplace)
@@ -28,14 +30,24 @@ cp scripts/.studio-token.example scripts/.studio-token   # paste a fresh Bearer 
 
 The script:
 
-1. Runs `yarn dist` in `src/packages/uigoodies-components` (fresh `index.js`)
+1. Runs `yarn dist` in `src/packages/uigoodies-components`, `custom-locale`, and `translation-versions`
 2. Calls `POST /studio/api/2/marketplace/copy` (commits into the site sandbox)
 3. Reloads Groovy plugin scripts
-4. Optionally merges `uigoodies-plugin-whitelist.append` into the **site sandbox** whitelist only when `SKIP_WHITELIST=0` (skipped by default; never touches Studio global whitelist)
+4. Merges optional `ui.xml` fragments (Image Studio, DevContentOps, Translation tool + toolbar) unless `SKIP_UI_XML=1`
+5. Optionally merges `uigoodies-plugin-whitelist.append` into the **site sandbox** whitelist only when `SKIP_WHITELIST=0` (skipped by default)
+
+See [docs/INSTALLATION.md](docs/INSTALLATION.md) for environment variables, post-install checklist, and REST API index.
 
 ### Manual CURL install
 
-1. Build the UI: `cd src/packages/uigoodies-components && yarn install && yarn dist`
+1. Build all bundles on the Studio host:
+
+```bash
+cd src/packages/uigoodies-components && yarn install && yarn dist
+cd ../custom-locale && yarn install && yarn dist
+cd ../translation-versions && yarn install && yarn dist
+```
+
 2. Create a Studio API token.
 3. Run marketplace/copy — **`path` must exist on the Studio host**, not only on your laptop:
 
@@ -70,22 +82,36 @@ See [docs/GROOVY_SANDBOX.md](docs/GROOVY_SANDBOX.md) for sandbox and bean-restri
 
 ### Installation note for Project Tools auto-wiring
 
-This plugin now includes auto-wiring in `craftercms-plugin.yaml` to add Project Tools entries:
+This plugin auto-wires Project Tools entries in `craftercms-plugin.yaml`:
 
-- **Copy Content Types (cross-project)** (URL: `uigoodies-cross-site-content-types`)
-- **Cross Site Copy** (URL: `uigoodies-cross-site-content-copy`) — copy content items (and optional dependencies) to another project
-- **OpenSearch playground** (URL: `uigoodies-opensearch-playground`) — raw OpenSearch DSL against Engine `search.json` for the active site
-- **Tomcat Log** (URL: `uigoodies-log-tail`) — live SSE tail of `catalina.out` via an Engine REST script; the server only streams while the panel is open
-- **Image Studio** (Tools Panel sidebar) — crop, focal point, adjustments, and image size requirements lookup
+- **Content Type Copy** (`uigoodies-cross-site-content-types`)
+- **Cross Site Copy** (`uigoodies-cross-site-content-copy`)
+- **OpenSearch** (`uigoodies-opensearch-playground`)
+- **Log Tail** (`uigoodies-log-tail`)
+- **DevContentOps Tools** (`uigoodies-dev-content-ops`)
+- **Translation** (`uigoodies-translation-config`) — locales, content-type fields, locale site scaffold
 
-If you are upgrading from a previous install, re-install/upgrade the plugin so the auto-wiring section is applied.
-If your project manages `config/studio/ui.xml` manually, merge the generated tool entry into
-`//reference[@id='craftercms.siteTools']/tools`.
+Also auto-wired when install merges `ui.xml`:
+
+- **Image Studio** (Tools Panel sidebar)
+- **Translation** preview toolbar button (visible when ≥2 locales configured)
+
+**Form controls** (`custom-locale`, `translation-versions`) register via the plugin descriptor; bundles install to `config/studio/static-assets/plugins/.../control/`.
+
+If you are upgrading from a previous install, re-install/upgrade the plugin so auto-wiring is applied.
+If your project manages `config/studio/ui.xml` manually, merge fragments from `authoring/config/studio/` or see [docs/INSTALLATION.md](docs/INSTALLATION.md).
+
+**Translation sites:** after install, follow [docs/TRANSLATION_SETUP.md](docs/TRANSLATION_SETUP.md) (locales, content types, global vs locale homes).
 
 # Building
 
-To build this plugin on your own, make your customizations as required, then run `yarn` and then `yarn dist` in the
-`uigoodies-components` folder. The output will be placed in the `/authoring` folder of this project.
+To build this plugin on your own, make your customizations as required, then run `yarn` and `yarn dist` in:
+
+- `src/packages/uigoodies-components` (main Studio UI bundle)
+- `src/packages/custom-locale` (form control)
+- `src/packages/translation-versions` (form control)
+
+Output is placed in `/authoring/static-assets/plugins/org/rd/plugin/uigoodies/`.
 
 ## CodeRabbit review (working tree)
 
@@ -122,6 +148,22 @@ Registered widgets use plugin id **`org.rd.plugin.uigoodies`**, app **`uigoodies
 | `org.rd.plugin.uigoodies.CrossSiteContentTypeCopy` | Project tool: copy `config.xml` + `form-definition.xml` for content types between sites. | [cross-site-content-type-copy.md](docs/widgets/cross-site-content-type-copy.md) |
 | `org.rd.plugin.uigoodies.CrossSiteContentCopy` | Project tool: multi-select cross-site content copy with plan preview, per-item actions, and switch-to-destination after copy. | [cross-site-content-copy.md](docs/widgets/cross-site-content-copy.md) |
 | `org.rd.plugin.uigoodies.ComponentPreviewPathNavigator` | Path navigator that opens headless/component preview URLs with path mapping. | [component-preview-path-navigator.md](docs/widgets/component-preview-path-navigator.md) |
-| `org.rd.plugin.uigoodies.OpenSearchPlayground` | Project tool: Explorer + Dictionary tabs for schema/content-type discovery, expanded Search API options, and raw OpenSearch JSON against Engine `search.json`. | [open-search-playground.md](docs/widgets/open-search-playground.md) |
-| `org.rd.plugin.uigoodies.LogTail` | Project tool: SSE live tail of `catalina.out` (colorized, collapsible stack traces, fullscreen). Server-side script streams only while the panel is open. | [log-tail.md](docs/widgets/log-tail.md) |
+| `org.rd.plugin.uigoodies.OpenSearchPlayground` | Project tool: Explorer + Dictionary tabs, OpenSearch DSL, Engine `search.json`. | [open-search-playground.md](docs/widgets/open-search-playground.md) |
+| `org.rd.plugin.uigoodies.LogTail` | Project tool: SSE live tail of Tomcat/deployer/search logs. | [log-tail.md](docs/widgets/log-tail.md) |
+| `org.rd.plugin.uigoodies.DevContentOpsTools` | Project tool: git log, working tree, branches, repo health, item states. | [dev-content-ops-tools.md](docs/widgets/dev-content-ops-tools.md) |
+| `org.rd.plugin.uigoodies.TranslationConfigTools` | Project tool: `translation-config.xml`, content-type Translation fields, locale scaffold. | [translation-config-tools.md](docs/widgets/translation-config-tools.md) |
+| `org.rd.plugin.uigoodies.TranslationDialog` | Translation dialog (locale tree + copy). | [translation-tools.md](docs/widgets/translation-tools.md) |
+| `org.rd.plugin.uigoodies.openTranslationToolbarButton` | Preview toolbar → locale picker / copy. | [translation-tools.md](docs/widgets/translation-tools.md) |
+| `org.rd.plugin.uigoodies.openTranslationPanelButton` | Tools panel translation entry (optional). | [translation-tools.md](docs/widgets/translation-tools.md) |
+| `org.rd.plugin.uigoodies.openImageStudioPanelButton` | Sidebar → Image Studio dialog. | [open-image-studio-panel-button.md](docs/widgets/open-image-studio-panel-button.md) |
+| `org.rd.plugin.uigoodies.ImageStudio` | Image Studio UI (embedded in dialog). | [image-studio.md](docs/widgets/image-studio.md) |
+
+### Form controls (separate bundles)
+
+| Control | Field id | Doc |
+|---------|----------|-----|
+| `custom-locale` | `localeSourceId_s` | [translation-tools.md](docs/widgets/translation-tools.md), [TRANSLATION_SETUP.md](docs/TRANSLATION_SETUP.md) |
+| `translation-versions` | `translations` | [translation-tools.md](docs/widgets/translation-tools.md), [TRANSLATION_SETUP.md](docs/TRANSLATION_SETUP.md) |
+
+Full widget index: [docs/widgets/README.md](docs/widgets/README.md).
   

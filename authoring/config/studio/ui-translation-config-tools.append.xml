@@ -1,0 +1,8 @@
+        <tool>
+            <title id="uigoodies.translationConfigTools.title" defaultMessage="Translation"/>
+            <icon id="@mui/icons-material/TranslateRounded"/>
+            <url>uigoodies-translation-config</url>
+            <widget id="org.rd.plugin.uigoodies.TranslationConfigTools">
+                <plugin id="org.rd.plugin.uigoodies" type="apps" name="uigoodies" file="index.js"/>
+            </widget>
+        </tool>

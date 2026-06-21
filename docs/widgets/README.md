@@ -2,6 +2,8 @@
 
 Each file in this folder documents one **registered widget** (or embedded view used by open buttons). Plugin id: **`org.rd.plugin.uigoodies`**, app bundle: **`uigoodies`** / `index.js`.
 
+**Installation and requirements:** [../INSTALLATION.md](../INSTALLATION.md) · **Translation setup:** [../TRANSLATION_SETUP.md](../TRANSLATION_SETUP.md) · **Doc index:** [../README.md](../README.md)
+
 **Every widget doc includes a `## Configuration` section** with a copy-paste **`config/studio/ui.xml`** example: either a `<widget>` snippet (toolbar / tools panel) or a full **Project Tools** `<tool>` block where that applies.
 
 | Widget ID | Description | Page |
@@ -29,5 +31,16 @@ Each file in this folder documents one **registered widget** (or embedded view u
 | `org.rd.plugin.uigoodies.openImageStudioPanelButton` | Sidebar button → Image Studio dialog (crop, focal point, adjust, save). | [open-image-studio-panel-button.md](open-image-studio-panel-button.md) |
 | `org.rd.plugin.uigoodies.ImageStudio` | Image editing UI embedded in Image Studio dialog. | [image-studio.md](image-studio.md) |
 | `org.rd.plugin.uigoodies.DevContentOpsTools` | Project tool: git log graph, remotes, patches, ingestion sync. | [dev-content-ops-tools.md](dev-content-ops-tools.md) |
+| `org.rd.plugin.uigoodies.TranslationConfigTools` | Project tool: edit translation-config.xml and add Translation fields to content types. | [translation-config-tools.md](translation-config-tools.md) |
+| `org.rd.plugin.uigoodies.TranslationDialog` | Translation dialog (locale path tree + copy). | [translation-tools.md](translation-tools.md) |
+| `org.rd.plugin.uigoodies.openTranslationToolbarButton` | Preview toolbar → translation locale picker. | [translation-tools.md](translation-tools.md) |
+| `org.rd.plugin.uigoodies.openTranslationPanelButton` | Tools panel locale picker + copy actions. | [translation-tools.md](translation-tools.md) |
+
+### Form controls (separate bundles)
+
+| Control | Field id | Doc |
+|---------|----------|-----|
+| `custom-locale` | `localeSourceId_s` | [translation-tools.md](translation-tools.md), [../TRANSLATION_SETUP.md](../TRANSLATION_SETUP.md) |
+| `translation-versions` | `translations` | [translation-tools.md](translation-tools.md), [../TRANSLATION_SETUP.md](../TRANSLATION_SETUP.md) |
 
 Back to repository root: [../../README.md](../../README.md).

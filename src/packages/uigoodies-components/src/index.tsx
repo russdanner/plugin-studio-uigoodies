@@ -22,6 +22,10 @@ import LogTail from './components/LogTail';
 import ImageStudio from './components/ImageStudio/ImageStudio';
 import OpenImageStudioPanelButton from './components/OpenImageStudioPanelButton';
 import DevContentOpsTools from './components/DevContentOps/DevContentOpsTools';
+import TranslationDialog from './components/Translation/TranslationDialog';
+import TranslationConfigTools from './components/Translation/TranslationConfigTools';
+import OpenTranslationPanelButton from './components/Translation/components/OpenTranslationPanelButton';
+import OpenTranslationToolbarButton from './components/Translation/components/OpenTranslationToolbarButton';
 
 const plugin: PluginDescriptor = {
   locales: undefined,
@@ -51,7 +55,11 @@ const plugin: PluginDescriptor = {
     'org.rd.plugin.uigoodies.LogTail': LogTail,
     'org.rd.plugin.uigoodies.ImageStudio': ImageStudio,
     'org.rd.plugin.uigoodies.openImageStudioPanelButton': OpenImageStudioPanelButton,
-    'org.rd.plugin.uigoodies.DevContentOpsTools': DevContentOpsTools
+    'org.rd.plugin.uigoodies.DevContentOpsTools': DevContentOpsTools,
+    'org.rd.plugin.uigoodies.TranslationConfigTools': TranslationConfigTools,
+    'org.rd.plugin.uigoodies.TranslationDialog': TranslationDialog,
+    'org.rd.plugin.uigoodies.openTranslationPanelButton': OpenTranslationPanelButton,
+    'org.rd.plugin.uigoodies.openTranslationToolbarButton': OpenTranslationToolbarButton
   }
 };
 
@@ -78,7 +86,11 @@ export {
   LogTail,
   ImageStudio,
   OpenImageStudioPanelButton,
-  DevContentOpsTools
+  DevContentOpsTools,
+  TranslationConfigTools,
+  TranslationDialog,
+  OpenTranslationPanelButton,
+  OpenTranslationToolbarButton
 };
 
 export default plugin;

@@ -2,6 +2,8 @@
 
 Project tool for advanced git and Studio ingestion operations. Use the **Project** selector in the header to work on any site you can access (defaults to the current Studio project).
 
+**Install:** [../INSTALLATION.md](../INSTALLATION.md) — auto-wired Project Tool; merge `authoring/config/studio/ui-dev-content-ops-tools.append.xml` if needed.
+
 All plugin REST calls pass the selected site as `?siteId=` on the URL and `siteId` in POST bodies. Git operations use `GitRepositoryHelper.getRepository(siteId, SANDBOX)` for that site's sandbox repo. Studio workflow APIs (`fetchItemStates`, pull/push remotes, etc.) receive the same selected `siteId`.
 
 ## Tabs
