@@ -126,7 +126,103 @@ By default the script reviews changes under `src/packages/uigoodies-components/s
 
 # Widgets
 
-Registered widgets use plugin id **`org.rd.plugin.uigoodies`**, app **`uigoodies`**, file **`index.js`**. Each doc under **[`docs/widgets/`](docs/widgets/README.md)** includes a **`## Configuration`** section with copy-paste **`ui.xml`** (or Project Tools `<tool>`) examples, or TypeScript for embedded-only views.
+Registered widgets use plugin id **`org.rd.plugin.uigoodies`**, app **`uigoodies`**, file **`index.js`**. Each doc under **[`docs/widgets/`](docs/widgets/README.md)** includes a **`## Configuration`** section with copy-paste **`ui.xml`** (or Project Tools `<tool>`) examples.
+
+Screenshots below are from Studio **Project Tools**, the **Tools Panel**, and the **preview toolbar**. Full widget index at the end of this section.
+
+## Project Tools
+
+### OpenSearch Playground
+
+Explorer, OpenSearch DSL editor, and live JSON from Engine `search.json`.
+
+![OpenSearch Playground — Explorer, DSL editor, and response](docs/images/opensearch-playground.png)
+
+Doc: [open-search-playground.md](docs/widgets/open-search-playground.md)
+
+### Log Tail
+
+Live SSE tail of Tomcat `catalina.out` (and related logs) while the panel is open.
+
+![Log Tail — streaming log console](docs/images/log-tail.png)
+
+Doc: [log-tail.md](docs/widgets/log-tail.md)
+
+### DevContentOps Tools
+
+Git log, working tree, branches, database maintenance, repository health, and site item state management for any Studio project you can access.
+
+**Git log** — commit graph, patches, ingestion sync, cross-project patch apply:
+
+![DevContentOps Tools — Git log tab](docs/images/dev-content-ops-git-log.png)
+
+**Working tree** — stage, commit, discard, clean, resolve conflicts:
+
+![DevContentOps Tools — Working tree tab](docs/images/dev-content-ops-working-tree.png)
+
+**Repository health** — git-sizer-style metrics and safe optimize operations:
+
+![DevContentOps Tools — Repository health tab](docs/images/dev-content-ops-repository-health.png)
+
+**Site items** — filter by path/type/state; bulk state updates:
+
+![DevContentOps Tools — Site items tab](docs/images/dev-content-ops-site-items.png)
+
+**Database** — audit history and processed-commits cache (ingestion helper):
+
+![DevContentOps Tools — Database tab](docs/images/dev-content-ops-database.png)
+
+Doc: [dev-content-ops-tools.md](docs/widgets/dev-content-ops-tools.md)
+
+### Cross Site Copy
+
+Multi-select copy between projects with plan preview, per-item actions, and switch-to-destination after copy.
+
+![Cross Site Copy — source, destination, and preview](docs/images/cross-site-content-copy.png)
+
+![Cross Site Copy — copy results](docs/images/cross-site-content-copy-results.png)
+
+Doc: [cross-site-content-copy.md](docs/widgets/cross-site-content-copy.md)
+
+### Translation (Project Tool)
+
+Locales, content-type Translation field readiness, and locale site scaffold. See [TRANSLATION_SETUP.md](docs/TRANSLATION_SETUP.md).
+
+Doc: [translation-config-tools.md](docs/widgets/translation-config-tools.md)
+
+## Tools Panel
+
+### Image Studio
+
+Crop, focal point, filters, adjustments, draw annotations, resize, and save back to `/static-assets`.
+
+![Image Studio editor](docs/images/image-studio-editor.png)
+
+Docs: [open-image-studio-panel-button.md](docs/widgets/open-image-studio-panel-button.md), [image-studio.md](docs/widgets/image-studio.md)
+
+## Preview toolbar
+
+### Translation
+
+Locale picker and copy (visible when ≥2 locales are configured in `translation-config.xml`).
+
+![Preview toolbar — Translation button with other toolbar widgets](docs/images/translation-toolbar.png)
+
+Docs: [translation-tools.md](docs/widgets/translation-tools.md)
+
+### Device simulator
+
+Responsive preview presets in a flyout (ICE-compatible `devices` configuration).
+
+![Device simulator flyout on preview toolbar](docs/images/device-simulator-toolbar.png)
+
+Doc: [device-simulator-flyout-toolbar-button.md](docs/widgets/device-simulator-flyout-toolbar-button.md)
+
+## Form controls
+
+Translation form controls (`custom-locale`, `translation-versions`) render inside the Content Form when content types include the Translation section. Setup: [TRANSLATION_SETUP.md](docs/TRANSLATION_SETUP.md).
+
+## Full widget index
 
 | Widget ID | What it does | Doc |
 |-----------|----------------|-----|
