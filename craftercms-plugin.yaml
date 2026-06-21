@@ -13,7 +13,7 @@ plugin:
   version:
     major: 1
     minor: 0
-    patch: 15
+    patch: 68
   description: A plugin to adds some UI goodies to your studio
   documentation: "https://raw.githubusercontent.com/russdanner/plugin-studio-uigoodies/master/README.md"
   website:
@@ -218,6 +218,41 @@ installation:
                               value: Search
                             - name: path
                               value: ../logs/search/opensearch.log
+  - type: preview-app
+    parentXpath: //reference[@id='craftercms.siteTools']
+    elementXpath: //reference[@id='craftercms.siteTools']//widget[@id='org.rd.plugin.uigoodies.DevContentOpsTools']
+    element:
+      name: tools
+      children:
+        - name: tool
+          children:
+            - name: title
+              attributes:
+                - name: id
+                  value: uigoodies.devContentOpsTools.title
+                - name: defaultMessage
+                  value: DevContentOps Tools
+            - name: icon
+              attributes:
+                - name: id
+                  value: "@mui/icons-material/BuildRounded"
+            - name: url
+              value: uigoodies-dev-content-ops
+            - name: widget
+              attributes:
+                - name: id
+                  value: org.rd.plugin.uigoodies.DevContentOpsTools
+              children:
+                - name: plugin
+                  attributes:
+                    - name: id
+                      value: org.rd.plugin.uigoodies
+                    - name: type
+                      value: apps
+                    - name: name
+                      value: uigoodies
+                    - name: file
+                      value: index.js
   # Tools Panel (sidebar) — Image Studio
   - type: preview-app
     parentXpath: //widget[@id='craftercms.components.ToolsPanel']

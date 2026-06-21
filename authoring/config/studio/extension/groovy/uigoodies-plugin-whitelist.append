@@ -5,6 +5,72 @@
 # Beans (applicationContext.get)
 method org.craftercms.commons.spring.context.ApplicationContextAccessor get java.lang.String
 
+# DevContentOps (studio.gitRepositoryHelper, contentRepository, sitesService, processedCommitsDao)
+method org.craftercms.studio.api.v2.repository.ContentRepository getRepoLastCommitId java.lang.String
+method org.craftercms.studio.api.v2.repository.ContentRepository getCommitIdsBetween java.lang.String java.lang.String java.lang.String
+method org.craftercms.studio.api.v2.service.site.SitesService getSite java.lang.String
+method org.craftercms.studio.api.v2.service.site.SitesService getLastCommitId java.lang.String
+method org.craftercms.studio.api.v2.service.site.SitesService updateLastCommitId java.lang.String java.lang.String
+method org.craftercms.studio.api.v2.dal.ProcessedCommitsDAO isProcessed long java.lang.String
+method org.craftercms.studio.api.v2.dal.Site getId
+method org.springframework.context.ApplicationEventPublisher publishEvent java.lang.Object
+new org.craftercms.studio.api.v2.event.site.SyncFromRepoEvent java.lang.String
+method org.craftercms.studio.impl.v2.sync.SyncFromRepositoryTask syncRepoListener org.craftercms.studio.api.v2.event.site.SyncFromRepoEvent
+method org.eclipse.jgit.revwalk.RevCommit getAuthorIdent
+method org.eclipse.jgit.lib.PersonIdent getName
+method org.eclipse.jgit.lib.PersonIdent getEmailAddress
+method org.eclipse.jgit.api.Git gc
+method org.eclipse.jgit.api.Git status
+method org.eclipse.jgit.api.Git add
+method org.eclipse.jgit.api.Git commit
+method org.eclipse.jgit.api.Git reset
+method org.eclipse.jgit.api.Git checkout
+method org.eclipse.jgit.api.Git clean
+method org.eclipse.jgit.api.Git diff
+method org.eclipse.jgit.api.StatusCommand call
+method org.eclipse.jgit.api.AddCommand addPath java.lang.String
+method org.eclipse.jgit.api.AddCommand call
+method org.eclipse.jgit.api.CommitCommand setMessage java.lang.String
+method org.eclipse.jgit.api.CommitCommand call
+method org.eclipse.jgit.api.ResetCommand addPath java.lang.String
+method org.eclipse.jgit.api.ResetCommand call
+method org.eclipse.jgit.api.CheckoutCommand setStage org.eclipse.jgit.api.CheckoutCommand$Stage
+method org.eclipse.jgit.api.CheckoutCommand addPath java.lang.String
+method org.eclipse.jgit.api.CheckoutCommand call
+method org.eclipse.jgit.api.CleanCommand setForce boolean
+method org.eclipse.jgit.api.CleanCommand setPaths java.util.Set
+method org.eclipse.jgit.api.CleanCommand call
+method org.eclipse.jgit.api.DiffCommand setCached boolean
+method org.eclipse.jgit.api.DiffCommand addPath java.lang.String
+method org.eclipse.jgit.api.DiffCommand call
+method org.eclipse.jgit.api.Status getAdded
+method org.eclipse.jgit.api.Status getChanged
+method org.eclipse.jgit.api.Status getModified
+method org.eclipse.jgit.api.Status getRemoved
+method org.eclipse.jgit.api.Status getMissing
+method org.eclipse.jgit.api.Status getUntracked
+method org.eclipse.jgit.api.Status getConflicting
+method org.eclipse.jgit.api.Status getUncommittedChanges
+method org.eclipse.jgit.revwalk.RevCommit getName
+method org.craftercms.studio.api.v2.utils.GitRepositoryHelper getSandboxRepoLockKey java.lang.String
+method org.craftercms.studio.api.v1.service.GeneralLockService lock java.lang.String
+method org.craftercms.studio.api.v1.service.GeneralLockService unlock java.lang.String
+method org.craftercms.studio.api.v2.exception.git.cli.GitCliException getMessage
+method org.craftercms.studio.impl.v2.utils.git.GitCli isRepoClean java.io.File
+method org.craftercms.studio.impl.v2.utils.git.GitCli clean java.io.File boolean boolean
+method org.craftercms.studio.impl.v2.utils.git.GitCli resetHard java.io.File
+method org.craftercms.studio.api.v2.utils.GitRepositoryHelper gitStatusOk org.eclipse.jgit.lib.Repository
+method java.io.File getAbsolutePath
+new groovy.json.JsonSlurper
+method groovy.json.JsonSlurper parseText java.lang.String
+method org.craftercms.studio.api.v2.service.item.internal.ItemServiceInternal updateStateBits java.lang.String java.lang.String long long
+method org.craftercms.studio.api.v2.service.item.internal.ItemServiceInternal updateStateBitsBulk java.lang.String java.util.Collection long long
+method org.craftercms.studio.api.v2.utils.GitRepositoryHelper getRepository java.lang.String org.craftercms.studio.api.v1.constant.GitRepositories
+method org.craftercms.studio.api.v2.utils.GitRepositoryHelper buildRepoPath org.craftercms.studio.api.v1.constant.GitRepositories java.lang.String
+method org.craftercms.studio.api.v2.utils.GitRepositoryHelper openRepository java.nio.file.Path
+method org.craftercms.studio.api.v2.utils.GitRepositoryHelper getFilesInCommit org.eclipse.jgit.lib.Repository org.eclipse.jgit.revwalk.RevCommit
+method org.craftercms.studio.api.v2.utils.GitRepositoryHelper removeIndexAndClean java.io.File
+
 # Content (bean: cstudioContentService)
 method org.craftercms.studio.api.v1.service.content.ContentService contentExists java.lang.String java.lang.String
 method org.craftercms.studio.api.v1.service.content.ContentService getContentItem java.lang.String java.lang.String
@@ -59,6 +125,19 @@ staticMethod java.nio.file.Files exists java.nio.file.Path java.nio.file.LinkOpt
 staticMethod java.nio.file.Files isRegularFile java.nio.file.Path java.nio.file.LinkOption[]
 staticMethod java.nio.file.Files isReadable java.nio.file.Path
 staticMethod java.nio.file.Files size java.nio.file.Path
+staticMethod java.nio.file.Files createDirectories java.nio.file.Path java.nio.file.attribute.FileAttribute[]
+staticMethod java.nio.file.Files deleteIfExists java.nio.file.Path
+staticMethod java.nio.file.Files readString java.nio.file.Path
+staticMethod java.nio.file.Files writeString java.nio.file.Path java.lang.CharSequence
+staticMethod java.nio.file.Files writeString java.nio.file.Path java.lang.CharSequence java.nio.charset.Charset java.nio.file.OpenOption[]
+staticMethod java.nio.file.Files isDirectory java.nio.file.Path java.nio.file.LinkOption[]
+staticMethod java.nio.file.Files newDirectoryStream java.nio.file.Path
+method java.nio.file.DirectoryStream close
+method java.nio.file.DirectoryStream iterator
+method java.nio.file.Path resolve java.lang.String
+method java.nio.file.Path getParent
+method java.nio.file.Path fileName
+method java.nio.file.Path toFile
 staticMethod java.nio.file.Files newByteChannel java.nio.file.Path java.nio.file.OpenOption[]
 method java.nio.channels.SeekableByteChannel position long
 method java.nio.channels.SeekableByteChannel position
@@ -96,3 +175,40 @@ method java.util.concurrent.atomic.AtomicInteger incrementAndGet
 method java.util.concurrent.atomic.AtomicInteger decrementAndGet
 staticMethod java.lang.Thread sleep long
 staticMethod java.lang.Thread currentThread
+
+# Database tools (sysadmin audit truncation)
+method org.craftercms.studio.api.v2.service.security.SecurityService getCurrentUser
+method org.craftercms.studio.api.v2.service.security.SecurityService isSystemAdmin java.lang.String
+method org.craftercms.studio.api.v1.service.security.SecurityService getCurrentUser
+method org.craftercms.studio.api.v1.service.security.SecurityService isSystemAdmin java.lang.String
+method org.craftercms.studio.api.v2.service.audit.internal.AuditServiceInternal getAuditLogTotal java.lang.String java.lang.String java.util.List boolean java.time.ZonedDateTime java.time.ZonedDateTime java.lang.String java.lang.String java.lang.String
+method org.craftercms.studio.api.v2.service.audit.internal.AuditServiceInternal deleteAuditLogForSite long
+method org.craftercms.studio.api.v2.service.audit.internal.AuditServiceInternal createAuditLogEntry
+method org.craftercms.studio.api.v2.service.audit.internal.AuditServiceInternal insertAuditLog org.craftercms.studio.api.v2.dal.AuditLog
+method org.craftercms.studio.api.v2.dal.AuditLog setSiteId long
+method org.craftercms.studio.api.v2.dal.AuditLog setOperation java.lang.String
+method org.craftercms.studio.api.v2.dal.AuditLog setPrimaryTargetType java.lang.String
+method org.craftercms.studio.api.v2.dal.AuditLog setPrimaryTargetValue java.lang.String
+method org.craftercms.studio.api.v2.dal.AuditLog setActorId java.lang.String
+method org.craftercms.studio.api.v2.dal.AuditLog setActorDetails java.lang.String
+method org.craftercms.studio.api.v2.dal.AuditLog setOperationTimestamp java.time.ZonedDateTime
+method org.craftercms.studio.api.v2.dal.Site getId
+method javax.sql.DataSource getConnection
+method java.sql.Connection prepareStatement java.lang.String
+method java.sql.Connection setAutoCommit boolean
+method java.sql.Connection commit
+method java.sql.Connection rollback
+method java.sql.Connection close
+method java.sql.PreparedStatement setObject int java.lang.Object
+method java.sql.PreparedStatement executeUpdate
+method java.sql.PreparedStatement executeQuery
+method java.sql.PreparedStatement close
+method java.sql.ResultSet next
+method java.sql.ResultSet getInt int
+method java.sql.ResultSet close
+new java.sql.Timestamp long
+staticMethod java.time.ZonedDateTime parse java.lang.CharSequence
+staticMethod java.time.ZonedDateTime now java.time.ZoneId
+method java.time.ZonedDateTime toInstant
+method java.time.ZonedDateTime minusSeconds long
+method java.time.Instant toEpochMilli

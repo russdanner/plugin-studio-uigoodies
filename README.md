@@ -31,7 +31,7 @@ The script:
 1. Runs `yarn dist` in `src/packages/uigoodies-components` (fresh `index.js`)
 2. Calls `POST /studio/api/2/marketplace/copy` (commits into the site sandbox)
 3. Reloads Groovy plugin scripts
-4. Merges `uigoodies-plugin-whitelist.append` when the site has a Groovy whitelist file
+4. Optionally merges `uigoodies-plugin-whitelist.append` into the **site sandbox** whitelist only when `SKIP_WHITELIST=0` (skipped by default; never touches Studio global whitelist)
 
 ### Manual CURL install
 
@@ -61,8 +61,8 @@ curl --location --request POST 'http://SERVER_AND_PORT/studio/api/2/marketplace/
 | `yarn dist` run before copy | Without it, sites get stale or missing `index.js` |
 | Bump `craftercms-plugin.yaml` version after changes | Marketplace may skip unchanged plugin artifacts |
 | Groovy script reload after install | Updated `.groovy` / class files are not live until reload |
-| `studio.scripting.sandbox.whitelist.enable: true` | Append `authoring/config/studio/extension/groovy/uigoodies-plugin-whitelist.append` to the site whitelist and commit |
-| `studio.scripting.restrictBeans: true` | Add `cstudioContentService,dependencyServiceInternal` to `studio.scripting.allowedBeans` |
+| `studio.scripting.sandbox.whitelist.enable: true` | Manually append `authoring/config/studio/extension/groovy/uigoodies-plugin-whitelist.append` to your Studio whitelist path; install script does not modify it |
+| `studio.scripting.restrictBeans: true` | Add `cstudioContentService,dependencyServiceInternal,studio.gitRepositoryHelper,contentRepository,sitesService,processedCommitsDao` to `studio.scripting.allowedBeans` |
 
 Do **not** rsync into `static-assets/` at the site root — marketplace maps plugin assets to `config/studio/static-assets/...`. Manual copies leave dirty git and wrong paths.
 

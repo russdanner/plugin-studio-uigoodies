@@ -20,8 +20,8 @@ if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
   echo "" >&2
   echo "  SKIP_YARN_DIST=1       Skip UI build (bundle must already exist)." >&2
   echo "  SKIP_SCRIPT_RELOAD=1   Skip Groovy script reload after copy." >&2
-  echo "  SKIP_WHITELIST=1       Do not merge sandbox whitelist fragment." >&2
-  echo "  SKIP_UI_XML=1          Do not merge Image Studio into config/studio/ui.xml." >&2
+  echo "  SKIP_WHITELIST=1       Do not merge sandbox whitelist fragment (default: skip)." >&2
+  echo "  SKIP_UI_XML=1          Do not merge Image Studio / DevContentOps into config/studio/ui.xml." >&2
   echo "" >&2
   echo "IMPORTANT: marketplace/copy reads 'path' from the Studio server's filesystem." >&2
   echo "  Run this script ON the Studio host (or set path to a clone on that host)." >&2
@@ -39,6 +39,8 @@ WHITELIST="${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox/config/studio/extensio
 WHITELIST_APPEND="${PLUGIN_PATH}/authoring/config/studio/extension/groovy/uigoodies-plugin-whitelist.append"
 UI_XML_FRAGMENT="${PLUGIN_PATH}/authoring/config/studio/ui-image-studio-widget.append.xml"
 IMAGE_STUDIO_WIDGET_ID="org.rd.plugin.uigoodies.openImageStudioPanelButton"
+UI_SITE_TOOLS_FRAGMENT="${PLUGIN_PATH}/authoring/config/studio/ui-dev-content-ops-tools.append.xml"
+DEV_CONTENT_OPS_TOOL_ID="org.rd.plugin.uigoodies.DevContentOpsTools"
 MARKER="# Studio UI Goodies plugin (org.rd.plugin.uigoodies)"
 
 if ! studio_require_token; then
@@ -110,6 +112,48 @@ EOF
 echo ""
 echo "marketplace/copy finished."
 
+sync_git_cli_runner() {
+  # UigoodiesGitCliRunner was removed; delete stale copies from older installs.
+  local stale_plugin="${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox/config/studio/scripts/classes/plugins/org/rd/plugin/uigoodies/UigoodiesGitCliRunner.groovy"
+  local stale_studio="${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox/config/studio/scripts/classes/org/craftercms/studio/impl/v2/utils/git/UigoodiesGitCliRunner.groovy"
+  for stale in "${stale_plugin}" "${stale_studio}"; do
+    if [[ ! -f "${stale}" ]]; then
+      continue
+    fi
+    if git -C "${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+      local rel="${stale#${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox/}"
+      git -C "${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox" rm -f "${rel}" 2>/dev/null || rm -f "${stale}"
+    else
+      rm -f "${stale}"
+    fi
+    echo "Removed stale UigoodiesGitCliRunner: ${stale}"
+  done
+}
+
+sync_git_cli_runner
+
+sync_stale_blob_store_classes() {
+  local sandbox="${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox"
+  local rel_paths=(
+    "config/studio/scripts/classes/plugins/org/rd/plugin/uigoodies/DevContentOpsBlobPublishItem.groovy"
+    "config/studio/scripts/classes/plugins/org/rd/plugin/uigoodies/DevContentOpsBlobStoreNoopStage.groovy"
+  )
+  for rel in "${rel_paths[@]}"; do
+    local stale="${sandbox}/${rel}"
+    if [[ ! -f "${stale}" ]]; then
+      continue
+    fi
+    if git -C "${sandbox}" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+      git -C "${sandbox}" rm -f "${rel}" 2>/dev/null || rm -f "${stale}"
+    else
+      rm -f "${stale}"
+    fi
+    echo "Removed stale blob-store class: ${stale}"
+  done
+}
+
+sync_stale_blob_store_classes
+
 if [[ "${SKIP_SCRIPT_RELOAD:-}" != "1" ]]; then
   echo "Reloading Groovy plugin scripts for site '${SITE_ID}'..."
   reload_code="$(curl -s -o /dev/null -w '%{http_code}' \
@@ -122,9 +166,9 @@ if [[ "${SKIP_SCRIPT_RELOAD:-}" != "1" ]]; then
   fi
 fi
 
-if [[ "${SKIP_WHITELIST:-}" != "1" && -f "${WHITELIST_APPEND}" && -f "${WHITELIST}" ]]; then
+if [[ "${SKIP_WHITELIST:-1}" != "1" && -f "${WHITELIST_APPEND}" && -f "${WHITELIST}" ]]; then
   if ! grep -qF "${MARKER}" "${WHITELIST}" 2>/dev/null; then
-    echo "Appending uigoodies Groovy sandbox whitelist entries..."
+    echo "Appending uigoodies Groovy sandbox whitelist entries to site sandbox..."
     {
       echo ""
       echo "${MARKER}"
@@ -133,7 +177,7 @@ if [[ "${SKIP_WHITELIST:-}" != "1" && -f "${WHITELIST_APPEND}" && -f "${WHITELIS
     if git -C "${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
       git -C "${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox" add "config/studio/extension/groovy/whitelist" 2>/dev/null || true
     fi
-    echo "Commit site sandbox if studio.scripting.sandbox.whitelist.enable is true."
+    echo "Commit site sandbox if you intentionally maintain a site-local whitelist."
   else
     added=0
     while IFS= read -r line; do
@@ -144,13 +188,13 @@ if [[ "${SKIP_WHITELIST:-}" != "1" && -f "${WHITELIST_APPEND}" && -f "${WHITELIS
       fi
     done < <(grep -v '^#' "${WHITELIST_APPEND}" | grep -v '^[[:space:]]*$' || true)
     if [[ "${added}" -eq 1 ]]; then
-      echo "Merged missing uigoodies whitelist entries."
+      echo "Merged missing uigoodies whitelist entries into site sandbox."
       if git -C "${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
         git -C "${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox" add "config/studio/extension/groovy/whitelist" 2>/dev/null || true
       fi
     fi
   fi
-elif [[ "${SKIP_WHITELIST:-}" != "1" && -f "${WHITELIST_APPEND}" && ! -f "${WHITELIST}" ]]; then
+elif [[ "${SKIP_WHITELIST:-1}" != "1" && -f "${WHITELIST_APPEND}" && ! -f "${WHITELIST}" ]]; then
   echo "Note: site whitelist not found at ${WHITELIST} — skip or create whitelist before merge."
 fi
 
@@ -194,6 +238,50 @@ PY
   fi
 elif [[ "${SKIP_UI_XML:-}" != "1" && ! -f "${SITE_UI_XML}" ]]; then
   echo "Note: site ui.xml not found at ${SITE_UI_XML} — merge Image Studio widget manually."
+fi
+
+if [[ "${SKIP_UI_XML:-}" != "1" && -f "${SITE_UI_XML}" && -f "${UI_SITE_TOOLS_FRAGMENT}" ]]; then
+  if grep -qF "${DEV_CONTENT_OPS_TOOL_ID}" "${SITE_UI_XML}" 2>/dev/null; then
+    echo "DevContentOps Tools already present in ui.xml."
+  else
+    echo "Merging DevContentOps Tools into config/studio/ui.xml..."
+    python3 - "${SITE_UI_XML}" "${UI_SITE_TOOLS_FRAGMENT}" "${DEV_CONTENT_OPS_TOOL_ID}" <<'PY'
+import sys
+from pathlib import Path
+
+ui_path = Path(sys.argv[1])
+fragment_path = Path(sys.argv[2])
+widget_id = sys.argv[3]
+text = ui_path.read_text(encoding="utf-8")
+fragment = fragment_path.read_text(encoding="utf-8")
+if widget_id in text:
+    sys.exit(0)
+needle = '<reference id="craftercms.siteTools">'
+start = text.find(needle)
+if start == -1:
+    needle = "id='craftercms.siteTools'"
+    start = text.find(needle)
+if start == -1:
+    print("Warning: craftercms.siteTools reference not found in ui.xml — add DevContentOps Tools manually.", file=sys.stderr)
+    sys.exit(0)
+tools_open = text.find("<tools>", start)
+if tools_open == -1:
+    print("Warning: siteTools <tools> not found — add DevContentOps Tools manually.", file=sys.stderr)
+    sys.exit(0)
+tools_close = text.find("</tools>", tools_open)
+if tools_close == -1:
+    print("Warning: siteTools </tools> not found — add DevContentOps Tools manually.", file=sys.stderr)
+    sys.exit(0)
+updated = text[:tools_close] + fragment + text[tools_close:]
+ui_path.write_text(updated, encoding="utf-8")
+print("DevContentOps Tools merged into Project Tools.")
+PY
+    if git -C "${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+      git -C "${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox" add "config/studio/ui.xml" 2>/dev/null || true
+    fi
+  fi
+elif [[ "${SKIP_UI_XML:-}" != "1" && ! -f "${SITE_UI_XML}" ]]; then
+  echo "Note: site ui.xml not found — merge DevContentOps Tools manually (see docs/widgets/dev-content-ops-tools.md)."
 fi
 
 if [[ -f "${SITE_PLUGIN}" ]]; then

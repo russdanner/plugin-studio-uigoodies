@@ -1,0 +1,8 @@
+        <tool>
+            <title id="uigoodies.devContentOpsTools.title" defaultMessage="DevContentOps Tools"/>
+            <icon id="@mui/icons-material/BuildRounded"/>
+            <url>uigoodies-dev-content-ops</url>
+            <widget id="org.rd.plugin.uigoodies.DevContentOpsTools">
+                <plugin id="org.rd.plugin.uigoodies" type="apps" name="uigoodies" file="index.js"/>
+            </widget>
+        </tool>

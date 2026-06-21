@@ -1,6 +1,6 @@
 const { jsx, Fragment, jsxs } = craftercms.libs.reactJsxRuntime;
 const { useSelector, useDispatch } = craftercms.libs.ReactRedux;
-const { Tooltip, useTheme, accordionClasses, accordionSummaryClasses, Accordion, AccordionSummary, Typography, AccordionDetails, Button: Button$1, CircularProgress, alpha, buttonClasses, Backdrop, Alert, Paper, Box: Box$1, AlertTitle, Stepper, Step, StepLabel, Autocomplete, TextField: TextField$1, FormControlLabel, Checkbox, List, ListItem, Dialog, FormControl, InputAdornment, IconButton: IconButton$1, FormHelperText, Stack: Stack$1, TableRow, TableCell, Menu: Menu$1, MenuItem: MenuItem$1, Divider, Chip, Table, TableHead, TableBody, ListItemText, DialogTitle, DialogContent, DialogActions, Collapse: Collapse$1, useMediaQuery, Tabs, Tab, Slider, ToggleButtonGroup, ToggleButton, InputLabel, Select, Switch, ButtonGroup, ListItemButton, RadioGroup, Radio, Breadcrumbs, Link, ListItemIcon } = craftercms.libs.MaterialUI;
+const { Tooltip, useTheme, accordionClasses, accordionSummaryClasses, Accordion, AccordionSummary, Typography, AccordionDetails, Button: Button$1, CircularProgress, alpha, buttonClasses, Backdrop, Alert, Paper, Box: Box$1, AlertTitle, Stepper, Step, StepLabel, Autocomplete, TextField: TextField$1, FormControlLabel, Checkbox, List, ListItem, Dialog, FormControl, InputAdornment, IconButton: IconButton$1, FormHelperText, Stack: Stack$1, TableRow, TableCell, Menu: Menu$1, MenuItem: MenuItem$1, Divider, Chip, Table, TableHead, TableBody, ListItemText, DialogTitle, DialogContent, DialogActions, Collapse: Collapse$1, useMediaQuery, Tabs, Tab, Slider, ToggleButtonGroup, ToggleButton, InputLabel, Select, Switch, ButtonGroup, ListItemButton, RadioGroup, Radio, Breadcrumbs, Link, ListItemIcon, LinearProgress, TableContainer, TablePagination } = craftercms.libs.MaterialUI;
 const IconButton = craftercms.libs.MaterialUI.IconButton && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.IconButton, 'default') ? craftercms.libs.MaterialUI.IconButton['default'] : craftercms.libs.MaterialUI.IconButton;
 const Button = craftercms.libs.MaterialUI.Button && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Button, 'default') ? craftercms.libs.MaterialUI.Button['default'] : craftercms.libs.MaterialUI.Button;
 const SystemIcon = craftercms.components.SystemIcon && Object.prototype.hasOwnProperty.call(craftercms.components.SystemIcon, 'default') ? craftercms.components.SystemIcon['default'] : craftercms.components.SystemIcon;
@@ -18,22 +18,22 @@ const { writeContent, fetchChildrenByPath, checkPathExistence, fetchDetailedItem
 const { DialogFooter, PathNavigator } = craftercms.components;
 const ToolsPanelListItemButton = craftercms.components.ToolsPanelListItemButton && Object.prototype.hasOwnProperty.call(craftercms.components.ToolsPanelListItemButton, 'default') ? craftercms.components.ToolsPanelListItemButton['default'] : craftercms.components.ToolsPanelListItemButton;
 const Tooltip$1 = craftercms.libs.MaterialUI.Tooltip && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Tooltip, 'default') ? craftercms.libs.MaterialUI.Tooltip['default'] : craftercms.libs.MaterialUI.Tooltip;
-const { pull, push } = craftercms.services.repositories;
+const { pull, push, fetchRepositories } = craftercms.services.repositories;
 const DownloadIcon = craftercms.utils.constants.components.get('@mui/icons-material/DownloadOutlined') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/DownloadOutlined'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/DownloadOutlined')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/DownloadOutlined');
 const PublishIcon = craftercms.utils.constants.components.get('@mui/icons-material/PublishOutlined') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/PublishOutlined'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/PublishOutlined')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/PublishOutlined');
 const Snackbar = craftercms.libs.MaterialUI.Snackbar && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Snackbar, 'default') ? craftercms.libs.MaterialUI.Snackbar['default'] : craftercms.libs.MaterialUI.Snackbar;
 const { FormattedMessage } = craftercms.libs.ReactIntl;
 const { of, from, concatMap: concatMap$1, forkJoin, Subject, firstValueFrom } = craftercms.libs.rxjs;
-const { concatMap, expand, toArray, catchError, switchMap, takeUntil, map, take } = craftercms.libs.rxjs;
+const { concatMap, expand, toArray, catchError, switchMap, takeUntil, map, take, debounceTime, distinctUntilChanged } = craftercms.libs.rxjs;
 const { fetchUnpublished, fetchMyActivity } = craftercms.services.dashboard;
 const { nou } = craftercms.utils.object;
 const { lookupItemByPath } = craftercms.utils.content;
-const { hasInitialPublish, fetchAll } = craftercms.services.sites;
+const { hasInitialPublish, fetchAll, fetchLegacySite } = craftercms.services.sites;
 const { useTheme: useTheme$1, useThemeProps: useThemeProps$2, styled, alpha: alpha$1 } = craftercms.libs.MaterialUI;
 const InfoOutlinedIcon = craftercms.utils.constants.components.get('@mui/icons-material/InfoOutlined') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/InfoOutlined'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/InfoOutlined')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/InfoOutlined');
 const Menu = craftercms.libs.MaterialUI.Menu && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Menu, 'default') ? craftercms.libs.MaterialUI.Menu['default'] : craftercms.libs.MaterialUI.Menu;
 const MenuItem = craftercms.libs.MaterialUI.MenuItem && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.MenuItem, 'default') ? craftercms.libs.MaterialUI.MenuItem['default'] : craftercms.libs.MaterialUI.MenuItem;
-const ExpandMoreRounded = craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreRounded');
+const ExpandMoreRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreRounded');
 const { fetchContentTypes: fetchContentTypes$1 } = craftercms.services.contentTypes;
 const { fetchConfigurationXML, writeConfiguration } = craftercms.services.configuration;
 const { createSvgIcon } = craftercms.libs.MaterialUI;
@@ -48,7 +48,7 @@ const ArrowDropDownRoundedIcon = craftercms.utils.constants.components.get('@mui
 const { withoutIndex, getRootPath, getIndividualPaths, withoutFile, withIndex } = craftercms.utils.path;
 const Collapse = craftercms.libs.MaterialUI.Collapse && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Collapse, 'default') ? craftercms.libs.MaterialUI.Collapse['default'] : craftercms.libs.MaterialUI.Collapse;
 const Checkbox$1 = craftercms.libs.MaterialUI.Checkbox && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Checkbox, 'default') ? craftercms.libs.MaterialUI.Checkbox['default'] : craftercms.libs.MaterialUI.Checkbox;
-const { postJSON, getGlobalHeaders } = craftercms.utils.ajax;
+const { postJSON, getGlobalHeaders, get: get$1 } = craftercms.utils.ajax;
 const Popover = craftercms.libs.MaterialUI.Popover && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Popover, 'default') ? craftercms.libs.MaterialUI.Popover['default'] : craftercms.libs.MaterialUI.Popover;
 const Paper$1 = craftercms.libs.MaterialUI.Paper && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Paper, 'default') ? craftercms.libs.MaterialUI.Paper['default'] : craftercms.libs.MaterialUI.Paper;
 const Typography$1 = craftercms.libs.MaterialUI.Typography && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Typography, 'default') ? craftercms.libs.MaterialUI.Typography['default'] : craftercms.libs.MaterialUI.Typography;
@@ -105,6 +105,29 @@ const ContentPasteRoundedIcon = craftercms.utils.constants.components.get('@mui/
 const CloseRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/CloseRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/CloseRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/CloseRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/CloseRounded');
 const FolderRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/FolderRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/FolderRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/FolderRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/FolderRounded');
 const ImageRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/ImageRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ImageRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ImageRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ImageRounded');
+const AccountTreeRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/AccountTreeRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/AccountTreeRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/AccountTreeRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/AccountTreeRounded');
+const CompareArrowsRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/CompareArrowsRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/CompareArrowsRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/CompareArrowsRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/CompareArrowsRounded');
+const HistoryRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/HistoryRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/HistoryRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/HistoryRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/HistoryRounded');
+const PlaylistAddRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/PlaylistAddRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/PlaylistAddRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/PlaylistAddRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/PlaylistAddRounded');
+const RestoreRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/RestoreRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/RestoreRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/RestoreRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/RestoreRounded');
+const WarningAmberRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/WarningAmberRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/WarningAmberRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/WarningAmberRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/WarningAmberRounded');
+const VisibilityRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/VisibilityRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/VisibilityRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/VisibilityRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/VisibilityRounded');
+const DeleteForeverRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/DeleteForeverRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/DeleteForeverRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/DeleteForeverRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/DeleteForeverRounded');
+const DeleteOutlineRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/DeleteOutlineRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/DeleteOutlineRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/DeleteOutlineRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/DeleteOutlineRounded');
+const DownloadRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/DownloadRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/DownloadRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/DownloadRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/DownloadRounded');
+const CheckCircleOutlineRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/CheckCircleOutlineRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/CheckCircleOutlineRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/CheckCircleOutlineRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/CheckCircleOutlineRounded');
+const ErrorOutlineRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/ErrorOutlineRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ErrorOutlineRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ErrorOutlineRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ErrorOutlineRounded');
+const HelpOutlineRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/HelpOutlineRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/HelpOutlineRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/HelpOutlineRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/HelpOutlineRounded');
+const { fetchItemStates } = craftercms.services.workflow;
+const { createPresenceTable } = craftercms.utils.array;
+const { STATE_NEW_MASK, STATE_MODIFIED_MASK, STATE_DELETED_MASK, STATE_LOCKED_MASK, STATE_SYSTEM_PROCESSING_MASK, STATE_SUBMITTED_MASK, STATE_SCHEDULED_MASK, STATE_PUBLISHING_MASK, PUBLISHING_DESTINATION_MASK, PUBLISHING_STAGED_MASK, PUBLISHING_LIVE_MASK, STATE_DISABLED_MASK, STATE_TRANSLATION_UP_TO_DATE_MASK, STATE_TRANSLATION_PENDING_MASK, STATE_TRANSLATION_IN_PROGRESS_MASK } = craftercms.utils.constants;
+const CloudDownloadRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/CloudDownloadRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/CloudDownloadRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/CloudDownloadRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/CloudDownloadRounded');
+const AddRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/AddRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/AddRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/AddRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/AddRounded');
+const StorageRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/StorageRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/StorageRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/StorageRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/StorageRounded');
+const CleaningServicesRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/CleaningServicesRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/CleaningServicesRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/CleaningServicesRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/CleaningServicesRounded');
+const PlaylistAddCheckRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/PlaylistAddCheckRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/PlaylistAddCheckRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/PlaylistAddCheckRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/PlaylistAddCheckRounded');
+const CommitRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/CommitRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/CommitRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/CommitRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/CommitRounded');
+const InsertDriveFileRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/InsertDriveFileRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/InsertDriveFileRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/InsertDriveFileRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/InsertDriveFileRounded');
 
 /*
  * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
@@ -1985,7 +2008,7 @@ function CopyCurrentPageUrl(props) {
                             textTransform: 'none',
                             borderRadius: 1,
                             minWidth: 0
-                        }, endIcon: jsx(ExpandMoreRounded, {}), children: "Copy URLs" }))] })) : (jsxs(Fragment, { children: [jsx(Button, { size: "small", variant: "text", onClick: handleClick, children: "Copy Page URL" }), options && options.length > 0 && (jsx(Tooltip, { title: "Copy more URLs", children: jsx(IconButton, { id: "urls-select-button", color: "inherit", size: "small", "aria-controls": optionMenuAnchorEl ? 'urls-select-menu' : undefined, "aria-haspopup": "true", onClick: handleOptionMenuClick, children: jsx(ExpandMoreRounded, {}) }) }))] })), options && options.length > 0 && (jsx(Menu, { id: "urls-select-menu", anchorEl: optionMenuAnchorEl, open: Boolean(optionMenuAnchorEl), onClose: function () { return setOptionMenuAnchorEl(null); }, MenuListProps: {
+                        }, endIcon: jsx(ExpandMoreRoundedIcon, {}), children: "Copy URLs" }))] })) : (jsxs(Fragment, { children: [jsx(Button, { size: "small", variant: "text", onClick: handleClick, children: "Copy Page URL" }), options && options.length > 0 && (jsx(Tooltip, { title: "Copy more URLs", children: jsx(IconButton, { id: "urls-select-button", color: "inherit", size: "small", "aria-controls": optionMenuAnchorEl ? 'urls-select-menu' : undefined, "aria-haspopup": "true", onClick: handleOptionMenuClick, children: jsx(ExpandMoreRoundedIcon, {}) }) }))] })), options && options.length > 0 && (jsx(Menu, { id: "urls-select-menu", anchorEl: optionMenuAnchorEl, open: Boolean(optionMenuAnchorEl), onClose: function () { return setOptionMenuAnchorEl(null); }, MenuListProps: {
                     'aria-labelledby': 'urls-select-button'
                 }, slotProps: {
                     paper: {
@@ -8002,7 +8025,7 @@ function PluginErrorAlert(_a) {
     var details = _a.details;
     return (jsx(Alert, { severity: "error", children: jsx(Typography, { variant: "body2", component: "div", children: details.message }) }));
 }
-function unwrapPluginResponse(response, payloadCheck) {
+function unwrapPluginResponse$1(response, payloadCheck) {
     if (payloadCheck === void 0) { payloadCheck = isPlanPayload; }
     var current = response;
     for (var depth = 0; depth < 6; depth++) {
@@ -8042,7 +8065,7 @@ function parsePlanResponse(response) {
             sourcePaths: []
         };
     }
-    var raw = unwrapPluginResponse(response, isPlanPayload);
+    var raw = unwrapPluginResponse$1(response, isPlanPayload);
     if (raw.error) {
         return __assign(__assign({}, raw), { error: sanitizeUserErrorMessage(asPlainString(raw.error), fallback), items: [] });
     }
@@ -8089,7 +8112,7 @@ function parseCopyResponse(response) {
             detail: envelopeError.detail
         };
     }
-    var raw = unwrapPluginResponse(response, isCopyResultPayload);
+    var raw = unwrapPluginResponse$1(response, isCopyResultPayload);
     if (raw.error) {
         return {
             successCount: 0,
@@ -11506,7 +11529,7 @@ function OpenSearchSchemaPanel(_a) {
                         }, children: "Insert exists" })), jsx(MenuItem$1, { onClick: function () { return menuField && openClauseDialog('match', menuField); }, children: "Insert match\u2026" }), jsx(MenuItem$1, { onClick: function () { return menuField && openClauseDialog('term', menuField); }, children: "Insert term\u2026" }), jsx(MenuItem$1, { onClick: function () { return menuField && openClauseDialog('prefix', menuField); }, children: "Insert prefix\u2026" }), jsx(MenuItem$1, { onClick: function () { return menuField && openClauseDialog('wildcard', menuField); }, children: "Insert wildcard\u2026" }), jsx(MenuItem$1, { onClick: function () { return menuField && openClauseDialog('range', menuField); }, children: "Insert range\u2026" })] }), jsxs(Dialog, { open: dialog.open, onClose: function () { return setDialog(function (d) { return (__assign(__assign({}, d), { open: false, mode: null })); }); }, fullWidth: true, maxWidth: "sm", children: [jsxs(DialogTitle, { children: [dialog.mode === 'match' && 'Match', dialog.mode === 'term' && 'Term', dialog.mode === 'prefix' && 'Prefix', dialog.mode === 'wildcard' && 'Wildcard', dialog.mode === 'range' && 'Range', dialog.field && (jsx(Typography, { component: "span", variant: "body2", fontFamily: "monospace", display: "block", sx: { mt: 1 }, children: dialog.field }))] }), jsx(DialogContent, { children: dialog.mode === 'range' ? (jsxs(Fragment, { children: [jsx(TextField$1, { margin: "dense", fullWidth: true, label: "gte (optional)", value: dialog.gte, onChange: function (e) { return setDialog(function (d) { return (__assign(__assign({}, d), { gte: e.target.value })); }); }, placeholder: "2024-01-01 or now-1y" }), jsx(TextField$1, { margin: "dense", fullWidth: true, label: "lte (optional)", value: dialog.lte, onChange: function (e) { return setDialog(function (d) { return (__assign(__assign({}, d), { lte: e.target.value })); }); }, placeholder: "now" })] })) : (jsx(TextField$1, { autoFocus: true, margin: "dense", fullWidth: true, label: dialog.mode === 'wildcard' ? 'Pattern (* and ? allowed)' : 'Value', value: dialog.value, onChange: function (e) { return setDialog(function (d) { return (__assign(__assign({}, d), { value: e.target.value })); }); }, multiline: dialog.mode === 'match', minRows: dialog.mode === 'match' ? 3 : 1 })) }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: function () { return setDialog(function (d) { return (__assign(__assign({}, d), { open: false, mode: null })); }); }, children: "Cancel" }), jsx(Button$1, { variant: "contained", onClick: confirmClauseDialog, children: "Insert clause" })] })] }), jsx(Divider, { sx: { my: 1 } }), jsxs(Box$1, { sx: { px: 1.5, py: 0.5 }, children: [jsx(Typography, { variant: "subtitle2", children: "Common fields (shortcuts)" }), jsxs(Typography, { variant: "caption", color: "text.secondary", children: ["Curated list \u2014 toggles ", jsx(Typography, { component: "span", variant: "caption", fontFamily: "monospace", children: "_source" }), "."] })] }), jsx(List, { dense: true, sx: { overflow: 'auto', py: 0, maxHeight: 220 }, children: CRAFTER_OPENSEARCH_FIELD_GROUPS.map(function (group) { return (jsxs(React__default.Fragment, { children: [jsx(ListItem, { secondaryAction: jsx(IconButton$1, { edge: "end", size: "small", "aria-label": openGroups[group.title] ? 'Collapse' : 'Expand', onClick: function () { return setOpenGroups(function (s) {
                                     var _a;
                                     return (__assign(__assign({}, s), (_a = {}, _a[group.title] = !s[group.title], _a)));
-                                }); }, children: openGroups[group.title] ? jsx(ExpandLessRoundedIcon, {}) : jsx(ExpandMoreRounded, {}) }), sx: { py: 0.5 }, children: jsx(ListItemText, { primary: group.title, primaryTypographyProps: { variant: 'subtitle2' } }) }), jsx(Collapse$1, { in: openGroups[group.title], timeout: "auto", unmountOnExit: true, children: jsx(List, { component: "div", dense: true, disablePadding: true, children: group.fields.map(function (field) { return (jsx(ListItem, { sx: { pl: 2, py: 0 }, children: jsx(FormControlLabel, { control: jsx(Checkbox, { size: "small", checked: sourceIsWildcard || selectedFields.has(field), disabled: sourceIsWildcard, onChange: function (_, c) { return toggleField(field, c); } }), label: jsx(Typography, { variant: "body2", fontFamily: "monospace", children: field }) }) }, field)); }) }) }), jsx(Divider, { component: "li" })] }, group.title)); }) })] }));
+                                }); }, children: openGroups[group.title] ? jsx(ExpandLessRoundedIcon, {}) : jsx(ExpandMoreRoundedIcon, {}) }), sx: { py: 0.5 }, children: jsx(ListItemText, { primary: group.title, primaryTypographyProps: { variant: 'subtitle2' } }) }), jsx(Collapse$1, { in: openGroups[group.title], timeout: "auto", unmountOnExit: true, children: jsx(List, { component: "div", dense: true, disablePadding: true, children: group.fields.map(function (field) { return (jsx(ListItem, { sx: { pl: 2, py: 0 }, children: jsx(FormControlLabel, { control: jsx(Checkbox, { size: "small", checked: sourceIsWildcard || selectedFields.has(field), disabled: sourceIsWildcard, onChange: function (_, c) { return toggleField(field, c); } }), label: jsx(Typography, { variant: "body2", fontFamily: "monospace", children: field }) }) }, field)); }) }) }), jsx(Divider, { component: "li" })] }, group.title)); }) })] }));
 }
 
 // These are filled with ranges (rangeFrom[i] up to but not including
@@ -39650,14 +39673,14 @@ function filterNonDefaultQueryParams(queryParams) {
 /** Trigger a JSON file download in the browser without leaving the page. */
 function downloadJsonFile(filename, data) {
     var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    triggerBlobDownload(filename, blob);
+    triggerBlobDownload$1(filename, blob);
 }
 /** Trigger a text/CSV file download in the browser. Adds a BOM so Excel detects UTF-8. */
 function downloadTextFile(filename, text, mimeType) {
     var blob = new Blob(['\ufeff', text], { type: "".concat(mimeType, ";charset=utf-8") });
-    triggerBlobDownload(filename, blob);
+    triggerBlobDownload$1(filename, blob);
 }
-function triggerBlobDownload(filename, blob) {
+function triggerBlobDownload$1(filename, blob) {
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
     a.href = url;
@@ -45946,6 +45969,4354 @@ function OpenImageStudioPanelButton(props) {
     return jsx(ToolsPanelListItemButton, { icon: icon, title: title, onClick: handleClick });
 }
 
+function CommitGraphMarker(_a) {
+    var commit = _a.commit, isSelected = _a.isSelected, isFirst = _a.isFirst, isLast = _a.isLast;
+    var theme = useTheme();
+    var primary = theme.palette.primary.main;
+    var lineColor = alpha(theme.palette.text.primary, 0.12);
+    var processedColor = theme.palette.success.main;
+    var unprocessedColor = theme.palette.warning.main;
+    var nodeColor = commit.processed ? processedColor : unprocessedColor;
+    var radius = isSelected ? 6 : 4.5;
+    return (jsxs(Box$1, { sx: {
+            width: 32,
+            minWidth: 32,
+            flexShrink: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            alignSelf: 'stretch',
+            py: 0.75
+        }, children: [!isFirst && jsx(Box$1, { sx: { width: 2, flex: 1, minHeight: 8, bgcolor: lineColor, borderRadius: 1 } }), jsx(Box$1, { sx: {
+                    width: radius * 2,
+                    height: radius * 2,
+                    borderRadius: '50%',
+                    bgcolor: isSelected ? primary : nodeColor,
+                    border: isSelected ? "2px solid ".concat(alpha(primary, 0.35)) : "2px solid ".concat(alpha(nodeColor, 0.35)),
+                    boxShadow: isSelected ? "0 0 0 3px ".concat(alpha(primary, 0.15)) : 'none',
+                    boxSizing: 'border-box',
+                    flexShrink: 0,
+                    transition: 'box-shadow 0.15s ease, transform 0.15s ease',
+                    transform: isSelected ? 'scale(1.05)' : 'none'
+                } }), !isLast && jsx(Box$1, { sx: { width: 2, flex: 1, minHeight: 8, bgcolor: lineColor, borderRadius: 1 } })] }));
+}
+
+/*
+ * Copyright (C) 2007-2026 Crafter Software Corporation. All Rights Reserved.
+ */
+/** Coerce API values to plain strings (Studio may serialize Java/Groovy strings as objects). */
+function apiText(value) {
+    if (value == null) {
+        return '';
+    }
+    if (typeof value === 'string') {
+        return value;
+    }
+    if (typeof value === 'number' || typeof value === 'boolean') {
+        return String(value);
+    }
+    if (typeof value === 'object') {
+        var obj = value;
+        if (typeof obj.value === 'string') {
+            return obj.value;
+        }
+        if (Array.isArray(obj.values)) {
+            return obj.values.map(function (v) { return apiText(v); }).join('');
+        }
+        if (typeof obj.strings === 'string') {
+            return obj.strings;
+        }
+        if (Array.isArray(obj.strings)) {
+            return obj.strings.map(function (v) { return apiText(v); }).join('');
+        }
+        if (typeof obj.bytes === 'string') {
+            return obj.bytes;
+        }
+    }
+    return String(value);
+}
+function normalizeCommit(commit) {
+    return __assign(__assign({}, commit), { id: apiText(commit.id), shortId: apiText(commit.shortId), author: commit.author ? apiText(commit.author) : commit.author, email: commit.email ? apiText(commit.email) : commit.email, date: apiText(commit.date), subject: apiText(commit.subject), body: commit.body ? apiText(commit.body) : commit.body });
+}
+function normalizeFileDiff(diff) {
+    var _a;
+    return __assign(__assign({}, diff), { changeType: apiText(diff.changeType), path: apiText(diff.path), oldPath: diff.oldPath ? apiText(diff.oldPath) : diff.oldPath, newPath: diff.newPath ? apiText(diff.newPath) : diff.newPath, diff: apiText(diff.diff), lines: ((_a = diff.lines) !== null && _a !== void 0 ? _a : []).map(function (line) { return (__assign(__assign({}, line), { content: apiText(line.content) })); }) });
+}
+function pluginUrl(script, siteId, query) {
+    if (query === void 0) { query = ''; }
+    var base = '/studio/api/2/plugin/script/plugins/org/rd/plugin/uigoodies/' +
+        script +
+        '?siteId=' +
+        encodeURIComponent(siteId);
+    return query ? base + '&' + query : base;
+}
+/** Reject responses scoped to a different site than the selected project. */
+function assertSiteScope(expectedSiteId, data) {
+    var responseSiteId = data.siteId ? apiText(data.siteId) : '';
+    if (responseSiteId && responseSiteId !== expectedSiteId) {
+        throw new Error("API response site mismatch: expected \"".concat(expectedSiteId, "\", got \"").concat(responseSiteId, "\""));
+    }
+    return data;
+}
+function isAjaxEnvelope(obj) {
+    return 'response' in obj && ('status' in obj || 'xhr' in obj);
+}
+function isDevContentOpsPayload(obj) {
+    return ('commits' in obj ||
+        ('siteId' in obj && 'branches' in obj) ||
+        ('id' in obj && 'subject' in obj) ||
+        'diff' in obj ||
+        'patch' in obj ||
+        'content' in obj ||
+        'success' in obj ||
+        'fileDiffs' in obj ||
+        ('files' in obj && 'total' in obj));
+}
+function unwrapPluginResponse(raw) {
+    var current = raw;
+    for (var depth = 0; depth < 8; depth++) {
+        if (!current || typeof current !== 'object') {
+            break;
+        }
+        var obj = current;
+        if (isAjaxEnvelope(obj)) {
+            current = obj.response;
+            continue;
+        }
+        if (typeof obj.code === 'number' && obj.code >= 1000) {
+            throw new Error(String(obj.message || 'DevContentOps API error'));
+        }
+        if ('result' in obj && obj.result != null && typeof obj.result === 'object') {
+            var result = obj.result;
+            if (!isDevContentOpsPayload(obj) || isDevContentOpsPayload(result)) {
+                current = obj.result;
+                continue;
+            }
+        }
+        if ('response' in obj &&
+            obj.response != null &&
+            typeof obj.response === 'object' &&
+            !isDevContentOpsPayload(obj)) {
+            current = obj.response;
+            continue;
+        }
+        if (isDevContentOpsPayload(obj)) {
+            break;
+        }
+        break;
+    }
+    if (!current || typeof current !== 'object') {
+        throw new Error('Empty response from DevContentOps API');
+    }
+    var payload = current;
+    var err = payload.error;
+    if (err) {
+        var hint = payload.hint;
+        var message = apiText(err);
+        var hintText = hint ? apiText(hint) : '';
+        throw new Error(hintText ? "".concat(message, " (").concat(hintText, ")") : message);
+    }
+    return payload;
+}
+function pluginGet(expectedSiteId, url) {
+    return get$1(url).pipe(map(function (r) { return assertSiteScope(expectedSiteId, unwrapPluginResponse(r)); }));
+}
+function fetchDevContentOpsStatus(siteId, branch) {
+    var q = 'action=status' + (branch ? '&branch=' + encodeURIComponent(branch) : '');
+    return pluginGet(siteId, pluginUrl('dev-content-ops-git', siteId, q)).pipe(map(function (data) {
+        return assertSiteScope(siteId, __assign(__assign({}, data), { siteId: apiText(data.siteId) || siteId, branch: apiText(data.branch), sandboxBranch: apiText(data.sandboxBranch), headCommitId: apiText(data.headCommitId), branchHeadCommitId: apiText(data.branchHeadCommitId), lastProcessedCommitId: apiText(data.lastProcessedCommitId), gitStatusOk: data.gitStatusOk, workTreeClean: data.workTreeClean }));
+    }));
+}
+function fetchWorkTree(siteId, branch) {
+    var q = 'action=workTree';
+    return pluginGet(siteId, pluginUrl('dev-content-ops-git', siteId, q)).pipe(map(function (data) {
+        var _a;
+        return assertSiteScope(siteId, __assign(__assign({}, data), { siteId: apiText(data.siteId) || siteId, branch: apiText(data.branch), sandboxBranch: apiText(data.sandboxBranch), headCommitId: apiText(data.headCommitId), branchHeadCommitId: apiText(data.branchHeadCommitId), lastProcessedCommitId: apiText(data.lastProcessedCommitId), repoPath: apiText(data.repoPath), files: ((_a = data.files) !== null && _a !== void 0 ? _a : []).map(function (file) { return ({
+                path: apiText(file.path),
+                status: apiText(file.status),
+                staged: Boolean(file.staged),
+                conflict: Boolean(file.conflict),
+                stagedStatus: apiText(file.stagedStatus),
+                workTreeStatus: apiText(file.workTreeStatus)
+            }); }) }));
+    }));
+}
+function fetchWorkTreeDiff(siteId, path, mode) {
+    if (mode === void 0) { mode = 'unstaged'; }
+    var q = 'action=workTreeDiff&path=' +
+        encodeURIComponent(path) +
+        '&mode=' +
+        encodeURIComponent(mode);
+    return pluginGet(siteId, pluginUrl('dev-content-ops-git', siteId, q));
+}
+function postWorkTreeStage(siteId, opts) {
+    var _a, _b;
+    return postDevContentOpsAction(siteId, {
+        action: 'workTreeStage',
+        paths: (_a = opts.paths) !== null && _a !== void 0 ? _a : [],
+        all: (_b = opts.all) !== null && _b !== void 0 ? _b : false
+    });
+}
+function postWorkTreeUnstage(siteId, opts) {
+    var _a, _b;
+    return postDevContentOpsAction(siteId, {
+        action: 'workTreeUnstage',
+        paths: (_a = opts.paths) !== null && _a !== void 0 ? _a : [],
+        all: (_b = opts.all) !== null && _b !== void 0 ? _b : false
+    });
+}
+function postWorkTreeDiscard(siteId, opts) {
+    var _a, _b;
+    return postDevContentOpsAction(siteId, {
+        action: 'workTreeDiscard',
+        paths: (_a = opts.paths) !== null && _a !== void 0 ? _a : [],
+        all: (_b = opts.all) !== null && _b !== void 0 ? _b : false
+    });
+}
+function postWorkTreeClean(siteId, opts) {
+    var _a, _b;
+    return postDevContentOpsAction(siteId, {
+        action: 'workTreeClean',
+        paths: (_a = opts.paths) !== null && _a !== void 0 ? _a : [],
+        allUntracked: (_b = opts.allUntracked) !== null && _b !== void 0 ? _b : false
+    });
+}
+function postWorkTreeCommit(siteId, message) {
+    return postDevContentOpsAction(siteId, { action: 'workTreeCommit', message: message });
+}
+function postWorkTreeResolveConflict(siteId, path, strategy) {
+    return postDevContentOpsAction(siteId, {
+        action: 'workTreeResolveConflict',
+        path: path,
+        strategy: strategy
+    });
+}
+function postWorkTreeResetHard(siteId) {
+    return postDevContentOpsAction(siteId, {
+        action: 'workTreeResetHard',
+        confirmed: true
+    });
+}
+function fetchGitLog(siteId, opts) {
+    var order = opts.order === 'asc' ? 'asc' : 'desc';
+    var q = 'action=log&branch=' +
+        encodeURIComponent(opts.branch) +
+        '&skip=' +
+        opts.skip +
+        '&limit=' +
+        opts.limit +
+        '&order=' +
+        order;
+    if (opts.since) {
+        q += '&since=' + opts.since;
+    }
+    if (opts.until) {
+        q += '&until=' + opts.until;
+    }
+    return pluginGet(siteId, pluginUrl('dev-content-ops-git', siteId, q)).pipe(map(function (data) {
+        var _a;
+        return (__assign(__assign({}, data), { branch: apiText(data.branch), headCommitId: apiText(data.headCommitId), commits: ((_a = data.commits) !== null && _a !== void 0 ? _a : []).map(normalizeCommit) }));
+    }));
+}
+function fetchGitCommitDetail(siteId, commitId) {
+    return pluginGet(siteId, pluginUrl('dev-content-ops-git', siteId, 'action=commit&commitId=' + encodeURIComponent(commitId))).pipe(map(normalizeCommit));
+}
+function fetchCommitFiles(siteId, commitId, opts) {
+    var q = 'action=commitFiles&commitId=' +
+        encodeURIComponent(commitId) +
+        '&skip=' +
+        opts.skip +
+        '&limit=' +
+        opts.limit;
+    return pluginGet(siteId, pluginUrl('dev-content-ops-git', siteId, q)).pipe(map(function (data) {
+        var _a;
+        return (__assign(__assign({}, data), { commitId: apiText(data.commitId), files: ((_a = data.files) !== null && _a !== void 0 ? _a : []).map(function (file) { return (__assign(__assign({}, file), { changeType: apiText(file.changeType), path: apiText(file.path), oldPath: file.oldPath ? apiText(file.oldPath) : file.oldPath, newPath: file.newPath ? apiText(file.newPath) : file.newPath })); }), changeCounts: data.changeCounts
+                ? Object.fromEntries(Object.entries(data.changeCounts).map(function (_a) {
+                    var key = _a[0], value = _a[1];
+                    return [apiText(key), Number(value) || 0];
+                }))
+                : undefined }));
+    }));
+}
+function fetchGitFileContent(siteId, commitId, path) {
+    return pluginGet(siteId, pluginUrl('dev-content-ops-git', siteId, 'action=file&commitId=' + encodeURIComponent(commitId) + '&path=' + encodeURIComponent(path))).pipe(map(function (data) { return (__assign(__assign({}, data), { path: apiText(data.path), content: apiText(data.content), message: data.message ? apiText(data.message) : data.message })); }));
+}
+function fetchGitDiff(siteId, fromRef, toRef, path) {
+    var q = 'action=diff&from=' + encodeURIComponent(fromRef) + '&to=' + encodeURIComponent(toRef);
+    if (path) {
+        q += '&path=' + encodeURIComponent(path);
+    }
+    return pluginGet(siteId, pluginUrl('dev-content-ops-git', siteId, q)).pipe(map(function (data) {
+        var _a;
+        return (__assign(__assign({}, data), { diff: apiText(data.diff), from: apiText(data.from), to: apiText(data.to), path: data.path ? apiText(data.path) : data.path, fileDiffs: ((_a = data.fileDiffs) !== null && _a !== void 0 ? _a : []).map(normalizeFileDiff) }));
+    }));
+}
+function buildPatchFromSelection(siteId, selections) {
+    return postJSON(pluginUrl('dev-content-ops-git', siteId), {
+        siteId: siteId,
+        action: 'buildPatch',
+        selections: selections
+    }).pipe(map(function (r) {
+        var data = unwrapPluginResponse(r);
+        return __assign(__assign({}, data), { patch: apiText(data.patch) });
+    }));
+}
+function postDevContentOpsAction(siteId, body) {
+    return postJSON(pluginUrl('dev-content-ops-git', siteId), __assign({ siteId: siteId }, body)).pipe(map(function (r) {
+        var data = unwrapPluginResponse(r);
+        assertSiteScope(siteId, data);
+        return data;
+    }));
+}
+function fetchRepoHealth(siteId) {
+    return pluginGet(siteId, pluginUrl('dev-content-ops-git', siteId, 'action=repoHealth'));
+}
+function postOptimizeRepo(siteId, operation) {
+    return postDevContentOpsAction(siteId, {
+        action: 'optimizeRepo',
+        operation: operation
+    });
+}
+function postUpdateItemStateBits(siteId, path, onMask, offMask) {
+    return postDevContentOpsAction(siteId, {
+        action: 'updateItemStateBits',
+        path: path,
+        onMask: onMask,
+        offMask: offMask
+    });
+}
+function fetchGitRefs(siteId) {
+    return pluginGet(siteId, pluginUrl('dev-content-ops-git', siteId, 'action=refs'));
+}
+function postCreateBranch(siteId, opts) {
+    return postDevContentOpsAction(siteId, __assign({ action: 'createBranch' }, opts));
+}
+function postCreateTag(siteId, opts) {
+    return postDevContentOpsAction(siteId, __assign({ action: 'createTag' }, opts));
+}
+function postDeleteBranch(siteId, opts) {
+    return postDevContentOpsAction(siteId, __assign({ action: 'deleteBranch' }, opts));
+}
+function postDeleteTag(siteId, opts) {
+    return postDevContentOpsAction(siteId, __assign({ action: 'deleteTag' }, opts));
+}
+function databasePluginUrl(siteId, query) {
+    if (query === void 0) { query = ''; }
+    return pluginUrl('database-tools', siteId, query);
+}
+function fetchDatabaseAccess(siteId) {
+    return pluginGet(siteId, databasePluginUrl(siteId, 'action=access'));
+}
+function fetchAuditStats(siteId, opts) {
+    var q = 'action=auditStats&scope=' + encodeURIComponent(opts.scope);
+    if (opts.beforeDate) {
+        q += '&beforeDate=' + encodeURIComponent(opts.beforeDate);
+    }
+    return pluginGet(siteId, databasePluginUrl(siteId, q));
+}
+function postTruncateAudit(siteId, opts) {
+    return postJSON(databasePluginUrl(siteId), __assign({ siteId: siteId, action: 'truncateAudit' }, opts)).pipe(map(function (r) {
+        var data = unwrapPluginResponse(r);
+        assertSiteScope(siteId, data);
+        return data;
+    }));
+}
+function fetchProcessedCommitsStats(siteId, opts) {
+    var q = 'action=processedCommitsStats&scope=' + encodeURIComponent(opts.scope);
+    return pluginGet(siteId, databasePluginUrl(siteId, q));
+}
+function postTruncateProcessedCommits(siteId, opts) {
+    return postJSON(databasePluginUrl(siteId), __assign({ siteId: siteId, action: 'truncateProcessedCommits' }, opts)).pipe(map(function (r) {
+        var data = unwrapPluginResponse(r);
+        assertSiteScope(siteId, data);
+        return data;
+    }));
+}
+function fetchBlobStoreOverview(siteId) {
+    return pluginGet(siteId, pluginUrl('dev-content-ops-git', siteId, 'action=blobStores')).pipe(map(function (data) {
+        var _a;
+        return assertSiteScope(siteId, __assign(__assign({}, data), { configured: Boolean(data.configured), stores: ((_a = data.stores) !== null && _a !== void 0 ? _a : []).map(function (store) {
+                var _a;
+                return (__assign(__assign({}, store), { id: apiText(store.id), type: apiText(store.type), pattern: apiText(store.pattern), treeRoot: apiText(store.treeRoot), mappings: ((_a = store.mappings) !== null && _a !== void 0 ? _a : []).map(function (mapping) { return ({
+                        publishingTarget: apiText(mapping.publishingTarget),
+                        storeTarget: apiText(mapping.storeTarget),
+                        prefix: mapping.prefix ? apiText(mapping.prefix) : undefined
+                    }); }) }));
+            }), stagingTarget: apiText(data.stagingTarget), liveTarget: apiText(data.liveTarget) }));
+    }));
+}
+function fetchBlobStoreChildren(siteId, storeId, path) {
+    var q = 'action=blobStoreChildren&storeId=' + encodeURIComponent(storeId);
+    if (path) {
+        q += '&path=' + encodeURIComponent(path);
+    }
+    return pluginGet(siteId, pluginUrl('dev-content-ops-git', siteId, q)).pipe(map(function (data) {
+        var _a;
+        return assertSiteScope(siteId, __assign(__assign({}, data), { storeId: apiText(data.storeId) || storeId, parentPath: apiText(data.parentPath), entries: ((_a = data.entries) !== null && _a !== void 0 ? _a : []).map(function (entry) { return (__assign(__assign({}, entry), { name: apiText(entry.name), path: apiText(entry.path), folder: Boolean(entry.folder), repoPointerPath: entry.repoPointerPath ? apiText(entry.repoPointerPath) : undefined, presence: entry.presence
+                    ? {
+                        inRepo: Boolean(entry.presence.inRepo),
+                        inPreview: Boolean(entry.presence.inPreview),
+                        inStaging: Boolean(entry.presence.inStaging),
+                        inLive: Boolean(entry.presence.inLive),
+                        stagingConfigured: Boolean(entry.presence.stagingConfigured),
+                        liveConfigured: Boolean(entry.presence.liveConfigured)
+                    }
+                    : undefined })); }) }));
+    }));
+}
+function postSyncBlobStore(siteId, opts) {
+    return postJSON(pluginUrl('dev-content-ops-git', siteId), {
+        siteId: siteId,
+        action: 'syncBlobStore',
+        target: opts.target,
+        paths: opts.paths,
+        storeId: opts.storeId
+    }).pipe(map(function (r) {
+        var _a, _b;
+        var data = unwrapPluginResponse(r);
+        assertSiteScope(siteId, data);
+        return __assign(__assign({}, data), { target: apiText(data.target), publishingTarget: apiText(data.publishingTarget), storeId: apiText(data.storeId), message: data.message ? apiText(data.message) : undefined, syncedPaths: ((_a = data.syncedPaths) !== null && _a !== void 0 ? _a : []).map(function (p) { return apiText(p); }), failedPaths: ((_b = data.failedPaths) !== null && _b !== void 0 ? _b : []).map(function (p) { return apiText(p); }) });
+    }));
+}
+
+var monoSx = {
+    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+    fontSize: '0.8125rem'
+};
+var codeBlockSx = __assign(__assign({}, monoSx), { p: 1.25, borderRadius: 1.5, border: 1, borderColor: 'divider', bgcolor: function (theme) { return alpha(theme.palette.text.primary, 0.03); }, wordBreak: 'break-all' });
+var surfacePaperSx = {
+    borderRadius: 2,
+    border: 1,
+    borderColor: 'divider',
+    bgcolor: 'background.paper',
+    overflow: 'hidden',
+    boxShadow: function (theme) { return "0 1px 2px ".concat(alpha(theme.palette.common.black, 0.04)); }
+};
+var panelHeaderSx = {
+    px: 2,
+    py: 1.25,
+    borderBottom: 1,
+    borderColor: 'divider',
+    bgcolor: function (theme) { return alpha(theme.palette.text.primary, 0.025); },
+    display: 'flex',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: 1.5,
+    flexWrap: 'wrap',
+    minHeight: 48,
+    flexShrink: 0
+};
+var toolbarPaperSx = __assign(__assign({}, surfacePaperSx), { flexShrink: 0, overflow: 'hidden' });
+/** Standard tab root — flex column, no overflow bleed. */
+function TabShell(_a) {
+    var children = _a.children;
+    return (jsx(Box$1, { sx: {
+            height: '100%',
+            minHeight: 0,
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+            overflow: 'hidden'
+        }, children: children }));
+}
+function TabToolbar(_a) {
+    var children = _a.children;
+    return (jsx(Paper, { variant: "outlined", sx: __assign(__assign({}, toolbarPaperSx), { py: 1.25, px: 1.5 }), children: jsx(Stack$1, { spacing: 1.25, children: children }) }));
+}
+function TabAlertStack(_a) {
+    var children = _a.children;
+    return (jsx(Stack$1, { spacing: 1, sx: { flexShrink: 0 }, children: children }));
+}
+function TabContentPanel(_a) {
+    var children = _a.children, sx = _a.sx;
+    return (jsx(Paper, { variant: "outlined", sx: __spreadArray([
+            __assign(__assign({}, surfacePaperSx), { flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' })
+        ], (sx ? [sx] : []), true), children: children }));
+}
+function ToolbarRow(_a) {
+    var children = _a.children, _b = _a.justify, justify = _b === void 0 ? 'space-between' : _b;
+    return (jsx(Stack$1, { direction: "row", spacing: 1.5, flexWrap: "wrap", useFlexGap: true, alignItems: "center", justifyContent: justify, sx: { minWidth: 0 }, children: children }));
+}
+function ToolbarDivider() {
+    return (jsx(Divider, { flexItem: true, orientation: "vertical", sx: { alignSelf: 'stretch', my: 0.5, borderColor: 'divider' } }));
+}
+function PanelHeader(_a) {
+    var title = _a.title, subtitle = _a.subtitle, action = _a.action;
+    return (jsxs(Box$1, { sx: panelHeaderSx, children: [jsxs(Box$1, { sx: { minWidth: 0, flex: '1 1 160px' }, children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, lineHeight: 1.3, children: title }), subtitle && (jsx(Typography, { variant: "caption", color: "text.secondary", display: "block", sx: { mt: 0.25 }, children: subtitle }))] }), action ? (jsx(Box$1, { sx: {
+                    minWidth: 0,
+                    flex: '0 1 auto',
+                    maxWidth: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                    gap: 1,
+                    justifyContent: 'flex-end'
+                }, children: action })) : null] }));
+}
+var actionStackSx = {
+    alignItems: 'stretch',
+    minWidth: 0,
+    '& > .MuiButton-root': {
+        justifyContent: 'flex-start'
+    },
+    '& > .MuiFormControl-root': {
+        width: '100%',
+        minWidth: 0
+    }
+};
+function ActionButtonStack(_a) {
+    var children = _a.children, _b = _a.spacing, spacing = _b === void 0 ? 1 : _b, _c = _a.align, align = _c === void 0 ? 'stretch' : _c, sx = _a.sx;
+    return (jsx(Stack$1, { direction: "column", spacing: spacing, sx: __spreadArray([actionStackSx, { alignItems: align }], (sx ? [sx] : []), true), children: children }));
+}
+function ToolbarGroup(_a) {
+    var label = _a.label, children = _a.children, _b = _a.inline, inline = _b === void 0 ? true : _b;
+    return (jsxs(Stack$1, { spacing: inline ? 0.5 : 0.75, sx: { minWidth: 0, flex: inline ? '0 1 auto' : '1 1 auto' }, children: [jsx(Typography, { variant: "caption", fontWeight: 700, color: "text.secondary", sx: { letterSpacing: 0.8, textTransform: 'uppercase', fontSize: '0.65rem' }, children: label }), inline ? (jsx(Stack$1, { direction: "row", spacing: 1, flexWrap: "wrap", useFlexGap: true, alignItems: "center", sx: { minWidth: 0 }, children: children })) : (jsx(ActionButtonStack, { children: children }))] }));
+}
+function SectionLabel(_a) {
+    var children = _a.children;
+    return (jsx(Typography, { variant: "caption", fontWeight: 700, color: "text.secondary", sx: { letterSpacing: 0.6, textTransform: 'uppercase', fontSize: '0.65rem' }, children: children }));
+}
+function ProcessedStatusChip(_a) {
+    var processed = _a.processed, _b = _a.size, size = _b === void 0 ? 'small' : _b;
+    if (processed) {
+        return (jsx(Chip, { size: size, label: "Processed", color: "success", variant: "outlined", sx: { height: 20, fontWeight: 600, flexShrink: 0 } }));
+    }
+    return (jsx(Chip, { size: size, label: "Unprocessed", color: "warning", sx: { height: 20, fontWeight: 600, flexShrink: 0 } }));
+}
+function RepoStatusBar(_a) {
+    var _b, _c, _d, _e;
+    var status = _a.status;
+    var head = (_c = (_b = (status.headCommitId || status.branchHeadCommitId)) === null || _b === void 0 ? void 0 : _b.slice(0, 8)) !== null && _c !== void 0 ? _c : '—';
+    var processed = ((_d = status.lastProcessedCommitId) === null || _d === void 0 ? void 0 : _d.slice(0, 8)) || '—';
+    var unprocessed = (_e = status.unprocessedCount) !== null && _e !== void 0 ? _e : 0;
+    return (jsxs(Stack$1, { direction: "row", spacing: 0.75, flexWrap: "wrap", useFlexGap: true, justifyContent: { xs: 'flex-start', lg: 'flex-end' }, children: [jsx(Chip, { size: "small", label: "HEAD ".concat(head), sx: __assign({ fontWeight: 600 }, monoSx) }), jsx(Chip, { size: "small", variant: "outlined", label: "Processed ".concat(processed), sx: __assign({}, monoSx) }), jsx(Chip, { size: "small", color: unprocessed ? 'warning' : 'success', variant: unprocessed ? 'filled' : 'outlined', label: unprocessed ? "".concat(unprocessed, " unprocessed") : 'All processed', sx: { fontWeight: 600 } })] }));
+}
+function CommitSummaryCard(_a) {
+    var _b;
+    var commit = _a.commit, processed = _a.processed;
+    return (jsxs(Box$1, { sx: __assign(__assign({}, codeBlockSx), { p: 1.5 }), children: [jsxs(Stack$1, { direction: "row", spacing: 1, alignItems: "center", flexWrap: "wrap", useFlexGap: true, sx: { mb: 1 }, children: [jsx(Chip, { label: commit.shortId, size: "small", color: "primary", variant: "outlined", sx: __assign(__assign({}, monoSx), { fontWeight: 700 }) }), jsx(ProcessedStatusChip, { processed: processed === true })] }), jsx(Typography, { variant: "subtitle2", fontWeight: 600, sx: { mb: 0.75 }, children: commit.subject }), jsxs(Typography, { variant: "caption", color: "text.secondary", display: "block", sx: { mb: 1 }, children: [(_b = commit.author) !== null && _b !== void 0 ? _b : 'Unknown author', " \u00B7 ", new Date(commit.date).toLocaleString()] }), jsx(Typography, { variant: "caption", color: "text.secondary", sx: __assign(__assign({}, monoSx), { fontSize: '0.7rem', wordBreak: 'break-all' }), children: commit.id }), commit.body && (jsx(Typography, { variant: "body2", color: "text.secondary", sx: { mt: 1, whiteSpace: 'pre-wrap' }, children: commit.body }))] }));
+}
+function DangerZone(_a) {
+    var children = _a.children, title = _a.title, description = _a.description, action = _a.action;
+    var structured = Boolean(title || description || action);
+    return (jsxs(Box$1, { sx: {
+            p: 1.5,
+            borderRadius: 1.5,
+            border: 1,
+            borderColor: function (theme) { return alpha(theme.palette.error.main, 0.35); },
+            bgcolor: function (theme) { return alpha(theme.palette.error.main, 0.04); }
+        }, children: [jsx(SectionLabel, { children: "Danger zone" }), structured ? (jsxs(Stack$1, { spacing: 1.5, sx: { mt: 1 }, children: [title ? (jsx(Typography, { variant: "subtitle2", fontWeight: 700, children: title })) : null, description ? (jsx(Typography, { variant: "body2", color: "text.secondary", children: description })) : null, action ? jsx(Box$1, { children: action }) : null] })) : (jsx(ActionButtonStack, { spacing: 1, sx: { mt: 1 }, children: children }))] }));
+}
+
+function changeLabel(changeType) {
+    switch (changeType) {
+        case 'ADD':
+            return 'created';
+        case 'MODIFY':
+            return 'updated';
+        case 'DELETE':
+            return 'deleted';
+        case 'COPY':
+            return 'copied';
+        case 'RENAME':
+            return 'renamed';
+        default:
+            return changeType.toLowerCase();
+    }
+}
+function changeShortLabel(changeType) {
+    switch (changeType) {
+        case 'ADD':
+            return '+';
+        case 'MODIFY':
+            return '~';
+        case 'DELETE':
+            return '−';
+        case 'COPY':
+            return 'C';
+        case 'RENAME':
+            return 'R';
+        default:
+            return changeType.charAt(0);
+    }
+}
+function changeColor(changeType) {
+    switch (changeType) {
+        case 'ADD':
+            return 'success';
+        case 'DELETE':
+            return 'error';
+        case 'MODIFY':
+            return 'warning';
+        case 'COPY':
+        case 'RENAME':
+            return 'info';
+        default:
+            return 'default';
+    }
+}
+var CHANGE_TYPE_ORDER = ['ADD', 'MODIFY', 'DELETE', 'COPY', 'RENAME'];
+function countFileChanges(files) {
+    var _a;
+    var counts = {};
+    for (var _i = 0, files_1 = files; _i < files_1.length; _i++) {
+        var file = files_1[_i];
+        counts[file.changeType] = ((_a = counts[file.changeType]) !== null && _a !== void 0 ? _a : 0) + 1;
+    }
+    return counts;
+}
+function orderedChangeEntries(counts) {
+    var seen = new Set();
+    var entries = [];
+    for (var _i = 0, CHANGE_TYPE_ORDER_1 = CHANGE_TYPE_ORDER; _i < CHANGE_TYPE_ORDER_1.length; _i++) {
+        var type = CHANGE_TYPE_ORDER_1[_i];
+        var n = counts[type];
+        if (n && n > 0) {
+            entries.push([type, n]);
+            seen.add(type);
+        }
+    }
+    for (var _a = 0, _b = Object.entries(counts); _a < _b.length; _a++) {
+        var _c = _b[_a], type = _c[0], n = _c[1];
+        if (!seen.has(type) && n && n > 0) {
+            entries.push([type, n]);
+        }
+    }
+    return entries;
+}
+function isMixedChangeSet(counts) {
+    return orderedChangeEntries(counts).length > 1;
+}
+function FileChangeTypeChip(_a) {
+    var changeType = _a.changeType, compact = _a.compact;
+    var label = compact ? changeShortLabel(changeType) : changeLabel(changeType);
+    var chip = (jsx(Chip, { size: "small", label: label, color: changeColor(changeType), sx: __assign({ height: 20, fontSize: 10, flexShrink: 0, minWidth: compact ? 22 : undefined }, (compact ? monoSx : {})) }));
+    if (compact) {
+        return jsx(Tooltip, { title: changeLabel(changeType), children: chip });
+    }
+    return chip;
+}
+function FileChangeSummary(_a) {
+    var counts = _a.counts;
+    var entries = useMemo(function () { return orderedChangeEntries(counts); }, [counts]);
+    if (entries.length === 0) {
+        return null;
+    }
+    if (entries.length === 1) {
+        var _b = entries[0], type = _b[0], n = _b[1];
+        return (jsx(Chip, { size: "small", label: "".concat(n, " ").concat(changeLabel(type)), color: changeColor(type), sx: { height: 20, fontWeight: 600 } }));
+    }
+    return (jsxs(Stack$1, { direction: "row", spacing: 0.5, alignItems: "center", flexWrap: "wrap", useFlexGap: true, children: [jsx(Chip, { size: "small", variant: "outlined", label: "Mixed", sx: { height: 20, fontWeight: 600 } }), entries.map(function (_a) {
+                var type = _a[0], n = _a[1];
+                return (jsx(Tooltip, { title: "".concat(n, " ").concat(changeLabel(type)), children: jsx(Chip, { size: "small", label: "".concat(changeShortLabel(type)).concat(n), color: changeColor(type), sx: __assign({ height: 20, minWidth: 28, fontWeight: 700 }, monoSx) }) }, type));
+            })] }));
+}
+
+function selectionKey(sel) {
+    var _a;
+    return "".concat(sel.commitId, ":").concat((_a = sel.path) !== null && _a !== void 0 ? _a : '*');
+}
+function PatchBasketPanel(_a) {
+    var _b;
+    var selections = _a.selections, onRemove = _a.onRemove, onClear = _a.onClear, onBuildPatch = _a.onBuildPatch, onApplyPatch = _a.onApplyPatch, onDownloadPatch = _a.onDownloadPatch, building = _a.building, patchPreview = _a.patchPreview, sourceSiteId = _a.sourceSiteId, _c = _a.sites, sites = _c === void 0 ? [] : _c, applyTargetSiteId = _a.applyTargetSiteId, onApplyTargetSiteChange = _a.onApplyTargetSiteChange;
+    var _d = React__default.useState(false), expanded = _d[0], setExpanded = _d[1];
+    var applyTarget = applyTargetSiteId || sourceSiteId || '';
+    var applyTargetSite = (_b = sites.find(function (site) { return site.id === applyTarget; })) !== null && _b !== void 0 ? _b : null;
+    var applyToOtherProject = Boolean(sourceSiteId && applyTarget && applyTarget !== sourceSiteId);
+    var hasContent = selections.length > 0 || Boolean(patchPreview);
+    var showExpanded = expanded || hasContent;
+    return (jsxs(Paper, { variant: "outlined", sx: __assign(__assign({}, surfacePaperSx), { flexShrink: 0 }), children: [jsxs(Stack$1, { direction: "row", spacing: 1, alignItems: "center", sx: {
+                    px: 1.5,
+                    py: 1,
+                    borderBottom: showExpanded ? 1 : 0,
+                    borderColor: 'divider',
+                    flexWrap: 'wrap',
+                    useFlexGap: true
+                }, children: [jsx(IconButton$1, { size: "small", onClick: function () { return setExpanded(function (v) { return !v; }); }, "aria-label": showExpanded ? 'Collapse patch basket' : 'Expand patch basket', sx: { ml: -0.5 }, children: jsx(ExpandMoreRoundedIcon, { fontSize: "small", sx: {
+                                transform: showExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                                transition: 'transform 0.15s ease'
+                            } }) }), jsxs(Typography, { variant: "subtitle2", fontWeight: 700, sx: { flex: 1, minWidth: 0 }, children: ["Patch basket", jsxs(Typography, { component: "span", variant: "body2", color: "text.secondary", sx: { ml: 0.75 }, children: ["(", selections.length, ")"] })] }), jsxs(Stack$1, { direction: "row", spacing: 0.75, flexWrap: "wrap", useFlexGap: true, children: [jsx(Button$1, { size: "small", variant: "contained", disabled: !selections.length || building, onClick: onBuildPatch, children: "Build" }), jsx(Button$1, { size: "small", variant: "outlined", disabled: !patchPreview, startIcon: jsx(DownloadRoundedIcon, {}), onClick: onDownloadPatch, children: "Download" }), jsx(Button$1, { size: "small", variant: "outlined", disabled: !patchPreview, startIcon: jsx(ContentPasteRoundedIcon, {}), onClick: onApplyPatch, children: "Apply" }), jsx(Button$1, { size: "small", color: "inherit", disabled: !selections.length, onClick: onClear, children: "Clear" })] })] }), jsx(Collapse$1, { in: showExpanded, children: jsx(Box$1, { sx: { p: 1.5 }, children: !hasContent ? (jsx(Typography, { variant: "body2", color: "text.secondary", children: "Add commits or files from the log, then build a patch." })) : (jsxs(Stack$1, { spacing: 1.5, children: [selections.length > 0 && (jsx(List, { dense: true, disablePadding: true, sx: { maxHeight: 140, overflow: 'auto' }, children: selections.map(function (sel, idx) {
+                                    var _a;
+                                    return (jsx(ListItem, { sx: {
+                                            py: 0.5,
+                                            pl: 1,
+                                            pr: 0,
+                                            mb: 0.5,
+                                            borderRadius: 1,
+                                            border: 1,
+                                            borderColor: 'divider',
+                                            bgcolor: 'background.default'
+                                        }, secondaryAction: jsx(IconButton$1, { edge: "end", size: "small", onClick: function () { return onRemove(idx); }, "aria-label": "Remove from patch basket", children: jsx(DeleteOutlineRoundedIcon, { fontSize: "small" }) }), children: jsx(ListItemText, { primary: jsxs(Stack$1, { direction: "row", spacing: 0.75, alignItems: "center", flexWrap: "wrap", useFlexGap: true, children: [jsx(Chip, { size: "small", label: (_a = sel.shortId) !== null && _a !== void 0 ? _a : sel.commitId.slice(0, 8), sx: __assign(__assign({ height: 20 }, monoSx), { fontWeight: 600 }) }), sel.path ? (jsx(Typography, { variant: "caption", sx: { wordBreak: 'break-all' }, children: sel.path })) : (jsx(Typography, { variant: "caption", color: "text.secondary", children: "entire commit" })), sel.changeType && (jsx(Chip, { size: "small", variant: "outlined", label: changeLabel(sel.changeType), color: changeColor(sel.changeType), sx: { height: 20 } }))] }), secondary: sel.subject, secondaryTypographyProps: { variant: 'caption', sx: { mt: 0.25 } } }) }, selectionKey(sel) + idx));
+                                }) })), patchPreview && (jsxs(Box$1, { children: [jsx(Typography, { variant: "caption", color: "text.secondary", fontWeight: 600, children: "Preview" }), jsx(Paper, { variant: "outlined", sx: __assign(__assign({}, codeBlockSx), { mt: 0.5, maxHeight: 96, overflow: 'auto', fontSize: 11 }), children: jsx("pre", { style: { margin: 0, whiteSpace: 'pre-wrap' }, children: patchPreview.slice(0, 4000) }) })] })), patchPreview && sites.length > 0 && onApplyTargetSiteChange && (jsxs(Stack$1, { spacing: 0.75, children: [jsx(Autocomplete, { size: "small", options: sites, value: applyTargetSite, onChange: function (_, value) { var _a, _b; return onApplyTargetSiteChange((_b = (_a = value === null || value === void 0 ? void 0 : value.id) !== null && _a !== void 0 ? _a : sourceSiteId) !== null && _b !== void 0 ? _b : ''); }, getOptionLabel: function (option) { return "".concat(option.name, " (").concat(option.id, ")"); }, isOptionEqualToValue: function (option, value) { return option.id === value.id; }, renderInput: function (params) { return (jsx(TextField$1, __assign({}, params, { label: "Apply to project", placeholder: "Same as header unless changed" }))); } }), applyToOtherProject && (jsx(Typography, { variant: "caption", color: "warning.main", children: "Patch applies to another project's sandbox repository." }))] }))] })) }) })] }));
+}
+
+var FILE_PAGE = 25;
+function CommitFileList(_a) {
+    var _this = this;
+    var siteId = _a.siteId, commit = _a.commit, onViewFile = _a.onViewFile, onDiffFile = _a.onDiffFile, onAddToPatch = _a.onAddToPatch, onRemoveFromHistory = _a.onRemoveFromHistory, patchKeys = _a.patchKeys;
+    var _b = useState([]), files = _b[0], setFiles = _b[1];
+    var _c = useState(0), total = _c[0], setTotal = _c[1];
+    var _d = useState(0), skip = _d[0], setSkip = _d[1];
+    var _e = useState(false), hasMore = _e[0], setHasMore = _e[1];
+    var _f = useState(true), loading = _f[0], setLoading = _f[1];
+    var _g = useState(null), error = _g[0], setError = _g[1];
+    var _h = useState({}), changeCounts = _h[0], setChangeCounts = _h[1];
+    var load = useCallback(function (nextSkip, append) { return __awaiter(_this, void 0, void 0, function () {
+        var data_1, e_1;
+        var _a, _b, _c;
+        return __generator(this, function (_d) {
+            switch (_d.label) {
+                case 0:
+                    setLoading(true);
+                    setError(null);
+                    _d.label = 1;
+                case 1:
+                    _d.trys.push([1, 3, 4, 5]);
+                    return [4 /*yield*/, firstValueFrom(fetchCommitFiles(siteId, commit.id, { skip: nextSkip, limit: FILE_PAGE }))];
+                case 2:
+                    data_1 = _d.sent();
+                    setFiles(function (prev) {
+                        var _a, _b;
+                        var nextFiles = append ? __spreadArray(__spreadArray([], prev, true), ((_a = data_1.files) !== null && _a !== void 0 ? _a : []), true) : (_b = data_1.files) !== null && _b !== void 0 ? _b : [];
+                        if (data_1.changeCounts) {
+                            setChangeCounts(data_1.changeCounts);
+                        }
+                        else {
+                            setChangeCounts(countFileChanges(nextFiles));
+                        }
+                        return nextFiles;
+                    });
+                    setTotal((_a = data_1.total) !== null && _a !== void 0 ? _a : 0);
+                    setSkip((_b = data_1.nextSkip) !== null && _b !== void 0 ? _b : nextSkip);
+                    setHasMore((_c = data_1.hasMore) !== null && _c !== void 0 ? _c : false);
+                    return [3 /*break*/, 5];
+                case 3:
+                    e_1 = _d.sent();
+                    setError(e_1.message || 'Failed to load files');
+                    return [3 /*break*/, 5];
+                case 4:
+                    setLoading(false);
+                    return [7 /*endfinally*/];
+                case 5: return [2 /*return*/];
+            }
+        });
+    }); }, [siteId, commit.id]);
+    useEffect(function () {
+        load(0, false);
+    }, [load]);
+    var mixedChanges = useMemo(function () { return isMixedChangeSet(changeCounts); }, [changeCounts]);
+    return (jsxs(Box$1, { sx: { mt: 1, mb: 1, minWidth: 0, maxWidth: '100%' }, children: [jsxs(Stack$1, { direction: "row", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 0.75, sx: { mb: 0.75 }, children: [jsxs(SectionLabel, { children: ["Changed files (", total, ")"] }), !loading && files.length > 0 && jsx(FileChangeSummary, { counts: changeCounts })] }), error && (jsx(Typography, { variant: "caption", color: "error", sx: { display: 'block', mb: 0.5 }, children: error })), loading && files.length === 0 ? (jsx(Box$1, { sx: { py: 1, display: 'flex', justifyContent: 'center' }, children: jsx(CircularProgress, { size: 20 }) })) : files.length === 0 ? (jsx(Typography, { variant: "caption", color: "text.secondary", children: "No file changes in this commit." })) : (jsx(List, { dense: true, disablePadding: true, children: files.map(function (file) {
+                    var inPatch = patchKeys.has(selectionKey({ commitId: commit.id, path: file.path }));
+                    return (jsxs(ListItem, { sx: {
+                            py: 0.75,
+                            pl: 1,
+                            pr: 0,
+                            mb: 0.5,
+                            alignItems: 'stretch',
+                            flexDirection: 'column',
+                            minWidth: 0,
+                            borderRadius: 1,
+                            border: 1,
+                            borderColor: 'divider',
+                            bgcolor: 'background.default'
+                        }, children: [jsxs(Stack$1, { direction: "row", spacing: 0.5, alignItems: "flex-start", sx: { width: '100%', minWidth: 0 }, children: [jsx(FileChangeTypeChip, { changeType: file.changeType, compact: mixedChanges }), jsx(Typography, { variant: "caption", component: "span", sx: { flex: 1, minWidth: 0, wordBreak: 'break-all', lineHeight: 1.4 }, children: file.path })] }), jsxs(Stack$1, { direction: "row", spacing: 0.25, sx: { mt: 0.25, flexShrink: 0 }, children: [jsx(Tooltip, { title: "View at commit", children: jsx(IconButton$1, { size: "small", onClick: function () { return onViewFile(commit, file); }, children: jsx(VisibilityRoundedIcon, { fontSize: "small" }) }) }), commit.parents[0] && file.changeType !== 'DELETE' && (jsx(Tooltip, { title: "Diff vs parent", children: jsx(IconButton$1, { size: "small", onClick: function () { return onDiffFile(commit, file); }, children: jsx(CompareArrowsRoundedIcon, { fontSize: "small" }) }) })), jsx(Tooltip, { title: inPatch ? 'Already in patch' : 'Add to patch', children: jsx("span", { children: jsx(IconButton$1, { size: "small", disabled: inPatch, onClick: function () {
+                                                    return onAddToPatch({
+                                                        commitId: commit.id,
+                                                        shortId: commit.shortId,
+                                                        subject: commit.subject,
+                                                        path: file.path,
+                                                        changeType: file.changeType
+                                                    });
+                                                }, children: jsx(PlaylistAddRoundedIcon, { fontSize: "small" }) }) }) }), jsx(Tooltip, { title: "Remove from history", children: jsx(IconButton$1, { size: "small", onClick: function () { return onRemoveFromHistory(commit, file); }, children: jsx(DeleteForeverRoundedIcon, { fontSize: "small" }) }) })] })] }, file.path + file.changeType));
+                }) })), hasMore && (jsx(Button$1, { size: "small", disabled: loading, onClick: function () { return load(skip, true); }, sx: { mt: 0.5 }, children: loading ? 'Loading…' : 'Load more files' }))] }));
+}
+
+function lineColor(type, theme) {
+    switch (type) {
+        case 'add':
+            return { bg: alpha(theme.palette.success.main, 0.18), color: theme.palette.success.dark };
+        case 'remove':
+            return { bg: alpha(theme.palette.error.main, 0.15), color: theme.palette.error.dark };
+        case 'meta':
+            return { bg: alpha(theme.palette.info.main, 0.08), color: theme.palette.text.secondary };
+        default:
+            return { bg: 'transparent', color: theme.palette.text.primary };
+    }
+}
+function DiffViewer(_a) {
+    var _b;
+    var title = _a.title, fileDiffs = _a.fileDiffs, activePath = _a.activePath, onActivePathChange = _a.onActivePathChange, fallbackText = _a.fallbackText;
+    var theme = useTheme();
+    var paths = fileDiffs.map(function (f) { return f.path; });
+    var selectedPath = activePath && paths.includes(activePath) ? activePath : paths[0];
+    var active = fileDiffs.find(function (f) { return f.path === selectedPath; });
+    if (!fileDiffs.length && fallbackText) {
+        return (jsx(PaperFallback, { children: jsx("pre", { style: { margin: 0, whiteSpace: 'pre-wrap', fontFamily: 'monospace', fontSize: 12 }, children: fallbackText ? apiText(fallbackText) : '' }) }));
+    }
+    if (!active) {
+        return null;
+    }
+    return (jsxs(Box$1, { sx: { display: 'flex', flexDirection: 'column', minHeight: 0, flex: 1 }, children: [title && (jsx(Typography, { variant: "caption", color: "text.secondary", sx: { mb: 1, display: 'block' }, children: title ? apiText(title) : null })), paths.length > 1 && (jsx(Tabs, { value: selectedPath, onChange: function (_, v) { return onActivePathChange === null || onActivePathChange === void 0 ? void 0 : onActivePathChange(v); }, variant: "scrollable", scrollButtons: "auto", sx: { minHeight: 36, mb: 1, borderBottom: 1, borderColor: 'divider' }, children: fileDiffs.map(function (f) { return (jsx(Tab, { value: f.path, label: f.path.split('/').pop() || f.path, sx: { minHeight: 36, py: 0.5 } }, f.path)); }) })), jsx(Box$1, { sx: {
+                    flex: 1,
+                    overflow: 'auto',
+                    fontFamily: 'monospace',
+                    fontSize: 12,
+                    lineHeight: 1.45,
+                    border: 1,
+                    borderColor: 'divider',
+                    borderRadius: 1,
+                    bgcolor: alpha(theme.palette.background.default, 0.6)
+                }, children: (_b = active.lines) === null || _b === void 0 ? void 0 : _b.map(function (line, idx) {
+                    var colors = lineColor(line.type, theme);
+                    return (jsxs(Box$1, { sx: {
+                            px: 1,
+                            py: 0.125,
+                            bgcolor: colors.bg,
+                            color: colors.color,
+                            whiteSpace: 'pre-wrap',
+                            wordBreak: 'break-word'
+                        }, children: [line.type === 'add' ? '+' : line.type === 'remove' ? '-' : ' ', apiText(line.content)] }, idx));
+                }) })] }));
+}
+function PaperFallback(_a) {
+    var children = _a.children;
+    return (jsx(Box$1, { sx: {
+            p: 1,
+            maxHeight: 480,
+            overflow: 'auto',
+            border: 1,
+            borderColor: 'divider',
+            borderRadius: 1
+        }, children: children }));
+}
+
+var LOG_LIMIT = 50;
+function GitLogTab(_a) {
+    var _this = this;
+    var _b, _c;
+    var siteId = _a.siteId, _d = _a.sites, sites = _d === void 0 ? [] : _d;
+    var dispatch = useDispatch();
+    var _e = useState(null), status = _e[0], setStatus = _e[1];
+    var _f = useState(''), branch = _f[0], setBranch = _f[1];
+    var _g = useState([]), commits = _g[0], setCommits = _g[1];
+    var _h = useState(null), selected = _h[0], setSelected = _h[1];
+    var _j = useState({}), expanded = _j[0], setExpanded = _j[1];
+    var _k = useState(false), loading = _k[0], setLoading = _k[1];
+    var _l = useState(false), loadingMore = _l[0], setLoadingMore = _l[1];
+    var _m = useState(false), hasMore = _m[0], setHasMore = _m[1];
+    var _o = useState(0), nextSkip = _o[0], setNextSkip = _o[1];
+    var _p = useState(''), sinceDate = _p[0], setSinceDate = _p[1];
+    var _q = useState(''), untilDate = _q[0], setUntilDate = _q[1];
+    var _r = useState('desc'), logOrder = _r[0], setLogOrder = _r[1];
+    var _s = useState(null), fileContent = _s[0], setFileContent = _s[1];
+    var _t = useState(''), diffFrom = _t[0], setDiffFrom = _t[1];
+    var _u = useState(''), diffTo = _u[0], setDiffTo = _u[1];
+    var _v = useState(null), diffView = _v[0], setDiffView = _v[1];
+    var _w = useState([]), patchSelections = _w[0], setPatchSelections = _w[1];
+    var _x = useState(''), patchPreview = _x[0], setPatchPreview = _x[1];
+    var _y = useState(''), patchText = _y[0], setPatchText = _y[1];
+    var _z = useState(siteId), patchApplyTargetSiteId = _z[0], setPatchApplyTargetSiteId = _z[1];
+    var _0 = useState(false), buildingPatch = _0[0], setBuildingPatch = _0[1];
+    var _1 = useState(false), diffDialogOpen = _1[0], setDiffDialogOpen = _1[1];
+    var _2 = useState(null), confirmDialog = _2[0], setConfirmDialog = _2[1];
+    var _3 = useState(null), apiError = _3[0], setApiError = _3[1];
+    var _4 = useState(null), filterFileResult = _4[0], setFilterFileResult = _4[1];
+    var listRef = useRef(null);
+    var loadMoreRef = useRef(null);
+    var loadingMoreRef = useRef(false);
+    var nextSkipRef = useRef(0);
+    var hasMoreRef = useRef(false);
+    var patchKeys = useMemo(function () { return new Set(patchSelections.map(selectionKey)); }, [patchSelections]);
+    var branchOptions = React__default.useMemo(function () {
+        var _a;
+        var names = new Set((_a = status === null || status === void 0 ? void 0 : status.branches) !== null && _a !== void 0 ? _a : []);
+        if (branch) {
+            names.add(branch);
+        }
+        return Array.from(names);
+    }, [status === null || status === void 0 ? void 0 : status.branches, branch]);
+    var notify = function (message, variant) {
+        dispatch(showSystemNotification({
+            message: message,
+            options: variant ? { variant: variant } : undefined
+        }));
+    };
+    var reportProcessedCommitUpdate = function (update, okMessage, partialMessage) {
+        if (!update) {
+            notify((partialMessage === null || partialMessage === void 0 ? void 0 : partialMessage.replace('; sync failed', '')) || okMessage.replace(' and sync triggered', ''), 'success');
+            notify('Repository sync was not triggered', 'error');
+            return false;
+        }
+        if (update.error && !update.success) {
+            notify(partialMessage ? "".concat(partialMessage, ": ").concat(apiText(update.error)) : apiText(update.error), 'error');
+            return false;
+        }
+        if (update.error) {
+            notify("".concat(partialMessage !== null && partialMessage !== void 0 ? partialMessage : 'Processed commit updated', ": ").concat(apiText(update.error)), 'error');
+            notify(okMessage.replace(' and sync triggered', ''), 'success');
+            return true;
+        }
+        notify(okMessage, 'success');
+        return true;
+    };
+    var loadStatus = useCallback(function () { return __awaiter(_this, void 0, void 0, function () {
+        var s, e_1, message;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 2, , 3]);
+                    setApiError(null);
+                    return [4 /*yield*/, firstValueFrom(fetchDevContentOpsStatus(siteId, branch || undefined))];
+                case 1:
+                    s = _a.sent();
+                    setStatus(s);
+                    if (!branch && (s === null || s === void 0 ? void 0 : s.branch)) {
+                        setBranch(s.branch);
+                    }
+                    return [3 /*break*/, 3];
+                case 2:
+                    e_1 = _a.sent();
+                    message = e_1.message || 'Failed to load repo status';
+                    setApiError(message);
+                    notify(message, 'error');
+                    return [3 /*break*/, 3];
+                case 3: return [2 /*return*/];
+            }
+        });
+    }); }, [siteId, branch]);
+    var parseEpoch = function (dateStr) {
+        if (!dateStr) {
+            return undefined;
+        }
+        var ms = Date.parse(dateStr);
+        return Number.isFinite(ms) ? Math.floor(ms / 1000) : undefined;
+    };
+    var loadLog = useCallback(function () {
+        var args_1 = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args_1[_i] = arguments[_i];
+        }
+        return __awaiter(_this, __spreadArray([], args_1, true), void 0, function (reset, explicitSkip) {
+            var skip, since, until, data_1, e_2, message;
+            var _a;
+            if (reset === void 0) { reset = true; }
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        if (!branch) {
+                            return [2 /*return*/];
+                        }
+                        skip = reset ? 0 : explicitSkip !== null && explicitSkip !== void 0 ? explicitSkip : nextSkip;
+                        if (reset) {
+                            setLoading(true);
+                        }
+                        else {
+                            setLoadingMore(true);
+                        }
+                        _b.label = 1;
+                    case 1:
+                        _b.trys.push([1, 3, 4, 5]);
+                        setApiError(null);
+                        since = parseEpoch(sinceDate);
+                        until = parseEpoch(untilDate);
+                        return [4 /*yield*/, firstValueFrom(fetchGitLog(siteId, { branch: branch, skip: skip, limit: LOG_LIMIT, since: since, until: until, order: logOrder }))];
+                    case 2:
+                        data_1 = _b.sent();
+                        if (reset) {
+                            setCommits((_a = data_1.commits) !== null && _a !== void 0 ? _a : []);
+                        }
+                        else {
+                            setCommits(function (prev) {
+                                var _a;
+                                var ids = new Set(prev.map(function (c) { return c.id; }));
+                                var appended = ((_a = data_1.commits) !== null && _a !== void 0 ? _a : []).filter(function (c) { return !ids.has(c.id); });
+                                return appended.length ? __spreadArray(__spreadArray([], prev, true), appended, true) : prev;
+                            });
+                        }
+                        setHasMore(data_1.hasMore);
+                        setNextSkip(data_1.nextSkip);
+                        return [3 /*break*/, 5];
+                    case 3:
+                        e_2 = _b.sent();
+                        message = e_2.message || 'Failed to load git log';
+                        setApiError(message);
+                        notify(message, 'error');
+                        return [3 /*break*/, 5];
+                    case 4:
+                        setLoading(false);
+                        setLoadingMore(false);
+                        return [7 /*endfinally*/];
+                    case 5: return [2 /*return*/];
+                }
+            });
+        });
+    }, [siteId, branch, nextSkip, sinceDate, untilDate, logOrder]);
+    useEffect(function () {
+        var cancelled = false;
+        firstValueFrom(fetchLegacySite(siteId).pipe(take(1)))
+            .then(function (site) {
+            if (!cancelled) {
+                setBranch((site === null || site === void 0 ? void 0 : site.sandboxBranch) || 'master');
+            }
+        })
+            .catch(function () {
+            if (!cancelled) {
+                setBranch('master');
+            }
+        });
+        return function () {
+            cancelled = true;
+        };
+    }, [siteId]);
+    useEffect(function () {
+        setPatchApplyTargetSiteId(siteId);
+    }, [siteId]);
+    useEffect(function () {
+        loadStatus();
+    }, [loadStatus]);
+    useEffect(function () {
+        if (branch) {
+            loadLog(true, 0);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- reload when filters change
+    }, [branch, sinceDate, untilDate, logOrder]);
+    useEffect(function () {
+        nextSkipRef.current = nextSkip;
+    }, [nextSkip]);
+    useEffect(function () {
+        hasMoreRef.current = hasMore;
+    }, [hasMore]);
+    useEffect(function () {
+        var root = listRef.current;
+        var sentinel = loadMoreRef.current;
+        if (!root || !sentinel || !hasMore) {
+            return;
+        }
+        var observer = new IntersectionObserver(function (entries) {
+            var _a;
+            if (!((_a = entries[0]) === null || _a === void 0 ? void 0 : _a.isIntersecting) || loadingMoreRef.current || !hasMoreRef.current) {
+                return;
+            }
+            loadingMoreRef.current = true;
+            loadLog(false, nextSkipRef.current).finally(function () {
+                loadingMoreRef.current = false;
+            });
+        }, { root: root, rootMargin: '160px', threshold: 0 });
+        observer.observe(sentinel);
+        return function () { return observer.disconnect(); };
+    }, [loadLog, hasMore, commits.length]);
+    var selectCommit = function (commit) { return __awaiter(_this, void 0, void 0, function () {
+        var detail;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    setSelected(commit);
+                    setFileContent(null);
+                    _b.label = 1;
+                case 1:
+                    _b.trys.push([1, 3, , 4]);
+                    return [4 /*yield*/, firstValueFrom(fetchGitCommitDetail(siteId, commit.id))];
+                case 2:
+                    detail = _b.sent();
+                    setSelected(detail);
+                    return [3 /*break*/, 4];
+                case 3:
+                    _b.sent();
+                    return [3 /*break*/, 4];
+                case 4: return [2 /*return*/];
+            }
+        });
+    }); };
+    var onDownloadPatch = function () {
+        var content = patchText || patchPreview;
+        if (!content) {
+            return;
+        }
+        var blob = new Blob([content], { type: 'text/plain' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'git-patch.patch';
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+    var onApplyPatch = function () { return __awaiter(_this, void 0, void 0, function () {
+        var content, targetSiteId, targetSite, targetLabel, applyToTarget;
+        var _this = this;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    content = patchText || patchPreview;
+                    if (!content) {
+                        notify('Build a patch first', 'error');
+                        return [2 /*return*/];
+                    }
+                    targetSiteId = patchApplyTargetSiteId || siteId;
+                    targetSite = sites.find(function (site) { return site.id === targetSiteId; });
+                    targetLabel = targetSite ? "".concat(targetSite.name, " (").concat(targetSite.id, ")") : targetSiteId;
+                    applyToTarget = function () { return __awaiter(_this, void 0, void 0, function () {
+                        var e_3;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0:
+                                    _a.trys.push([0, 2, , 3]);
+                                    return [4 /*yield*/, firstValueFrom(postDevContentOpsAction(targetSiteId, { action: 'applyPatch', patch: content }))];
+                                case 1:
+                                    _a.sent();
+                                    notify(targetSiteId === siteId
+                                        ? 'Patch applied'
+                                        : "Patch applied to ".concat(targetLabel), 'success');
+                                    if (targetSiteId === siteId) {
+                                        loadLog(true);
+                                    }
+                                    return [3 /*break*/, 3];
+                                case 2:
+                                    e_3 = _a.sent();
+                                    notify(e_3.message || 'Apply patch failed', 'error');
+                                    return [3 /*break*/, 3];
+                                case 3: return [2 /*return*/];
+                            }
+                        });
+                    }); };
+                    if (targetSiteId !== siteId) {
+                        setConfirmDialog({
+                            title: 'Apply patch to another project',
+                            message: "Apply this patch to ".concat(targetLabel, "? Changes are written to that project's sandbox git repository."),
+                            action: function () {
+                                setConfirmDialog(null);
+                                void applyToTarget();
+                            }
+                        });
+                        return [2 /*return*/];
+                    }
+                    return [4 /*yield*/, applyToTarget()];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    }); };
+    var onSetProcessedCommit = function (commitId) { return __awaiter(_this, void 0, void 0, function () {
+        var result, e_4;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    if (!commitId) {
+                        return [2 /*return*/];
+                    }
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 3, , 4]);
+                    return [4 /*yield*/, firstValueFrom(postDevContentOpsAction(siteId, { action: 'setProcessedCommit', commitId: commitId, batchSize: 500 }))];
+                case 2:
+                    result = _a.sent();
+                    reportProcessedCommitUpdate(result, 'Processed commit updated and sync triggered', 'Processed commit updated; sync failed');
+                    loadStatus();
+                    loadLog(true);
+                    return [3 /*break*/, 4];
+                case 3:
+                    e_4 = _a.sent();
+                    notify(e_4.message || 'Failed to set processed commit', 'error');
+                    return [3 /*break*/, 4];
+                case 4: return [2 /*return*/];
+            }
+        });
+    }); };
+    var onSetProcessed = function () { return __awaiter(_this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    if (!selected) {
+                        return [2 /*return*/];
+                    }
+                    return [4 /*yield*/, onSetProcessedCommit(selected.id)];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    }); };
+    var addToPatch = function (sel) {
+        var key = selectionKey(sel);
+        if (patchSelections.some(function (s) { return selectionKey(s) === key; })) {
+            notify('Already in patch basket', 'error');
+            return;
+        }
+        setPatchSelections(function (prev) { return __spreadArray(__spreadArray([], prev, true), [sel], false); });
+        notify('Added to patch basket', 'success');
+    };
+    var removeFromPatch = function (index) {
+        setPatchSelections(function (prev) { return prev.filter(function (_, i) { return i !== index; }); });
+    };
+    var clearPatchBasket = function () {
+        setPatchSelections([]);
+        setPatchPreview('');
+        setPatchText('');
+    };
+    var onBuildPatchBasket = function () { return __awaiter(_this, void 0, void 0, function () {
+        var result, patch, e_5;
+        var _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    if (!patchSelections.length) {
+                        return [2 /*return*/];
+                    }
+                    setBuildingPatch(true);
+                    _b.label = 1;
+                case 1:
+                    _b.trys.push([1, 3, 4, 5]);
+                    return [4 /*yield*/, firstValueFrom(buildPatchFromSelection(siteId, patchSelections))];
+                case 2:
+                    result = _b.sent();
+                    patch = (_a = result.patch) !== null && _a !== void 0 ? _a : '';
+                    setPatchPreview(patch);
+                    setPatchText(patch);
+                    notify('Patch built', 'success');
+                    return [3 /*break*/, 5];
+                case 3:
+                    e_5 = _b.sent();
+                    notify(e_5.message || 'Failed to build patch', 'error');
+                    return [3 /*break*/, 5];
+                case 4:
+                    setBuildingPatch(false);
+                    return [7 /*endfinally*/];
+                case 5: return [2 /*return*/];
+            }
+        });
+    }); };
+    var onDiffRefs = function () { return __awaiter(_this, void 0, void 0, function () {
+        var result, e_6;
+        var _a, _b, _c;
+        return __generator(this, function (_d) {
+            switch (_d.label) {
+                case 0:
+                    if (!diffFrom || !diffTo) {
+                        notify('Enter from and to refs', 'error');
+                        return [2 /*return*/];
+                    }
+                    _d.label = 1;
+                case 1:
+                    _d.trys.push([1, 3, , 4]);
+                    return [4 /*yield*/, firstValueFrom(fetchGitDiff(siteId, diffFrom, diffTo))];
+                case 2:
+                    result = _d.sent();
+                    setDiffView({
+                        title: "Diff ".concat(diffFrom, " \u2192 ").concat(diffTo),
+                        fileDiffs: (_a = result.fileDiffs) !== null && _a !== void 0 ? _a : [],
+                        activePath: (_c = (_b = result.fileDiffs) === null || _b === void 0 ? void 0 : _b[0]) === null || _c === void 0 ? void 0 : _c.path,
+                        fallbackText: result.diff
+                    });
+                    setDiffDialogOpen(true);
+                    return [3 /*break*/, 4];
+                case 3:
+                    e_6 = _d.sent();
+                    notify(e_6.message || 'Diff failed', 'error');
+                    return [3 /*break*/, 4];
+                case 4: return [2 /*return*/];
+            }
+        });
+    }); };
+    var onDiffCommits = function () { return __awaiter(_this, void 0, void 0, function () {
+        var result, e_7;
+        var _a, _b, _c;
+        return __generator(this, function (_d) {
+            switch (_d.label) {
+                case 0:
+                    if (!(selected === null || selected === void 0 ? void 0 : selected.parents[0])) {
+                        notify('Select a commit with a parent to diff', 'error');
+                        return [2 /*return*/];
+                    }
+                    _d.label = 1;
+                case 1:
+                    _d.trys.push([1, 3, , 4]);
+                    return [4 /*yield*/, firstValueFrom(fetchGitDiff(siteId, selected.parents[0], selected.id))];
+                case 2:
+                    result = _d.sent();
+                    setDiffView({
+                        title: "Diff parent \u2192 ".concat(selected.shortId),
+                        fileDiffs: (_a = result.fileDiffs) !== null && _a !== void 0 ? _a : [],
+                        activePath: (_c = (_b = result.fileDiffs) === null || _b === void 0 ? void 0 : _b[0]) === null || _c === void 0 ? void 0 : _c.path,
+                        fallbackText: result.diff
+                    });
+                    setDiffDialogOpen(true);
+                    return [3 /*break*/, 4];
+                case 3:
+                    e_7 = _d.sent();
+                    notify(e_7.message || 'Diff failed', 'error');
+                    return [3 /*break*/, 4];
+                case 4: return [2 /*return*/];
+            }
+        });
+    }); };
+    var onDiffFile = function (commit, file) { return __awaiter(_this, void 0, void 0, function () {
+        var parent, result, e_8;
+        var _a, _b, _c, _d;
+        return __generator(this, function (_e) {
+            switch (_e.label) {
+                case 0:
+                    parent = commit.parents[0];
+                    if (!parent) {
+                        notify('Commit has no parent to diff against', 'error');
+                        return [2 /*return*/];
+                    }
+                    _e.label = 1;
+                case 1:
+                    _e.trys.push([1, 3, , 4]);
+                    return [4 /*yield*/, firstValueFrom(fetchGitDiff(siteId, parent, commit.id, file.path))];
+                case 2:
+                    result = _e.sent();
+                    setDiffView({
+                        title: "".concat(file.path, " (").concat(commit.shortId, ")"),
+                        fileDiffs: (_a = result.fileDiffs) !== null && _a !== void 0 ? _a : [],
+                        activePath: (_d = (_c = (_b = result.fileDiffs) === null || _b === void 0 ? void 0 : _b[0]) === null || _c === void 0 ? void 0 : _c.path) !== null && _d !== void 0 ? _d : file.path,
+                        fallbackText: result.diff
+                    });
+                    setDiffDialogOpen(true);
+                    return [3 /*break*/, 4];
+                case 3:
+                    e_8 = _e.sent();
+                    notify(e_8.message || 'Diff failed', 'error');
+                    return [3 /*break*/, 4];
+                case 4: return [2 /*return*/];
+            }
+        });
+    }); };
+    var onViewFileAtCommit = function (commit, file) { return __awaiter(_this, void 0, void 0, function () {
+        var result, e_9;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    if (file.changeType === 'DELETE') {
+                        notify('File was deleted in this commit', 'error');
+                        return [2 /*return*/];
+                    }
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 3, , 4]);
+                    return [4 /*yield*/, firstValueFrom(fetchGitFileContent(siteId, commit.id, file.path))];
+                case 2:
+                    result = _a.sent();
+                    if (result.binary) {
+                        notify(result.message || 'Binary file cannot be previewed as text', 'error');
+                        return [2 /*return*/];
+                    }
+                    setFileContent({ path: result.path, content: result.content });
+                    setSelected(commit);
+                    return [3 /*break*/, 4];
+                case 3:
+                    e_9 = _a.sent();
+                    notify(e_9.message || 'Failed to load file', 'error');
+                    return [3 /*break*/, 4];
+                case 4: return [2 /*return*/];
+            }
+        });
+    }); };
+    var onRemoveFileFromHistory = function (commit, file) {
+        var path = file.path.startsWith('/') ? file.path.slice(1) : file.path;
+        destructiveAction('Remove file from history', "Remove \"".concat(path, "\" from all history? Commit IDs will change."), function () { return __awaiter(_this, void 0, void 0, function () {
+            var result, e_10;
+            var _a;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _b.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, firstValueFrom(postDevContentOpsAction(siteId, {
+                                action: 'filterFile',
+                                path: path
+                            }))];
+                    case 1:
+                        result = _b.sent();
+                        if (result.error) {
+                            notify(apiText(result.error), 'error');
+                            setFilterFileResult(result);
+                            return [2 /*return*/];
+                        }
+                        setFilterFileResult(result);
+                        if ((_a = result.processedCommitUpdate) === null || _a === void 0 ? void 0 : _a.error) {
+                            notify("History rewritten; sync failed: ".concat(apiText(result.processedCommitUpdate.error)), 'error');
+                        }
+                        else {
+                            notify(apiText(result.message) || 'History rewritten and sync triggered', result.warning ? 'error' : 'success');
+                        }
+                        loadStatus();
+                        loadLog(true);
+                        return [3 /*break*/, 3];
+                    case 2:
+                        e_10 = _b.sent();
+                        notify(e_10.message || 'Failed to remove file from history', 'error');
+                        return [3 /*break*/, 3];
+                    case 3: return [2 /*return*/];
+                }
+            });
+        }); });
+    };
+    var copyFilterFileDetails = function () {
+        var _a;
+        if (!filterFileResult) {
+            return;
+        }
+        var text = [
+            filterFileResult.error ? apiText(filterFileResult.error) : '',
+            filterFileResult.warning ? apiText(filterFileResult.warning) : '',
+            filterFileResult.message ? apiText(filterFileResult.message) : '',
+            filterFileResult.headCommitId ? "New HEAD: ".concat(filterFileResult.headCommitId) : '',
+            filterFileResult.lastProcessedCommitId
+                ? "Previous processed: ".concat(filterFileResult.lastProcessedCommitId)
+                : ''
+        ]
+            .filter(Boolean)
+            .join('\n\n');
+        (_a = navigator.clipboard) === null || _a === void 0 ? void 0 : _a.writeText(text).then(function () { return notify('Copied to clipboard', 'success'); }, function () { return notify('Could not copy to clipboard', 'error'); });
+    };
+    var onAddEntireCommitToPatch = function (commit) {
+        addToPatch({
+            commitId: commit.id,
+            shortId: commit.shortId,
+            subject: commit.subject
+        });
+    };
+    var destructiveAction = function (title, message, action, commit) {
+        setConfirmDialog({
+            title: title,
+            message: message,
+            commit: commit,
+            action: function () {
+                action()
+                    .then(function () { return setConfirmDialog(null); })
+                    .catch(function (e) { return notify(e.message || 'Action failed', 'error'); });
+            }
+        });
+    };
+    return (jsxs(TabShell, { children: [apiError && (jsx(Alert, { severity: "error", onClose: function () { return setApiError(null); }, sx: { flexShrink: 0 }, children: apiError })), jsxs(TabToolbar, { children: [jsxs(Stack$1, { direction: "row", spacing: 1.5, flexWrap: "wrap", useFlexGap: true, alignItems: "center", justifyContent: "space-between", children: [jsxs(Stack$1, { direction: "row", spacing: 1, flexWrap: "wrap", useFlexGap: true, alignItems: "center", children: [jsxs(FormControl, { size: "small", sx: { minWidth: 132 }, children: [jsx(InputLabel, { children: "Branch" }), jsx(Select, { label: "Branch", value: branch, onChange: function (e) { return setBranch(e.target.value); }, children: branchOptions.map(function (b) { return (jsx(MenuItem$1, { value: b, children: b }, b)); }) })] }), jsx(Tooltip, { title: (status === null || status === void 0 ? void 0 : status.sandboxBranch) && branch !== status.sandboxBranch
+                                            ? "Sandbox branch is ".concat(status.sandboxBranch)
+                                            : undefined, disableHoverListener: !((status === null || status === void 0 ? void 0 : status.sandboxBranch) && branch !== status.sandboxBranch), children: jsx(Chip, { size: "small", variant: "outlined", color: (status === null || status === void 0 ? void 0 : status.sandboxBranch) && branch !== status.sandboxBranch ? 'warning' : 'default', label: 'Sandbox · ' + ((status === null || status === void 0 ? void 0 : status.sandboxBranch) || '—'), sx: { fontWeight: 600 } }) }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: jsx(RefreshRoundedIcon, {}), onClick: function () { return loadLog(true); }, children: "Refresh" })] }), status && jsx(RepoStatusBar, { status: status })] }), jsx(Divider, {}), jsxs(Stack$1, { direction: "row", spacing: 1.5, flexWrap: "wrap", useFlexGap: true, alignItems: "center", children: [jsxs(FormControl, { size: "small", sx: { minWidth: 140 }, children: [jsx(InputLabel, { children: "Order" }), jsxs(Select, { label: "Order", value: logOrder, onChange: function (e) { return setLogOrder(e.target.value); }, children: [jsx(MenuItem$1, { value: "desc", children: "Newest first" }), jsx(MenuItem$1, { value: "asc", children: "Oldest first" })] })] }), jsx(TextField$1, { size: "small", label: "Since", type: "datetime-local", value: sinceDate, onChange: function (e) { return setSinceDate(e.target.value); }, InputLabelProps: { shrink: true }, sx: { width: 188 } }), jsx(TextField$1, { size: "small", label: "Until", type: "datetime-local", value: untilDate, onChange: function (e) { return setUntilDate(e.target.value); }, InputLabelProps: { shrink: true }, sx: { width: 188 } }), jsx(Divider, { flexItem: true, orientation: "vertical", sx: { alignSelf: 'stretch', my: 0.5 } }), jsx(TextField$1, { size: "small", label: "Diff from", placeholder: "commit or branch", value: diffFrom, onChange: function (e) { return setDiffFrom(e.target.value); }, sx: { width: 132 } }), jsx(TextField$1, { size: "small", label: "Diff to", placeholder: "commit or branch", value: diffTo, onChange: function (e) { return setDiffTo(e.target.value); }, sx: { width: 132 } }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: jsx(CompareArrowsRoundedIcon, {}), onClick: onDiffRefs, children: "Diff refs" })] })] }), jsxs(Box$1, { sx: {
+                    display: 'flex',
+                    flexDirection: { xs: 'column', lg: 'row' },
+                    gap: 2,
+                    flex: 1,
+                    minHeight: 0,
+                    minWidth: 0,
+                    overflow: 'hidden'
+                }, children: [jsxs(Paper, { variant: "outlined", sx: __assign(__assign({}, surfacePaperSx), { flex: '1 1 0', minWidth: 0, minHeight: 0, display: 'flex', flexDirection: 'column' }), children: [jsx(PanelHeader, { title: "Commit history", action: jsxs(Stack$1, { direction: "row", spacing: 1.5, alignItems: "center", sx: { display: { xs: 'none', sm: 'flex' } }, children: [jsxs(Stack$1, { direction: "row", spacing: 0.5, alignItems: "center", children: [jsx(Box$1, { sx: { width: 8, height: 8, borderRadius: '50%', bgcolor: 'success.main' } }), jsx(Typography, { variant: "caption", color: "text.secondary", children: "Processed" })] }), jsxs(Stack$1, { direction: "row", spacing: 0.5, alignItems: "center", children: [jsx(Box$1, { sx: { width: 8, height: 8, borderRadius: '50%', bgcolor: 'warning.main' } }), jsx(Typography, { variant: "caption", color: "text.secondary", children: "Unprocessed" })] })] }) }), loading && !commits.length ? (jsx(Box$1, { sx: { p: 5, display: 'flex', justifyContent: 'center' }, children: jsx(CircularProgress, { size: 32 }) })) : commits.length === 0 ? (jsx(Box$1, { sx: { p: 4, textAlign: 'center' }, children: jsx(Typography, { variant: "body2", color: "text.secondary", children: "No commits" }) })) : (jsx(Box$1, { ref: listRef, sx: {
+                                    flex: 1,
+                                    overflowY: 'auto',
+                                    overflowX: 'hidden',
+                                    minHeight: 0,
+                                    minWidth: 0
+                                }, children: jsxs(List, { dense: true, sx: { py: 0, minWidth: 0 }, children: [commits.map(function (commit, index) {
+                                            var _a;
+                                            var isOpen = expanded[commit.id];
+                                            var isSelected = (selected === null || selected === void 0 ? void 0 : selected.id) === commit.id;
+                                            var isLast = index === commits.length - 1 && !hasMore;
+                                            return (jsxs(Box$1, { sx: { display: 'flex', minWidth: 0 }, children: [jsx(CommitGraphMarker, { commit: commit, isSelected: isSelected, isFirst: index === 0, isLast: isLast }), jsxs(Box$1, { sx: { flex: 1, minWidth: 0 }, children: [jsxs(ListItemButton, { selected: isSelected, onClick: function () { return selectCommit(commit); }, sx: {
+                                                                    py: 1,
+                                                                    alignItems: 'flex-start',
+                                                                    minWidth: 0,
+                                                                    pr: 1,
+                                                                    borderLeft: 3,
+                                                                    borderColor: 'transparent',
+                                                                    transition: 'background-color 0.15s ease, border-color 0.15s ease',
+                                                                    '&.Mui-selected': {
+                                                                        bgcolor: 'action.selected',
+                                                                        borderColor: 'primary.main'
+                                                                    },
+                                                                    '&:hover': { bgcolor: 'action.hover' }
+                                                                }, children: [jsx(IconButton$1, { size: "small", sx: { mr: 0.5, mt: 0.25 }, onClick: function (e) {
+                                                                            e.stopPropagation();
+                                                                            setExpanded(function (prev) {
+                                                                                var _a;
+                                                                                return (__assign(__assign({}, prev), (_a = {}, _a[commit.id] = !prev[commit.id], _a)));
+                                                                            });
+                                                                        }, children: isOpen ? jsx(KeyboardArrowDownRoundedIcon, { fontSize: "small" }) : jsx(KeyboardArrowRightRoundedIcon, { fontSize: "small" }) }), jsx(ListItemText, { sx: { minWidth: 0, mr: 0 }, primary: jsxs(Stack$1, { direction: "row", spacing: 1, alignItems: "center", sx: { minWidth: 0 }, children: [jsx(Typography, { variant: "body2", sx: __assign(__assign({}, monoSx), { flexShrink: 0, fontWeight: 700, color: 'primary.main' }), children: commit.shortId }), jsx(Typography, { variant: "body2", sx: {
+                                                                                        flex: 1,
+                                                                                        minWidth: 0,
+                                                                                        overflow: 'hidden',
+                                                                                        textOverflow: 'ellipsis',
+                                                                                        whiteSpace: 'nowrap'
+                                                                                    }, children: commit.subject }), jsx(ProcessedStatusChip, { processed: commit.processed })] }), secondary: "".concat((_a = commit.author) !== null && _a !== void 0 ? _a : '—', " \u00B7 ").concat(new Date(commit.date).toLocaleString()), secondaryTypographyProps: { noWrap: true, sx: { overflow: 'hidden', textOverflow: 'ellipsis' } } })] }), isOpen && (jsxs(Box$1, { sx: { pl: 4, pr: 1, pb: 1, minWidth: 0, maxWidth: '100%', boxSizing: 'border-box' }, children: [jsx(Typography, { variant: "caption", color: "text.secondary", display: "block", sx: { wordBreak: 'break-all' }, children: commit.id }), commit.body && (jsx(Typography, { variant: "body2", sx: { mt: 0.5, whiteSpace: 'pre-wrap' }, children: commit.body })), jsx(Stack$1, { direction: "row", spacing: 1, sx: { mt: 0.5, mb: 0.5 }, children: jsx(Button$1, { size: "small", variant: "outlined", startIcon: jsx(PlaylistAddRoundedIcon, {}), disabled: patchKeys.has(selectionKey({ commitId: commit.id })), onClick: function () { return onAddEntireCommitToPatch(commit); }, children: "Add commit to patch" }) }), jsx(CommitFileList, { siteId: siteId, commit: commit, onViewFile: onViewFileAtCommit, onDiffFile: onDiffFile, onAddToPatch: addToPatch, onRemoveFromHistory: onRemoveFileFromHistory, patchKeys: patchKeys })] }))] })] }, commit.id));
+                                        }), hasMore && jsx(Box$1, { ref: loadMoreRef, sx: { height: 8 }, "aria-hidden": true }), loadingMore && (jsx(Box$1, { sx: { py: 2, display: 'flex', justifyContent: 'center' }, children: jsx(CircularProgress, { size: 24 }) }))] }) }))] }), jsxs(Box$1, { sx: {
+                            flex: { xs: '0 1 auto', lg: '0 0 360px' },
+                            width: { xs: '100%', lg: 360 },
+                            maxWidth: { lg: '42%' },
+                            minWidth: { lg: 300 },
+                            minHeight: 0,
+                            maxHeight: { xs: 'min(48vh, 520px)', lg: 'none' },
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 2,
+                            overflow: 'hidden'
+                        }, children: [jsxs(Paper, { variant: "outlined", sx: __assign(__assign({}, surfacePaperSx), { flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }), children: [jsx(PanelHeader, { title: "Details & actions" }), jsx(Box$1, { sx: { p: 2, flex: 1, minHeight: 0, overflow: 'auto' }, children: !selected ? (jsx(Typography, { variant: "body2", color: "text.secondary", sx: { py: 4, textAlign: 'center' }, children: "No commit selected" })) : (jsxs(Stack$1, { spacing: 2, children: [jsx(CommitSummaryCard, { commit: selected, processed: selected.processed }), jsxs(Box$1, { children: [jsx(SectionLabel, { children: "Patch" }), jsx(ActionButtonStack, { spacing: 1, sx: { mt: 1, mb: 1.5 }, children: jsx(Button$1, { size: "small", variant: "outlined", startIcon: jsx(PlaylistAddRoundedIcon, {}), disabled: patchKeys.has(selectionKey({ commitId: selected.id })), onClick: function () { return onAddEntireCommitToPatch(selected); }, children: "Add commit to patch" }) }), jsx(CommitFileList, { siteId: siteId, commit: selected, onViewFile: onViewFileAtCommit, onDiffFile: onDiffFile, onAddToPatch: addToPatch, onRemoveFromHistory: onRemoveFileFromHistory, patchKeys: patchKeys })] }), jsxs(Box$1, { children: [jsx(SectionLabel, { children: "Actions" }), jsxs(ActionButtonStack, { spacing: 1, sx: { mt: 1 }, children: [jsx(Button$1, { size: "small", variant: "outlined", startIcon: jsx(CompareArrowsRoundedIcon, {}), onClick: onDiffCommits, children: "Diff parent" }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: jsx(HistoryRoundedIcon, {}), onClick: onSetProcessed, children: "Set processed + sync" }), jsx(Button$1, { size: "small", variant: "outlined", color: "warning", startIcon: jsx(RestoreRoundedIcon, {}), onClick: function () {
+                                                                        return destructiveAction('Revert working tree', 'Revert working tree to this commit?', function () { return __awaiter(_this, void 0, void 0, function () {
+                                                                            return __generator(this, function (_a) {
+                                                                                switch (_a.label) {
+                                                                                    case 0: return [4 /*yield*/, firstValueFrom(postDevContentOpsAction(siteId, { action: 'revertToCommit', commitId: selected.id }))];
+                                                                                    case 1:
+                                                                                        _a.sent();
+                                                                                        notify('Working tree reverted', 'success');
+                                                                                        loadLog(true);
+                                                                                        return [2 /*return*/];
+                                                                                }
+                                                                            });
+                                                                        }); });
+                                                                    }, children: "Revert to commit" })] })] }), fileContent && (jsxs(Box$1, { children: [jsx(SectionLabel, { children: "File preview" }), jsx(Typography, { variant: "caption", color: "text.secondary", display: "block", sx: { mt: 0.75, mb: 0.5, wordBreak: 'break-all' }, children: fileContent.path }), jsx(Paper, { variant: "outlined", sx: __assign(__assign({}, codeBlockSx), { maxHeight: 220, overflow: 'auto', fontSize: 11 }), children: jsx("pre", { style: { margin: 0, whiteSpace: 'pre-wrap' }, children: fileContent.content }) })] })), jsxs(DangerZone, { children: [jsx(Button$1, { size: "small", variant: "outlined", color: "error", startIcon: jsx(WarningAmberRoundedIcon, {}), onClick: function () {
+                                                                return destructiveAction('Reset HEAD', 'Reset HEAD to this commit?', function () { return __awaiter(_this, void 0, void 0, function () {
+                                                                    var result;
+                                                                    return __generator(this, function (_a) {
+                                                                        switch (_a.label) {
+                                                                            case 0: return [4 /*yield*/, firstValueFrom(postDevContentOpsAction(siteId, {
+                                                                                    action: 'resetHead',
+                                                                                    commitId: selected.id
+                                                                                }))];
+                                                                            case 1:
+                                                                                result = _a.sent();
+                                                                                reportProcessedCommitUpdate(result.processedCommitUpdate, 'HEAD reset and sync triggered', 'HEAD reset; sync failed');
+                                                                                loadStatus();
+                                                                                loadLog(true);
+                                                                                return [2 /*return*/];
+                                                                        }
+                                                                    });
+                                                                }); }, selected);
+                                                            }, children: "Reset HEAD" }), jsx(Button$1, { size: "small", color: "error", variant: "outlined", onClick: function () {
+                                                                return destructiveAction('Trim history', 'Discard history before this commit?', function () { return __awaiter(_this, void 0, void 0, function () {
+                                                                    var result;
+                                                                    return __generator(this, function (_a) {
+                                                                        switch (_a.label) {
+                                                                            case 0: return [4 /*yield*/, firstValueFrom(postDevContentOpsAction(siteId, {
+                                                                                    action: 'trimHistory',
+                                                                                    keepCommitId: selected.id
+                                                                                }))];
+                                                                            case 1:
+                                                                                result = _a.sent();
+                                                                                reportProcessedCommitUpdate(result.processedCommitUpdate, 'History trimmed and sync triggered', 'History trimmed; sync failed');
+                                                                                loadStatus();
+                                                                                loadLog(true);
+                                                                                return [2 /*return*/];
+                                                                        }
+                                                                    });
+                                                                }); }, selected);
+                                                            }, children: "Trim History" })] })] })) })] }), jsx(PatchBasketPanel, { selections: patchSelections, onRemove: removeFromPatch, onClear: clearPatchBasket, onBuildPatch: onBuildPatchBasket, onApplyPatch: onApplyPatch, onDownloadPatch: onDownloadPatch, building: buildingPatch, patchPreview: patchPreview, sourceSiteId: siteId, sites: sites, applyTargetSiteId: patchApplyTargetSiteId, onApplyTargetSiteChange: setPatchApplyTargetSiteId })] })] }), jsxs(Dialog, { open: diffDialogOpen, onClose: function () { return setDiffDialogOpen(false); }, maxWidth: "lg", fullWidth: true, PaperProps: { sx: { minHeight: 520, borderRadius: 2 } }, children: [jsx(DialogTitle, { sx: { pb: 1 }, children: "Diff viewer" }), jsx(DialogContent, { sx: { display: 'flex', flexDirection: 'column', minHeight: 400 }, children: diffView && (jsx(DiffViewer, { title: diffView.title, fileDiffs: diffView.fileDiffs, activePath: diffView.activePath, fallbackText: diffView.fallbackText, onActivePathChange: function (path) { return setDiffView(function (prev) { return (prev ? __assign(__assign({}, prev), { activePath: path }) : prev); }); } })) }), jsx(DialogActions, { children: jsx(Button$1, { onClick: function () { return setDiffDialogOpen(false); }, children: "Close" }) })] }), jsxs(Dialog, { open: Boolean(filterFileResult), onClose: function () { return setFilterFileResult(null); }, maxWidth: "sm", fullWidth: true, children: [jsx(DialogTitle, { children: (filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.success) ? 'File removed from history' : 'Remove file from history' }), jsxs(DialogContent, { children: [(filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.error) && (jsx(Alert, { severity: "error", sx: { mb: 2 }, children: apiText(filterFileResult.error) })), (filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.warning) && (jsx(Alert, { severity: "warning", sx: { mb: 2 }, children: apiText(filterFileResult.warning) })), (filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.message) && (jsx(Typography, { variant: "body2", sx: { mb: 2 }, children: apiText(filterFileResult.message) })), ((_b = filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.processedCommitUpdate) === null || _b === void 0 ? void 0 : _b.error) && (jsxs(Alert, { severity: "warning", sx: { mb: 2 }, children: ["Sync failed: ", apiText(filterFileResult.processedCommitUpdate.error)] })), (filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.headCommitId) && (jsxs(Fragment, { children: [jsx(Typography, { variant: "caption", color: "text.secondary", fontWeight: 600, children: "New HEAD commit" }), jsx(Paper, { variant: "outlined", sx: __assign(__assign({}, codeBlockSx), { mb: 1.5 }), children: apiText(filterFileResult.headCommitId) })] })), (filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.lastProcessedCommitId) && (jsxs(Fragment, { children: [jsx(Typography, { variant: "caption", color: "text.secondary", fontWeight: 600, children: "Previous processed commit" }), jsx(Paper, { variant: "outlined", sx: __assign(__assign({}, codeBlockSx), { mb: 1.5 }), children: apiText(filterFileResult.lastProcessedCommitId) })] }))] }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: copyFilterFileDetails, children: "Copy" }), ((_c = filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.processedCommitUpdate) === null || _c === void 0 ? void 0 : _c.error) && filterFileResult.headCommitId && (jsx(Button$1, { color: "primary", onClick: function () {
+                                    var head = apiText(filterFileResult.headCommitId);
+                                    setFilterFileResult(null);
+                                    onSetProcessedCommit(head);
+                                }, children: "Retry sync" })), jsx(Button$1, { onClick: function () { return setFilterFileResult(null); }, children: "Close" })] })] }), jsxs(Dialog, { open: Boolean(confirmDialog), onClose: function () { return setConfirmDialog(null); }, maxWidth: "sm", fullWidth: true, children: [jsx(DialogTitle, { children: confirmDialog === null || confirmDialog === void 0 ? void 0 : confirmDialog.title }), jsxs(DialogContent, { children: [jsx(Typography, { variant: "body2", children: confirmDialog === null || confirmDialog === void 0 ? void 0 : confirmDialog.message }), (confirmDialog === null || confirmDialog === void 0 ? void 0 : confirmDialog.commit) && (jsxs(Paper, { variant: "outlined", sx: __assign(__assign({}, codeBlockSx), { mt: 2 }), children: [jsx(Typography, { variant: "caption", color: "text.secondary", display: "block", sx: { mb: 0.75, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.6 }, children: "Commit" }), jsx(Typography, { variant: "body2", sx: __assign(__assign({}, monoSx), { wordBreak: 'break-all' }), children: (confirmDialog.commit.shortId || confirmDialog.commit.id.slice(0, 8)) + ' · ' + confirmDialog.commit.id }), jsx(Typography, { variant: "body2", sx: { mt: 1, fontWeight: 500 }, children: confirmDialog.commit.subject || '(no commit message)' })] }))] }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: function () { return setConfirmDialog(null); }, children: "Cancel" }), jsx(Button$1, { color: "error", onClick: function () { return confirmDialog === null || confirmDialog === void 0 ? void 0 : confirmDialog.action(); }, children: "Confirm" })] })] })] }));
+}
+
+/*
+ * Copyright (C) 2007-2026 Crafter Software Corporation. All Rights Reserved.
+ *
+ * Threshold legend for Repository health — mirrors DevContentOpsRepoHealthThresholds.groovy
+ * (CrafterCMS content sandbox profile, not typical source-code repos).
+ */
+var REPO_HEALTH_PROFILE_LABEL = 'CrafterCMS content sandbox';
+function fmtCount(n) {
+    return n.toLocaleString('en-US');
+}
+function fmtBytes(bytes) {
+    if (bytes < 1024) {
+        return "".concat(bytes, " B");
+    }
+    if (bytes < 1024 * 1024) {
+        return "".concat((bytes / 1024).toFixed(1), " KB");
+    }
+    if (bytes < 1024 * 1024 * 1024) {
+        return "".concat((bytes / (1024 * 1024)).toFixed(1), " MB");
+    }
+    return "".concat((bytes / (1024 * 1024 * 1024)).toFixed(2), " GB");
+}
+function fmtKiB(kib) {
+    if (kib < 1024) {
+        return "".concat(fmtCount(kib), " KiB");
+    }
+    return fmtBytes(kib * 1024);
+}
+var REPO_HEALTH_CONCERN_LEVELS = [
+    {
+        id: 'ok',
+        label: 'OK',
+        scoreRange: '0',
+        summary: 'Value is below the watch threshold. No action needed for this metric.'
+    },
+    {
+        id: 'watch',
+        label: 'Watch',
+        scoreRange: '3 – 9',
+        summary: 'Value reached the warn threshold. Worth monitoring — common in busy sandboxes.'
+    },
+    {
+        id: 'elevated',
+        label: 'Elevated',
+        scoreRange: '10 – 29',
+        summary: 'Well above the warn threshold. Plan GC, repack, asset review, or history trim.'
+    },
+    {
+        id: 'critical',
+        label: 'Critical',
+        scoreRange: '30+',
+        summary: 'At or above the critical threshold. Prioritize remediation before performance degrades.'
+    }
+];
+var REPO_HEALTH_SCORING_NOTE = 'Each metric and repository-config row receives a concern score. Below the warn threshold → 0. At or above critical → 30. Between warn and critical → scales from 3 upward (roughly 3× value ÷ warn). Overall concern is the highest score across all rows.';
+var REPO_HEALTH_INTRO = 'These metrics follow git-sizer style analysis, tuned for CrafterCMS sandboxes: frequent author commits, XML content items, large static assets under /static-assets, and deeper folder trees than typical app repos.';
+var REPO_HEALTH_CONFIG_NOTE = 'Repository configuration rows show Git settings and runtime object-store stats. Rows highlighted in amber use a non-recommended value (compare Current vs Recommended). Config rows use the same concern scoring when values exceed content thresholds.';
+var REPO_HEALTH_METRIC_GROUPS = [
+    {
+        id: 'overall',
+        title: 'Overall repository size',
+        summary: 'Totals across all reachable Git objects (commits, trees, blobs, tags, refs).',
+        metrics: [
+            {
+                id: 'commits',
+                label: 'Commits · count',
+                description: 'Number of commit objects in history. Sandboxes accumulate many small commits from Studio saves and publishes.',
+                warn: fmtCount(100000),
+                critical: fmtCount(500000)
+            },
+            {
+                id: 'commitTotalSize',
+                label: 'Commits · total size',
+                description: 'Combined compressed size of all commit objects (metadata + diffs).',
+                warn: fmtBytes(500 * 1024 * 1024),
+                critical: fmtBytes(2 * 1024 * 1024 * 1024)
+            },
+            {
+                id: 'trees',
+                label: 'Trees · count',
+                description: 'Directory listing objects — one per folder snapshot in history.',
+                warn: fmtCount(250000),
+                critical: fmtCount(1000000)
+            },
+            {
+                id: 'treeTotalSize',
+                label: 'Trees · total size',
+                description: 'Combined size of all tree objects.',
+                warn: fmtBytes(5 * 1024 * 1024 * 1024),
+                critical: fmtBytes(20 * 1024 * 1024 * 1024)
+            },
+            {
+                id: 'totalTreeEntries',
+                label: 'Trees · total tree entries',
+                description: 'Sum of file/folder entries across all trees. Grows with content item count and renames.',
+                warn: fmtCount(5000000),
+                critical: fmtCount(25000000)
+            },
+            {
+                id: 'blobs',
+                label: 'Blobs · count',
+                description: 'Unique file versions stored in Git (every revision of every file).',
+                warn: fmtCount(250000),
+                critical: fmtCount(1000000)
+            },
+            {
+                id: 'totalBlobSize',
+                label: 'Blobs · total size',
+                description: 'Combined size of all blob objects. Dominated by images, video, and PDFs in static assets.',
+                warn: fmtBytes(10 * 1024 * 1024 * 1024),
+                critical: fmtBytes(50 * 1024 * 1024 * 1024)
+            },
+            {
+                id: 'tags',
+                label: 'Annotated tags · count',
+                description: 'Signed or annotated tag objects (uncommon in CMS sandboxes unless used for releases).',
+                warn: fmtCount(5000),
+                critical: fmtCount(25000)
+            },
+            {
+                id: 'refs',
+                label: 'References · count',
+                description: 'Branches, remote-tracking refs, and tags. Crafter sites often have many branch namespaces.',
+                warn: fmtCount(250),
+                critical: fmtCount(1000)
+            }
+        ]
+    },
+    {
+        id: 'biggest',
+        title: 'Biggest objects',
+        summary: 'Single largest instances — often the best clue for oversized assets or accidental bulk commits.',
+        metrics: [
+            {
+                id: 'maxCommitSize',
+                label: 'Commits · maximum size',
+                description: 'Largest individual commit object. Huge commits may indicate bulk imports or binary dumps in one save.',
+                warn: fmtBytes(256 * 1024),
+                critical: fmtBytes(2 * 1024 * 1024)
+            },
+            {
+                id: 'maxCommitParents',
+                label: 'Commits · maximum parents',
+                description: 'Merge commits with many parents (rare in CMS workflows; high values may indicate corruption or unusual merges).',
+                warn: fmtCount(10),
+                critical: fmtCount(30)
+            },
+            {
+                id: 'maxTreeEntries',
+                label: 'Trees · maximum entries',
+                description: 'Deepest single directory listing. Very flat sites with thousands of siblings in one folder trigger this.',
+                warn: fmtCount(500),
+                critical: fmtCount(5000)
+            },
+            {
+                id: 'largestBlob',
+                label: 'Blobs · maximum size',
+                description: 'Largest single file version in history. Multi-MB images and video are expected; hundreds of MB may need asset policy review.',
+                warn: fmtBytes(100 * 1024 * 1024),
+                critical: fmtBytes(500 * 1024 * 1024)
+            }
+        ]
+    },
+    {
+        id: 'history',
+        title: 'History structure',
+        summary: 'How deep and chained the revision graph is.',
+        metrics: [
+            {
+                id: 'maxHistoryDepth',
+                label: 'Maximum history depth',
+                description: 'Longest ancestor chain from HEAD. Long-lived sandboxes with daily edits accumulate depth over years.',
+                warn: fmtCount(100000),
+                critical: fmtCount(500000)
+            },
+            {
+                id: 'maxTagDepth',
+                label: 'Maximum tag depth',
+                description: 'Deepest chain of annotated tags pointing to other tags.',
+                warn: fmtCount(5),
+                critical: fmtCount(20)
+            }
+        ]
+    },
+    {
+        id: 'checkout',
+        title: 'Biggest checkout (HEAD)',
+        summary: 'Working-tree shape at the current HEAD commit — what Studio and the preview engine see on disk.',
+        metrics: [
+            {
+                id: 'checkoutDirectories',
+                label: 'Number of directories',
+                description: 'Distinct folder paths in the current tree. Deep IA and many content-type folders increase this.',
+                warn: fmtCount(10000),
+                critical: fmtCount(50000)
+            },
+            {
+                id: 'checkoutMaxPathDepth',
+                label: 'Maximum path depth',
+                description: 'Folder nesting depth (path segments). Crafter page folders like /site/website/about/index.xml add depth.',
+                warn: fmtCount(20),
+                critical: fmtCount(40)
+            },
+            {
+                id: 'checkoutMaxPathLength',
+                label: 'Maximum path length',
+                description: 'Longest full path string in characters. Very long names or deep nesting can hit OS path limits.',
+                warn: fmtCount(350),
+                critical: fmtCount(800)
+            },
+            {
+                id: 'checkoutFileCount',
+                label: 'Number of files',
+                description: 'Regular files at HEAD (XML content, templates, static assets).',
+                warn: fmtCount(200000),
+                critical: fmtCount(1000000)
+            },
+            {
+                id: 'checkoutTotalFileSize',
+                label: 'Total size of files',
+                description: 'Sum of file sizes at HEAD (uncompressed working-tree footprint, not .git pack size).',
+                warn: fmtBytes(20 * 1024 * 1024 * 1024),
+                critical: fmtBytes(100 * 1024 * 1024 * 1024)
+            },
+            {
+                id: 'checkoutSymlinks',
+                label: 'Number of symlinks',
+                description: 'Symbolic links in the tree (unusual in standard Crafter projects).',
+                warn: fmtCount(500),
+                critical: fmtCount(5000)
+            },
+            {
+                id: 'checkoutSubmodules',
+                label: 'Number of submodules',
+                description: 'Git submodule links (gitlink entries). Rare unless submodules were added manually.',
+                warn: fmtCount(10),
+                critical: fmtCount(50)
+            }
+        ]
+    },
+    {
+        id: 'disk',
+        title: 'On-disk footprint',
+        summary: 'Physical .git directory size — what consumes disk on the authoring server.',
+        metrics: [
+            {
+                id: 'gitDirSize',
+                label: 'Repository disk size (.git)',
+                description: 'Total bytes under the .git directory including objects, refs, and logs.',
+                warn: fmtBytes(5 * 1024 * 1024 * 1024),
+                critical: fmtBytes(25 * 1024 * 1024 * 1024)
+            },
+            {
+                id: 'packSize',
+                label: 'Pack file size',
+                description: 'Compressed packfiles under objects/pack. Primary storage after GC/repack.',
+                warn: fmtBytes(4 * 1024 * 1024 * 1024),
+                critical: fmtBytes(20 * 1024 * 1024 * 1024)
+            },
+            {
+                id: 'looseSize',
+                label: 'Loose object size',
+                description: 'Unpacked objects under objects/ (excluding pack). High values mean GC has not run recently.',
+                warn: fmtBytes(1 * 1024 * 1024 * 1024),
+                critical: fmtBytes(5 * 1024 * 1024 * 1024)
+            }
+        ]
+    },
+    {
+        id: 'runtime',
+        title: 'Runtime object store (configuration tab)',
+        summary: 'Derived from .git/objects layout — also shown under Repository configuration.',
+        metrics: [
+            {
+                id: 'count-objects.loose',
+                label: 'Loose objects',
+                description: 'Count of loose object files. Frequent Studio commits create loose objects until GC packs them.',
+                warn: fmtCount(5000),
+                critical: fmtCount(25000)
+            },
+            {
+                id: 'count-objects.loose-size',
+                label: 'Loose object size',
+                description: 'Approximate KiB used by loose objects (from disk scan).',
+                warn: fmtKiB(512 * 1024),
+                critical: fmtKiB(2 * 1024 * 1024)
+            },
+            {
+                id: 'count-objects.packs',
+                label: 'Pack files',
+                description: 'Number of .pack files. Many packs slow object lookups — repack consolidates them.',
+                warn: fmtCount(12),
+                critical: fmtCount(30)
+            }
+        ]
+    }
+];
+
+function concernChipColor(id) {
+    switch (id) {
+        case 'critical':
+            return 'error';
+        case 'elevated':
+            return 'warning';
+        case 'watch':
+            return 'info';
+        default:
+            return 'success';
+    }
+}
+function concernChipIcon(id) {
+    switch (id) {
+        case 'critical':
+            return jsx(ErrorOutlineRoundedIcon, {});
+        case 'elevated':
+            return jsx(WarningAmberRoundedIcon, {});
+        case 'watch':
+            return jsx(InfoOutlinedIcon, {});
+        default:
+            return jsx(CheckCircleOutlineRoundedIcon, {});
+    }
+}
+function RepoHealthLearnMoreDialog(_a) {
+    var open = _a.open, onClose = _a.onClose, profileLabel = _a.profileLabel;
+    var _b = useState('overall'), expandedGroup = _b[0], setExpandedGroup = _b[1];
+    var thresholdLabel = (profileLabel === null || profileLabel === void 0 ? void 0 : profileLabel.trim()) || REPO_HEALTH_PROFILE_LABEL;
+    return (jsxs(Dialog, { open: open, onClose: onClose, maxWidth: "md", fullWidth: true, scroll: "paper", children: [jsxs(DialogTitle, { sx: { pr: 6 }, children: [jsxs(Stack$1, { spacing: 0.5, children: [jsx(Typography, { variant: "h6", component: "span", fontWeight: 700, children: "Repository health guide" }), jsx(Typography, { variant: "body2", color: "text.secondary", children: "Concern levels, metrics, and content thresholds" })] }), jsx(IconButton$1, { "aria-label": "Close", onClick: onClose, sx: { position: 'absolute', right: 12, top: 12 }, size: "small", children: jsx(CloseRoundedIcon, {}) })] }), jsx(DialogContent, { dividers: true, sx: { pt: 2 }, children: jsxs(Stack$1, { spacing: 2.5, children: [jsxs(Alert, { severity: "info", icon: jsx(InfoOutlinedIcon, {}), children: [jsxs(Typography, { variant: "body2", fontWeight: 600, gutterBottom: true, children: ["Threshold profile: ", thresholdLabel] }), jsx(Typography, { variant: "body2", children: REPO_HEALTH_INTRO })] }), jsxs(Box$1, { children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, gutterBottom: true, children: "Concern levels" }), jsx(Typography, { variant: "body2", color: "text.secondary", sx: { mb: 1.5 }, children: REPO_HEALTH_SCORING_NOTE }), jsx(Stack$1, { spacing: 1.25, children: REPO_HEALTH_CONCERN_LEVELS.map(function (level) { return (jsxs(Box$1, { sx: {
+                                            display: 'grid',
+                                            gridTemplateColumns: { xs: '1fr', sm: '140px 1fr' },
+                                            gap: 1,
+                                            alignItems: 'start',
+                                            p: 1.25,
+                                            borderRadius: 1,
+                                            border: 1,
+                                            borderColor: 'divider',
+                                            bgcolor: function (theme) { return alpha(theme.palette[concernChipColor(level.id)].main, 0.04); }
+                                        }, children: [jsxs(Stack$1, { spacing: 0.5, children: [jsx(Chip, { size: "small", icon: concernChipIcon(level.id), label: level.label, color: concernChipColor(level.id), variant: level.id === 'ok' ? 'outlined' : 'filled', sx: { fontWeight: 700, width: 'fit-content' } }), jsxs(Typography, { variant: "caption", color: "text.secondary", sx: { pl: 0.25 }, children: ["Score ", level.scoreRange] })] }), jsx(Typography, { variant: "body2", children: level.summary })] }, level.id)); }) })] }), jsxs(Box$1, { children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, gutterBottom: true, children: "Metrics & thresholds" }), jsx(Typography, { variant: "body2", color: "text.secondary", sx: { mb: 1 }, children: "Watch = first alert level. Critical = maximum concern (score 30). Values between warn and critical scale proportionally." }), REPO_HEALTH_METRIC_GROUPS.map(function (group) { return (jsxs(Accordion, { expanded: expandedGroup === group.id, onChange: function (_, isExpanded) { return setExpandedGroup(isExpanded ? group.id : false); }, disableGutters: true, elevation: 0, sx: {
+                                        border: 1,
+                                        borderColor: 'divider',
+                                        '&:not(:last-child)': { borderBottom: 0 },
+                                        '&:before': { display: 'none' },
+                                        bgcolor: 'transparent'
+                                    }, children: [jsx(AccordionSummary, { expandIcon: jsx(ExpandMoreRoundedIcon, {}), children: jsxs(Stack$1, { spacing: 0.25, sx: { minWidth: 0, pr: 1 }, children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, children: group.title }), jsx(Typography, { variant: "caption", color: "text.secondary", children: group.summary })] }) }), jsx(AccordionDetails, { sx: { pt: 0, px: 0 }, children: jsxs(Table, { size: "small", children: [jsx(TableHead, { children: jsxs(TableRow, { children: [jsx(TableCell, { sx: { fontWeight: 700, width: '28%' }, children: "Metric" }), jsx(TableCell, { sx: { fontWeight: 700 }, children: "What it measures" }), jsx(TableCell, { sx: { fontWeight: 700, width: 88 }, align: "right", children: "Watch" }), jsx(TableCell, { sx: { fontWeight: 700, width: 88 }, align: "right", children: "Critical" })] }) }), jsx(TableBody, { children: group.metrics.map(function (metric) { return (jsxs(TableRow, { hover: true, children: [jsx(TableCell, { sx: { verticalAlign: 'top', fontWeight: 600 }, children: metric.label }), jsx(TableCell, { sx: { verticalAlign: 'top' }, children: jsx(Typography, { variant: "body2", color: "text.secondary", children: metric.description }) }), jsx(TableCell, { align: "right", sx: { verticalAlign: 'top', whiteSpace: 'nowrap' }, children: jsx(Typography, { variant: "body2", color: "info.main", fontWeight: 600, children: metric.warn }) }), jsx(TableCell, { align: "right", sx: { verticalAlign: 'top', whiteSpace: 'nowrap' }, children: jsx(Typography, { variant: "body2", color: "error.main", fontWeight: 600, children: metric.critical }) })] }, metric.id)); }) })] }) })] }, group.id)); })] }), jsxs(Alert, { severity: "warning", icon: jsx(WarningAmberRoundedIcon, {}), sx: { alignItems: 'flex-start' }, children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, gutterBottom: true, children: "Repository configuration" }), jsx(Typography, { variant: "body2", children: REPO_HEALTH_CONFIG_NOTE })] })] }) })] }));
+}
+
+/*
+ * Copyright (C) 2007-2026 Crafter Software Corporation. All Rights Reserved.
+ */
+function concernLevel$1(concern) {
+    if (concern >= 30) {
+        return 'critical';
+    }
+    if (concern >= 10) {
+        return 'elevated';
+    }
+    if (concern >= 3) {
+        return 'watch';
+    }
+    return 'ok';
+}
+function concernLabel$1(level) {
+    switch (level) {
+        case 'critical':
+            return 'Critical';
+        case 'elevated':
+            return 'Elevated';
+        case 'watch':
+            return 'Watch';
+        default:
+            return 'OK';
+    }
+}
+function concernEmoji(level) {
+    switch (level) {
+        case 'critical':
+            return '🔴';
+        case 'elevated':
+            return '🟠';
+        case 'watch':
+            return '🟡';
+        default:
+            return '🟢';
+    }
+}
+function concernBadge(concern) {
+    var level = concernLevel$1(concern);
+    return "".concat(concernEmoji(level), " ").concat(concernLabel$1(level), " (").concat(concern, ")");
+}
+function escapeMdCell(value) {
+    if (value === undefined || value === null) {
+        return '—';
+    }
+    return String(value).replace(/\|/g, '\\|').replace(/\r?\n/g, ' ').trim();
+}
+function groupMetrics$1(metrics) {
+    var order = [];
+    var map = new Map();
+    metrics.forEach(function (metric) {
+        var _a;
+        var group = ((_a = metric.group) === null || _a === void 0 ? void 0 : _a.trim()) || 'Metrics';
+        if (!map.has(group)) {
+            map.set(group, []);
+            order.push(group);
+        }
+        map.get(group).push(metric);
+    });
+    return order.map(function (group) { return ({ group: group, metrics: map.get(group) }); });
+}
+function groupConfigSettings$1(settings) {
+    var order = [];
+    var map = new Map();
+    settings.forEach(function (setting) {
+        var _a;
+        var group = ((_a = setting.group) === null || _a === void 0 ? void 0 : _a.trim()) || 'Configuration';
+        if (!map.has(group)) {
+            map.set(group, []);
+            order.push(group);
+        }
+        map.get(group).push(setting);
+    });
+    return order.map(function (group) { return ({ group: group, settings: map.get(group) }); });
+}
+function sourceLabel$1(setting) {
+    switch (setting.source) {
+        case 'local':
+            return setting.sourceDetail || '.git/config';
+        case 'global':
+            return setting.sourceDetail || 'global gitconfig';
+        case 'system':
+            return setting.sourceDetail || 'system gitconfig';
+        case 'runtime':
+            return 'git count-objects';
+        case 'default':
+            return 'Git default';
+        default:
+            return setting.sourceDetail || setting.source || '—';
+    }
+}
+function groupEmoji(groupConcern) {
+    var level = concernLevel$1(groupConcern);
+    if (level === 'critical') {
+        return '🚨';
+    }
+    if (level === 'elevated') {
+        return '⚠️';
+    }
+    if (level === 'watch') {
+        return '👀';
+    }
+    return '✨';
+}
+function buildRepoHealthReportMarkdown(report, opts) {
+    var _a, _b, _c, _d;
+    var lines = [];
+    var generatedAt = new Date();
+    var overall = (_a = report.overallConcern) !== null && _a !== void 0 ? _a : 0;
+    var overallLevel = concernLevel$1(overall);
+    var projectLabel = opts.siteName ? "".concat(opts.siteName, " (").concat(opts.siteId, ")") : opts.siteId;
+    var metrics = (_b = report.metrics) !== null && _b !== void 0 ? _b : [];
+    var settings = (_d = (_c = report.repoConfig) === null || _c === void 0 ? void 0 : _c.settings) !== null && _d !== void 0 ? _d : [];
+    var metricGroups = groupMetrics$1(metrics);
+    var configGroups = groupConfigSettings$1(settings);
+    var attentionMetrics = metrics.filter(function (m) { var _a; return ((_a = m.concern) !== null && _a !== void 0 ? _a : 0) > 0; });
+    var attentionSettings = settings.filter(function (s) { var _a; return ((_a = s.concern) !== null && _a !== void 0 ? _a : 0) > 0 || s.deviatesFromRecommended; });
+    lines.push('# 🏥 Repository Health Report');
+    lines.push('');
+    lines.push("> \uD83D\uDCC5 **Generated:** ".concat(generatedAt.toLocaleString(), " \u00B7 \uD83D\uDEE0\uFE0F **DevContentOps Tools** \u00B7 CrafterCMS Studio"));
+    lines.push('');
+    lines.push('---');
+    lines.push('');
+    lines.push('## 📋 Executive summary');
+    lines.push('');
+    lines.push('| Field | Value |');
+    lines.push('| --- | --- |');
+    lines.push("| \uD83D\uDDC2\uFE0F **Project** | ".concat(escapeMdCell(projectLabel), " |"));
+    lines.push("| ".concat(concernEmoji(overallLevel), " **Overall health** | ").concat(escapeMdCell(concernBadge(overall)), " |"));
+    if (report.summary) {
+        lines.push("| \uD83D\uDCDD **Summary** | ".concat(escapeMdCell(report.summary), " |"));
+    }
+    if (report.mode) {
+        lines.push("| \uD83D\uDD2C **Analysis mode** | ".concat(escapeMdCell(report.mode), " |"));
+    }
+    if (report.repoPath) {
+        lines.push("| \uD83D\uDCC1 **Repository path** | `".concat(escapeMdCell(report.repoPath), "` |"));
+    }
+    if (report.thresholdProfileLabel) {
+        lines.push("| \uD83D\uDCCF **Threshold profile** | ".concat(escapeMdCell(report.thresholdProfileLabel), " |"));
+    }
+    lines.push("| \uD83D\uDCCA **Metrics tracked** | ".concat(metrics.length, " |"));
+    lines.push("| \u2699\uFE0F **Config settings** | ".concat(settings.length, " |"));
+    lines.push("| \u26A1 **Items needing attention** | ".concat(attentionMetrics.length + attentionSettings.length, " |"));
+    lines.push('');
+    if (attentionMetrics.length > 0 || attentionSettings.length > 0) {
+        lines.push('### 🎯 Highlights');
+        lines.push('');
+        attentionMetrics.slice(0, 8).forEach(function (metric) {
+            var _a;
+            lines.push("- ".concat(concernEmoji(concernLevel$1((_a = metric.concern) !== null && _a !== void 0 ? _a : 0)), " **").concat(metric.label, ":** ").concat(escapeMdCell(metric.value)));
+        });
+        attentionSettings.slice(0, 8).forEach(function (setting) {
+            var _a;
+            var flag = setting.deviatesFromRecommended ? '⚠️ Non-recommended' : concernBadge((_a = setting.concern) !== null && _a !== void 0 ? _a : 0);
+            lines.push("- ".concat(flag, " **").concat(setting.label, ":** `").concat(escapeMdCell(setting.value), "`"));
+        });
+        lines.push('');
+    }
+    lines.push('---');
+    lines.push('');
+    lines.push('## 📊 Health metrics');
+    lines.push('');
+    lines.push('_Git-sizer style metrics for object store size, history shape, and reference graph health._');
+    lines.push('');
+    if (metricGroups.length === 0) {
+        lines.push('_No metrics were returned._');
+        lines.push('');
+    }
+    else {
+        metricGroups.forEach(function (_a) {
+            var group = _a.group, groupMetricsList = _a.metrics;
+            var groupConcern = Math.max.apply(Math, __spreadArray([0], groupMetricsList.map(function (m) { var _a; return (_a = m.concern) !== null && _a !== void 0 ? _a : 0; }), false));
+            lines.push("### ".concat(groupEmoji(groupConcern), " ").concat(group));
+            lines.push('');
+            lines.push('| Metric | Value | Status | Object ID |');
+            lines.push('| --- | --- | --- | --- |');
+            groupMetricsList.forEach(function (metric) {
+                var _a, _b;
+                lines.push("| ".concat(escapeMdCell(metric.label), " | **").concat(escapeMdCell(metric.value), "** | ").concat(escapeMdCell(concernBadge((_a = metric.concern) !== null && _a !== void 0 ? _a : 0)), " | ").concat(escapeMdCell(((_b = metric.objectId) === null || _b === void 0 ? void 0 : _b.slice(0, 12)) || '—'), " |"));
+            });
+            lines.push('');
+        });
+    }
+    lines.push('---');
+    lines.push('');
+    lines.push('## ⚙️ Repository configuration');
+    lines.push('');
+    lines.push('_Git settings and runtime object-store stats that affect GC, repack, status, and commit performance._');
+    lines.push('');
+    if (configGroups.length === 0) {
+        lines.push('_No configuration settings were returned._');
+        lines.push('');
+    }
+    else {
+        configGroups.forEach(function (_a) {
+            var group = _a.group, groupSettings = _a.settings;
+            var groupConcern = Math.max.apply(Math, __spreadArray([0], groupSettings.map(function (s) { var _a; return (_a = s.concern) !== null && _a !== void 0 ? _a : 0; }), false));
+            var hasDeviations = groupSettings.some(function (s) { return s.deviatesFromRecommended; });
+            var headerEmoji = hasDeviations ? '⚠️' : groupEmoji(groupConcern);
+            lines.push("### ".concat(headerEmoji, " ").concat(group));
+            lines.push('');
+            lines.push('| Setting | Value | Recommended | Source | Performance | Status |');
+            lines.push('| --- | --- | --- | --- | --- | --- |');
+            groupSettings.forEach(function (setting) {
+                var _a;
+                var statusParts = [concernBadge((_a = setting.concern) !== null && _a !== void 0 ? _a : 0)];
+                if (setting.deviatesFromRecommended) {
+                    statusParts.push('⚠️ Non-recommended');
+                }
+                var label = setting.description
+                    ? "".concat(setting.label, " \u2014 _").concat(escapeMdCell(setting.description), "_")
+                    : setting.label;
+                lines.push("| ".concat(escapeMdCell(label), " | `").concat(escapeMdCell(setting.value), "` | ").concat(escapeMdCell(setting.recommendedValue || '—'), " | ").concat(escapeMdCell(sourceLabel$1(setting)), " | ").concat(escapeMdCell(setting.performanceNote || '—'), " | ").concat(escapeMdCell(statusParts.join(' · ')), " |"));
+            });
+            lines.push('');
+        });
+    }
+    lines.push('---');
+    lines.push('');
+    lines.push('## 💡 Recommendations');
+    lines.push('');
+    if (attentionMetrics.length === 0 && attentionSettings.length === 0) {
+        lines.push('✅ **Looking good!** No metrics or settings flagged above baseline concern.');
+    }
+    else {
+        lines.push('Prioritize items marked 🟠 Elevated, 🔴 Critical, or ⚠️ Non-recommended:');
+        lines.push('');
+        if (attentionMetrics.length > 0) {
+            lines.push('### Metrics');
+            lines.push('');
+            attentionMetrics
+                .sort(function (a, b) { var _a, _b; return ((_a = b.concern) !== null && _a !== void 0 ? _a : 0) - ((_b = a.concern) !== null && _b !== void 0 ? _b : 0); })
+                .forEach(function (metric) {
+                var _a, _b;
+                lines.push("- ".concat(concernEmoji(concernLevel$1((_a = metric.concern) !== null && _a !== void 0 ? _a : 0)), " **").concat(metric.label, "** \u2014 ").concat(escapeMdCell(metric.value), " (").concat((_b = metric.concern) !== null && _b !== void 0 ? _b : 0, " concern)"));
+            });
+            lines.push('');
+        }
+        if (attentionSettings.length > 0) {
+            lines.push('### Configuration');
+            lines.push('');
+            attentionSettings
+                .sort(function (a, b) { var _a, _b; return ((_a = b.concern) !== null && _a !== void 0 ? _a : 0) - ((_b = a.concern) !== null && _b !== void 0 ? _b : 0); })
+                .forEach(function (setting) {
+                var _a;
+                var rec = setting.recommendedValue ? " \u2192 recommended `".concat(setting.recommendedValue, "`") : '';
+                var dev = setting.deviatesFromRecommended ? ' ⚠️' : '';
+                lines.push("- ".concat(concernEmoji(concernLevel$1((_a = setting.concern) !== null && _a !== void 0 ? _a : 0))).concat(dev, " **").concat(setting.label, "** \u2014 `").concat(escapeMdCell(setting.value), "`").concat(rec));
+            });
+            lines.push('');
+        }
+        lines.push('_Optimize operations reorganize or prune Git storage — they do not remove committed site files from branches. Use **Git log → Trim History** to rewrite history._');
+    }
+    lines.push('');
+    lines.push('---');
+    lines.push('');
+    lines.push('## 📎 Report legend');
+    lines.push('');
+    lines.push('| Symbol | Meaning |');
+    lines.push('| --- | --- |');
+    lines.push('| 🟢 OK | Concern score 0–2 |');
+    lines.push('| 🟡 Watch | Concern score 3–9 |');
+    lines.push('| 🟠 Elevated | Concern score 10–29 |');
+    lines.push('| 🔴 Critical | Concern score 30+ |');
+    lines.push('| ⚠️ Non-recommended | Setting differs from CrafterCMS sandbox recommendation |');
+    lines.push('');
+    lines.push("_Report ID: ".concat(opts.siteId, " \u00B7 ").concat(generatedAt.toISOString(), "_"));
+    return lines.join('\n');
+}
+function triggerBlobDownload(filename, blob) {
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { return URL.revokeObjectURL(url); }, 0);
+}
+function downloadRepoHealthReportMarkdown(report, opts) {
+    var markdown = buildRepoHealthReportMarkdown(report, opts);
+    var date = new Date().toISOString().slice(0, 10);
+    var safeSite = opts.siteId.replace(/[^a-zA-Z0-9_-]+/g, '-');
+    var blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' });
+    triggerBlobDownload("".concat(safeSite, "-repo-health-").concat(date, ".md"), blob);
+}
+
+/*
+ * Copyright (C) 2007-2026 Crafter Software Corporation. All Rights Reserved.
+ */
+var REPO_OPTIMIZE_OPTIONS = [
+    {
+        id: 'gcAuto',
+        label: 'GC (auto)',
+        command: 'git gc --auto',
+        summary: 'Lightweight maintenance; runs only when Git decides it is needed.',
+        consequence: 'Routine housekeeping. Git runs this automatically in many workflows.',
+        whyRisky: 'Low impact. Git skips work unless internal thresholds are met.',
+        whatIsDestroyed: 'Only Git objects that are already unreachable (not on any branch or tag) — and only if Git chooses to prune them during this run.',
+        whatIsPreserved: 'All commits on branches and tags, all files in those commits (including /site/ content), and all commit SHAs.',
+        contentHistoryRisk: 'No risk to committed site content or published history. Uncommitted or dangling Git objects may be pruned if Git decides to.',
+        risk: 'safe'
+    },
+    {
+        id: 'gc',
+        label: 'GC (prune now)',
+        command: 'git gc --prune=now',
+        summary: 'Standard garbage collection with immediate pruning.',
+        consequence: 'Repacks the repository and prunes unreachable objects immediately.',
+        whyRisky: 'Moderate because it holds the sandbox Git lock and prunes unreachable objects now instead of waiting. It does not rewrite reachable commit history.',
+        whatIsDestroyed: 'Unreachable loose Git objects: dangling commits (e.g. after a hard reset or deleted branch), orphaned blobs, and other objects not reachable from any ref.',
+        whatIsPreserved: 'Every commit still pointed to by a branch or tag, all file versions in that history, and all commit IDs. Your site XML, assets, and config on branches stay intact.',
+        contentHistoryRisk: 'No risk to committed site content on branches. You may lose unreferenced Git objects (recovery copies of old commits not on any branch). Studio may be slow while the sandbox lock is held.',
+        risk: 'moderate'
+    },
+    {
+        id: 'gcAggressive',
+        label: 'GC (aggressive)',
+        command: 'git gc --aggressive --prune=now',
+        summary: 'Deep repack with aggressive delta compression.',
+        consequence: 'Rewrites packfiles and prunes unreachable objects. Long-running on large repos.',
+        whyRisky: 'Labeled destructive because of duration, CPU/disk load, and sandbox lock time — not because it rewrites commit history. Packfiles are rebuilt; reachable commit SHAs and trees are unchanged.',
+        whatIsDestroyed: 'Same as standard GC: unreachable Git objects are pruned. Existing packfiles are replaced with newly compressed packs.',
+        whatIsPreserved: 'All commits, trees, and blobs reachable from branches/tags — including every version of site content in Git history. Commit hashes for reachable commits do not change.',
+        contentHistoryRisk: 'No risk to committed site content or branch history. Risk is operational (long lock, high I/O) plus loss of unreachable/dangling objects. Use Trim History separately if you need to remove content from history.',
+        risk: 'destructive'
+    },
+    {
+        id: 'repack',
+        label: 'Repack (all loose)',
+        command: 'git repack -a -d',
+        summary: 'Pack all loose objects; remove redundant packs.',
+        consequence: 'Consolidates loose objects into packfiles.',
+        whyRisky: 'Moderate disk churn and sandbox lock. Does not delete commits or change history — only reorganizes how Git stores objects on disk.',
+        whatIsDestroyed: 'Redundant packfiles and loose object files after their contents are copied into new packs.',
+        whatIsPreserved: 'All reachable commits, blobs, and trees. Site content and history are unchanged.',
+        contentHistoryRisk: 'No risk to committed content or history. Temporary extra disk use while repacking.',
+        risk: 'moderate'
+    },
+    {
+        id: 'repackFromPack',
+        label: 'Repack (from existing packs)',
+        command: 'git repack -A -d',
+        summary: 'Repack objects from existing packfiles into a new pack.',
+        consequence: 'Consolidates packfiles; may require temporary disk space equal to the current pack size.',
+        whyRisky: 'Labeled destructive because it can need roughly 2× .git disk space until the old packs are removed, and it locks the sandbox for a long time on large repos. It does not alter commit history.',
+        whatIsDestroyed: 'Old packfiles after their objects are rewritten into a new consolidated pack.',
+        whatIsPreserved: 'All commits and file content reachable from refs. No commit SHAs or site files are removed.',
+        contentHistoryRisk: 'No risk to committed content or history. Risk is running out of disk space mid-operation on very large repositories.',
+        risk: 'destructive'
+    },
+    {
+        id: 'repackAggressive',
+        label: 'Repack (aggressive delta)',
+        command: 'git repack -a -d -f --depth=250 --window=250',
+        summary: 'Full repack with maximum delta compression.',
+        consequence: 'Very slow full repack with aggressive compression.',
+        whyRisky: 'Labeled destructive due to extreme CPU, I/O, and lock duration on large repos — not because it deletes site content. Rewrites packfiles only.',
+        whatIsDestroyed: 'Previous packfiles and loose objects after recompression into new packs.',
+        whatIsPreserved: 'All reachable commits, trees, blobs, and branch/tag refs. Site content in Git history is preserved.',
+        contentHistoryRisk: 'No risk to committed content or branch history. Operational risk only: long Studio git lock and heavy disk activity.',
+        risk: 'destructive'
+    },
+    {
+        id: 'prune',
+        label: 'Prune (expire now)',
+        command: 'git prune --expire=now',
+        summary: 'Remove unreachable loose objects immediately.',
+        consequence: 'Deletes loose Git objects that nothing points to.',
+        whyRisky: 'Moderate because it permanently removes unreachable objects immediately — including dangling commits you might still want to recover via reflog or fsck.',
+        whatIsDestroyed: 'Unreachable loose objects only (not objects inside packfiles until a later GC). Typical victims: dangling commits after reset, orphaned blobs, objects from deleted branches that are no longer referenced.',
+        whatIsPreserved: 'All objects reachable from branches and tags — your committed site content and full branch history remain.',
+        contentHistoryRisk: 'No risk to content on branches. You may permanently lose unreferenced Git objects (recovery copies). Does not remove commits that are still on a branch.',
+        risk: 'moderate'
+    },
+    {
+        id: 'reflogExpire',
+        label: 'Expire all reflogs',
+        command: 'git reflog expire --expire=now --all',
+        summary: 'Clear all reflog entries for every ref.',
+        consequence: 'Removes Git’s internal “undo” log for every branch and HEAD.',
+        whyRisky: 'Labeled destructive because it removes recovery paths: you cannot use reflog to restore a recently deleted branch, undo a hard reset, or find a “lost” commit that is no longer on any branch.',
+        whatIsDestroyed: 'Reflog entries only — Git’s local journal of where refs used to point. Reflogs are not part of published history and are not pushed to remotes.',
+        whatIsPreserved: 'Current branch and tag tips, all commits still referenced by those refs, and all site content in those commits. Commit history on branches is unchanged.',
+        contentHistoryRisk: 'No risk to committed site content on branches. You lose the ability to recover recent Git mistakes via reflog (e.g. “I reset HEAD yesterday and need that commit back”).',
+        risk: 'destructive'
+    },
+    {
+        id: 'fullOptimize',
+        label: 'Full optimize (reflog + aggressive GC)',
+        command: 'git reflog expire --expire=now --all && git gc --aggressive --prune=now',
+        summary: 'Expire all reflogs, then run aggressive GC.',
+        consequence: 'Highest-impact maintenance: clears reflogs, rewrites packs, and prunes unreachable objects.',
+        whyRisky: 'Combines reflog expiry (no recovery via reflog) with aggressive GC (long lock, pack rewrite, prune unreachable objects). Still does not rewrite reachable commit history.',
+        whatIsDestroyed: 'All reflog entries, unreachable Git objects, and old packfiles. Does not remove commits or files that remain on branches/tags.',
+        whatIsPreserved: 'All commits, files, and SHAs still reachable from branches and tags — your site sandbox content on branches is preserved.',
+        contentHistoryRisk: 'No risk to committed site content on branches. You may lose dangling/unreachable objects and all reflog-based recovery. For removing content from history, use Git log → Trim History (that rewrites history).',
+        risk: 'destructive'
+    }
+];
+function getRepoOptimizeOption(id) {
+    return REPO_OPTIMIZE_OPTIONS.find(function (option) { return option.id === id; });
+}
+function requiresConfirmation(option) {
+    return option.risk !== 'safe';
+}
+
+function concernLevel(concern) {
+    if (concern >= 30) {
+        return 'critical';
+    }
+    if (concern >= 10) {
+        return 'elevated';
+    }
+    if (concern >= 3) {
+        return 'watch';
+    }
+    return 'ok';
+}
+function concernPalette(level) {
+    switch (level) {
+        case 'critical':
+            return 'error';
+        case 'elevated':
+            return 'warning';
+        case 'watch':
+            return 'info';
+        default:
+            return 'success';
+    }
+}
+function concernLabel(level) {
+    switch (level) {
+        case 'critical':
+            return 'Critical';
+        case 'elevated':
+            return 'Elevated';
+        case 'watch':
+            return 'Watch';
+        default:
+            return 'OK';
+    }
+}
+function concernProgress(concern) {
+    return Math.min(100, Math.round((Math.max(0, concern) / 30) * 100));
+}
+function ConcernIndicator(_a) {
+    var concern = _a.concern, _b = _a.compact, compact = _b === void 0 ? false : _b;
+    var level = concernLevel(concern);
+    var color = concernPalette(level);
+    var progress = concernProgress(concern);
+    return (jsxs(Stack$1, { spacing: 0.75, alignItems: compact ? 'flex-start' : 'flex-end', sx: { minWidth: compact ? 0 : 108 }, children: [jsx(Chip, { size: "small", icon: level === 'ok' ? (jsx(CheckCircleOutlineRoundedIcon, {})) : level === 'critical' ? (jsx(ErrorOutlineRoundedIcon, {})) : level === 'elevated' ? (jsx(WarningAmberRoundedIcon, {})) : (jsx(InfoOutlinedIcon, {})), label: concernLabel(level), color: color, variant: level === 'ok' ? 'outlined' : 'filled', sx: { fontWeight: 700 } }), concern > 0 && (jsx(LinearProgress, { variant: "determinate", value: progress, color: color, sx: { width: compact ? 72 : '100%', height: 6, borderRadius: 999 } }))] }));
+}
+function riskColor(risk) {
+    if (risk === 'destructive') {
+        return 'error';
+    }
+    if (risk === 'moderate') {
+        return 'warning';
+    }
+    return 'success';
+}
+function riskLabel(risk) {
+    if (risk === 'destructive') {
+        return 'Destructive';
+    }
+    if (risk === 'moderate') {
+        return 'Moderate';
+    }
+    return 'Safe';
+}
+function groupMetrics(metrics) {
+    var order = [];
+    var map = new Map();
+    metrics.forEach(function (metric) {
+        var _a;
+        var group = ((_a = metric.group) === null || _a === void 0 ? void 0 : _a.trim()) || 'Metrics';
+        if (!map.has(group)) {
+            map.set(group, []);
+            order.push(group);
+        }
+        map.get(group).push(metric);
+    });
+    return order.map(function (group) { return ({ group: group, metrics: map.get(group) }); });
+}
+function groupConfigSettings(settings) {
+    var order = [];
+    var map = new Map();
+    settings.forEach(function (setting) {
+        var _a;
+        var group = ((_a = setting.group) === null || _a === void 0 ? void 0 : _a.trim()) || 'Configuration';
+        if (!map.has(group)) {
+            map.set(group, []);
+            order.push(group);
+        }
+        map.get(group).push(setting);
+    });
+    return order.map(function (group) { return ({ group: group, settings: map.get(group) }); });
+}
+function sourceLabel(setting) {
+    switch (setting.source) {
+        case 'local':
+            return setting.sourceDetail || '.git/config';
+        case 'global':
+            return setting.sourceDetail || 'global gitconfig';
+        case 'system':
+            return setting.sourceDetail || 'system gitconfig';
+        case 'runtime':
+            return 'git count-objects';
+        case 'default':
+            return 'Git default';
+        default:
+            return setting.sourceDetail || setting.source || '—';
+    }
+}
+function ConfigRow(_a) {
+    var _b, _c;
+    var setting = _a.setting;
+    var deviates = Boolean(setting.deviatesFromRecommended);
+    var recommended = (_b = setting.recommendedValue) === null || _b === void 0 ? void 0 : _b.trim();
+    return (jsxs(TableRow, { hover: true, sx: deviates
+            ? {
+                bgcolor: function (theme) { return alpha(theme.palette.warning.main, 0.1); },
+                boxShadow: function (theme) { return "inset 3px 0 0 ".concat(theme.palette.warning.main); },
+                '&:hover': {
+                    bgcolor: function (theme) { return alpha(theme.palette.warning.main, 0.14); }
+                }
+            }
+            : undefined, children: [jsx(TableCell, { sx: { fontWeight: 600, width: '22%', verticalAlign: 'top' }, children: jsxs(Stack$1, { direction: "row", spacing: 0.75, alignItems: "flex-start", children: [deviates ? (jsx(WarningAmberRoundedIcon, { color: "warning", sx: { fontSize: 18, mt: 0.25, flexShrink: 0 } })) : null, jsxs(Box$1, { children: [jsx(Typography, { variant: "body2", sx: monoSx, children: setting.label }), setting.description && (jsx(Typography, { variant: "caption", color: "text.secondary", display: "block", sx: { mt: 0.5, fontWeight: 400 }, children: setting.description }))] })] }) }), jsxs(TableCell, { sx: { width: '14%', verticalAlign: 'top' }, children: [jsx(Typography, { variant: "body2", sx: __assign(__assign({}, monoSx), { fontWeight: deviates ? 700 : 400, color: deviates ? 'warning.dark' : 'text.primary' }), children: setting.value }), deviates && recommended && (jsxs(Typography, { variant: "caption", color: "warning.dark", display: "block", sx: { mt: 0.5, fontWeight: 600 }, children: ["Recommended: ", recommended] }))] }), jsxs(TableCell, { sx: { width: '14%', verticalAlign: 'top' }, children: [jsx(Typography, { variant: "caption", color: "text.secondary", children: sourceLabel(setting) }), setting.defaultValue && setting.value !== setting.defaultValue && !deviates && (jsxs(Typography, { variant: "caption", color: "text.secondary", display: "block", children: ["default: ", setting.defaultValue] })), deviates && setting.defaultValue && (jsxs(Typography, { variant: "caption", color: "text.secondary", display: "block", children: ["Git default: ", setting.defaultValue] }))] }), jsx(TableCell, { sx: { verticalAlign: 'top' }, children: jsx(Typography, { variant: "body2", children: setting.performanceNote || '—' }) }), jsx(TableCell, { align: "right", sx: { width: 120, verticalAlign: 'top' }, children: jsxs(Stack$1, { spacing: 0.5, alignItems: "flex-end", children: [deviates ? (jsx(Chip, { size: "small", color: "warning", variant: "outlined", label: "Non-recommended" })) : null, jsx(ConcernIndicator, { concern: (_c = setting.concern) !== null && _c !== void 0 ? _c : 0, compact: true })] }) })] }));
+}
+function OptimizeRiskDetails(_a) {
+    var option = _a.option;
+    return (jsxs(Stack$1, { spacing: 1.25, sx: { mt: 0.5 }, children: [jsx(Typography, { variant: "body2", color: "text.secondary", children: option.summary }), jsxs(Box$1, { sx: {
+                    p: 1.5,
+                    borderRadius: 1,
+                    border: 1,
+                    borderColor: 'divider',
+                    bgcolor: function (theme) { return alpha(theme.palette.success.main, 0.06); }
+                }, children: [jsx(Typography, { variant: "caption", sx: { fontWeight: 700, display: 'block', mb: 0.5 }, children: "Site content & history" }), jsx(Typography, { variant: "body2", children: option.contentHistoryRisk })] }), (option.risk === 'moderate' || option.risk === 'destructive') && (jsxs(Box$1, { sx: {
+                    p: 1.5,
+                    borderRadius: 1,
+                    border: 1,
+                    borderColor: option.risk === 'destructive' ? 'error.light' : 'warning.light',
+                    bgcolor: function (theme) {
+                        return alpha(theme.palette[option.risk === 'destructive' ? 'error' : 'warning'].main, 0.06);
+                    }
+                }, children: [jsxs(Typography, { variant: "caption", sx: { fontWeight: 700, display: 'block', mb: 0.5 }, children: ["Why ", riskLabel(option.risk).toLowerCase()] }), jsx(Typography, { variant: "body2", children: option.whyRisky })] })), jsxs(Stack$1, { spacing: 0.75, children: [jsxs(Typography, { variant: "caption", color: "text.secondary", children: [jsx("strong", { children: "Preserved:" }), " ", option.whatIsPreserved] }), jsxs(Typography, { variant: "caption", color: "text.secondary", children: [jsx("strong", { children: "May be removed:" }), " ", option.whatIsDestroyed] })] })] }));
+}
+function MetricCard(_a) {
+    var _b, _c;
+    var metric = _a.metric;
+    var level = concernLevel((_b = metric.concern) !== null && _b !== void 0 ? _b : 0);
+    var borderColor = function (theme) {
+        return level === 'ok' ? theme.palette.divider : theme.palette[concernPalette(level)].main;
+    };
+    return (jsx(Paper, { variant: "outlined", sx: {
+            p: 1.75,
+            height: '100%',
+            borderLeftWidth: 4,
+            borderLeftStyle: 'solid',
+            borderLeftColor: borderColor,
+            bgcolor: function (theme) {
+                return level === 'ok' ? 'background.paper' : alpha(theme.palette[concernPalette(level)].main, 0.04);
+            }
+        }, children: jsxs(Stack$1, { direction: "row", spacing: 1.5, justifyContent: "space-between", alignItems: "flex-start", children: [jsxs(Box$1, { sx: { minWidth: 0, flex: 1 }, children: [jsx(Typography, { variant: "caption", color: "text.secondary", fontWeight: 700, display: "block", sx: { mb: 0.75 }, children: metric.label }), jsx(Typography, { variant: "h6", fontWeight: 800, lineHeight: 1.2, sx: monoSx, children: String(metric.value) }), metric.objectId && (jsx(Chip, { size: "small", variant: "outlined", label: metric.objectId.slice(0, 12), sx: __assign(__assign({}, monoSx), { mt: 1, maxWidth: '100%' }) }))] }), jsx(ConcernIndicator, { concern: (_c = metric.concern) !== null && _c !== void 0 ? _c : 0 })] }) }));
+}
+function MetricGroupSection(_a) {
+    var group = _a.group, metrics = _a.metrics;
+    var groupConcern = Math.max.apply(Math, __spreadArray([0], metrics.map(function (metric) { var _a; return (_a = metric.concern) !== null && _a !== void 0 ? _a : 0; }), false));
+    var level = concernLevel(groupConcern);
+    return (jsxs(Box$1, { sx: { px: 2, py: 2 }, children: [jsxs(Stack$1, { direction: "row", spacing: 1, alignItems: "center", sx: { mb: 1.5 }, children: [jsx(Typography, { variant: "overline", sx: { fontWeight: 800, letterSpacing: '0.08em', flex: 1 }, children: group }), jsx(Chip, { size: "small", label: concernLabel(level), color: concernPalette(level), variant: level === 'ok' ? 'outlined' : 'filled' })] }), jsx(Box$1, { sx: {
+                    display: 'grid',
+                    gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))', xl: 'repeat(3, minmax(0, 1fr))' },
+                    gap: 1.5
+                }, children: metrics.map(function (metric) { return (jsx(MetricCard, { metric: metric }, metric.id)); }) })] }));
+}
+function RepoHealthTab(_a) {
+    var _this = this;
+    var _b, _c, _d;
+    var siteId = _a.siteId, siteName = _a.siteName;
+    var _e = useState(true), loading = _e[0], setLoading = _e[1];
+    var _f = useState(null), optimizing = _f[0], setOptimizing = _f[1];
+    var _g = useState(null), report = _g[0], setReport = _g[1];
+    var _h = useState(null), error = _h[0], setError = _h[1];
+    var _j = useState(null), notice = _j[0], setNotice = _j[1];
+    var _k = useState('gcAuto'), selectedOperation = _k[0], setSelectedOperation = _k[1];
+    var _l = useState(null), confirmOption = _l[0], setConfirmOption = _l[1];
+    var _m = useState(false), ackChecked = _m[0], setAckChecked = _m[1];
+    var _o = useState(false), learnMoreOpen = _o[0], setLearnMoreOpen = _o[1];
+    var selectedOptimize = useMemo(function () { var _a; return (_a = getRepoOptimizeOption(selectedOperation)) !== null && _a !== void 0 ? _a : REPO_OPTIMIZE_OPTIONS[0]; }, [selectedOperation]);
+    var metricGroups = useMemo(function () { var _a; return groupMetrics((_a = report === null || report === void 0 ? void 0 : report.metrics) !== null && _a !== void 0 ? _a : []); }, [report === null || report === void 0 ? void 0 : report.metrics]);
+    var configGroups = useMemo(function () { var _a, _b; return groupConfigSettings((_b = (_a = report === null || report === void 0 ? void 0 : report.repoConfig) === null || _a === void 0 ? void 0 : _a.settings) !== null && _b !== void 0 ? _b : []); }, [(_b = report === null || report === void 0 ? void 0 : report.repoConfig) === null || _b === void 0 ? void 0 : _b.settings]);
+    var load = useCallback(function () { return __awaiter(_this, void 0, void 0, function () {
+        var data, e_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    setLoading(true);
+                    setError(null);
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 3, 4, 5]);
+                    return [4 /*yield*/, firstValueFrom(fetchRepoHealth(siteId))];
+                case 2:
+                    data = _a.sent();
+                    if (!data.success) {
+                        setError(data.error || data.message || 'Analysis failed');
+                        setReport(null);
+                    }
+                    else {
+                        setReport(data);
+                    }
+                    return [3 /*break*/, 5];
+                case 3:
+                    e_1 = _a.sent();
+                    setError(e_1 instanceof Error ? e_1.message : 'Analysis failed');
+                    setReport(null);
+                    return [3 /*break*/, 5];
+                case 4:
+                    setLoading(false);
+                    return [7 /*endfinally*/];
+                case 5: return [2 /*return*/];
+            }
+        });
+    }); }, [siteId]);
+    useEffect(function () {
+        load();
+    }, [load]);
+    var runOptimize = function (operation) { return __awaiter(_this, void 0, void 0, function () {
+        var result, option_1, parts, option, e_2;
+        var _a, _b;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
+                case 0:
+                    setOptimizing(operation);
+                    setNotice(null);
+                    setError(null);
+                    _c.label = 1;
+                case 1:
+                    _c.trys.push([1, 4, 5, 6]);
+                    return [4 /*yield*/, firstValueFrom(postOptimizeRepo(siteId, operation))];
+                case 2:
+                    result = _c.sent();
+                    if (!result.success) {
+                        option_1 = getRepoOptimizeOption(operation);
+                        parts = [result.error, result.hint].filter(Boolean);
+                        if (result.mode === 'external' && result.command) {
+                            parts.push(result.command);
+                        }
+                        setError(parts.join(' — ') || "".concat((_a = option_1 === null || option_1 === void 0 ? void 0 : option_1.label) !== null && _a !== void 0 ? _a : operation, " could not be completed"));
+                        return [2 /*return*/];
+                    }
+                    option = getRepoOptimizeOption(operation);
+                    setNotice(result.message || "".concat((_b = option === null || option === void 0 ? void 0 : option.label) !== null && _b !== void 0 ? _b : operation, " completed"));
+                    return [4 /*yield*/, load()];
+                case 3:
+                    _c.sent();
+                    return [3 /*break*/, 6];
+                case 4:
+                    e_2 = _c.sent();
+                    setError(e_2 instanceof Error ? e_2.message : 'Optimization failed');
+                    return [3 /*break*/, 6];
+                case 5:
+                    setOptimizing(null);
+                    return [7 /*endfinally*/];
+                case 6: return [2 /*return*/];
+            }
+        });
+    }); };
+    var openConfirm = function (option) {
+        setConfirmOption(option);
+        setAckChecked(false);
+    };
+    var closeConfirm = function () {
+        setConfirmOption(null);
+        setAckChecked(false);
+    };
+    var confirmReady = useMemo(function () {
+        if (!confirmOption) {
+            return false;
+        }
+        if (requiresConfirmation(confirmOption)) {
+            return ackChecked;
+        }
+        return true;
+    }, [ackChecked, confirmOption]);
+    var requestOptimize = function () {
+        var option = selectedOptimize;
+        if (option.risk === 'safe') {
+            runOptimize(option.id);
+            return;
+        }
+        openConfirm(option);
+    };
+    var confirmAndRun = function () {
+        if (!confirmOption || !confirmReady) {
+            return;
+        }
+        var operation = confirmOption.id;
+        closeConfirm();
+        runOptimize(operation);
+    };
+    var onDownloadReport = function () {
+        if (!report) {
+            return;
+        }
+        downloadRepoHealthReportMarkdown(report, { siteId: siteId, siteName: siteName });
+        setNotice('Repository health report downloaded');
+    };
+    var overall = (_c = report === null || report === void 0 ? void 0 : report.overallConcern) !== null && _c !== void 0 ? _c : 0;
+    return (jsxs(TabShell, { children: [jsxs(TabToolbar, { children: [jsxs(ToolbarRow, { children: [jsxs(Box$1, { sx: { minWidth: 0, flex: '1 1 200px' }, children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, children: "Repository health" }), jsxs(Typography, { variant: "caption", color: "text.secondary", display: "block", children: [siteName ? "".concat(siteName, " (").concat(siteId, ")") : siteId, (report === null || report === void 0 ? void 0 : report.thresholdProfileLabel) ? " \u00B7 Thresholds: ".concat(report.thresholdProfileLabel) : ''] }), (report === null || report === void 0 ? void 0 : report.repoPath) && (jsx(Typography, { variant: "caption", color: "text.secondary", sx: __assign(__assign({}, monoSx), { display: 'block', mt: 0.25 }), noWrap: true, children: report.repoPath }))] }), jsxs(Stack$1, { direction: "row", spacing: 1, flexWrap: "wrap", useFlexGap: true, alignItems: "center", sx: { flexShrink: 0 }, children: [report ? jsx(ConcernIndicator, { concern: overall, compact: true }) : null, jsx(Button$1, { size: "small", variant: "outlined", startIcon: jsx(DownloadRoundedIcon, {}), disabled: !report || loading, onClick: onDownloadReport, children: "Download report" }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: jsx(HelpOutlineRoundedIcon, {}), onClick: function () { return setLearnMoreOpen(true); }, children: "Learn more" }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: loading ? jsx(CircularProgress, { size: 16 }) : jsx(RefreshRoundedIcon, {}), disabled: loading || Boolean(optimizing), onClick: function () { return load(); }, children: "Refresh" })] })] }), jsx(Divider, {}), jsxs(ToolbarGroup, { label: "Optimize", children: [jsxs(FormControl, { size: "small", sx: { minWidth: 220, maxWidth: 320 }, children: [jsx(InputLabel, { children: "Operation" }), jsx(Select, { label: "Operation", value: selectedOperation, onChange: function (e) { return setSelectedOperation(e.target.value); }, disabled: loading || Boolean(optimizing), children: REPO_OPTIMIZE_OPTIONS.map(function (option) { return (jsx(MenuItem$1, { value: option.id, children: option.label }, option.id)); }) })] }), jsx(Chip, { size: "small", label: riskLabel(selectedOptimize.risk), color: riskColor(selectedOptimize.risk) }), jsx(Button$1, { size: "small", variant: "contained", color: selectedOptimize.risk === 'destructive' ? 'error' : 'primary', disabled: loading || Boolean(optimizing), startIcon: optimizing === selectedOperation ? (jsx(CircularProgress, { size: 16, color: "inherit" })) : (jsx(AutoFixHighRoundedIcon, {})), onClick: requestOptimize, children: "Run" })] }), jsx(Box$1, { sx: { minWidth: 0 }, children: jsx(OptimizeRiskDetails, { option: selectedOptimize }) })] }), jsxs(TabAlertStack, { children: [error && (jsx(Alert, { severity: "error", onClose: function () { return setError(null); }, children: error })), notice && (jsx(Alert, { severity: "success", onClose: function () { return setNotice(null); }, children: notice }))] }), jsx(Box$1, { sx: {
+                    flex: 1,
+                    minHeight: 0,
+                    overflowY: 'auto',
+                    overflowX: 'hidden',
+                    pr: 0.5,
+                    WebkitOverflowScrolling: 'touch'
+                }, children: jsxs(Paper, { variant: "outlined", sx: __assign(__assign({}, surfacePaperSx), { display: 'flex', flexDirection: 'column' }), children: [jsx(PanelHeader, { title: "Health metrics", subtitle: (_d = report === null || report === void 0 ? void 0 : report.summary) !== null && _d !== void 0 ? _d : 'Run analysis to load repository metrics' }), loading && !report ? (jsx(Box$1, { sx: { p: 4, display: 'flex', justifyContent: 'center' }, children: jsx(CircularProgress, { size: 32 }) })) : (jsxs(Stack$1, { spacing: 0, divider: jsx(Box$1, { sx: { borderBottom: 1, borderColor: 'divider' } }), children: [metricGroups.map(function (_a) {
+                                    var group = _a.group, metrics = _a.metrics;
+                                    return (jsx(MetricGroupSection, { group: group, metrics: metrics }, group));
+                                }), configGroups.length > 0 && (jsxs(Box$1, { children: [jsxs(Box$1, { sx: { px: 2, py: 1.5, bgcolor: function (theme) { return alpha(theme.palette.text.primary, 0.03); } }, children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, children: "Repository configuration" }), jsx(Typography, { variant: "caption", color: "text.secondary", display: "block", children: "Git settings and runtime object-store stats that affect GC, repack, status, and Studio commit performance." }), configGroups.some(function (_a) {
+                                                    var settings = _a.settings;
+                                                    return settings.some(function (s) { return s.deviatesFromRecommended; });
+                                                }) && (jsxs(Stack$1, { direction: "row", spacing: 0.75, alignItems: "center", sx: { mt: 1 }, children: [jsx(WarningAmberRoundedIcon, { color: "warning", sx: { fontSize: 16 } }), jsx(Typography, { variant: "caption", color: "warning.dark", fontWeight: 600, children: "Highlighted rows use a non-recommended value \u2014 compare current vs recommended in the Value column." })] }))] }), jsxs(Table, { size: "small", children: [jsx(TableHead, { children: jsxs(TableRow, { children: [jsx(TableCell, { children: "Setting" }), jsx(TableCell, { children: "Value" }), jsx(TableCell, { children: "Source" }), jsx(TableCell, { children: "Performance impact" }), jsx(TableCell, { align: "right", children: "Status" })] }) }), jsx(TableBody, { children: configGroups.map(function (_a) {
+                                                        var group = _a.group, settings = _a.settings;
+                                                        return (jsxs(React__default.Fragment, { children: [jsx(TableRow, { children: jsx(TableCell, { colSpan: 5, sx: { bgcolor: function (theme) { return alpha(theme.palette.text.primary, 0.04); }, fontWeight: 700 }, children: group }) }), settings.map(function (setting) { return (jsx(ConfigRow, { setting: setting }, setting.key)); })] }, group));
+                                                    }) })] })] }))] })), jsx(Box$1, { sx: {
+                                px: 2,
+                                py: 1.25,
+                                borderTop: 1,
+                                borderColor: 'divider',
+                                bgcolor: function (theme) { return alpha(theme.palette.text.primary, 0.02); },
+                                flexShrink: 0
+                            }, children: jsx(Typography, { variant: "caption", color: "text.secondary", children: "Metrics follow git-sizer style. Optimize operations reorganize or prune Git storage \u2014 they do not remove committed site files from branches. Use Git log \u2192 Trim History to rewrite history and remove content from the past." }) })] }) }), jsxs(Dialog, { open: Boolean(confirmOption), onClose: closeConfirm, maxWidth: "sm", fullWidth: true, children: [jsxs(DialogTitle, { sx: { display: 'flex', alignItems: 'center', gap: 1 }, children: [(confirmOption === null || confirmOption === void 0 ? void 0 : confirmOption.risk) === 'destructive' && jsx(WarningAmberRoundedIcon, { color: "error" }), "Confirm: ", confirmOption === null || confirmOption === void 0 ? void 0 : confirmOption.label] }), jsx(DialogContent, { children: jsxs(Stack$1, { spacing: 2, children: [jsx(Alert, { severity: (confirmOption === null || confirmOption === void 0 ? void 0 : confirmOption.risk) === 'destructive' ? 'error' : 'warning', icon: jsx(WarningAmberRoundedIcon, {}), children: confirmOption === null || confirmOption === void 0 ? void 0 : confirmOption.consequence }), confirmOption && (jsxs(Fragment, { children: [jsxs(Box$1, { sx: {
+                                                p: 1.5,
+                                                borderRadius: 1,
+                                                border: 1,
+                                                borderColor: 'success.light',
+                                                bgcolor: function (theme) { return alpha(theme.palette.success.main, 0.06); }
+                                            }, children: [jsx(Typography, { variant: "subtitle2", gutterBottom: true, children: "Your site content & branch history" }), jsx(Typography, { variant: "body2", children: confirmOption.contentHistoryRisk })] }), jsxs(Box$1, { sx: {
+                                                p: 1.5,
+                                                borderRadius: 1,
+                                                border: 1,
+                                                borderColor: 'divider'
+                                            }, children: [jsxs(Typography, { variant: "subtitle2", gutterBottom: true, children: ["Why this is labeled ", riskLabel(confirmOption.risk).toLowerCase()] }), jsx(Typography, { variant: "body2", sx: { mb: 1.5 }, children: confirmOption.whyRisky }), jsxs(Typography, { variant: "caption", color: "text.secondary", display: "block", sx: { mb: 0.5 }, children: [jsx("strong", { children: "Preserved:" }), " ", confirmOption.whatIsPreserved] }), jsxs(Typography, { variant: "caption", color: "text.secondary", display: "block", children: [jsx("strong", { children: "May be permanently removed:" }), " ", confirmOption.whatIsDestroyed] })] })] })), jsx(Box$1, { sx: codeBlockSx, children: confirmOption === null || confirmOption === void 0 ? void 0 : confirmOption.command }), jsx(FormControlLabel, { control: jsx(Checkbox, { checked: ackChecked, onChange: function (_, checked) { return setAckChecked(checked); } }), label: "I understand what may be removed, what stays on branches, and want to proceed." })] }) }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: closeConfirm, children: "Cancel" }), jsx(Button$1, { color: "error", variant: "contained", disabled: !confirmReady || Boolean(optimizing), onClick: confirmAndRun, children: "Run optimization" })] })] }), jsx(RepoHealthLearnMoreDialog, { open: learnMoreOpen, onClose: function () { return setLearnMoreOpen(false); }, profileLabel: report === null || report === void 0 ? void 0 : report.thresholdProfileLabel })] }));
+}
+
+/*
+ * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License version 3 as published by
+ * the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+function useUpdateRefs(latestValues) {
+  const ref = useRef(latestValues);
+  ref.current = latestValues;
+  return ref;
+}
+
+/*
+ * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License version 3 as published by
+ * the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+function useDebouncedInput(observer, time = 250) {
+  const subject$Ref = React__default.useRef(new Subject());
+  const observerRef = useUpdateRefs(observer);
+  useEffect(() => {
+    const subscription = subject$Ref.current.pipe(debounceTime(time), distinctUntilChanged()).subscribe((value) => {
+      observerRef.current(value);
+    });
+    return () => subscription.unsubscribe();
+  }, [time]);
+  return subject$Ref.current;
+}
+
+/*
+ * Copyright (C) 2007-2026 Crafter Software Corporation. All Rights Reserved.
+ */
+var STATE_FILTER_BITS = [
+    { key: 'new', label: 'New' },
+    { key: 'modified', label: 'Modified' },
+    { key: 'deleted', label: 'Deleted' },
+    { key: 'locked', label: 'Locked' },
+    { key: 'systemProcessing', label: 'System processing' },
+    { key: 'submitted', label: 'Submitted' },
+    { key: 'scheduled', label: 'Scheduled' },
+    { key: 'publishing', label: 'Publishing' },
+    { key: 'staged', label: 'Staged' },
+    { key: 'live', label: 'Live' },
+    { key: 'disabled', label: 'Disabled' }
+];
+var INDIVIDUAL_STATE_BITS = [
+    { id: 'new', label: 'New', mask: STATE_NEW_MASK },
+    { id: 'modified', label: 'Modified', mask: STATE_MODIFIED_MASK },
+    { id: 'deleted', label: 'Deleted', mask: STATE_DELETED_MASK },
+    { id: 'locked', label: 'Locked', mask: STATE_LOCKED_MASK },
+    { id: 'systemProcessing', label: 'System processing', mask: STATE_SYSTEM_PROCESSING_MASK },
+    { id: 'submitted', label: 'Submitted', mask: STATE_SUBMITTED_MASK },
+    { id: 'scheduled', label: 'Scheduled', mask: STATE_SCHEDULED_MASK },
+    { id: 'publishing', label: 'Publishing', mask: STATE_PUBLISHING_MASK },
+    { id: 'destination', label: 'Publish destination', mask: PUBLISHING_DESTINATION_MASK },
+    { id: 'staged', label: 'Staged', mask: PUBLISHING_STAGED_MASK },
+    { id: 'live', label: 'Live', mask: PUBLISHING_LIVE_MASK },
+    { id: 'disabled', label: 'Disabled', mask: STATE_DISABLED_MASK },
+    { id: 'translationUpToDate', label: 'Translation up to date', mask: STATE_TRANSLATION_UP_TO_DATE_MASK },
+    { id: 'translationPending', label: 'Translation pending', mask: STATE_TRANSLATION_PENDING_MASK },
+    { id: 'translationInProgress', label: 'Translation in progress', mask: STATE_TRANSLATION_IN_PROGRESS_MASK }
+];
+function formatStateBitLabel(label, mask) {
+    return "".concat(label, " (").concat(mask, ")");
+}
+/** Table/list display — human label only; mask shown in detail panel or tooltip. */
+function formatStateBitShortLabel(label) {
+    return label;
+}
+function shortContentTypeLabel(item) {
+    var _a;
+    var raw = item.contentTypeId || item.systemType || '—';
+    if (raw.includes('/')) {
+        return (_a = raw.split('/').filter(Boolean).pop()) !== null && _a !== void 0 ? _a : raw;
+    }
+    return raw;
+}
+function displayItemPath(path) {
+    return path.replace(/^\.\//, '');
+}
+function isStateBitSet(state, mask) {
+    return Boolean(state & mask);
+}
+function activeStateBitEntries(state) {
+    return INDIVIDUAL_STATE_BITS.filter(function (bit) { return isStateBitSet(state, bit.mask); });
+}
+/** Per-item toggles for every primitive state bit in Crafter's item state integer. */
+var ITEM_STATE_TOGGLE_CONTROLS = INDIVIDUAL_STATE_BITS.map(function (bit) { return ({
+    id: bit.id,
+    label: bit.label,
+    mask: bit.mask
+}); });
+function getStateBitmap(stateMap) {
+    var mask = 0;
+    if (stateMap.new)
+        mask += STATE_NEW_MASK;
+    if (stateMap.modified)
+        mask += STATE_MODIFIED_MASK;
+    if (stateMap.deleted)
+        mask += STATE_DELETED_MASK;
+    if (stateMap.locked)
+        mask += STATE_LOCKED_MASK;
+    if (stateMap.systemProcessing)
+        mask += STATE_SYSTEM_PROCESSING_MASK;
+    if (stateMap.submitted)
+        mask += STATE_SUBMITTED_MASK;
+    if (stateMap.scheduled)
+        mask += STATE_SCHEDULED_MASK;
+    if (stateMap.publishing)
+        mask += STATE_PUBLISHING_MASK;
+    if (stateMap.staged)
+        mask += PUBLISHING_STAGED_MASK;
+    if (stateMap.live)
+        mask += PUBLISHING_LIVE_MASK;
+    if (stateMap.disabled)
+        mask += STATE_DISABLED_MASK;
+    if (stateMap.translationUpToDate)
+        mask += STATE_TRANSLATION_UP_TO_DATE_MASK;
+    if (stateMap.translationPending)
+        mask += STATE_TRANSLATION_PENDING_MASK;
+    if (stateMap.translationInProgress)
+        mask += STATE_TRANSLATION_IN_PROGRESS_MASK;
+    return mask;
+}
+function buildItemStateBitMasks(currentState, draft) {
+    var onMask = 0;
+    var offMask = 0;
+    for (var _i = 0, ITEM_STATE_TOGGLE_CONTROLS_1 = ITEM_STATE_TOGGLE_CONTROLS; _i < ITEM_STATE_TOGGLE_CONTROLS_1.length; _i++) {
+        var control = ITEM_STATE_TOGGLE_CONTROLS_1[_i];
+        var shouldBeOn = Boolean(draft[control.id]);
+        var isOn = isStateBitSet(currentState, control.mask);
+        if (shouldBeOn && !isOn) {
+            onMask |= control.mask;
+        }
+        else if (!shouldBeOn && isOn) {
+            offMask |= control.mask;
+        }
+    }
+    return { onMask: onMask, offMask: offMask };
+}
+function itemStateDraftFromState(state) {
+    var draft = {};
+    for (var _i = 0, ITEM_STATE_TOGGLE_CONTROLS_2 = ITEM_STATE_TOGGLE_CONTROLS; _i < ITEM_STATE_TOGGLE_CONTROLS_2.length; _i++) {
+        var control = ITEM_STATE_TOGGLE_CONTROLS_2[_i];
+        draft[control.id] = isStateBitSet(state, control.mask);
+    }
+    return draft;
+}
+function itemStateDraftHasChanges(currentState, draft) {
+    var _a = buildItemStateBitMasks(currentState, draft), onMask = _a.onMask, offMask = _a.offMask;
+    return onMask !== 0 || offMask !== 0;
+}
+/** Combined integer value for the current toggle draft. */
+function stateIntegerFromDraft(draft) {
+    var value = 0;
+    for (var _i = 0, ITEM_STATE_TOGGLE_CONTROLS_3 = ITEM_STATE_TOGGLE_CONTROLS; _i < ITEM_STATE_TOGGLE_CONTROLS_3.length; _i++) {
+        var control = ITEM_STATE_TOGGLE_CONTROLS_3[_i];
+        if (draft[control.id]) {
+            value |= control.mask;
+        }
+    }
+    return value;
+}
+var DEFAULT_ITEM_PATH_REGEX = '.*';
+function resolveItemPathRegex(pathRegex) {
+    var trimmed = pathRegex.trim();
+    return trimmed || DEFAULT_ITEM_PATH_REGEX;
+}
+function itemMatchesName(item, nameFilter) {
+    var _a;
+    if (!nameFilter.trim()) {
+        return true;
+    }
+    return ((_a = item.label) !== null && _a !== void 0 ? _a : '').toLowerCase().includes(nameFilter.trim().toLowerCase());
+}
+function itemMatchesType(item, typeFilter) {
+    var _a, _b;
+    if (!typeFilter.trim()) {
+        return true;
+    }
+    var needle = typeFilter.trim().toLowerCase();
+    return (((_a = item.contentTypeId) !== null && _a !== void 0 ? _a : '').toLowerCase().includes(needle) ||
+        ((_b = item.systemType) !== null && _b !== void 0 ? _b : '').toLowerCase().includes(needle));
+}
+
+var INITIAL_STATE_FILTERS = STATE_FILTER_BITS.map(function (_a) {
+    var key = _a.key;
+    return key;
+});
+var compactCellSx = {
+    py: 0.75,
+    px: 1.25,
+    fontSize: '0.8125rem'
+};
+function StateFilterChips(_a) {
+    var stateFilters = _a.stateFilters, onStateFilterChange = _a.onStateFilterChange;
+    var anyActive = !Object.values(stateFilters).some(Boolean);
+    return (jsxs(Stack$1, { direction: "row", flexWrap: "wrap", useFlexGap: true, gap: 0.5, sx: { mt: 0.75 }, children: [jsx(Chip, { size: "small", label: "Any state", variant: anyActive ? 'filled' : 'outlined', color: anyActive ? 'primary' : 'default', onClick: function () { return onStateFilterChange('any', true); } }), STATE_FILTER_BITS.map(function (_a) {
+                var key = _a.key, label = _a.label;
+                return (jsx(Chip, { size: "small", label: label, variant: stateFilters[key] ? 'filled' : 'outlined', color: stateFilters[key] ? 'primary' : 'default', onClick: function () { return onStateFilterChange(key, !stateFilters[key]); } }, key));
+            })] }));
+}
+function ItemStatesCell(_a) {
+    var item = _a.item;
+    var bits = activeStateBitEntries(item.state);
+    return (jsxs(Stack$1, { direction: "row", spacing: 0.5, alignItems: "center", flexWrap: "wrap", useFlexGap: true, children: [jsx(Tooltip, { title: "Combined state value: ".concat(item.state), children: jsx(Box$1, { sx: { display: 'inline-flex', lineHeight: 0 }, children: jsx(ItemStateIcon, { item: item }) }) }), bits.length === 0 ? (jsx(Typography, { variant: "caption", color: "text.secondary", children: "\u2014" })) : (bits.map(function (bit) { return (jsx(Chip, { size: "small", label: formatStateBitShortLabel(bit.label), variant: "outlined", sx: { height: 22, '& .MuiChip-label': { px: 0.75, fontSize: '0.7rem' } }, title: formatStateBitLabel(bit.label, bit.mask) }, bit.id)); }))] }));
+}
+function SiteItemsTab(_a) {
+    var _this = this;
+    var siteId = _a.siteId;
+    var _b = useState(false), fetching = _b[0], setFetching = _b[1];
+    var _c = useState(null), items = _c[0], setItems = _c[1];
+    var _d = useState(0), total = _d[0], setTotal = _d[1];
+    var _e = useState(null), error = _e[0], setError = _e[1];
+    var _f = useState(null), notice = _f[0], setNotice = _f[1];
+    var _g = useState(''), pathRegex = _g[0], setPathRegex = _g[1];
+    var _h = useState(''), debouncedPathRegex = _h[0], setDebouncedPathRegex = _h[1];
+    var _j = useState(false), invalidPathRegex = _j[0], setInvalidPathRegex = _j[1];
+    var _k = useState(''), nameFilter = _k[0], setNameFilter = _k[1];
+    var _l = useState(''), typeFilter = _l[0], setTypeFilter = _l[1];
+    var _m = useState(createPresenceTable(INITIAL_STATE_FILTERS, false)), stateFilters = _m[0], setStateFilters = _m[1];
+    var _o = useState(0), offset = _o[0], setOffset = _o[1];
+    var _p = useState(25), limit = _p[0], setLimit = _p[1];
+    var _q = useState({}), selectedPaths = _q[0], setSelectedPaths = _q[1];
+    var _r = useState(null), activeItemPath = _r[0], setActiveItemPath = _r[1];
+    var _s = useState({}), itemStateDraft = _s[0], setItemStateDraft = _s[1];
+    var _t = useState(false), applying = _t[0], setApplying = _t[1];
+    var stateBitmap = useMemo(function () {
+        var bitmap = getStateBitmap(stateFilters);
+        return bitmap || null;
+    }, [stateFilters]);
+    var onPathRegex$ = useDebouncedInput(useCallback(function (keyword) {
+        try {
+            if (keyword) {
+                new RegExp(keyword);
+            }
+            setOffset(0);
+            setDebouncedPathRegex(keyword);
+            setInvalidPathRegex(false);
+        }
+        catch (_a) {
+            setInvalidPathRegex(true);
+        }
+    }, []), 400);
+    var fetchStates = useCallback(function () {
+        setFetching(true);
+        setError(null);
+        var pathQuery = resolveItemPathRegex(debouncedPathRegex);
+        fetchItemStates(siteId, pathQuery, stateBitmap !== null && stateBitmap !== void 0 ? stateBitmap : undefined, { limit: limit, offset: offset }).subscribe({
+            next: function (states) {
+                var _a;
+                setItems(states);
+                setTotal((_a = states.total) !== null && _a !== void 0 ? _a : states.length);
+                setFetching(false);
+            },
+            error: function (err) {
+                setError((err === null || err === void 0 ? void 0 : err.message) || 'Failed to load items');
+                setFetching(false);
+            }
+        });
+    }, [debouncedPathRegex, limit, offset, siteId, stateBitmap]);
+    useEffect(function () {
+        fetchStates();
+    }, [fetchStates]);
+    var filteredItems = useMemo(function () {
+        if (!items) {
+            return [];
+        }
+        return items.filter(function (item) { return itemMatchesName(item, nameFilter) && itemMatchesType(item, typeFilter); });
+    }, [items, nameFilter, typeFilter]);
+    var selectedList = useMemo(function () { return Object.entries(selectedPaths).filter(function (_a) {
+        var v = _a[1];
+        return v;
+    }).map(function (_a) {
+        var path = _a[0];
+        return path;
+    }); }, [selectedPaths]);
+    var activeItem = useMemo(function () { var _a; return (_a = filteredItems.find(function (item) { return item.path === activeItemPath; })) !== null && _a !== void 0 ? _a : null; }, [activeItemPath, filteredItems]);
+    var applyTargetPaths = useMemo(function () {
+        if (selectedList.length) {
+            return selectedList;
+        }
+        if (activeItem) {
+            return [activeItem.path];
+        }
+        return [];
+    }, [selectedList, activeItem]);
+    var applyTargetItems = useMemo(function () {
+        return applyTargetPaths
+            .map(function (path) { return filteredItems.find(function (item) { return item.path === path; }); })
+            .filter(function (item) { return Boolean(item); });
+    }, [applyTargetPaths, filteredItems]);
+    var referenceItem = useMemo(function () {
+        var _a;
+        if (activeItem && applyTargetPaths.includes(activeItem.path)) {
+            return activeItem;
+        }
+        return (_a = applyTargetItems[0]) !== null && _a !== void 0 ? _a : null;
+    }, [activeItem, applyTargetPaths, applyTargetItems]);
+    var draftStateValue = useMemo(function () { return stateIntegerFromDraft(itemStateDraft); }, [itemStateDraft]);
+    var itemStateDraftDirty = useMemo(function () { return applyTargetItems.some(function (item) { return itemStateDraftHasChanges(item.state, itemStateDraft); }); }, [applyTargetItems, itemStateDraft]);
+    useEffect(function () {
+        if (referenceItem) {
+            setItemStateDraft(itemStateDraftFromState(referenceItem.state));
+        }
+        else {
+            setItemStateDraft({});
+        }
+    }, [referenceItem === null || referenceItem === void 0 ? void 0 : referenceItem.path, referenceItem === null || referenceItem === void 0 ? void 0 : referenceItem.state]);
+    var onApplyItemStateDraft = function () { return __awaiter(_this, void 0, void 0, function () {
+        var updates, _i, updates_1, _a, item, masks, e_1;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    if (!applyTargetItems.length) {
+                        setError('Check items or select a row to apply state changes');
+                        return [2 /*return*/];
+                    }
+                    updates = applyTargetItems
+                        .map(function (item) { return ({
+                        item: item,
+                        masks: buildItemStateBitMasks(item.state, itemStateDraft)
+                    }); })
+                        .filter(function (_a) {
+                        var masks = _a.masks;
+                        return masks.onMask !== 0 || masks.offMask !== 0;
+                    });
+                    if (!updates.length) {
+                        return [2 /*return*/];
+                    }
+                    setApplying(true);
+                    setNotice(null);
+                    setError(null);
+                    _b.label = 1;
+                case 1:
+                    _b.trys.push([1, 6, 7, 8]);
+                    _i = 0, updates_1 = updates;
+                    _b.label = 2;
+                case 2:
+                    if (!(_i < updates_1.length)) return [3 /*break*/, 5];
+                    _a = updates_1[_i], item = _a.item, masks = _a.masks;
+                    return [4 /*yield*/, firstValueFrom(postUpdateItemStateBits(siteId, item.path, masks.onMask, masks.offMask))];
+                case 3:
+                    _b.sent();
+                    _b.label = 4;
+                case 4:
+                    _i++;
+                    return [3 /*break*/, 2];
+                case 5:
+                    setNotice("State updated for ".concat(updates.length, " item").concat(updates.length === 1 ? '' : 's'));
+                    fetchStates();
+                    return [3 /*break*/, 8];
+                case 6:
+                    e_1 = _b.sent();
+                    setError(e_1 instanceof Error ? e_1.message : 'Update failed');
+                    return [3 /*break*/, 8];
+                case 7:
+                    setApplying(false);
+                    return [7 /*endfinally*/];
+                case 8: return [2 /*return*/];
+            }
+        });
+    }); };
+    var onResetItemStateDraft = function () {
+        if (referenceItem) {
+            setItemStateDraft(itemStateDraftFromState(referenceItem.state));
+        }
+    };
+    var itemStatesSubtitle = useMemo(function () {
+        if (!applyTargetItems.length) {
+            return 'Check items or select a row';
+        }
+        if (applyTargetItems.length === 1) {
+            var item = applyTargetItems[0];
+            var dirty_1 = itemStateDraftDirty ? ' · unsaved changes' : '';
+            return "".concat(item.label, " \u00B7 current ").concat(item.state).concat(dirty_1);
+        }
+        var dirty = itemStateDraftDirty ? ' · unsaved changes' : '';
+        return "".concat(applyTargetItems.length, " checked items").concat(dirty);
+    }, [applyTargetItems, itemStateDraftDirty]);
+    var toggleSelectAll = function () {
+        if (selectedList.length === filteredItems.length) {
+            setSelectedPaths({});
+        }
+        else {
+            var next_1 = {};
+            filteredItems.forEach(function (item) {
+                next_1[item.path] = true;
+            });
+            setSelectedPaths(next_1);
+        }
+    };
+    var onStateFilterChange = function (key, checked) {
+        var _a;
+        setOffset(0);
+        if (key === 'any') {
+            setStateFilters(createPresenceTable(INITIAL_STATE_FILTERS, false));
+        }
+        else {
+            setStateFilters(__assign(__assign({}, stateFilters), (_a = {}, _a[key] = checked, _a)));
+        }
+    };
+    return (jsxs(TabShell, { children: [jsxs(TabToolbar, { children: [jsxs(Stack$1, { direction: { xs: 'column', md: 'row' }, spacing: 1.25, alignItems: { md: 'flex-start' }, useFlexGap: true, children: [jsx(TextField$1, { size: "small", label: "Name", value: nameFilter, onChange: function (e) { return setNameFilter(e.target.value); }, sx: { minWidth: 140, flex: { md: '0 1 180px' } } }), jsx(TextField$1, { size: "small", label: "Path (regex)", value: pathRegex, error: invalidPathRegex, helperText: invalidPathRegex ? 'Invalid regex' : 'Empty = all paths', FormHelperTextProps: { sx: { mx: 0, mt: 0.25 } }, onChange: function (e) {
+                                    setPathRegex(e.target.value);
+                                    onPathRegex$.next(e.target.value);
+                                }, sx: { flex: 1, minWidth: 0 } }), jsx(TextField$1, { size: "small", label: "Type", value: typeFilter, onChange: function (e) { return setTypeFilter(e.target.value); }, helperText: "Client filter on page", FormHelperTextProps: { sx: { mx: 0, mt: 0.25 } }, sx: { minWidth: 140, flex: { md: '0 1 160px' } } })] }), jsxs(Box$1, { children: [jsx(SectionLabel, { children: "Match items in state" }), jsx(StateFilterChips, { stateFilters: stateFilters, onStateFilterChange: onStateFilterChange })] })] }), jsxs(TabAlertStack, { children: [error && (jsx(Alert, { severity: "error", onClose: function () { return setError(null); }, children: error })), notice && (jsx(Alert, { severity: "success", onClose: function () { return setNotice(null); }, children: notice }))] }), jsxs(Box$1, { sx: {
+                    flex: 1,
+                    minHeight: 0,
+                    display: 'flex',
+                    flexDirection: { xs: 'column', lg: 'row' },
+                    gap: 1.5,
+                    overflow: 'hidden'
+                }, children: [jsxs(TabContentPanel, { sx: { flex: 1 }, children: [jsx(PanelHeader, { title: "Site items", subtitle: "".concat(filteredItems.length, " on page \u00B7 ").concat(total, " matching"), action: jsx(Button$1, { size: "small", variant: "outlined", disabled: fetching, onClick: function () { return fetchStates(); }, children: "Refresh" }) }), jsxs(Box$1, { sx: { position: 'relative', flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }, children: [fetching && (jsx(Box$1, { sx: {
+                                            position: 'absolute',
+                                            inset: 0,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            bgcolor: function (theme) { return alpha(theme.palette.background.paper, 0.65); },
+                                            zIndex: 2
+                                        }, children: jsx(CircularProgress, { size: 28 }) })), jsx(TableContainer, { sx: { flex: 1, minHeight: 0 }, children: jsxs(Table, { stickyHeader: true, size: "small", sx: { tableLayout: 'fixed', width: '100%' }, children: [jsx(TableHead, { children: jsxs(TableRow, { children: [jsx(TableCell, { padding: "checkbox", sx: __assign(__assign({}, compactCellSx), { width: 42 }), children: jsx(Checkbox, { size: "small", indeterminate: selectedList.length > 0 && selectedList.length < filteredItems.length, checked: filteredItems.length > 0 && selectedList.length === filteredItems.length, onChange: toggleSelectAll }) }), jsx(TableCell, { sx: __assign(__assign({}, compactCellSx), { width: '18%' }), children: "Name" }), jsx(TableCell, { sx: __assign(__assign({}, compactCellSx), { width: '42%' }), children: "Path" }), jsx(TableCell, { sx: __assign(__assign({}, compactCellSx), { width: '14%' }), children: "Type" }), jsx(TableCell, { sx: __assign(__assign({}, compactCellSx), { width: '26%' }), children: "State" })] }) }), jsxs(TableBody, { children: [filteredItems.map(function (item) { return (jsxs(TableRow, { hover: true, selected: activeItemPath === item.path, onClick: function () { return setActiveItemPath(item.path); }, sx: { cursor: 'pointer', '& .MuiTableCell-root': compactCellSx }, children: [jsx(TableCell, { padding: "checkbox", onClick: function (e) { return e.stopPropagation(); }, children: jsx(Checkbox, { size: "small", checked: Boolean(selectedPaths[item.path]), onChange: function (_, checked) {
+                                                                            var _a;
+                                                                            return setSelectedPaths(__assign(__assign({}, selectedPaths), (_a = {}, _a[item.path] = checked, _a)));
+                                                                        } }) }), jsx(TableCell, { children: jsx(Typography, { variant: "body2", noWrap: true, title: item.label, children: item.label }) }), jsx(TableCell, { children: jsx(Tooltip, { title: item.path, children: jsx(Typography, { variant: "body2", noWrap: true, sx: monoSx, children: displayItemPath(item.path) }) }) }), jsx(TableCell, { children: jsx(Tooltip, { title: item.contentTypeId || item.systemType || '', children: jsxs(Stack$1, { direction: "row", spacing: 0.5, alignItems: "center", sx: { minWidth: 0 }, children: [jsx(ItemTypeIcon, { item: item }), jsx(Typography, { variant: "caption", noWrap: true, sx: { minWidth: 0 }, children: shortContentTypeLabel(item) })] }) }) }), jsx(TableCell, { children: jsx(ItemStatesCell, { item: item }) })] }, item.path)); }), !fetching && filteredItems.length === 0 && (jsx(TableRow, { children: jsx(TableCell, { colSpan: 5, sx: { py: 3, textAlign: 'center' }, children: jsx(Typography, { variant: "body2", color: "text.secondary", children: "No items match the current filters" }) }) }))] })] }) })] }), jsx(TablePagination, { component: "div", count: total, page: Math.floor(offset / limit), onPageChange: function (_, page) { return setOffset(page * limit); }, rowsPerPage: limit, onRowsPerPageChange: function (e) {
+                                    setLimit(parseInt(e.target.value, 10));
+                                    setOffset(0);
+                                }, rowsPerPageOptions: [10, 25, 50, 100], sx: { flexShrink: 0, borderTop: 1, borderColor: 'divider' } })] }), jsx(Stack$1, { spacing: 1.5, sx: {
+                            width: { xs: '100%', lg: 360 },
+                            flexShrink: 0,
+                            minHeight: 0,
+                            minWidth: { lg: 300 },
+                            maxWidth: { lg: 400 },
+                            maxHeight: { xs: 'min(48vh, 520px)', lg: '100%' },
+                            overflowY: 'auto',
+                            overflowX: 'hidden',
+                            pb: 0.5
+                        }, children: jsxs(Paper, { elevation: 0, sx: __assign(__assign({}, surfacePaperSx), { display: 'flex', flexDirection: 'column', minHeight: { lg: 280 }, maxHeight: { lg: 'min(52vh, 520px)' } }), children: [jsx(PanelHeader, { title: jsxs(Stack$1, { direction: "row", spacing: 1, alignItems: "center", flexWrap: "wrap", useFlexGap: true, children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, lineHeight: 1.3, children: "Item states" }), applyTargetItems.length > 0 && (jsx(Chip, { size: "small", variant: "outlined", label: draftStateValue, sx: __assign(__assign({}, monoSx), { fontWeight: 700 }), title: "Combined state integer from toggles below" }))] }), subtitle: itemStatesSubtitle }), applyTargetItems.length > 0 ? (jsxs(Fragment, { children: [jsx(Box$1, { sx: { flex: 1, minHeight: 120, overflow: 'auto', px: 1.5, py: 0.5 }, children: jsx(Stack$1, { spacing: 0.25, children: ITEM_STATE_TOGGLE_CONTROLS.map(function (control) { return (jsx(FormControlLabel, { sx: { ml: 0, mr: 0, py: 0.25, alignItems: 'center' }, control: jsx(Switch, { size: "small", checked: Boolean(itemStateDraft[control.id]), disabled: applying, onChange: function (_, checked) {
+                                                            var _a;
+                                                            return setItemStateDraft(__assign(__assign({}, itemStateDraft), (_a = {}, _a[control.id] = checked, _a)));
+                                                        } }), label: jsx(Typography, { variant: "body2", sx: { fontSize: '0.8125rem' }, children: formatStateBitLabel(control.label, control.mask) }) }, control.id)); }) }) }), jsx(Box$1, { sx: {
+                                                flexShrink: 0,
+                                                px: 1.5,
+                                                py: 1.25,
+                                                borderTop: 1,
+                                                borderColor: 'divider',
+                                                bgcolor: function (theme) { return alpha(theme.palette.background.default, 0.5); }
+                                            }, children: jsxs(Stack$1, { spacing: 1, children: [jsx(Button$1, { size: "small", variant: "outlined", fullWidth: true, disabled: applying || !itemStateDraftDirty, onClick: onResetItemStateDraft, children: "Reset" }), jsxs(Button$1, { size: "small", variant: "contained", fullWidth: true, disabled: applying || !itemStateDraftDirty, onClick: onApplyItemStateDraft, children: ["Apply", applyTargetItems.length > 1 ? " (".concat(applyTargetItems.length, ")") : ''] })] }) })] })) : (jsx(Box$1, { sx: { p: 1.5 }, children: jsx(Typography, { variant: "body2", color: "text.secondary", children: "Check items or click a row, adjust flags, then Apply" }) }))] }) })] })] }));
+}
+
+function BranchesTab(_a) {
+    var _this = this;
+    var _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
+    var siteId = _a.siteId, siteName = _a.siteName;
+    var _p = useState(null), refs = _p[0], setRefs = _p[1];
+    var _q = useState(false), loading = _q[0], setLoading = _q[1];
+    var _r = useState(''), error = _r[0], setError = _r[1];
+    var _s = useState(''), notice = _s[0], setNotice = _s[1];
+    var _t = useState('branches'), section = _t[0], setSection = _t[1];
+    var _u = useState(null), createDialog = _u[0], setCreateDialog = _u[1];
+    var _v = useState(null), deleteDialog = _v[0], setDeleteDialog = _v[1];
+    var _w = useState(false), busy = _w[0], setBusy = _w[1];
+    var _x = useState(''), branchName = _x[0], setBranchName = _x[1];
+    var _y = useState(''), branchStart = _y[0], setBranchStart = _y[1];
+    var _z = useState(false), branchForce = _z[0], setBranchForce = _z[1];
+    var _0 = useState(''), tagName = _0[0], setTagName = _0[1];
+    var _1 = useState(''), tagCommit = _1[0], setTagCommit = _1[1];
+    var _2 = useState(''), tagMessage = _2[0], setTagMessage = _2[1];
+    var _3 = useState(false), tagAnnotated = _3[0], setTagAnnotated = _3[1];
+    var _4 = useState(true), deleteLocal = _4[0], setDeleteLocal = _4[1];
+    var _5 = useState(false), deleteRemote = _5[0], setDeleteRemote = _5[1];
+    var _6 = useState(false), deleteForce = _6[0], setDeleteForce = _6[1];
+    var _7 = useState(''), deleteRemoteName = _7[0], setDeleteRemoteName = _7[1];
+    var _8 = useState([]), remotes = _8[0], setRemotes = _8[1];
+    var _9 = useState(''), remoteName = _9[0], setRemoteName = _9[1];
+    var _10 = useState(''), syncBranch = _10[0], setSyncBranch = _10[1];
+    var _11 = useState(false), remoteSyncing = _11[0], setRemoteSyncing = _11[1];
+    var loadRefs = useCallback(function () { return __awaiter(_this, void 0, void 0, function () {
+        var data, e_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    setLoading(true);
+                    setError('');
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 3, 4, 5]);
+                    return [4 /*yield*/, firstValueFrom(fetchGitRefs(siteId))];
+                case 2:
+                    data = _a.sent();
+                    setRefs(data);
+                    return [3 /*break*/, 5];
+                case 3:
+                    e_1 = _a.sent();
+                    setError(e_1.message || 'Failed to load branches and tags');
+                    setRefs(null);
+                    return [3 /*break*/, 5];
+                case 4:
+                    setLoading(false);
+                    return [7 /*endfinally*/];
+                case 5: return [2 /*return*/];
+            }
+        });
+    }); }, [siteId]);
+    useEffect(function () {
+        loadRefs();
+    }, [loadRefs]);
+    useEffect(function () {
+        var _a;
+        if (((_a = refs === null || refs === void 0 ? void 0 : refs.remotes) === null || _a === void 0 ? void 0 : _a.length) && !deleteRemoteName) {
+            setDeleteRemoteName(refs.remotes[0]);
+        }
+    }, [refs, deleteRemoteName]);
+    var loadRemotes = useCallback(function () { return __awaiter(_this, void 0, void 0, function () {
+        var list, names;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    _b.trys.push([0, 2, , 3]);
+                    return [4 /*yield*/, firstValueFrom(fetchRepositories(siteId).pipe(take(1)))];
+                case 1:
+                    list = _b.sent();
+                    names = (list !== null && list !== void 0 ? list : []).map(function (r) { return r.name; }).filter(Boolean);
+                    setRemotes(names);
+                    if (remoteName && !names.includes(remoteName)) {
+                        setRemoteName('');
+                    }
+                    return [3 /*break*/, 3];
+                case 2:
+                    _b.sent();
+                    setRemotes([]);
+                    return [3 /*break*/, 3];
+                case 3: return [2 /*return*/];
+            }
+        });
+    }); }, [siteId, remoteName]);
+    useEffect(function () {
+        loadRemotes();
+    }, [loadRemotes]);
+    var resetCreateForm = function () {
+        setBranchName('');
+        setBranchStart('');
+        setBranchForce(false);
+        setTagName('');
+        setTagCommit('');
+        setTagMessage('');
+        setTagAnnotated(false);
+    };
+    var resetDeleteForm = function () {
+        var _a, _b;
+        setDeleteLocal(true);
+        setDeleteRemote(false);
+        setDeleteForce(false);
+        setDeleteRemoteName((_b = (_a = refs === null || refs === void 0 ? void 0 : refs.remotes) === null || _a === void 0 ? void 0 : _a[0]) !== null && _b !== void 0 ? _b : '');
+    };
+    var openDelete = function (kind, ref) {
+        resetDeleteForm();
+        setDeleteDialog({ kind: kind, ref: ref });
+    };
+    var onCreate = function () { return __awaiter(_this, void 0, void 0, function () {
+        var result, result, e_2;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    setBusy(true);
+                    setError('');
+                    setNotice('');
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 7, 8, 9]);
+                    if (!((createDialog === null || createDialog === void 0 ? void 0 : createDialog.kind) === 'branch')) return [3 /*break*/, 3];
+                    return [4 /*yield*/, firstValueFrom(postCreateBranch(siteId, {
+                            name: branchName.trim(),
+                            startPoint: branchStart.trim() || undefined,
+                            force: branchForce
+                        }))];
+                case 2:
+                    result = _a.sent();
+                    setNotice(result.message || "Branch \"".concat(branchName.trim(), "\" created"));
+                    return [3 /*break*/, 5];
+                case 3:
+                    if (!((createDialog === null || createDialog === void 0 ? void 0 : createDialog.kind) === 'tag')) return [3 /*break*/, 5];
+                    return [4 /*yield*/, firstValueFrom(postCreateTag(siteId, {
+                            name: tagName.trim(),
+                            commit: tagCommit.trim() || undefined,
+                            message: tagMessage.trim() || undefined,
+                            annotated: tagAnnotated
+                        }))];
+                case 4:
+                    result = _a.sent();
+                    setNotice(result.message || "Tag \"".concat(tagName.trim(), "\" created"));
+                    _a.label = 5;
+                case 5:
+                    setCreateDialog(null);
+                    resetCreateForm();
+                    return [4 /*yield*/, loadRefs()];
+                case 6:
+                    _a.sent();
+                    return [3 /*break*/, 9];
+                case 7:
+                    e_2 = _a.sent();
+                    setError(e_2.message || 'Create failed');
+                    return [3 /*break*/, 9];
+                case 8:
+                    setBusy(false);
+                    return [7 /*endfinally*/];
+                case 9: return [2 /*return*/];
+            }
+        });
+    }); };
+    var onDelete = function () { return __awaiter(_this, void 0, void 0, function () {
+        var result, result, e_3;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    if (!deleteDialog) {
+                        return [2 /*return*/];
+                    }
+                    setBusy(true);
+                    setError('');
+                    setNotice('');
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 7, 8, 9]);
+                    if (!(deleteDialog.kind === 'branch')) return [3 /*break*/, 3];
+                    return [4 /*yield*/, firstValueFrom(postDeleteBranch(siteId, {
+                            name: deleteDialog.ref.name,
+                            force: deleteForce,
+                            deleteLocal: deleteLocal,
+                            deleteRemote: deleteRemote,
+                            remote: deleteRemote ? deleteRemoteName : undefined
+                        }))];
+                case 2:
+                    result = _a.sent();
+                    setNotice(result.message || "Branch \"".concat(deleteDialog.ref.name, "\" deleted"));
+                    return [3 /*break*/, 5];
+                case 3: return [4 /*yield*/, firstValueFrom(postDeleteTag(siteId, {
+                        name: deleteDialog.ref.name,
+                        deleteLocal: deleteLocal,
+                        deleteRemote: deleteRemote,
+                        remote: deleteRemote ? deleteRemoteName : undefined
+                    }))];
+                case 4:
+                    result = _a.sent();
+                    setNotice(result.message || "Tag \"".concat(deleteDialog.ref.name, "\" deleted"));
+                    _a.label = 5;
+                case 5:
+                    setDeleteDialog(null);
+                    resetDeleteForm();
+                    return [4 /*yield*/, loadRefs()];
+                case 6:
+                    _a.sent();
+                    return [3 /*break*/, 9];
+                case 7:
+                    e_3 = _a.sent();
+                    setError(e_3.message || 'Delete failed');
+                    return [3 /*break*/, 9];
+                case 8:
+                    setBusy(false);
+                    return [7 /*endfinally*/];
+                case 9: return [2 /*return*/];
+            }
+        });
+    }); };
+    var rows = useMemo(function () {
+        var _a, _b, _c;
+        if (section === 'tags') {
+            return (_a = refs === null || refs === void 0 ? void 0 : refs.tags) !== null && _a !== void 0 ? _a : [];
+        }
+        if (section === 'remote') {
+            return (_b = refs === null || refs === void 0 ? void 0 : refs.remoteBranches) !== null && _b !== void 0 ? _b : [];
+        }
+        return (_c = refs === null || refs === void 0 ? void 0 : refs.branches) !== null && _c !== void 0 ? _c : [];
+    }, [refs, section]);
+    var sandboxBranch = (_b = refs === null || refs === void 0 ? void 0 : refs.sandboxBranch) !== null && _b !== void 0 ? _b : '';
+    var currentBranch = (_c = refs === null || refs === void 0 ? void 0 : refs.currentBranch) !== null && _c !== void 0 ? _c : '';
+    var branchNames = useMemo(function () { var _a; return ((_a = refs === null || refs === void 0 ? void 0 : refs.branches) !== null && _a !== void 0 ? _a : []).map(function (b) { return b.name; }); }, [refs === null || refs === void 0 ? void 0 : refs.branches]);
+    var canRemoteSync = Boolean(remoteName && syncBranch);
+    useEffect(function () {
+        var preferred = sandboxBranch || currentBranch;
+        if (preferred && (!syncBranch || !branchNames.includes(syncBranch))) {
+            setSyncBranch(preferred);
+        }
+    }, [sandboxBranch, currentBranch, syncBranch, branchNames]);
+    var onPull = function () { return __awaiter(_this, void 0, void 0, function () {
+        var e_4, err;
+        var _a, _b;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
+                case 0:
+                    if (!canRemoteSync) {
+                        setError('Select a remote and branch before pulling');
+                        return [2 /*return*/];
+                    }
+                    setRemoteSyncing(true);
+                    setError('');
+                    setNotice('');
+                    _c.label = 1;
+                case 1:
+                    _c.trys.push([1, 4, 5, 6]);
+                    return [4 /*yield*/, firstValueFrom(pull({ siteId: siteId, remoteName: remoteName, remoteBranch: syncBranch, mergeStrategy: 'none' }).pipe(take(1)))];
+                case 2:
+                    _c.sent();
+                    setNotice("Pulled ".concat(syncBranch, " from ").concat(remoteName));
+                    return [4 /*yield*/, loadRefs()];
+                case 3:
+                    _c.sent();
+                    return [3 /*break*/, 6];
+                case 4:
+                    e_4 = _c.sent();
+                    err = e_4;
+                    setError(((_b = (_a = err === null || err === void 0 ? void 0 : err.response) === null || _a === void 0 ? void 0 : _a.response) === null || _b === void 0 ? void 0 : _b.message) || 'Pull failed');
+                    return [3 /*break*/, 6];
+                case 5:
+                    setRemoteSyncing(false);
+                    return [7 /*endfinally*/];
+                case 6: return [2 /*return*/];
+            }
+        });
+    }); };
+    var onPush = function () { return __awaiter(_this, void 0, void 0, function () {
+        var e_5, err;
+        var _a, _b;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
+                case 0:
+                    if (!canRemoteSync) {
+                        setError('Select a remote and branch before pushing');
+                        return [2 /*return*/];
+                    }
+                    setRemoteSyncing(true);
+                    setError('');
+                    setNotice('');
+                    _c.label = 1;
+                case 1:
+                    _c.trys.push([1, 3, 4, 5]);
+                    return [4 /*yield*/, firstValueFrom(push(siteId, remoteName, syncBranch, false).pipe(take(1)))];
+                case 2:
+                    _c.sent();
+                    setNotice("Pushed ".concat(syncBranch, " to ").concat(remoteName));
+                    return [3 /*break*/, 5];
+                case 3:
+                    e_5 = _c.sent();
+                    err = e_5;
+                    setError(((_b = (_a = err === null || err === void 0 ? void 0 : err.response) === null || _a === void 0 ? void 0 : _a.response) === null || _b === void 0 ? void 0 : _b.message) || 'Push failed');
+                    return [3 /*break*/, 5];
+                case 4:
+                    setRemoteSyncing(false);
+                    return [7 /*endfinally*/];
+                case 5: return [2 /*return*/];
+            }
+        });
+    }); };
+    return (jsxs(TabShell, { children: [jsxs(TabToolbar, { children: [jsxs(ToolbarRow, { children: [jsxs(Box$1, { sx: { minWidth: 0 }, children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, children: "Branches & tags" }), jsx(Typography, { variant: "caption", color: "text.secondary", display: "block", children: siteName ? "".concat(siteName, " (").concat(siteId, ")") : siteId })] }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: loading ? jsx(CircularProgress, { size: 14 }) : jsx(RefreshRoundedIcon, {}), disabled: loading, onClick: loadRefs, children: "Refresh" })] }), jsxs(Stack$1, { direction: "row", spacing: 1, flexWrap: "wrap", useFlexGap: true, alignItems: "center", children: [jsx(Chip, { size: "small", label: "HEAD \u00B7 ".concat(currentBranch || '(detached)'), sx: __assign(__assign({}, monoSx), { fontWeight: 600 }) }), sandboxBranch && (jsx(Chip, { size: "small", variant: "outlined", label: "Sandbox \u00B7 ".concat(sandboxBranch), sx: monoSx }))] }), jsx(Divider, {}), jsxs(ToolbarRow, { justify: "flex-start", children: [remotes.length > 0 && (jsxs(Fragment, { children: [jsxs(ToolbarGroup, { label: "Remote sync", children: [jsxs(FormControl, { size: "small", required: true, sx: { minWidth: 132 }, children: [jsx(InputLabel, { children: "Remote" }), jsxs(Select, { label: "Remote", value: remoteName, displayEmpty: true, onChange: function (e) { return setRemoteName(e.target.value); }, disabled: remoteSyncing, children: [jsx(MenuItem$1, { value: "", disabled: true, children: jsx("em", { children: "Select remote" }) }), remotes.map(function (name) { return (jsx(MenuItem$1, { value: name, children: name }, name)); })] })] }), jsxs(FormControl, { size: "small", sx: { minWidth: 148 }, children: [jsx(InputLabel, { children: "Branch" }), jsx(Select, { label: "Branch", value: syncBranch, onChange: function (e) { return setSyncBranch(e.target.value); }, disabled: remoteSyncing || branchNames.length === 0, children: branchNames.map(function (name) { return (jsx(MenuItem$1, { value: name, children: name }, name)); }) })] }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: remoteSyncing ? jsx(CircularProgress, { size: 14 }) : jsx(CloudDownloadRoundedIcon, {}), disabled: !canRemoteSync || remoteSyncing, onClick: onPull, children: "Pull" }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: remoteSyncing ? jsx(CircularProgress, { size: 14 }) : jsx(CloudUploadRoundedIcon, {}), disabled: !canRemoteSync || remoteSyncing, onClick: onPush, children: "Push" })] }), jsx(ToolbarDivider, {})] })), jsx(ToolbarGroup, { label: "Actions", children: jsx(Button$1, { size: "small", variant: "contained", startIcon: jsx(AddRoundedIcon, {}), onClick: function () {
+                                        resetCreateForm();
+                                        setCreateDialog({ kind: section === 'tags' ? 'tag' : 'branch' });
+                                    }, children: section === 'tags' ? 'New tag' : 'New branch' }) })] })] }), jsxs(TabAlertStack, { children: [error && (jsx(Alert, { severity: "error", onClose: function () { return setError(''); }, children: error })), notice && (jsx(Alert, { severity: "success", onClose: function () { return setNotice(''); }, children: notice }))] }), jsxs(TabContentPanel, { children: [jsxs(Tabs, { value: section, onChange: function (_, value) { return setSection(value); }, sx: { px: 2, borderBottom: 1, borderColor: 'divider', minHeight: 42, flexShrink: 0 }, children: [jsx(Tab, { value: "branches", label: "Local branches (".concat((_e = (_d = refs === null || refs === void 0 ? void 0 : refs.branches) === null || _d === void 0 ? void 0 : _d.length) !== null && _e !== void 0 ? _e : 0, ")"), sx: { textTransform: 'none', minHeight: 42 } }), jsx(Tab, { value: "tags", label: "Tags (".concat((_g = (_f = refs === null || refs === void 0 ? void 0 : refs.tags) === null || _f === void 0 ? void 0 : _f.length) !== null && _g !== void 0 ? _g : 0, ")"), sx: { textTransform: 'none', minHeight: 42 } }), jsx(Tab, { value: "remote", label: "Remote tracking (".concat((_j = (_h = refs === null || refs === void 0 ? void 0 : refs.remoteBranches) === null || _h === void 0 ? void 0 : _h.length) !== null && _j !== void 0 ? _j : 0, ")"), sx: { textTransform: 'none', minHeight: 42 } })] }), jsx(Box$1, { sx: { flex: 1, minHeight: 0, overflow: 'auto' }, children: loading && !refs ? (jsx(Box$1, { sx: { p: 4, display: 'flex', justifyContent: 'center' }, children: jsx(CircularProgress, { size: 28 }) })) : rows.length === 0 ? (jsx(Box$1, { sx: { p: 3 }, children: jsx(Typography, { variant: "body2", color: "text.secondary", children: section === 'tags' ? 'No tags in this repository.' : section === 'remote' ? 'No remote tracking branches.' : 'No local branches.' }) })) : (jsxs(Table, { size: "small", stickyHeader: true, children: [jsx(TableHead, { children: jsxs(TableRow, { children: [jsx(TableCell, { children: "Name" }), jsx(TableCell, { sx: { width: 110 }, children: "Commit" }), jsx(TableCell, { children: "Subject" }), jsx(TableCell, { align: "right", sx: { width: 88 }, children: "Actions" })] }) }), jsx(TableBody, { children: rows.map(function (row) { return (jsxs(TableRow, { hover: true, children: [jsx(TableCell, { sx: __assign(__assign({}, monoSx), { wordBreak: 'break-all' }), children: jsxs(Stack$1, { direction: "row", spacing: 0.75, alignItems: "center", flexWrap: "wrap", useFlexGap: true, children: [jsx("span", { children: row.name }), row.current && jsx(Chip, { size: "small", color: "primary", label: "current", sx: { height: 20 } }), section === 'branches' && row.name === sandboxBranch && (jsx(Chip, { size: "small", variant: "outlined", label: "sandbox", sx: { height: 20 } })), section === 'remote' && row.remote && (jsx(Chip, { size: "small", variant: "outlined", label: row.remote, sx: { height: 20 } }))] }) }), jsx(TableCell, { sx: monoSx, children: row.commit || '—' }), jsx(TableCell, { children: jsx(Typography, { variant: "body2", noWrap: true, title: row.subject, children: row.subject || '—' }) }), jsx(TableCell, { align: "right", children: section !== 'remote' && (jsx(Button$1, { size: "small", color: "error", startIcon: jsx(DeleteOutlineRoundedIcon, {}), onClick: function () { return openDelete(section === 'tags' ? 'tag' : 'branch', row); }, children: "Delete" })) })] }, row.name)); }) })] })) })] }), jsxs(Dialog, { open: Boolean(createDialog), onClose: function () { return !busy && setCreateDialog(null); }, maxWidth: "sm", fullWidth: true, children: [jsx(DialogTitle, { children: (createDialog === null || createDialog === void 0 ? void 0 : createDialog.kind) === 'tag' ? 'Create tag' : 'Create branch' }), jsx(DialogContent, { children: (createDialog === null || createDialog === void 0 ? void 0 : createDialog.kind) === 'branch' ? (jsxs(Stack$1, { spacing: 2, sx: { mt: 1 }, children: [jsx(TextField$1, { label: "Branch name", value: branchName, onChange: function (e) { return setBranchName(e.target.value); }, fullWidth: true, autoFocus: true }), jsx(TextField$1, { label: "Start point (optional)", value: branchStart, onChange: function (e) { return setBranchStart(e.target.value); }, placeholder: "commit, tag, or branch", fullWidth: true, helperText: "Leave empty to branch from HEAD." }), jsx(FormControlLabel, { control: jsx(Checkbox, { checked: branchForce, onChange: function (e) { return setBranchForce(e.target.checked); } }), label: "Force (reset branch if it already exists)" })] })) : (jsxs(Stack$1, { spacing: 2, sx: { mt: 1 }, children: [jsx(TextField$1, { label: "Tag name", value: tagName, onChange: function (e) { return setTagName(e.target.value); }, fullWidth: true, autoFocus: true }), jsx(TextField$1, { label: "Commit (optional)", value: tagCommit, onChange: function (e) { return setTagCommit(e.target.value); }, placeholder: "defaults to HEAD", fullWidth: true }), jsx(FormControlLabel, { control: jsx(Checkbox, { checked: tagAnnotated, onChange: function (e) { return setTagAnnotated(e.target.checked); } }), label: "Annotated tag" }), tagAnnotated && (jsx(TextField$1, { label: "Tag message", value: tagMessage, onChange: function (e) { return setTagMessage(e.target.value); }, fullWidth: true, multiline: true, minRows: 2, required: true }))] })) }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: function () { return setCreateDialog(null); }, disabled: busy, children: "Cancel" }), jsx(Button$1, { variant: "contained", disabled: busy ||
+                                    ((createDialog === null || createDialog === void 0 ? void 0 : createDialog.kind) === 'branch' ? !branchName.trim() : !tagName.trim() || (tagAnnotated && !tagMessage.trim())), onClick: onCreate, children: "Create" })] })] }), jsxs(Dialog, { open: Boolean(deleteDialog), onClose: function () { return !busy && setDeleteDialog(null); }, maxWidth: "sm", fullWidth: true, children: [jsxs(DialogTitle, { children: ["Delete ", (deleteDialog === null || deleteDialog === void 0 ? void 0 : deleteDialog.kind) === 'tag' ? 'tag' : 'branch', " \u00B7 ", deleteDialog === null || deleteDialog === void 0 ? void 0 : deleteDialog.ref.name] }), jsx(DialogContent, { children: jsxs(Stack$1, { spacing: 2, sx: { mt: 1 }, children: [jsx(Typography, { variant: "body2", color: "text.secondary", children: "Remove the ref locally, from the remote, or both. Remote deletion is permanent for collaborators." }), jsx(FormControlLabel, { control: jsx(Checkbox, { checked: deleteLocal, onChange: function (e) { return setDeleteLocal(e.target.checked); } }), label: "Delete locally" }), jsx(FormControlLabel, { control: jsx(Checkbox, { checked: deleteRemote, onChange: function (e) { return setDeleteRemote(e.target.checked); } }), label: "Delete from remote (permanent)" }), (deleteDialog === null || deleteDialog === void 0 ? void 0 : deleteDialog.kind) === 'branch' && (jsx(FormControlLabel, { control: jsx(Checkbox, { checked: deleteForce, onChange: function (e) { return setDeleteForce(e.target.checked); } }), label: "Force local delete (-D)" })), deleteRemote && ((_l = (_k = refs === null || refs === void 0 ? void 0 : refs.remotes) === null || _k === void 0 ? void 0 : _k.length) !== null && _l !== void 0 ? _l : 0) > 0 && (jsxs(FormControl, { fullWidth: true, size: "small", children: [jsx(InputLabel, { children: "Remote" }), jsx(Select, { label: "Remote", value: deleteRemoteName || ((_m = refs === null || refs === void 0 ? void 0 : refs.remotes) === null || _m === void 0 ? void 0 : _m[0]) || '', onChange: function (e) { return setDeleteRemoteName(e.target.value); }, children: ((_o = refs === null || refs === void 0 ? void 0 : refs.remotes) !== null && _o !== void 0 ? _o : []).map(function (remote) { return (jsx(MenuItem$1, { value: remote, children: remote }, remote)); }) })] })), (deleteDialog === null || deleteDialog === void 0 ? void 0 : deleteDialog.kind) === 'branch' && deleteDialog.ref.name === sandboxBranch && deleteLocal && !deleteForce && (jsx(Alert, { severity: "warning", children: "This is the site sandbox branch. Enable force to delete it locally." })), (deleteDialog === null || deleteDialog === void 0 ? void 0 : deleteDialog.kind) === 'branch' && deleteDialog.ref.current && deleteLocal && (jsx(Alert, { severity: "warning", children: "This branch is currently checked out and cannot be deleted locally." }))] }) }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: function () { return setDeleteDialog(null); }, disabled: busy, children: "Cancel" }), jsx(Button$1, { color: "error", variant: "contained", disabled: busy ||
+                                    (!deleteLocal && !deleteRemote) ||
+                                    ((deleteDialog === null || deleteDialog === void 0 ? void 0 : deleteDialog.kind) === 'branch' && deleteDialog.ref.current && deleteLocal) ||
+                                    ((deleteDialog === null || deleteDialog === void 0 ? void 0 : deleteDialog.kind) === 'branch' &&
+                                        deleteDialog.ref.name === sandboxBranch &&
+                                        deleteLocal &&
+                                        !deleteForce), onClick: onDelete, children: "Delete" })] })] })] }));
+}
+
+/*
+ * Copyright (C) 2007-2026 Crafter Software Corporation. All Rights Reserved.
+ */
+var AUDIT_TRUNCATE_OPTIONS = [
+    {
+        id: 'site-all',
+        scope: 'site',
+        mode: 'all',
+        label: 'Delete all audit history for this project',
+        summary: 'Permanently removes every audit log entry for the selected project.',
+        consequence: 'Project audit history will be empty. Studio activity for this project will no longer appear in Audit.',
+        whatIsDestroyed: 'All rows in the Studio audit tables for this project, including content, publish, login, and configuration events tied to the project.',
+        whatIsPreserved: 'Site content, git history, users, groups, and audit history for other projects.'
+    },
+    {
+        id: 'site-before-date',
+        scope: 'site',
+        mode: 'beforeDate',
+        label: 'Delete project audit history before a date',
+        summary: 'Permanently removes audit entries older than the selected date for this project.',
+        consequence: 'Audit entries with timestamps before the cutoff date are deleted for this project only.',
+        whatIsDestroyed: 'Audit log rows (and their parameters) for this project with operation timestamps before the selected date.',
+        whatIsPreserved: 'Audit entries on or after the selected date for this project, plus all other projects and site content.'
+    },
+    {
+        id: 'global-all',
+        scope: 'global',
+        mode: 'all',
+        label: 'Delete all audit history (entire Studio)',
+        summary: 'Permanently removes every audit log entry for all projects and system activity.',
+        consequence: 'The Studio audit log will be empty across all projects.',
+        whatIsDestroyed: 'All rows in the audit and audit_parameters tables for every project and system-level Studio activity.',
+        whatIsPreserved: 'Site content, git repositories, users, and groups. Only audit history is removed.'
+    },
+    {
+        id: 'global-before-date',
+        scope: 'global',
+        mode: 'beforeDate',
+        label: 'Delete all audit history before a date (entire Studio)',
+        summary: 'Permanently removes audit entries older than the selected date across Studio.',
+        consequence: 'Audit entries with timestamps before the cutoff date are deleted for all projects.',
+        whatIsDestroyed: 'Audit log rows (and their parameters) with operation timestamps before the selected date across Studio.',
+        whatIsPreserved: 'Audit entries on or after the selected date, site content, git history, users, and groups.'
+    }
+];
+function getAuditTruncateOption(scope, mode) {
+    var _a;
+    return ((_a = AUDIT_TRUNCATE_OPTIONS.find(function (option) { return option.scope === scope && option.mode === mode; })) !== null && _a !== void 0 ? _a : AUDIT_TRUNCATE_OPTIONS[0]);
+}
+var PROCESSED_COMMITS_TRUNCATE_OPTIONS = [
+    {
+        scope: 'site',
+        label: 'Clear processed commits cache for this project',
+        summary: 'Removes rows from the processed_commits table for this project. Studio uses this table as a short-lived sync helper while ingesting git commits.',
+        consequence: 'Git Log per-commit "processed" badges may be wrong until the next sync. Sync continues from site.last_commit_id.',
+        whatIsDestroyed: 'Rows in processed_commits for this project only. These are bookkeeping entries, not git commits or site content.',
+        whatIsPreserved: 'Git history, site content, site.last_commit_id (the canonical sync pointer), and processed_commits rows for other projects.'
+    },
+    {
+        scope: 'global',
+        label: 'Clear processed commits cache (entire Studio)',
+        summary: 'Removes all rows from processed_commits across every project.',
+        consequence: 'All projects may show incorrect per-commit processed badges until their next sync. No content or git history is deleted.',
+        whatIsDestroyed: 'All rows in the processed_commits table for every project.',
+        whatIsPreserved: 'Git repositories, site content, site.last_commit_id values on each project, and all other Studio tables.'
+    }
+];
+function getProcessedCommitsTruncateOption(scope) {
+    var _a;
+    return (_a = PROCESSED_COMMITS_TRUNCATE_OPTIONS.find(function (option) { return option.scope === scope; })) !== null && _a !== void 0 ? _a : PROCESSED_COMMITS_TRUNCATE_OPTIONS[0];
+}
+
+function DatabaseTab(_a) {
+    var _this = this;
+    var _b, _c, _d, _e;
+    var siteId = _a.siteId, siteName = _a.siteName;
+    var _f = useState(true), accessLoading = _f[0], setAccessLoading = _f[1];
+    var _g = useState(false), systemAdmin = _g[0], setSystemAdmin = _g[1];
+    var _h = useState(''), username = _h[0], setUsername = _h[1];
+    var _j = useState(''), accessError = _j[0], setAccessError = _j[1];
+    var _k = useState('site'), scope = _k[0], setScope = _k[1];
+    var _l = useState('all'), mode = _l[0], setMode = _l[1];
+    var _m = useState(''), beforeDate = _m[0], setBeforeDate = _m[1];
+    var _o = useState(null), stats = _o[0], setStats = _o[1];
+    var _p = useState(false), statsLoading = _p[0], setStatsLoading = _p[1];
+    var _q = useState(''), statsError = _q[0], setStatsError = _q[1];
+    var _r = useState(false), confirmOpen = _r[0], setConfirmOpen = _r[1];
+    var _s = useState(false), ackChecked = _s[0], setAckChecked = _s[1];
+    var _t = useState(false), busy = _t[0], setBusy = _t[1];
+    var _u = useState(''), notice = _u[0], setNotice = _u[1];
+    var _v = useState(''), actionError = _v[0], setActionError = _v[1];
+    var _w = useState('site'), processedScope = _w[0], setProcessedScope = _w[1];
+    var _x = useState(null), processedStats = _x[0], setProcessedStats = _x[1];
+    var _y = useState(false), processedStatsLoading = _y[0], setProcessedStatsLoading = _y[1];
+    var _z = useState(''), processedStatsError = _z[0], setProcessedStatsError = _z[1];
+    var _0 = useState(false), processedConfirmOpen = _0[0], setProcessedConfirmOpen = _0[1];
+    var _1 = useState(false), processedAckChecked = _1[0], setProcessedAckChecked = _1[1];
+    var _2 = useState(false), processedBusy = _2[0], setProcessedBusy = _2[1];
+    var _3 = useState(''), processedNotice = _3[0], setProcessedNotice = _3[1];
+    var _4 = useState(''), processedActionError = _4[0], setProcessedActionError = _4[1];
+    var option = useMemo(function () { return getAuditTruncateOption(scope, mode); }, [scope, mode]);
+    var processedOption = useMemo(function () { return getProcessedCommitsTruncateOption(processedScope); }, [processedScope]);
+    var loadAccess = useCallback(function () { return __awaiter(_this, void 0, void 0, function () {
+        var data, e_1;
+        var _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    setAccessLoading(true);
+                    setAccessError('');
+                    _b.label = 1;
+                case 1:
+                    _b.trys.push([1, 3, 4, 5]);
+                    return [4 /*yield*/, firstValueFrom(fetchDatabaseAccess(siteId))];
+                case 2:
+                    data = _b.sent();
+                    setSystemAdmin(Boolean(data.systemAdmin));
+                    setUsername((_a = data.username) !== null && _a !== void 0 ? _a : '');
+                    return [3 /*break*/, 5];
+                case 3:
+                    e_1 = _b.sent();
+                    setAccessError(e_1.message || 'Failed to verify access');
+                    setSystemAdmin(false);
+                    return [3 /*break*/, 5];
+                case 4:
+                    setAccessLoading(false);
+                    return [7 /*endfinally*/];
+                case 5: return [2 /*return*/];
+            }
+        });
+    }); }, [siteId]);
+    var loadStats = useCallback(function () { return __awaiter(_this, void 0, void 0, function () {
+        var data, e_2;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    if (!systemAdmin) {
+                        return [2 /*return*/];
+                    }
+                    setStatsLoading(true);
+                    setStatsError('');
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 3, 4, 5]);
+                    return [4 /*yield*/, firstValueFrom(fetchAuditStats(siteId, {
+                            scope: scope,
+                            beforeDate: mode === 'beforeDate' ? beforeDate : undefined
+                        }))];
+                case 2:
+                    data = _a.sent();
+                    setStats(data);
+                    return [3 /*break*/, 5];
+                case 3:
+                    e_2 = _a.sent();
+                    setStats(null);
+                    setStatsError(e_2.message || 'Failed to load audit statistics');
+                    return [3 /*break*/, 5];
+                case 4:
+                    setStatsLoading(false);
+                    return [7 /*endfinally*/];
+                case 5: return [2 /*return*/];
+            }
+        });
+    }); }, [beforeDate, mode, scope, siteId, systemAdmin]);
+    var loadProcessedStats = useCallback(function () { return __awaiter(_this, void 0, void 0, function () {
+        var data, e_3;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    if (!systemAdmin) {
+                        return [2 /*return*/];
+                    }
+                    setProcessedStatsLoading(true);
+                    setProcessedStatsError('');
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 3, 4, 5]);
+                    return [4 /*yield*/, firstValueFrom(fetchProcessedCommitsStats(siteId, { scope: processedScope }))];
+                case 2:
+                    data = _a.sent();
+                    setProcessedStats(data);
+                    return [3 /*break*/, 5];
+                case 3:
+                    e_3 = _a.sent();
+                    setProcessedStats(null);
+                    setProcessedStatsError(e_3.message || 'Failed to load processed commits statistics');
+                    return [3 /*break*/, 5];
+                case 4:
+                    setProcessedStatsLoading(false);
+                    return [7 /*endfinally*/];
+                case 5: return [2 /*return*/];
+            }
+        });
+    }); }, [processedScope, siteId, systemAdmin]);
+    var refreshAll = useCallback(function () { return __awaiter(_this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, Promise.all([loadStats(), loadProcessedStats()])];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    }); }, [loadProcessedStats, loadStats]);
+    useEffect(function () {
+        loadAccess();
+    }, [loadAccess]);
+    useEffect(function () {
+        if (systemAdmin) {
+            loadStats();
+        }
+    }, [loadStats, systemAdmin]);
+    useEffect(function () {
+        if (systemAdmin) {
+            loadProcessedStats();
+        }
+    }, [loadProcessedStats, systemAdmin]);
+    var canConfirm = ackChecked && (mode !== 'beforeDate' || Boolean(beforeDate));
+    var canConfirmProcessed = processedAckChecked;
+    var onOpenConfirm = function () {
+        setAckChecked(false);
+        setConfirmOpen(true);
+    };
+    var onOpenProcessedConfirm = function () {
+        setProcessedAckChecked(false);
+        setProcessedConfirmOpen(true);
+    };
+    var onTruncate = function () { return __awaiter(_this, void 0, void 0, function () {
+        var result, e_4;
+        var _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    setBusy(true);
+                    setActionError('');
+                    setNotice('');
+                    _b.label = 1;
+                case 1:
+                    _b.trys.push([1, 4, 5, 6]);
+                    return [4 /*yield*/, firstValueFrom(postTruncateAudit(siteId, {
+                            scope: scope,
+                            mode: mode,
+                            beforeDate: mode === 'beforeDate' ? beforeDate : undefined,
+                            confirmed: true
+                        }))];
+                case 2:
+                    result = _b.sent();
+                    setNotice(result.message || "Deleted ".concat((_a = result.deletedCount) !== null && _a !== void 0 ? _a : 0, " audit entries."));
+                    setConfirmOpen(false);
+                    return [4 /*yield*/, loadStats()];
+                case 3:
+                    _b.sent();
+                    return [3 /*break*/, 6];
+                case 4:
+                    e_4 = _b.sent();
+                    setActionError(e_4.message || 'Audit truncation failed');
+                    return [3 /*break*/, 6];
+                case 5:
+                    setBusy(false);
+                    return [7 /*endfinally*/];
+                case 6: return [2 /*return*/];
+            }
+        });
+    }); };
+    var onTruncateProcessed = function () { return __awaiter(_this, void 0, void 0, function () {
+        var result, e_5;
+        var _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    setProcessedBusy(true);
+                    setProcessedActionError('');
+                    setProcessedNotice('');
+                    _b.label = 1;
+                case 1:
+                    _b.trys.push([1, 4, 5, 6]);
+                    return [4 /*yield*/, firstValueFrom(postTruncateProcessedCommits(siteId, {
+                            scope: processedScope,
+                            confirmed: true
+                        }))];
+                case 2:
+                    result = _b.sent();
+                    setProcessedNotice(result.message || "Deleted ".concat((_a = result.deletedCount) !== null && _a !== void 0 ? _a : 0, " processed commit rows."));
+                    setProcessedConfirmOpen(false);
+                    return [4 /*yield*/, loadProcessedStats()];
+                case 3:
+                    _b.sent();
+                    return [3 /*break*/, 6];
+                case 4:
+                    e_5 = _b.sent();
+                    setProcessedActionError(e_5.message || 'Processed commits truncation failed');
+                    return [3 /*break*/, 6];
+                case 5:
+                    setProcessedBusy(false);
+                    return [7 /*endfinally*/];
+                case 6: return [2 /*return*/];
+            }
+        });
+    }); };
+    if (accessLoading) {
+        return (jsx(Box$1, { sx: { flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 240 }, children: jsx(CircularProgress, { size: 28 }) }));
+    }
+    if (!systemAdmin) {
+        return (jsxs(Alert, { severity: "warning", icon: jsx(WarningAmberRoundedIcon, {}), children: [accessError || 'Database maintenance requires system administrator (system_admin) access.', username ? " Signed in as ".concat(username, ".") : ''] }));
+    }
+    var statsRefreshing = statsLoading || processedStatsLoading;
+    return (jsxs(TabShell, { children: [jsx(TabToolbar, { children: jsxs(ToolbarRow, { children: [jsxs(Box$1, { sx: { minWidth: 0 }, children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, children: "Database" }), jsxs(Typography, { variant: "caption", color: "text.secondary", display: "block", children: [siteName ? "".concat(siteName, " (").concat(siteId, ")") : siteId, " \u00B7 sysadmin: ", username] })] }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: statsRefreshing ? jsx(CircularProgress, { size: 14 }) : jsx(RefreshRoundedIcon, {}), disabled: statsRefreshing, onClick: refreshAll, children: "Refresh stats" })] }) }), jsxs(TabAlertStack, { children: [notice && (jsx(Alert, { severity: "success", onClose: function () { return setNotice(''); }, children: notice })), actionError && (jsx(Alert, { severity: "error", onClose: function () { return setActionError(''); }, children: actionError })), processedNotice && (jsx(Alert, { severity: "success", onClose: function () { return setProcessedNotice(''); }, children: processedNotice })), processedActionError && (jsx(Alert, { severity: "error", onClose: function () { return setProcessedActionError(''); }, children: processedActionError }))] }), jsxs(Box$1, { sx: {
+                    flex: 1,
+                    minHeight: 0,
+                    overflow: 'auto',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 2,
+                    pr: 0.5
+                }, children: [jsx(Paper, { variant: "outlined", sx: __assign(__assign({}, surfacePaperSx), { flexShrink: 0 }), children: jsxs(Box$1, { sx: { p: 2.5 }, children: [jsxs(Stack$1, { direction: "row", spacing: 1.5, alignItems: "center", sx: { mb: 2 }, children: [jsx(StorageRoundedIcon, { color: "primary" }), jsxs(Box$1, { children: [jsx(Typography, { variant: "subtitle1", fontWeight: 700, children: "Audit history" }), jsx(Typography, { variant: "body2", color: "text.secondary", children: "Permanently delete Studio audit log entries. This cannot be undone." })] })] }), statsError && (jsx(Alert, { severity: "error", onClose: function () { return setStatsError(''); }, sx: { mb: 2 }, children: statsError })), jsxs(Stack$1, { direction: { xs: 'column', md: 'row' }, spacing: 2, sx: { mb: 2 }, children: [jsxs(FormControl, { size: "small", sx: { minWidth: 220 }, children: [jsx(InputLabel, { children: "Scope" }), jsxs(Select, { label: "Scope", value: scope, onChange: function (e) { return setScope(e.target.value); }, children: [jsx(MenuItem$1, { value: "site", children: "This project only" }), jsx(MenuItem$1, { value: "global", children: "Entire Studio (all projects)" })] })] }), jsxs(FormControl, { size: "small", sx: { minWidth: 220 }, children: [jsx(InputLabel, { children: "Operation" }), jsxs(Select, { label: "Operation", value: mode, onChange: function (e) { return setMode(e.target.value); }, children: [jsx(MenuItem$1, { value: "all", children: "Delete all audit history" }), jsx(MenuItem$1, { value: "beforeDate", children: "Delete before date" })] })] }), mode === 'beforeDate' && (jsx(TextField$1, { size: "small", type: "date", label: "Delete before", value: beforeDate, onChange: function (e) { return setBeforeDate(e.target.value); }, InputLabelProps: { shrink: true }, helperText: "Entries before this date (UTC midnight) will be deleted." }))] }), jsxs(Paper, { variant: "outlined", sx: { p: 2, mb: 2, bgcolor: 'background.default' }, children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, gutterBottom: true, children: option.label }), jsx(Typography, { variant: "body2", color: "text.secondary", sx: { mb: 1.5 }, children: option.summary }), jsxs(Stack$1, { direction: { xs: 'column', sm: 'row' }, spacing: 2, children: [jsxs(Box$1, { children: [jsx(Typography, { variant: "caption", color: "text.secondary", fontWeight: 600, children: "Matching entries" }), jsx(Typography, { variant: "h5", fontWeight: 700, children: statsLoading ? '…' : Number((_c = (_b = stats === null || stats === void 0 ? void 0 : stats.deleteCount) !== null && _b !== void 0 ? _b : stats === null || stats === void 0 ? void 0 : stats.matchingEntries) !== null && _c !== void 0 ? _c : 0).toLocaleString() })] }), jsxs(Box$1, { children: [jsx(Typography, { variant: "caption", color: "text.secondary", fontWeight: 600, children: "Total in scope" }), jsx(Typography, { variant: "h5", fontWeight: 700, children: statsLoading ? '…' : Number((_d = stats === null || stats === void 0 ? void 0 : stats.totalEntries) !== null && _d !== void 0 ? _d : 0).toLocaleString() })] })] })] }), jsx(DangerZone, { title: "Destructive database operation", description: option.consequence, action: jsx(Button$1, { color: "error", variant: "contained", onClick: onOpenConfirm, disabled: mode === 'beforeDate' && !beforeDate, children: "Truncate audit history" }) })] }) }), jsx(Paper, { variant: "outlined", sx: __assign(__assign({}, surfacePaperSx), { flexShrink: 0 }), children: jsxs(Box$1, { sx: { p: 2.5 }, children: [jsxs(Stack$1, { direction: "row", spacing: 1.5, alignItems: "center", sx: { mb: 2 }, children: [jsx(HistoryRoundedIcon, { color: "primary" }), jsxs(Box$1, { children: [jsx(Typography, { variant: "subtitle1", fontWeight: 700, children: "Processed commits (git sync cache)" }), jsx(Typography, { variant: "body2", color: "text.secondary", children: "Clears the Studio processed_commits table. Safe after history rewrite; does not delete git or content." })] })] }), processedStatsError && (jsx(Alert, { severity: "error", onClose: function () { return setProcessedStatsError(''); }, sx: { mb: 2 }, children: processedStatsError })), jsx(Stack$1, { direction: { xs: 'column', md: 'row' }, spacing: 2, sx: { mb: 2 }, children: jsxs(FormControl, { size: "small", sx: { minWidth: 220 }, children: [jsx(InputLabel, { children: "Scope" }), jsxs(Select, { label: "Scope", value: processedScope, onChange: function (e) { return setProcessedScope(e.target.value); }, children: [jsx(MenuItem$1, { value: "site", children: "This project only" }), jsx(MenuItem$1, { value: "global", children: "Entire Studio (all projects)" })] })] }) }), jsxs(Paper, { variant: "outlined", sx: { p: 2, mb: 2, bgcolor: 'background.default' }, children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, gutterBottom: true, children: processedOption.label }), jsx(Typography, { variant: "body2", color: "text.secondary", sx: { mb: 1.5 }, children: processedOption.summary }), jsxs(Stack$1, { direction: { xs: 'column', sm: 'row' }, spacing: 2, children: [jsxs(Box$1, { children: [jsx(Typography, { variant: "caption", color: "text.secondary", fontWeight: 600, children: "Cached rows" }), jsx(Typography, { variant: "h5", fontWeight: 700, children: processedStatsLoading ? '…' : Number((_e = processedStats === null || processedStats === void 0 ? void 0 : processedStats.rowCount) !== null && _e !== void 0 ? _e : 0).toLocaleString() })] }), processedScope === 'site' && (jsxs(Box$1, { children: [jsx(Typography, { variant: "caption", color: "text.secondary", fontWeight: 600, children: "Sync pointer (preserved)" }), jsx(Typography, { variant: "body2", fontFamily: "monospace", sx: { wordBreak: 'break-all' }, children: processedStatsLoading
+                                                                ? '…'
+                                                                : (processedStats === null || processedStats === void 0 ? void 0 : processedStats.lastProcessedCommitId) || '(none set)' })] }))] })] }), jsx(DangerZone, { title: "Clear sync cache", description: processedOption.consequence, action: jsx(Button$1, { color: "warning", variant: "contained", onClick: onOpenProcessedConfirm, children: "Truncate processed commits" }) })] }) })] }), jsxs(Dialog, { open: confirmOpen, onClose: function () { return !busy && setConfirmOpen(false); }, maxWidth: "sm", fullWidth: true, children: [jsx(DialogTitle, { children: "Confirm audit history truncation" }), jsx(DialogContent, { children: jsxs(Stack$1, { spacing: 2, sx: { mt: 1 }, children: [jsx(Alert, { severity: "error", icon: jsx(WarningAmberRoundedIcon, {}), children: option.consequence }), jsxs(Box$1, { children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, children: "What will be deleted" }), jsx(Typography, { variant: "body2", color: "text.secondary", children: option.whatIsDestroyed })] }), jsxs(Box$1, { children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, children: "What is preserved" }), jsx(Typography, { variant: "body2", color: "text.secondary", children: option.whatIsPreserved })] }), jsxs(Typography, { variant: "body2", children: ["This action is logged in the Studio audit log and server log as performed by ", jsx("strong", { children: username }), "."] }), jsx(FormControlLabel, { control: jsx(Checkbox, { checked: ackChecked, onChange: function (e) { return setAckChecked(e.target.checked); } }), label: "I understand this permanently deletes audit history and cannot be undone." })] }) }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: function () { return setConfirmOpen(false); }, disabled: busy, children: "Cancel" }), jsx(Button$1, { color: "error", variant: "contained", disabled: !canConfirm || busy, onClick: onTruncate, children: busy ? 'Deleting…' : 'Delete audit history' })] })] }), jsxs(Dialog, { open: processedConfirmOpen, onClose: function () { return !processedBusy && setProcessedConfirmOpen(false); }, maxWidth: "sm", fullWidth: true, children: [jsx(DialogTitle, { children: "Confirm processed commits truncation" }), jsx(DialogContent, { children: jsxs(Stack$1, { spacing: 2, sx: { mt: 1 }, children: [jsx(Alert, { severity: "warning", icon: jsx(WarningAmberRoundedIcon, {}), children: processedOption.consequence }), jsxs(Box$1, { children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, children: "What will be deleted" }), jsx(Typography, { variant: "body2", color: "text.secondary", children: processedOption.whatIsDestroyed })] }), jsxs(Box$1, { children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, children: "What is preserved" }), jsx(Typography, { variant: "body2", color: "text.secondary", children: processedOption.whatIsPreserved })] }), jsxs(Typography, { variant: "body2", children: ["This action is logged in the Studio audit log and server log as performed by ", jsx("strong", { children: username }), "."] }), jsx(FormControlLabel, { control: jsx(Checkbox, { checked: processedAckChecked, onChange: function (e) { return setProcessedAckChecked(e.target.checked); } }), label: "I understand this clears the git sync cache and may affect Git Log processed badges until the next sync." })] }) }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: function () { return setProcessedConfirmOpen(false); }, disabled: processedBusy, children: "Cancel" }), jsx(Button$1, { color: "warning", variant: "contained", disabled: !canConfirmProcessed || processedBusy, onClick: onTruncateProcessed, children: processedBusy ? 'Clearing…' : 'Truncate processed commits' })] })] })] }));
+}
+
+function isUntracked(file) {
+    return file.workTreeStatus === 'untracked' || file.status.includes('untracked');
+}
+function canStage(file) {
+    if (file.conflict) {
+        return false;
+    }
+    var ws = file.workTreeStatus;
+    return ws === 'modified' || ws === 'deleted' || ws === 'untracked';
+}
+function canUnstage(file) {
+    return Boolean(file.staged) && !file.conflict;
+}
+function canDiscard(file) {
+    if (file.conflict) {
+        return false;
+    }
+    var ws = file.workTreeStatus;
+    return ws === 'modified' || ws === 'deleted' || ws === 'untracked';
+}
+function canClean(file) {
+    return isUntracked(file);
+}
+function statusChipColor(status) {
+    if (status.includes('conflict')) {
+        return 'error';
+    }
+    if (status.includes('untracked')) {
+        return 'info';
+    }
+    if (status.includes('deleted') || status.includes('removed')) {
+        return 'warning';
+    }
+    if (status.includes('staged')) {
+        return 'success';
+    }
+    if (status.includes('modified')) {
+        return 'warning';
+    }
+    return 'default';
+}
+function WorkingTreeTab(_a) {
+    var _this = this;
+    var _b, _c;
+    var siteId = _a.siteId, siteName = _a.siteName;
+    var _d = useState(null), data = _d[0], setData = _d[1];
+    var _e = useState(true), loading = _e[0], setLoading = _e[1];
+    var _f = useState(false), busy = _f[0], setBusy = _f[1];
+    var _g = useState(''), error = _g[0], setError = _g[1];
+    var _h = useState(''), notice = _h[0], setNotice = _h[1];
+    var _j = useState(new Set()), selected = _j[0], setSelected = _j[1];
+    var _k = useState(false), commitOpen = _k[0], setCommitOpen = _k[1];
+    var _l = useState(''), commitMessage = _l[0], setCommitMessage = _l[1];
+    var _m = useState(false), resetOpen = _m[0], setResetOpen = _m[1];
+    var _o = useState(false), resetAck = _o[0], setResetAck = _o[1];
+    var _p = useState(false), diffOpen = _p[0], setDiffOpen = _p[1];
+    var _q = useState(false), diffLoading = _q[0], setDiffLoading = _q[1];
+    var _r = useState(''), diffTitle = _r[0], setDiffTitle = _r[1];
+    var _s = useState([]), fileDiffs = _s[0], setFileDiffs = _s[1];
+    var files = (_b = data === null || data === void 0 ? void 0 : data.files) !== null && _b !== void 0 ? _b : [];
+    var selectedPaths = useMemo(function () { return Array.from(selected); }, [selected]);
+    var hasSelection = selectedPaths.length > 0;
+    var selectedFiles = useMemo(function () { return files.filter(function (file) { return selected.has(file.path); }); }, [files, selected]);
+    var conflictCount = (_c = data === null || data === void 0 ? void 0 : data.conflictCount) !== null && _c !== void 0 ? _c : files.filter(function (f) { return f.conflict; }).length;
+    var hasChanges = Boolean(data === null || data === void 0 ? void 0 : data.hasChanges) || files.length > 0 || !(data === null || data === void 0 ? void 0 : data.workTreeClean);
+    var anyStageable = files.some(canStage);
+    var anyStaged = files.some(canUnstage);
+    var anyDiscardable = files.some(canDiscard);
+    var anyUntracked = files.some(canClean);
+    var selectedStageable = selectedFiles.some(canStage);
+    var selectedStaged = selectedFiles.some(canUnstage);
+    var selectedDiscardable = selectedFiles.some(canDiscard);
+    var selectedUntracked = selectedFiles.some(canClean);
+    var canStageAction = hasSelection ? selectedStageable : anyStageable;
+    var canUnstageAction = hasSelection && selectedStaged;
+    var canCommitAction = anyStaged;
+    var canDiscardAction = hasSelection ? selectedDiscardable : anyDiscardable;
+    var canCleanAction = hasSelection ? selectedUntracked : anyUntracked;
+    var canResetAction = hasChanges;
+    var load = useCallback(function () { return __awaiter(_this, void 0, void 0, function () {
+        var result, e_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    setLoading(true);
+                    setError('');
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 3, 4, 5]);
+                    return [4 /*yield*/, firstValueFrom(fetchWorkTree(siteId))];
+                case 2:
+                    result = _a.sent();
+                    setData(result);
+                    setSelected(new Set());
+                    return [3 /*break*/, 5];
+                case 3:
+                    e_1 = _a.sent();
+                    setData(null);
+                    setError(e_1.message || 'Failed to load working tree');
+                    return [3 /*break*/, 5];
+                case 4:
+                    setLoading(false);
+                    return [7 /*endfinally*/];
+                case 5: return [2 /*return*/];
+            }
+        });
+    }); }, [siteId]);
+    useEffect(function () {
+        load();
+    }, [load]);
+    var runAction = function (action, okMessage) { return __awaiter(_this, void 0, void 0, function () {
+        var e_2;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    setBusy(true);
+                    setError('');
+                    setNotice('');
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 4, 5, 6]);
+                    return [4 /*yield*/, action()];
+                case 2:
+                    _a.sent();
+                    return [4 /*yield*/, load()];
+                case 3:
+                    _a.sent();
+                    return [3 /*break*/, 6];
+                case 4:
+                    e_2 = _a.sent();
+                    setError(e_2.message || 'Operation failed');
+                    return [3 /*break*/, 6];
+                case 5:
+                    setBusy(false);
+                    return [7 /*endfinally*/];
+                case 6: return [2 /*return*/];
+            }
+        });
+    }); };
+    var togglePath = function (path) {
+        setSelected(function (prev) {
+            var next = new Set(prev);
+            if (next.has(path)) {
+                next.delete(path);
+            }
+            else {
+                next.add(path);
+            }
+            return next;
+        });
+    };
+    var toggleAll = function () {
+        if (selected.size === files.length) {
+            setSelected(new Set());
+        }
+        else {
+            setSelected(new Set(files.map(function (f) { return f.path; })));
+        }
+    };
+    var onDiff = function (file, mode) { return __awaiter(_this, void 0, void 0, function () {
+        var result, e_3;
+        var _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    setDiffLoading(true);
+                    setDiffOpen(true);
+                    setDiffTitle("".concat(file.path, " (").concat(mode === 'staged' ? 'staged vs HEAD' : 'working tree vs index', ")"));
+                    setFileDiffs([]);
+                    _b.label = 1;
+                case 1:
+                    _b.trys.push([1, 3, 4, 5]);
+                    return [4 /*yield*/, firstValueFrom(fetchWorkTreeDiff(siteId, file.path, mode))];
+                case 2:
+                    result = _b.sent();
+                    setFileDiffs((_a = result.fileDiffs) !== null && _a !== void 0 ? _a : []);
+                    return [3 /*break*/, 5];
+                case 3:
+                    e_3 = _b.sent();
+                    setError(e_3.message || 'Failed to load diff');
+                    setDiffOpen(false);
+                    return [3 /*break*/, 5];
+                case 4:
+                    setDiffLoading(false);
+                    return [7 /*endfinally*/];
+                case 5: return [2 /*return*/];
+            }
+        });
+    }); };
+    var onCommit = function () { return __awaiter(_this, void 0, void 0, function () {
+        var message;
+        var _this = this;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    message = commitMessage.trim();
+                    if (!message) {
+                        setError('Commit message is required');
+                        return [2 /*return*/];
+                    }
+                    return [4 /*yield*/, runAction(function () { return __awaiter(_this, void 0, void 0, function () {
+                            var result;
+                            var _a;
+                            return __generator(this, function (_b) {
+                                switch (_b.label) {
+                                    case 0: return [4 /*yield*/, firstValueFrom(postWorkTreeCommit(siteId, message))];
+                                    case 1:
+                                        result = _b.sent();
+                                        setCommitOpen(false);
+                                        setCommitMessage('');
+                                        setNotice(result.message || "Committed ".concat((_a = result.shortId) !== null && _a !== void 0 ? _a : ''));
+                                        return [2 /*return*/];
+                                }
+                            });
+                        }); })];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    }); };
+    var onResetHard = function () { return __awaiter(_this, void 0, void 0, function () {
+        var _this = this;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    if (!resetAck) {
+                        return [2 /*return*/];
+                    }
+                    return [4 /*yield*/, runAction(function () { return __awaiter(_this, void 0, void 0, function () {
+                            var result;
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0: return [4 /*yield*/, firstValueFrom(postWorkTreeResetHard(siteId))];
+                                    case 1:
+                                        result = _a.sent();
+                                        setResetOpen(false);
+                                        setResetAck(false);
+                                        setNotice(result.message || 'Working tree reset');
+                                        return [2 /*return*/];
+                                }
+                            });
+                        }); })];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    }); };
+    return (jsxs(TabShell, { children: [jsxs(TabAlertStack, { children: [error && (jsx(Alert, { severity: "error", onClose: function () { return setError(''); }, children: error })), notice && (jsx(Alert, { severity: "success", onClose: function () { return setNotice(''); }, children: notice }))] }), jsxs(TabToolbar, { children: [jsxs(Stack$1, { direction: "row", spacing: 1.5, flexWrap: "wrap", useFlexGap: true, alignItems: "center", justifyContent: "space-between", children: [jsxs(Box$1, { sx: { minWidth: 0 }, children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, children: "Working tree" }), jsx(Typography, { variant: "caption", color: "text.secondary", display: "block", children: siteName ? "".concat(siteName, " (").concat(siteId, ")") : siteId })] }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: loading ? jsx(CircularProgress, { size: 14 }) : jsx(RefreshRoundedIcon, {}), disabled: loading || busy, onClick: function () { return load(); }, children: "Refresh" })] }), jsxs(Stack$1, { direction: "row", spacing: 1, flexWrap: "wrap", useFlexGap: true, alignItems: "center", children: [jsx(Chip, { size: "small", label: (data === null || data === void 0 ? void 0 : data.workTreeClean) ? 'Working tree clean' : 'Working tree dirty', color: (data === null || data === void 0 ? void 0 : data.workTreeClean) ? 'success' : 'warning', variant: (data === null || data === void 0 ? void 0 : data.workTreeClean) ? 'outlined' : 'filled' }), jsx(Chip, { size: "small", label: (data === null || data === void 0 ? void 0 : data.gitStatusOk) ? 'Git index OK' : 'Git index issues', color: (data === null || data === void 0 ? void 0 : data.gitStatusOk) ? 'success' : 'error', variant: "outlined" }), conflictCount > 0 && (jsx(Chip, { size: "small", color: "error", label: "".concat(conflictCount, " conflict(s)") })), (data === null || data === void 0 ? void 0 : data.headCommitId) && (jsx(Chip, { size: "small", variant: "outlined", sx: monoSx, label: "HEAD \u00B7 ".concat(data.headCommitId.slice(0, 7)) })), (data === null || data === void 0 ? void 0 : data.branch) && (jsx(Chip, { size: "small", variant: "outlined", sx: monoSx, label: "Branch \u00B7 ".concat(data.branch) })), jsxs(Typography, { variant: "caption", color: "text.secondary", sx: monoSx, children: [files.length, " changed path(s)"] })] }), jsx(Divider, {}), jsxs(Stack$1, { direction: "row", spacing: 2, flexWrap: "wrap", useFlexGap: true, alignItems: "flex-start", children: [jsxs(ToolbarGroup, { label: "Staging", children: [jsx(Tooltip, { title: hasSelection ? 'Stage selected unstaged paths' : 'Stage all unstaged paths', children: jsx("span", { children: jsx(Button$1, { size: "small", variant: "outlined", disabled: busy || loading || !canStageAction, startIcon: jsx(PlaylistAddCheckRoundedIcon, {}), onClick: function () {
+                                                    return runAction(function () { return __awaiter(_this, void 0, void 0, function () {
+                                                        var result;
+                                                        return __generator(this, function (_a) {
+                                                            switch (_a.label) {
+                                                                case 0: return [4 /*yield*/, firstValueFrom(postWorkTreeStage(siteId, hasSelection ? { paths: selectedPaths } : { all: true }))];
+                                                                case 1:
+                                                                    result = _a.sent();
+                                                                    setNotice(result.message || 'Staged');
+                                                                    return [2 /*return*/];
+                                                            }
+                                                        });
+                                                    }); });
+                                                }, children: hasSelection ? 'Stage selected' : 'Stage all' }) }) }), jsx(Tooltip, { title: "Unstage selected paths in the index", children: jsx("span", { children: jsx(Button$1, { size: "small", variant: "outlined", disabled: busy || loading || !canUnstageAction, onClick: function () {
+                                                    return runAction(function () { return __awaiter(_this, void 0, void 0, function () {
+                                                        var result;
+                                                        return __generator(this, function (_a) {
+                                                            switch (_a.label) {
+                                                                case 0: return [4 /*yield*/, firstValueFrom(postWorkTreeUnstage(siteId, { paths: selectedPaths }))];
+                                                                case 1:
+                                                                    result = _a.sent();
+                                                                    setNotice(result.message || 'Unstaged');
+                                                                    return [2 /*return*/];
+                                                            }
+                                                        });
+                                                    }); });
+                                                }, children: "Unstage selected" }) }) })] }), jsx(Divider, { flexItem: true, orientation: "vertical", sx: { alignSelf: 'stretch', my: 0.5 } }), jsx(ToolbarGroup, { label: "Commit", children: jsx(Tooltip, { title: "Commit staged changes to the sandbox repository", children: jsx("span", { children: jsx(Button$1, { size: "small", variant: "contained", disabled: busy || loading || !canCommitAction, startIcon: jsx(CommitRoundedIcon, {}), onClick: function () {
+                                                setCommitMessage('');
+                                                setCommitOpen(true);
+                                            }, children: "Commit staged" }) }) }) }), jsx(Divider, { flexItem: true, orientation: "vertical", sx: { alignSelf: 'stretch', my: 0.5 } }), jsxs(ToolbarGroup, { label: "Restore", children: [jsx(Tooltip, { title: hasSelection ? 'Discard working tree changes for selected paths' : 'Discard all unstaged changes', children: jsx("span", { children: jsx(Button$1, { size: "small", variant: "outlined", color: "warning", disabled: busy || loading || !canDiscardAction, startIcon: jsx(RestoreRoundedIcon, {}), onClick: function () {
+                                                    return runAction(function () { return __awaiter(_this, void 0, void 0, function () {
+                                                        var result;
+                                                        return __generator(this, function (_a) {
+                                                            switch (_a.label) {
+                                                                case 0: return [4 /*yield*/, firstValueFrom(postWorkTreeDiscard(siteId, hasSelection ? { paths: selectedPaths } : { all: true }))];
+                                                                case 1:
+                                                                    result = _a.sent();
+                                                                    setNotice(result.message || 'Discarded');
+                                                                    return [2 /*return*/];
+                                                            }
+                                                        });
+                                                    }); });
+                                                }, children: hasSelection ? 'Discard selected' : 'Discard all' }) }) }), jsx(Tooltip, { title: hasSelection ? 'Remove selected untracked paths' : 'Remove all untracked files', children: jsx("span", { children: jsx(Button$1, { size: "small", variant: "outlined", disabled: busy || loading || !canCleanAction, startIcon: jsx(CleaningServicesRoundedIcon, {}), onClick: function () {
+                                                    return runAction(function () { return __awaiter(_this, void 0, void 0, function () {
+                                                        var result;
+                                                        return __generator(this, function (_a) {
+                                                            switch (_a.label) {
+                                                                case 0: return [4 /*yield*/, firstValueFrom(postWorkTreeClean(siteId, hasSelection ? { paths: selectedPaths } : { allUntracked: true }))];
+                                                                case 1:
+                                                                    result = _a.sent();
+                                                                    setNotice(result.message || 'Cleaned');
+                                                                    return [2 /*return*/];
+                                                            }
+                                                        });
+                                                    }); });
+                                                }, children: hasSelection ? 'Remove untracked selected' : 'Clean untracked' }) }) }), jsx(Tooltip, { title: "Reset tracked files to HEAD and remove uncommitted changes", children: jsx("span", { children: jsx(Button$1, { size: "small", variant: "outlined", color: "error", disabled: busy || loading || !canResetAction, onClick: function () {
+                                                    setResetAck(false);
+                                                    setResetOpen(true);
+                                                }, children: "Reset hard" }) }) })] })] })] }), jsxs(TabContentPanel, { children: [jsx(Box$1, { sx: {
+                            px: 2,
+                            py: 1.25,
+                            borderBottom: 1,
+                            borderColor: 'divider',
+                            flexShrink: 0
+                        }, children: jsx(Typography, { variant: "subtitle2", fontWeight: 700, children: "Changed paths" }) }), loading && !data ? (jsx(Box$1, { sx: { p: 4, display: 'flex', justifyContent: 'center' }, children: jsx(CircularProgress, { size: 32 }) })) : files.length === 0 ? (jsx(Box$1, { sx: { p: 4, textAlign: 'center' }, children: jsx(Typography, { color: "text.secondary", children: "No uncommitted changes in the sandbox working tree." }) })) : (jsx(Box$1, { sx: { overflow: 'auto', flex: 1 }, children: jsxs(Table, { size: "small", stickyHeader: true, children: [jsx(TableHead, { children: jsxs(TableRow, { children: [jsx(TableCell, { padding: "checkbox", children: jsx(Checkbox, { size: "small", checked: files.length > 0 && selected.size === files.length, indeterminate: selected.size > 0 && selected.size < files.length, onChange: toggleAll }) }), jsx(TableCell, { children: "Path" }), jsx(TableCell, { children: "Status" }), jsx(TableCell, { align: "right", children: "Actions" })] }) }), jsx(TableBody, { children: files.map(function (file) { return (jsxs(TableRow, { hover: true, selected: selected.has(file.path), children: [jsx(TableCell, { padding: "checkbox", children: jsx(Checkbox, { size: "small", checked: selected.has(file.path), onChange: function () { return togglePath(file.path); } }) }), jsx(TableCell, { sx: __assign(__assign({}, monoSx), { maxWidth: 420 }), children: file.path }), jsx(TableCell, { children: jsx(Chip, { size: "small", label: file.status, color: statusChipColor(file.status), variant: file.conflict ? 'filled' : 'outlined' }) }), jsx(TableCell, { align: "right", children: jsxs(Stack$1, { direction: "row", spacing: 0.5, justifyContent: "flex-end", flexWrap: "wrap", useFlexGap: true, children: [(file.workTreeStatus || file.conflict) && (jsx(Tooltip, { title: "Diff working tree changes", children: jsx("span", { children: jsx(Button$1, { size: "small", variant: "text", disabled: busy || loading, startIcon: jsx(CompareArrowsRoundedIcon, {}), onClick: function () { return onDiff(file, 'unstaged'); }, children: "Diff" }) }) })), file.staged && (jsx(Button$1, { size: "small", variant: "text", disabled: busy || loading, onClick: function () { return onDiff(file, 'staged'); }, children: "Staged diff" })), canStage(file) && (jsx(Button$1, { size: "small", variant: "text", disabled: busy || loading, onClick: function () {
+                                                                return runAction(function () { return __awaiter(_this, void 0, void 0, function () {
+                                                                    var result;
+                                                                    return __generator(this, function (_a) {
+                                                                        switch (_a.label) {
+                                                                            case 0: return [4 /*yield*/, firstValueFrom(postWorkTreeStage(siteId, { paths: [file.path] }))];
+                                                                            case 1:
+                                                                                result = _a.sent();
+                                                                                setNotice(result.message || 'Staged');
+                                                                                return [2 /*return*/];
+                                                                        }
+                                                                    });
+                                                                }); });
+                                                            }, children: "Stage" })), canUnstage(file) && (jsx(Button$1, { size: "small", variant: "text", disabled: busy || loading, onClick: function () {
+                                                                return runAction(function () { return __awaiter(_this, void 0, void 0, function () {
+                                                                    var result;
+                                                                    return __generator(this, function (_a) {
+                                                                        switch (_a.label) {
+                                                                            case 0: return [4 /*yield*/, firstValueFrom(postWorkTreeUnstage(siteId, { paths: [file.path] }))];
+                                                                            case 1:
+                                                                                result = _a.sent();
+                                                                                setNotice(result.message || 'Unstaged');
+                                                                                return [2 /*return*/];
+                                                                        }
+                                                                    });
+                                                                }); });
+                                                            }, children: "Unstage" })), canDiscard(file) && (jsx(Button$1, { size: "small", variant: "text", color: "warning", disabled: busy || loading, startIcon: jsx(DeleteOutlineRoundedIcon, {}), onClick: function () {
+                                                                return runAction(function () { return __awaiter(_this, void 0, void 0, function () {
+                                                                    var result;
+                                                                    return __generator(this, function (_a) {
+                                                                        switch (_a.label) {
+                                                                            case 0: return [4 /*yield*/, firstValueFrom(postWorkTreeDiscard(siteId, { paths: [file.path] }))];
+                                                                            case 1:
+                                                                                result = _a.sent();
+                                                                                setNotice(result.message || 'Discarded');
+                                                                                return [2 /*return*/];
+                                                                        }
+                                                                    });
+                                                                }); });
+                                                            }, children: "Discard" })), file.conflict && (jsxs(Fragment, { children: [jsx(Button$1, { size: "small", variant: "text", disabled: busy || loading, onClick: function () {
+                                                                        return runAction(function () { return __awaiter(_this, void 0, void 0, function () {
+                                                                            var result;
+                                                                            return __generator(this, function (_a) {
+                                                                                switch (_a.label) {
+                                                                                    case 0: return [4 /*yield*/, firstValueFrom(postWorkTreeResolveConflict(siteId, file.path, 'ours'))];
+                                                                                    case 1:
+                                                                                        result = _a.sent();
+                                                                                        setNotice(result.message || 'Resolved with current branch');
+                                                                                        return [2 /*return*/];
+                                                                                }
+                                                                            });
+                                                                        }); });
+                                                                    }, children: "Use ours" }), jsx(Button$1, { size: "small", variant: "text", disabled: busy || loading, onClick: function () {
+                                                                        return runAction(function () { return __awaiter(_this, void 0, void 0, function () {
+                                                                            var result;
+                                                                            return __generator(this, function (_a) {
+                                                                                switch (_a.label) {
+                                                                                    case 0: return [4 /*yield*/, firstValueFrom(postWorkTreeResolveConflict(siteId, file.path, 'theirs'))];
+                                                                                    case 1:
+                                                                                        result = _a.sent();
+                                                                                        setNotice(result.message || 'Resolved with incoming');
+                                                                                        return [2 /*return*/];
+                                                                                }
+                                                                            });
+                                                                        }); });
+                                                                    }, children: "Use theirs" })] }))] }) })] }, file.path)); }) })] }) }))] }), jsxs(Dialog, { open: commitOpen, onClose: function () { return !busy && setCommitOpen(false); }, maxWidth: "sm", fullWidth: true, children: [jsx(DialogTitle, { children: "Commit staged changes" }), jsx(DialogContent, { children: jsxs(Stack$1, { spacing: 2, sx: { mt: 1 }, children: [jsx(Typography, { variant: "body2", color: "text.secondary", children: "Creates a new commit in the sandbox git repository. Studio may need to sync to ingest the commit." }), jsx(TextField$1, { fullWidth: true, size: "small", label: "Commit message", value: commitMessage, onChange: function (e) { return setCommitMessage(e.target.value); }, multiline: true, minRows: 3 })] }) }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: function () { return setCommitOpen(false); }, disabled: busy, children: "Cancel" }), jsx(Button$1, { variant: "contained", disabled: busy || !commitMessage.trim(), onClick: onCommit, children: busy ? 'Committing…' : 'Commit' })] })] }), jsxs(Dialog, { open: resetOpen, onClose: function () { return !busy && setResetOpen(false); }, maxWidth: "sm", fullWidth: true, children: [jsx(DialogTitle, { children: "Reset working tree to HEAD?" }), jsx(DialogContent, { children: jsxs(Stack$1, { spacing: 2, sx: { mt: 1 }, children: [jsx(Alert, { severity: "error", icon: jsx(WarningAmberRoundedIcon, {}), children: "This discards all uncommitted changes and resets tracked files to HEAD. Untracked files may also be removed." }), jsx(FormControlLabel, { control: jsx(Checkbox, { checked: resetAck, onChange: function (e) { return setResetAck(e.target.checked); } }), label: "I understand this cannot be undone." })] }) }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: function () { return setResetOpen(false); }, disabled: busy, children: "Cancel" }), jsx(Button$1, { color: "error", variant: "contained", disabled: !resetAck || busy, onClick: onResetHard, children: "Reset hard" })] })] }), jsxs(Dialog, { open: diffOpen, onClose: function () { return setDiffOpen(false); }, maxWidth: "lg", fullWidth: true, children: [jsx(DialogTitle, { children: diffTitle }), jsx(DialogContent, { sx: { minHeight: 320, display: 'flex', flexDirection: 'column' }, children: diffLoading ? (jsx(Box$1, { sx: { py: 4, display: 'flex', justifyContent: 'center' }, children: jsx(CircularProgress, { size: 28 }) })) : (jsx(DiffViewer, { title: diffTitle, fileDiffs: fileDiffs })) }), jsx(DialogActions, { children: jsx(Button$1, { onClick: function () { return setDiffOpen(false); }, children: "Close" }) })] })] }));
+}
+
+function PresenceChip(_a) {
+    var label = _a.label, active = _a.active, _b = _a.configured, configured = _b === void 0 ? true : _b, title = _a.title;
+    if (!configured) {
+        return (jsx(Tooltip, { title: "".concat(label, " mapping not configured"), children: jsx(Chip, { size: "small", label: label, variant: "outlined", sx: { height: 22, opacity: 0.55, '& .MuiChip-label': { px: 0.75, fontSize: '0.68rem' } } }) }));
+    }
+    return (jsx(Tooltip, { title: title, children: jsx(Chip, { size: "small", label: label, color: active ? 'success' : 'default', variant: active ? 'filled' : 'outlined', sx: { height: 22, '& .MuiChip-label': { px: 0.75, fontSize: '0.68rem' } } }) }));
+}
+function PresenceChips(_a) {
+    var presence = _a.presence;
+    return (jsxs(Stack$1, { direction: "row", spacing: 0.5, useFlexGap: true, flexWrap: "wrap", children: [jsx(PresenceChip, { label: "Repo", active: presence.inRepo, title: "Pointer file (.blob) exists in the sandbox Git repository" }), jsx(PresenceChip, { label: "Preview", active: presence.inPreview, title: "Asset exists in preview blob storage" }), jsx(PresenceChip, { label: "Staging", active: presence.inStaging, configured: presence.stagingConfigured, title: "Published pointer exists on the staging branch (asset was published to staging)" }), jsx(PresenceChip, { label: "Live", active: presence.inLive, configured: presence.liveConfigured, title: "Published pointer exists on the live branch (asset was published to live)" })] }));
+}
+function BlobStoreTreeNode(_a) {
+    var siteId = _a.siteId, store = _a.store, entry = _a.entry, depth = _a.depth, expanded = _a.expanded, onToggle = _a.onToggle, folderState = _a.folderState, onLoadFolder = _a.onLoadFolder, selectedPaths = _a.selectedPaths, onToggleSelect = _a.onToggleSelect;
+    var isFolder = entry.folder;
+    var indent = depth * 16 + 8;
+    useEffect(function () {
+        if (isFolder && expanded && !folderState) {
+            onLoadFolder(entry.path);
+        }
+    }, [isFolder, expanded, folderState, entry.path, onLoadFolder]);
+    return (jsxs(Box$1, { children: [jsxs(Stack$1, { direction: "row", alignItems: "center", spacing: 0.5, sx: {
+                    py: 0.5,
+                    pl: "".concat(indent, "px"),
+                    pr: 1,
+                    borderRadius: 1,
+                    '&:hover': { bgcolor: function (t) { return alpha(t.palette.text.primary, 0.04); } }
+                }, children: [isFolder ? (jsx(IconButton$1, { size: "small", onClick: onToggle, "aria-label": expanded ? 'Collapse folder' : 'Expand folder', children: expanded ? jsx(ExpandMoreRoundedIcon, { fontSize: "small" }) : jsx(ChevronRightRoundedIcon, { fontSize: "small" }) })) : (jsx(Checkbox, { size: "small", checked: Boolean(selectedPaths[entry.path]), onChange: function (e) { return onToggleSelect(entry.path, e.target.checked); }, sx: { p: 0.25 } })), isFolder ? (jsx(FolderRoundedIcon, { fontSize: "small", color: "action" })) : (jsx(InsertDriveFileRoundedIcon, { fontSize: "small", color: "action" })), jsx(Typography, { variant: "body2", sx: __assign(__assign({}, monoSx), { flex: 1, minWidth: 0 }), noWrap: true, title: entry.path, children: entry.name }), !isFolder && entry.presence && jsx(PresenceChips, { presence: entry.presence })] }), isFolder && (jsx(Collapse$1, { in: expanded, children: (folderState === null || folderState === void 0 ? void 0 : folderState.loading) ? (jsx(Box$1, { sx: { pl: "".concat(indent + 28, "px"), py: 0.5 }, children: jsx(CircularProgress, { size: 16 }) })) : (folderState === null || folderState === void 0 ? void 0 : folderState.error) ? (jsx(Typography, { variant: "caption", color: "error", sx: { pl: "".concat(indent + 28, "px") }, children: folderState.error })) : (folderState === null || folderState === void 0 ? void 0 : folderState.entries.map(function (child) { return (jsx(BlobStoreTreeBranch, { siteId: siteId, store: store, entry: child, depth: depth + 1, selectedPaths: selectedPaths, onToggleSelect: onToggleSelect }, child.path)); })) }))] }));
+}
+function BlobStoreTreeBranch(_a) {
+    var siteId = _a.siteId, store = _a.store, entry = _a.entry, depth = _a.depth, selectedPaths = _a.selectedPaths, onToggleSelect = _a.onToggleSelect;
+    var _b = useState(false), expanded = _b[0], setExpanded = _b[1];
+    var _c = useState({}), folderCache = _c[0], setFolderCache = _c[1];
+    var loadFolder = useCallback(function (path) {
+        setFolderCache(function (prev) {
+            var _a;
+            var _b, _c;
+            return (__assign(__assign({}, prev), (_a = {}, _a[path] = { entries: (_c = (_b = prev[path]) === null || _b === void 0 ? void 0 : _b.entries) !== null && _c !== void 0 ? _c : [], loading: true }, _a)));
+        });
+        firstValueFrom(fetchBlobStoreChildren(siteId, store.id, path))
+            .then(function (data) {
+            setFolderCache(function (prev) {
+                var _a;
+                return (__assign(__assign({}, prev), (_a = {}, _a[path] = { entries: data.entries, loading: false }, _a)));
+            });
+        })
+            .catch(function (err) {
+            setFolderCache(function (prev) {
+                var _a;
+                return (__assign(__assign({}, prev), (_a = {}, _a[path] = { entries: [], loading: false, error: err.message }, _a)));
+            });
+        });
+    }, [siteId, store.id]);
+    return (jsx(BlobStoreTreeNode, { siteId: siteId, store: store, entry: entry, depth: depth, expanded: expanded, onToggle: function () { return setExpanded(function (v) { return !v; }); }, folderState: entry.folder ? folderCache[entry.path] : undefined, onLoadFolder: loadFolder, selectedPaths: selectedPaths, onToggleSelect: onToggleSelect }));
+}
+function BlobStoreSection(_a) {
+    var _this = this;
+    var siteId = _a.siteId, store = _a.store, overview = _a.overview;
+    var _b = useState({ entries: [], loading: true }), rootState = _b[0], setRootState = _b[1];
+    var _c = useState({}), selectedPaths = _c[0], setSelectedPaths = _c[1];
+    var _d = useState(null), syncing = _d[0], setSyncing = _d[1];
+    var _e = useState(null), notice = _e[0], setNotice = _e[1];
+    var _f = useState(null), error = _f[0], setError = _f[1];
+    var loadRoot = useCallback(function () {
+        setRootState({ entries: [], loading: true });
+        setError(null);
+        firstValueFrom(fetchBlobStoreChildren(siteId, store.id, store.treeRoot || '/static-assets'))
+            .then(function (data) { return setRootState({ entries: data.entries, loading: false }); })
+            .catch(function (err) {
+            setRootState({ entries: [], loading: false });
+            setError(err.message);
+        });
+    }, [siteId, store.id, store.treeRoot]);
+    useEffect(function () {
+        loadRoot();
+    }, [loadRoot]);
+    var selectedList = useMemo(function () { return Object.keys(selectedPaths).filter(function (path) { return selectedPaths[path]; }); }, [selectedPaths]);
+    var hasStagingMapping = store.mappings.some(function (m) { return m.publishingTarget.toLowerCase() === 'staging'; });
+    var hasLiveMapping = store.mappings.some(function (m) { return m.publishingTarget.toLowerCase() === 'live'; });
+    var sync = function (target) { return __awaiter(_this, void 0, void 0, function () {
+        var result, err_1;
+        var _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    if (!selectedList.length) {
+                        return [2 /*return*/];
+                    }
+                    setSyncing(target);
+                    setNotice(null);
+                    setError(null);
+                    _b.label = 1;
+                case 1:
+                    _b.trys.push([1, 3, 4, 5]);
+                    return [4 /*yield*/, firstValueFrom(postSyncBlobStore(siteId, { target: target, paths: selectedList, storeId: store.id }))];
+                case 2:
+                    result = _b.sent();
+                    setNotice(result.message || "Synced ".concat((_a = result.syncedCount) !== null && _a !== void 0 ? _a : 0, " asset(s)."));
+                    setSelectedPaths({});
+                    loadRoot();
+                    return [3 /*break*/, 5];
+                case 3:
+                    err_1 = _b.sent();
+                    setError(err_1 instanceof Error ? err_1.message : 'Sync failed');
+                    return [3 /*break*/, 5];
+                case 4:
+                    setSyncing(null);
+                    return [7 /*endfinally*/];
+                case 5: return [2 /*return*/];
+            }
+        });
+    }); };
+    return (jsxs(Paper, { elevation: 0, sx: __assign(__assign({}, surfacePaperSx), { p: 2 }), children: [jsx(PanelHeader, { title: store.id, action: jsx(Button$1, { size: "small", startIcon: jsx(RefreshRoundedIcon, {}), onClick: loadRoot, children: "Refresh tree" }) }), jsxs(Stack$1, { direction: "row", spacing: 0.5, useFlexGap: true, flexWrap: "wrap", sx: { mt: 0.5 }, children: [jsx(Chip, { size: "small", label: store.type, variant: "outlined" }), jsx(Chip, { size: "small", label: store.active ? 'Active' : 'Inactive', color: store.active ? 'success' : 'default', variant: "outlined" }), store.readOnly && jsx(Chip, { size: "small", label: "Read-only", color: "warning", variant: "outlined" })] }), jsxs(Typography, { variant: "caption", color: "text.secondary", sx: __assign({ display: 'block', mt: 1 }, monoSx), children: ["Pattern: ", store.pattern] }), jsxs(Typography, { variant: "caption", color: "text.secondary", sx: __assign({ display: 'block' }, monoSx), children: ["Tree root: ", store.treeRoot || '/static-assets'] }), jsx(SectionLabel, { sx: { mt: 1.5 }, children: "Mappings" }), jsx(Stack$1, { direction: "row", spacing: 0.5, useFlexGap: true, flexWrap: "wrap", children: store.mappings.map(function (mapping) { return (jsx(Chip, { size: "small", variant: "outlined", label: "".concat(mapping.publishingTarget, ": ").concat(mapping.storeTarget).concat(mapping.prefix ? " (".concat(mapping.prefix, ")") : ''), sx: { maxWidth: '100%', '& .MuiChip-label': __assign(__assign({}, monoSx), { fontSize: '0.72rem' }) } }, mapping.publishingTarget)); }) }), jsxs(TabAlertStack, { sx: { mt: 1.5 }, children: [notice && (jsx(Alert, { severity: "success", onClose: function () { return setNotice(null); }, children: notice })), error && (jsx(Alert, { severity: "error", onClose: function () { return setError(null); }, children: error }))] }), jsx(TabToolbar, { sx: { mt: 1.5, px: 0 }, children: jsxs(ToolbarRow, { children: [jsx(ToolbarGroup, { children: jsxs(Typography, { variant: "body2", color: "text.secondary", children: [selectedList.length, " selected"] }) }), jsx(ToolbarDivider, {}), jsxs(ToolbarGroup, { children: [jsx(Button$1, { size: "small", variant: "outlined", startIcon: syncing === 'staging' ? jsx(CircularProgress, { size: 14 }) : jsx(CloudUploadRoundedIcon, {}), disabled: !selectedList.length ||
+                                        syncing !== null ||
+                                        !overview.stagingEnabled ||
+                                        !hasStagingMapping, onClick: function () { return sync('staging'); }, children: "Preview \u2192 staging" }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: syncing === 'live' ? jsx(CircularProgress, { size: 14 }) : jsx(CloudUploadRoundedIcon, {}), disabled: !selectedList.length || syncing !== null || !hasLiveMapping, onClick: function () { return sync('live'); }, children: "Preview \u2192 live" })] })] }) }), !overview.stagingEnabled && (jsx(Typography, { variant: "caption", color: "text.secondary", sx: { display: 'block', mb: 1 }, children: "Staging environment is not enabled for this project." })), jsx(Box$1, { sx: {
+                    mt: 1,
+                    border: 1,
+                    borderColor: 'divider',
+                    borderRadius: 1,
+                    maxHeight: 420,
+                    overflow: 'auto',
+                    bgcolor: function (t) { return alpha(t.palette.text.primary, 0.02); }
+                }, children: rootState.loading ? (jsxs(Box$1, { sx: { p: 2, display: 'flex', alignItems: 'center', gap: 1 }, children: [jsx(CircularProgress, { size: 18 }), jsx(Typography, { variant: "body2", color: "text.secondary", children: "Loading tree\u2026" })] })) : rootState.entries.length === 0 ? (jsx(Typography, { variant: "body2", color: "text.secondary", sx: { p: 2 }, children: "No matching assets under this path." })) : (rootState.entries.map(function (entry) { return (jsx(BlobStoreTreeBranch, { siteId: siteId, store: store, entry: entry, depth: 0, selectedPaths: selectedPaths, onToggleSelect: function (path, checked) {
+                        return setSelectedPaths(function (prev) {
+                            var next = __assign({}, prev);
+                            if (checked) {
+                                next[path] = true;
+                            }
+                            else {
+                                delete next[path];
+                            }
+                            return next;
+                        });
+                    } }, entry.path)); })) })] }));
+}
+function BlobStoreTab(_a) {
+    var siteId = _a.siteId;
+    var _b = useState(true), loading = _b[0], setLoading = _b[1];
+    var _c = useState(null), overview = _c[0], setOverview = _c[1];
+    var _d = useState(null), error = _d[0], setError = _d[1];
+    var loadOverview = useCallback(function () {
+        setLoading(true);
+        setError(null);
+        firstValueFrom(fetchBlobStoreOverview(siteId))
+            .then(function (data) { return setOverview(data); })
+            .catch(function (err) {
+            setOverview(null);
+            setError(err.message);
+        })
+            .finally(function () { return setLoading(false); });
+    }, [siteId]);
+    useEffect(function () {
+        loadOverview();
+    }, [loadOverview]);
+    return (jsxs(TabShell, { children: [jsx(TabToolbar, { children: jsxs(ToolbarRow, { children: [jsx(ToolbarGroup, { children: jsx(Typography, { variant: "body2", color: "text.secondary", children: "External blob storage paths, presence across environments, and preview sync." }) }), jsx(ToolbarDivider, {}), jsx(ToolbarGroup, { children: jsx(Button$1, { size: "small", startIcon: jsx(RefreshRoundedIcon, {}), onClick: loadOverview, disabled: loading, children: "Refresh" }) })] }) }), jsxs(TabContentPanel, { children: [jsx(TabAlertStack, { children: error && (jsx(Alert, { severity: "error", onClose: function () { return setError(null); }, children: error })) }), loading ? (jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', gap: 1, py: 4, justifyContent: 'center' }, children: [jsx(CircularProgress, { size: 22 }), jsx(Typography, { variant: "body2", color: "text.secondary", children: "Loading blob store configuration\u2026" })] })) : !(overview === null || overview === void 0 ? void 0 : overview.configured) ? (jsxs(Alert, { severity: "info", children: ["No blob store is configured for this project. Add blob stores under", ' ', jsx(Typography, { component: "span", sx: monoSx, children: "Configuration \u2192 Blob Stores" }), (overview === null || overview === void 0 ? void 0 : overview.configPresent) === false && ' (config file not found in the repository).', (overview === null || overview === void 0 ? void 0 : overview.configPresent) && overview.stores.length === 0 && ' (config file has no blob store entries).'] })) : (jsxs(Stack$1, { spacing: 2, children: [jsx(Alert, { severity: "info", icon: false, children: jsxs(Typography, { variant: "body2", children: [jsx("strong", { children: "Repo" }), " \u2014 sandbox pointer file (.blob) in Git.", ' ', jsx("strong", { children: "Preview" }), " \u2014 asset in preview blob storage.", ' ', jsx("strong", { children: "Staging / Live" }), " \u2014 published pointer on the environment branch (confirms publish state; sync copies preview blobs to the target external storage)."] }) }), overview.stores.map(function (store) { return (jsx(BlobStoreSection, { siteId: siteId, store: store, overview: overview }, store.id)); })] }))] })] }));
+}
+
+function DevContentOpsTools() {
+    var theme = useTheme();
+    var activeSiteId = useActiveSiteId();
+    var _a = useState('git-log'), tab = _a[0], setTab = _a[1];
+    var _b = useState([]), sites = _b[0], setSites = _b[1];
+    var _c = useState(true), sitesLoading = _c[0], setSitesLoading = _c[1];
+    var _d = useState(null), selectedSite = _d[0], setSelectedSite = _d[1];
+    useEffect(function () {
+        setSitesLoading(true);
+        var sub = fetchAll({ limit: 500, offset: 0 }).subscribe({
+            next: function (sitesResponse) {
+                var list = (Array.isArray(sitesResponse) ? sitesResponse : []).filter(Boolean);
+                setSites(list.sort(function (a, b) { return a.name.localeCompare(b.name); }));
+                setSitesLoading(false);
+            },
+            error: function () {
+                setSites([]);
+                setSitesLoading(false);
+            }
+        });
+        return function () { return sub.unsubscribe(); };
+    }, []);
+    useEffect(function () {
+        var _a, _b, _c;
+        if (!sites.length) {
+            return;
+        }
+        if (selectedSite && sites.some(function (site) { return site.id === selectedSite.id; })) {
+            return;
+        }
+        var preferredId = activeSiteId || ((_a = sites[0]) === null || _a === void 0 ? void 0 : _a.id);
+        var match = (_c = (_b = sites.find(function (site) { return site.id === preferredId; })) !== null && _b !== void 0 ? _b : sites[0]) !== null && _c !== void 0 ? _c : null;
+        setSelectedSite(match);
+    }, [activeSiteId, selectedSite, sites]);
+    var siteId = selectedSite === null || selectedSite === void 0 ? void 0 : selectedSite.id;
+    return (jsxs(Box$1, { sx: {
+            height: '100%',
+            minHeight: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            bgcolor: function (t) { return alpha(t.palette.text.primary, 0.02); }
+        }, children: [jsxs(Paper, { elevation: 0, square: true, sx: {
+                    px: 2.5,
+                    pt: 2.5,
+                    pb: 2,
+                    borderBottom: 1,
+                    borderColor: 'divider',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 2,
+                    bgcolor: 'background.paper',
+                    flexWrap: 'wrap',
+                    flexShrink: 0,
+                    overflow: 'visible'
+                }, children: [jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', gap: 1.5, minWidth: 0 }, children: [jsx(Box$1, { sx: {
+                                    width: 40,
+                                    height: 40,
+                                    borderRadius: 2,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    bgcolor: alpha(theme.palette.primary.main, 0.12),
+                                    color: 'primary.main',
+                                    flexShrink: 0
+                                }, children: jsx(AccountTreeRoundedIcon, { fontSize: "small" }) }), jsx(Typography, { variant: "h6", fontWeight: 700, lineHeight: 1.25, letterSpacing: "-0.01em", sx: { minWidth: 0 }, children: "DevContentOps Tools" })] }), jsx(Box$1, { sx: { minWidth: { xs: '100%', sm: 280 }, maxWidth: 360, flex: { sm: '0 1 360px' }, pt: 0.5 }, children: sitesLoading ? (jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', gap: 1, justifyContent: { xs: 'flex-start', sm: 'flex-end' } }, children: [jsx(CircularProgress, { size: 18 }), jsx(Typography, { variant: "body2", color: "text.secondary", children: "Loading projects\u2026" })] })) : sites.length === 0 ? (jsx(Chip, { size: "small", label: "No accessible projects", color: "warning", variant: "outlined" })) : (jsx(Autocomplete, { size: "small", options: sites, value: selectedSite, onChange: function (_, value) { return setSelectedSite(value); }, getOptionLabel: function (option) { return "".concat(option.name, " (").concat(option.id, ")"); }, isOptionEqualToValue: function (option, value) { return option.id === value.id; }, renderInput: function (params) { return (jsx(TextField$1, __assign({}, params, { label: "Project", InputLabelProps: __assign(__assign({}, params.InputLabelProps), { shrink: true }) }))); } })) })] }), jsxs(Tabs, { value: tab, onChange: function (_, v) { return setTab(v); }, variant: "scrollable", scrollButtons: "auto", allowScrollButtonsMobile: true, sx: {
+                    px: 2.5,
+                    borderBottom: 1,
+                    borderColor: 'divider',
+                    bgcolor: 'background.paper',
+                    minHeight: 44,
+                    flexShrink: 0,
+                    '& .MuiTab-root': { minHeight: 44, textTransform: 'none', fontWeight: 600, fontSize: '0.875rem' }
+                }, children: [jsx(Tab, { value: "git-log", label: "Git log" }), jsx(Tab, { value: "working-tree", label: "Working tree" }), jsx(Tab, { value: "branches", label: "Branches" }), jsx(Tab, { value: "database", label: "Database" }), jsx(Tab, { value: "repo-health", label: "Repository health" }), jsx(Tab, { value: "site-items", label: "Site items" }), jsx(Tab, { value: "blob-stores", label: "Blob stores" })] }), jsx(Box$1, { sx: { flex: 1, minHeight: 0, p: 2.5, display: 'flex', flexDirection: 'column', overflow: 'hidden' }, children: !siteId ? (jsx(Box$1, { sx: { flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 240 }, children: jsx(Typography, { color: "text.secondary", variant: "body1", children: sitesLoading ? 'Loading projects…' : 'Select a project to continue.' }) })) : (jsxs(Fragment, { children: [tab === 'git-log' && (jsx(GitLogTab, { siteId: siteId, siteName: selectedSite.name, sites: sites }, siteId)), tab === 'working-tree' && (jsx(WorkingTreeTab, { siteId: siteId, siteName: selectedSite.name }, siteId)), tab === 'branches' && (jsx(BranchesTab, { siteId: siteId, siteName: selectedSite.name }, siteId)), tab === 'database' && (jsx(DatabaseTab, { siteId: siteId, siteName: selectedSite.name }, siteId)), tab === 'repo-health' && (jsx(RepoHealthTab, { siteId: siteId, siteName: selectedSite.name }, siteId)), tab === 'site-items' && (jsx(SiteItemsTab, { siteId: siteId, siteName: selectedSite.name }, siteId)), tab === 'blob-stores' && (jsx(BlobStoreTab, { siteId: siteId, siteName: selectedSite.name }, siteId))] })) })] }));
+}
+
 var plugin = {
     locales: undefined,
     scripts: undefined,
@@ -45973,8 +50344,9 @@ var plugin = {
         'org.rd.plugin.uigoodies.OpenSearchPlayground': OpenSearchPlayground,
         'org.rd.plugin.uigoodies.LogTail': LogTail,
         'org.rd.plugin.uigoodies.ImageStudio': ImageStudio,
-        'org.rd.plugin.uigoodies.openImageStudioPanelButton': OpenImageStudioPanelButton
+        'org.rd.plugin.uigoodies.openImageStudioPanelButton': OpenImageStudioPanelButton,
+        'org.rd.plugin.uigoodies.DevContentOpsTools': DevContentOpsTools
     }
 };
 
-export { AudienceTargetingFlyoutToolbarButton, BulkPublishView, ComponentPreviewPathNavigator, ContentUpload, CopyCurrentPageUrl, CrossSiteContentCopy, CrossSiteContentTypeCopy, DeviceSimulatorFlyoutToolbarButton, EditOrViewCurrent, ImageStudio, LogTail, OpenBulkPublishPanelButton, OpenBulkPublishToolbarButton, OpenCannedSearchPanelButton, OpenCannedSearchToolbarButton, OpenContentUploadPanelButton, OpenContentUploadToolbarButton, OpenImageStudioPanelButton, OpenSearchPlayground, PublishOrRequestPublish, PullPushRemoteButtons, ToolPanelAccordion, plugin as default };
+export { AudienceTargetingFlyoutToolbarButton, BulkPublishView, ComponentPreviewPathNavigator, ContentUpload, CopyCurrentPageUrl, CrossSiteContentCopy, CrossSiteContentTypeCopy, DevContentOpsTools, DeviceSimulatorFlyoutToolbarButton, EditOrViewCurrent, ImageStudio, LogTail, OpenBulkPublishPanelButton, OpenBulkPublishToolbarButton, OpenCannedSearchPanelButton, OpenCannedSearchToolbarButton, OpenContentUploadPanelButton, OpenContentUploadToolbarButton, OpenImageStudioPanelButton, OpenSearchPlayground, PublishOrRequestPublish, PullPushRemoteButtons, ToolPanelAccordion, plugin as default };

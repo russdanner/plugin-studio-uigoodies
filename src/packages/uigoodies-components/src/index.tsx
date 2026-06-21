@@ -21,6 +21,7 @@ import OpenSearchPlayground from './components/OpenSearchPlayground';
 import LogTail from './components/LogTail';
 import ImageStudio from './components/ImageStudio/ImageStudio';
 import OpenImageStudioPanelButton from './components/OpenImageStudioPanelButton';
+import DevContentOpsTools from './components/DevContentOps/DevContentOpsTools';
 
 const plugin: PluginDescriptor = {
   locales: undefined,
@@ -49,7 +50,8 @@ const plugin: PluginDescriptor = {
     'org.rd.plugin.uigoodies.OpenSearchPlayground': OpenSearchPlayground,
     'org.rd.plugin.uigoodies.LogTail': LogTail,
     'org.rd.plugin.uigoodies.ImageStudio': ImageStudio,
-    'org.rd.plugin.uigoodies.openImageStudioPanelButton': OpenImageStudioPanelButton
+    'org.rd.plugin.uigoodies.openImageStudioPanelButton': OpenImageStudioPanelButton,
+    'org.rd.plugin.uigoodies.DevContentOpsTools': DevContentOpsTools
   }
 };
 
@@ -75,7 +77,8 @@ export {
   OpenSearchPlayground,
   LogTail,
   ImageStudio,
-  OpenImageStudioPanelButton
+  OpenImageStudioPanelButton,
+  DevContentOpsTools
 };
 
 export default plugin;

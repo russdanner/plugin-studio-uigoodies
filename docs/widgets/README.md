@@ -28,5 +28,6 @@ Each file in this folder documents one **registered widget** (or embedded view u
 | `org.rd.plugin.uigoodies.LogTail` | Project tool: live SSE tail of Tomcat `catalina.out`, colorized levels, collapsible stack traces, fullscreen. Server streams only while the panel is open. | [log-tail.md](log-tail.md) |
 | `org.rd.plugin.uigoodies.openImageStudioPanelButton` | Sidebar button → Image Studio dialog (crop, focal point, adjust, save). | [open-image-studio-panel-button.md](open-image-studio-panel-button.md) |
 | `org.rd.plugin.uigoodies.ImageStudio` | Image editing UI embedded in Image Studio dialog. | [image-studio.md](image-studio.md) |
+| `org.rd.plugin.uigoodies.DevContentOpsTools` | Project tool: git log graph, remotes, patches, ingestion sync. | [dev-content-ops-tools.md](dev-content-ops-tools.md) |
 
 Back to repository root: [../../README.md](../../README.md).
