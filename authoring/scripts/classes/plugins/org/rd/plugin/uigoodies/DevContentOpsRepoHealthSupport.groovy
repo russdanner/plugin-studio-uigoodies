@@ -3,6 +3,7 @@ package plugins.org.rd.plugin.uigoodies
 import org.craftercms.studio.api.v1.service.GeneralLockService
 import org.craftercms.studio.api.v2.utils.GitRepositoryHelper
 import org.eclipse.jgit.api.Git
+import org.eclipse.jgit.lib.Constants
 import org.eclipse.jgit.lib.FileMode
 import org.eclipse.jgit.lib.ObjectId
 import org.eclipse.jgit.lib.Ref
@@ -18,8 +19,8 @@ import java.nio.file.Path
 
 /**
  * GitSizer-inspired sandbox repository health metrics and optimization helpers.
- * Analysis uses JGit + NIO. Optimize prefers studio.gitCli / GitRepositoryHelper, then JGit GC,
- * then host CLI instructions when Studio has no API (e.g. reflog expire).
+ * Analysis uses JGit RevWalk with de-duplicated tree/blob scans, plus NIO for disk stats.
+ * Optimize prefers studio.gitCli / GitRepositoryHelper, then JGit GC, then host CLI instructions when Studio has no API.
  */
 final class DevContentOpsRepoHealthSupport {
 
@@ -31,9 +32,26 @@ final class DevContentOpsRepoHealthSupport {
 
     private DevContentOpsRepoHealthSupport() {}
 
-    static Map analyzeRepoHealth(GitRepositoryHelper helper, String siteId, def applicationContext = null) {
+    /** Optional progress: (phase, message, percent 0–100) */
+    static Map analyzeRepoHealth(
+        GitRepositoryHelper helper,
+        String siteId,
+        def applicationContext = null,
+        Closure progress = null
+    ) {
+        Closure report = { String phase, String message, int percent ->
+            if (progress) {
+                try {
+                    progress.call(phase, message, percent)
+                } catch (Exception ignored) {
+                }
+            }
+        }
+
         Repository repo = null
         try {
+            report('open', 'Opening sandbox repository…', 2)
+
             if (!helper) {
                 return DevContentOpsSupport.errorMap('Git services are not available in Studio')
             }
@@ -41,24 +59,41 @@ final class DevContentOpsRepoHealthSupport {
             Path workTreePath = DevContentOpsSandboxIoSupport.workTreePath(workTree.absolutePath)
             Path gitDirPath = DevContentOpsSandboxIoSupport.gitDirPath(workTreePath)
             repo = DevContentOpsSupport.openSandboxRepo(helper, siteId)
+
+            report('runtime', 'Checking git runtime…', 8)
             Object cli = DevContentOpsSupport.gitCli(applicationContext)
             Map runtime = DevContentOpsStudioGitSupport.runtimeGitChecks(helper, cli, repo, workTree)
+
+            report('config', 'Reading repository configuration…', 12)
             Map repoConfig = DevContentOpsRepoConfigSupport.collectRepoConfig(repo, gitDirPath)
 
-            Map objectStats = analyzeObjects(repo)
-            Map parentStats = analyzeCommitParents(repo)
-            Map historyStats = analyzeHistory(repo)
-            Map checkoutStats = analyzeHeadCheckout(repo)
+            report('objects', 'Scanning git objects…', 15)
+            Map objectStats = analyzeObjects(repo, report)
 
+            Map parentStats = [
+                maxParents: (objectStats.maxParents ?: 0) as int,
+                maxParentsCommitId: objectStats.maxParentsCommitId
+            ]
+
+            report('history', 'Measuring history depth…', 75)
+            Map historyStats = analyzeHistory(repo)
+
+            report('checkout', 'Scanning HEAD checkout…', 84)
+            Map checkoutStats = analyzeHeadCheckout(repo, workTreePath, siteId, applicationContext, report)
+
+            report('disk', 'Measuring on-disk footprint…', 92)
             int refCount = countRefs(repo)
             long gitDirBytes = DevContentOpsSandboxIoSupport.directorySize(gitDirPath)
             long looseBytes = DevContentOpsSandboxIoSupport.looseObjectBytes(gitDirPath)
             long packBytes = DevContentOpsSandboxIoSupport.packFileBytes(gitDirPath)
 
+            report('finalize', 'Building health report…', 96)
             List<Map> metrics = buildManualMetrics(objectStats, parentStats, historyStats, checkoutStats, refCount, gitDirBytes, looseBytes, packBytes)
             int overallConcern = maxConcern(metrics, repoConfig)
             int commits = (objectStats.commits ?: 0) as int
             long maxBlobBytes = (objectStats.maxBlobBytes ?: 0L) as long
+
+            report('done', 'Analysis complete', 100)
 
             return [
                 success: true,
@@ -380,7 +415,10 @@ final class DevContentOpsRepoHealthSupport {
         return metrics
     }
 
-    private static Map analyzeObjects(Repository repo) {
+    /**
+     * Walk reachable commits once; each unique tree/blob is sized at most once.
+     */
+    private static Map analyzeObjects(Repository repo, Closure report = null) {
         if (!repo) {
             return emptyObjectStats()
         }
@@ -400,6 +438,10 @@ final class DevContentOpsRepoHealthSupport {
         long totalTreeEntries = 0L
         int maxTreeEntries = 0
         String maxTreeId = null
+        int maxParents = 0
+        String maxParentsCommitId = null
+        int commitIndex = 0
+        long lastProgressAt = 0L
 
         try {
             markAllRefsRevWalk(revWalk, repo)
@@ -409,44 +451,40 @@ final class DevContentOpsRepoHealthSupport {
                 if (!seenCommits.add(commit.id)) {
                     continue
                 }
+                commitIndex++
                 long commitSize = objectSize(repo, commit.id)
                 commitBytes += commitSize
                 if (commitSize > maxCommitBytes) {
                     maxCommitBytes = commitSize
                     maxCommitId = commit.id.name()
                 }
-
-                RevTree rootTree = revWalk.parseTree(commit.tree)
-                Map treeScan = collectUniqueTrees(repo, revWalk, rootTree, seenTrees)
-                treeBytes += (treeScan.treeBytes ?: 0L) as long
-                totalTreeEntries += (treeScan.totalEntries ?: 0L) as long
-                if (((treeScan.maxEntries ?: 0) as int) > maxTreeEntries) {
-                    maxTreeEntries = treeScan.maxEntries as int
-                    maxTreeId = treeScan.maxTreeId as String
+                int parents = commit.parentCount
+                if (parents > maxParents) {
+                    maxParents = parents
+                    maxParentsCommitId = commit.id.name()
                 }
 
-                TreeWalk blobWalk = new TreeWalk(repo)
-                try {
-                    blobWalk.addTree(rootTree)
-                    blobWalk.setRecursive(true)
-                    while (blobWalk.next()) {
-                        FileMode mode = blobWalk.getFileMode(0)
-                        if (mode == FileMode.GITLINK) {
-                            continue
-                        }
-                        ObjectId blobId = blobWalk.getObjectId(0)
-                        if (!seenBlobs.add(blobId)) {
-                            continue
-                        }
-                        long blobSize = objectSize(repo, blobId)
-                        totalBlobBytes += blobSize
-                        if (blobSize > maxBlobBytes) {
-                            maxBlobBytes = blobSize
-                            maxBlobId = blobId.name()
-                        }
-                    }
-                } finally {
-                    blobWalk.close()
+                RevTree rootTree = revWalk.parseTree(commit.tree)
+                Map scan = scanUniqueTreesAndBlobs(repo, revWalk, rootTree, seenTrees, seenBlobs)
+                treeBytes += (scan.treeBytes ?: 0L) as long
+                totalTreeEntries += (scan.treeEntries ?: 0L) as long
+                if (((scan.maxTreeEntries ?: 0) as int) > maxTreeEntries) {
+                    maxTreeEntries = scan.maxTreeEntries as int
+                    maxTreeId = scan.maxTreeId as String
+                }
+                totalBlobBytes += (scan.blobBytes ?: 0L) as long
+                if (((scan.maxBlobBytes ?: 0L) as long) > maxBlobBytes) {
+                    maxBlobBytes = scan.maxBlobBytes as long
+                    maxBlobId = scan.maxBlobId as String
+                }
+
+                if (report && shouldEmitObjectProgress(commitIndex, lastProgressAt)) {
+                    report.call(
+                        'objects',
+                        "Scanning git objects… ${seenCommits.size()} commits, ${seenBlobs.size()} blobs, ${seenTrees.size()} trees",
+                        objectScanPercent(commitIndex)
+                    )
+                    lastProgressAt = System.currentTimeMillis()
                 }
             }
 
@@ -475,6 +513,14 @@ final class DevContentOpsRepoHealthSupport {
             revWalk.close()
         }
 
+        if (report && commitIndex > 0) {
+            report.call(
+                'objects',
+                "Git object scan complete — ${seenCommits.size()} commits, ${seenBlobs.size()} blobs, ${seenTrees.size()} trees",
+                70
+            )
+        }
+
         return [
             commits: seenCommits.size(),
             commitBytes: commitBytes,
@@ -490,25 +536,40 @@ final class DevContentOpsRepoHealthSupport {
             tags: tags,
             maxTreeEntries: maxTreeEntries,
             maxTreeId: maxTreeId,
+            maxParents: maxParents,
+            maxParentsCommitId: maxParentsCommitId,
             treeScanCapped: false
         ]
     }
 
-    private static Map collectUniqueTrees(
+    private static Map scanUniqueTreesAndBlobs(
         Repository repo,
         RevWalk revWalk,
-        RevTree tree,
-        Set<ObjectId> seenTrees
+        RevTree root,
+        Set<ObjectId> seenTrees,
+        Set<ObjectId> seenBlobs
     ) {
         long treeBytes = 0L
-        long totalEntries = 0L
-        int maxEntries = 0
+        long treeEntries = 0L
+        int maxTreeEntries = 0
         String maxTreeId = null
-        if (!tree) {
-            return [treeBytes: 0L, totalEntries: 0L, maxEntries: 0, maxTreeId: null]
+        long blobBytes = 0L
+        long maxBlobBytes = 0L
+        String maxBlobId = null
+
+        if (!root) {
+            return [
+                treeBytes: 0L,
+                treeEntries: 0L,
+                maxTreeEntries: 0,
+                maxTreeId: null,
+                blobBytes: 0L,
+                maxBlobBytes: 0L,
+                maxBlobId: null
+            ]
         }
 
-        List<RevTree> pending = [tree]
+        List<RevTree> pending = [root]
         while (!pending.isEmpty()) {
             RevTree current = pending.remove(0)
             if (!seenTrees.add(current.id)) {
@@ -523,13 +584,22 @@ final class DevContentOpsRepoHealthSupport {
                 int entries = 0
                 while (tw.next()) {
                     entries++
-                    if (tw.getFileMode(0) == FileMode.TREE) {
-                        pending.add(revWalk.parseTree(tw.getObjectId(0)))
+                    FileMode mode = tw.getFileMode(0)
+                    ObjectId objectId = tw.getObjectId(0)
+                    if (mode == FileMode.TREE) {
+                        pending.add(revWalk.parseTree(objectId))
+                    } else if (mode != FileMode.GITLINK && seenBlobs.add(objectId)) {
+                        long blobSize = objectSize(repo, objectId)
+                        blobBytes += blobSize
+                        if (blobSize > maxBlobBytes) {
+                            maxBlobBytes = blobSize
+                            maxBlobId = objectId.name()
+                        }
                     }
                 }
-                totalEntries += entries
-                if (entries > maxEntries) {
-                    maxEntries = entries
+                treeEntries += entries
+                if (entries > maxTreeEntries) {
+                    maxTreeEntries = entries
                     maxTreeId = current.id.name()
                 }
             } finally {
@@ -539,9 +609,12 @@ final class DevContentOpsRepoHealthSupport {
 
         return [
             treeBytes: treeBytes,
-            totalEntries: totalEntries,
-            maxEntries: maxEntries,
-            maxTreeId: maxTreeId
+            treeEntries: treeEntries,
+            maxTreeEntries: maxTreeEntries,
+            maxTreeId: maxTreeId,
+            blobBytes: blobBytes,
+            maxBlobBytes: maxBlobBytes,
+            maxBlobId: maxBlobId
         ]
     }
 
@@ -572,33 +645,16 @@ final class DevContentOpsRepoHealthSupport {
             tags: 0,
             maxTreeEntries: 0,
             maxTreeId: null,
+            maxParents: 0,
+            maxParentsCommitId: null,
             treeScanCapped: false
         ]
     }
 
-    private static Map analyzeCommitParents(Repository repo) {
-        int maxParents = 0
-        String maxParentsCommitId = null
-        RevWalk walk = new RevWalk(repo)
-        try {
-            markAllRefsRevWalk(walk, repo)
-            RevCommit commit
-            while ((commit = walk.next()) != null) {
-                int parents = commit.parentCount
-                if (parents > maxParents) {
-                    maxParents = parents
-                    maxParentsCommitId = commit.name()
-                }
-            }
-        } catch (Exception ignored) {
-        } finally {
-            walk.close()
-        }
-        return [maxParents: maxParents, maxParentsCommitId: maxParentsCommitId]
-    }
-
     private static Map analyzeHistory(Repository repo) {
         int maxHistoryDepth = 0
+        int maxTagDepth = 0
+
         repo.refDatabase.getRefsByPrefix('refs/heads/').each { Ref ref ->
             if (!ref?.objectId) {
                 return
@@ -608,6 +664,7 @@ final class DevContentOpsRepoHealthSupport {
                 maxHistoryDepth = depth
             }
         }
+
         repo.refDatabase.getRefsByPrefix('refs/tags/').each { Ref ref ->
             if (!ref?.objectId) {
                 return
@@ -616,24 +673,13 @@ final class DevContentOpsRepoHealthSupport {
             if (depth > maxHistoryDepth) {
                 maxHistoryDepth = depth
             }
+            int tagDepth = tagChainDepth(repo, ref.objectId, 0, 32)
+            if (tagDepth > maxTagDepth) {
+                maxTagDepth = tagDepth
+            }
         }
 
-        int maxTagDepth = analyzeMaxTagDepth(repo)
         return [maxHistoryDepth: maxHistoryDepth, maxTagDepth: maxTagDepth]
-    }
-
-    private static int analyzeMaxTagDepth(Repository repo) {
-        int maxDepth = 0
-        repo.refDatabase.getRefsByPrefix('refs/tags/').each { Ref ref ->
-            if (!ref?.objectId) {
-                return
-            }
-            int depth = tagChainDepth(repo, ref.objectId, 0, 32)
-            if (depth > maxDepth) {
-                maxDepth = depth
-            }
-        }
-        return maxDepth
     }
 
     private static int tagChainDepth(Repository repo, ObjectId tagId, int depth, int maxDepth) {
@@ -659,12 +705,40 @@ final class DevContentOpsRepoHealthSupport {
         }
     }
 
-    private static Map analyzeHeadCheckout(Repository repo) {
-        ObjectId head = repo?.resolve('HEAD')
-        if (!head) {
-            return emptyCheckoutStats()
+    private static Map analyzeHeadCheckout(
+        Repository repo,
+        Path workTreePath,
+        String siteId,
+        def applicationContext,
+        Closure report = null
+    ) {
+        ObjectId commitId = resolveCheckoutCommitId(repo, siteId, applicationContext)
+        Map treeStats = emptyCheckoutStats()
+        if (commitId) {
+            treeStats = analyzeCommitTreeCheckout(repo, commitId, report)
+            if (((treeStats.fileCount ?: 0) as int) > 0) {
+                return treeStats
+            }
         }
 
+        if (workTreePath) {
+            Map workTreeStats = DevContentOpsSandboxIoSupport.checkoutStatsFromWorkTree(workTreePath)
+            if (workTreeStats && ((workTreeStats.fileCount ?: 0) as int) > 0) {
+                if (report) {
+                    report.call(
+                        'checkout',
+                        "Scanning sandbox work tree… ${workTreeStats.fileCount} files",
+                        89
+                    )
+                }
+                return workTreeStats
+            }
+        }
+
+        return treeStats
+    }
+
+    private static Map analyzeCommitTreeCheckout(Repository repo, ObjectId commitId, Closure report = null) {
         Set<String> directories = new LinkedHashSet<>()
         int maxPathDepth = 0
         int maxPathLength = 0
@@ -672,15 +746,28 @@ final class DevContentOpsRepoHealthSupport {
         long totalFileBytes = 0L
         int symlinks = 0
         int submodules = 0
+        int pathIndex = 0
+        long lastProgressAt = 0L
 
         RevWalk revWalk = new RevWalk(repo)
         TreeWalk walk = new TreeWalk(repo)
         try {
-            RevCommit commit = revWalk.parseCommit(head)
-            walk.addTree(revWalk.parseTree(commit.tree))
+            RevCommit commit = revWalk.parseCommit(commitId)
+            RevTree tree = revWalk.parseTree(commit.getTree().getId())
+            walk.addTree(tree)
             walk.setRecursive(true)
             while (walk.next()) {
-                String path = walk.pathString
+                pathIndex++
+                if (report && shouldEmitObjectProgress(pathIndex, lastProgressAt)) {
+                    report.call(
+                        'checkout',
+                        "Scanning HEAD checkout… ${pathIndex} paths, ${fileCount} files",
+                        86 + Math.min(3, pathIndex / 500)
+                    )
+                    lastProgressAt = System.currentTimeMillis()
+                }
+
+                String path = walk.getPathString()
                 if (!path) {
                     continue
                 }
@@ -696,22 +783,22 @@ final class DevContentOpsRepoHealthSupport {
 
                 if (mode == FileMode.SYMLINK) {
                     symlinks++
-                }
-                if (mode == FileMode.GITLINK) {
+                } else if (mode == FileMode.GITLINK) {
                     submodules++
-                }
-                if (mode == FileMode.REGULAR_FILE || mode == FileMode.EXECUTABLE_FILE) {
+                } else if (mode.getObjectType() == Constants.OBJ_BLOB) {
                     fileCount++
                     ObjectId blobId = walk.getObjectId(0)
                     try {
-                        totalFileBytes += repo.open(blobId).size
+                        totalFileBytes += revWalk.objectReader.getObjectSize(blobId, Constants.OBJ_BLOB)
                     } catch (Exception ignored) {
+                        totalFileBytes += objectSize(repo, blobId)
                     }
                 }
             }
         } catch (Exception e) {
             org.slf4j.LoggerFactory.getLogger(DevContentOpsSupport).warn(
-                '[uigoodies DevContentOps] HEAD checkout analysis failed: {}',
+                '[uigoodies DevContentOps] HEAD checkout analysis failed for {}: {}',
+                commitId?.name(),
                 e.message,
                 e
             )
@@ -745,6 +832,7 @@ final class DevContentOpsRepoHealthSupport {
     }
 
     private static void markAllRefsRevWalk(RevWalk walk, Repository repo) {
+        int marked = 0
         List<Ref> refs = repo.refDatabase.getRefs() ?: []
         refs.each { Ref ref ->
             if (!ref?.objectId || ref.objectId == ObjectId.zeroId) {
@@ -752,8 +840,104 @@ final class DevContentOpsRepoHealthSupport {
             }
             try {
                 walk.markStart(walk.parseCommit(ref.objectId))
+                marked++
             } catch (Exception ignored) {
             }
+        }
+        if (marked == 0) {
+            repo.refDatabase.getRefsByPrefix('refs/heads/').each { Ref ref ->
+                if (!ref?.objectId || ref.objectId == ObjectId.zeroId) {
+                    return
+                }
+                try {
+                    walk.markStart(walk.parseCommit(ref.objectId))
+                } catch (Exception ignored) {
+                }
+            }
+        }
+    }
+
+    private static ObjectId resolveCheckoutCommitId(Repository repo, String siteId, def applicationContext) {
+        if (!repo) {
+            return null
+        }
+
+        LinkedHashSet<String> candidateIds = new LinkedHashSet<>()
+
+        def contentRepo = DevContentOpsSupport.contentRepository(applicationContext)
+        if (contentRepo && siteId) {
+            try {
+                String lastCommit = DevContentOpsSupport.plainString(contentRepo.getRepoLastCommitId(siteId))
+                if (lastCommit) {
+                    candidateIds.add(lastCommit)
+                }
+            } catch (Exception ignored) {
+            }
+        }
+
+        String branch = DevContentOpsSupport.plainString(repo.branch)
+        if (branch) {
+            try {
+                ObjectId branchHead = repo.resolve(DevContentOpsSupport.resolveBranchRef(repo, branch))
+                if (branchHead) {
+                    candidateIds.add(branchHead.name())
+                }
+            } catch (Exception ignored) {
+            }
+        }
+
+        def sitesSvc = DevContentOpsSupport.sitesService(applicationContext)
+        if (sitesSvc && siteId) {
+            try {
+                String sandboxBranch = DevContentOpsSupport.plainString(sitesSvc.getSite(siteId)?.sandboxBranch)
+                if (sandboxBranch) {
+                    ObjectId branchHead = repo.resolve(DevContentOpsSupport.resolveBranchRef(repo, sandboxBranch))
+                    if (branchHead) {
+                        candidateIds.add(branchHead.name())
+                    }
+                }
+            } catch (Exception ignored) {
+            }
+        }
+
+        try {
+            ObjectId head = repo.resolve('HEAD')
+            if (head) {
+                candidateIds.add(head.name())
+            }
+        } catch (Exception ignored) {
+        }
+
+        try {
+            repo.refDatabase.getRefsByPrefix('refs/heads/').each { Ref ref ->
+                if (ref?.objectId && ref.objectId != ObjectId.zeroId) {
+                    candidateIds.add(ref.objectId.name())
+                }
+            }
+        } catch (Exception ignored) {
+        }
+
+        for (String candidate : candidateIds) {
+            ObjectId commitId = parseCommitId(repo, candidate)
+            if (commitId) {
+                return commitId
+            }
+        }
+        return null
+    }
+
+    private static ObjectId parseCommitId(Repository repo, String objectIdText) {
+        if (!repo || !objectIdText?.trim()) {
+            return null
+        }
+        RevWalk walk = new RevWalk(repo)
+        try {
+            ObjectId objectId = ObjectId.fromString(objectIdText.trim())
+            return walk.parseCommit(objectId).id
+        } catch (Exception ignored) {
+            return null
+        } finally {
+            walk.close()
         }
     }
 
@@ -781,7 +965,14 @@ final class DevContentOpsRepoHealthSupport {
             return 0
         }
         try {
-            return repo.refDatabase.getRefs()?.size() ?: 0
+            List<Ref> refs = repo.refDatabase.getRefs()
+            if (refs) {
+                return refs.size()
+            }
+        } catch (Exception ignored) {
+        }
+        try {
+            return (repo.refDatabase.getRefsByPrefix('refs/heads/') ?: []).size()
         } catch (Exception ignored) {
             return 0
         }
@@ -803,6 +994,27 @@ final class DevContentOpsRepoHealthSupport {
             directories.add(dir)
             slash = dir.lastIndexOf('/')
         }
+    }
+
+    /** Progress events during long object/checkout walks (every N items or 400ms). */
+    private static boolean shouldEmitObjectProgress(int index, long lastProgressAtMs) {
+        if (index == 1) {
+            return true
+        }
+        if (index % 25 == 0) {
+            return true
+        }
+        long now = System.currentTimeMillis()
+        return lastProgressAtMs <= 0L || (now - lastProgressAtMs) >= 400L
+    }
+
+    /** Maps object-scan progress into the 15–70% analysis band (asymptotic). */
+    private static int objectScanPercent(int objectIndex) {
+        if (objectIndex <= 0) {
+            return 15
+        }
+        double fraction = 1.0d - (1.0d / (1.0d + (objectIndex / 800.0d)))
+        return 15 + (int) Math.min(55d, Math.round(55.0d * fraction))
     }
 
     private static Map countMetric(String id, String group, String label, long value, long warn, long critical, Map extra = [:]) {

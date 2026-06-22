@@ -2,7 +2,7 @@
  * Copyright (C) 2007-2026 Crafter Software Corporation. All Rights Reserved.
  */
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
   Box,
@@ -41,7 +41,7 @@ import HelpOutlineRoundedIcon from '@mui/icons-material/HelpOutlineRounded';
 import DownloadRoundedIcon from '@mui/icons-material/DownloadRounded';
 import { RepoHealthLearnMoreDialog } from './RepoHealthLearnMoreDialog';
 import { downloadRepoHealthReportMarkdown } from './repoHealthReportMarkdown';
-import { fetchRepoHealth, postOptimizeRepo, type RepoConfigSetting, type RepoHealthMetric, type RepoHealthReport } from './devContentOpsApi';
+import { streamRepoHealth, postOptimizeRepo, type RepoConfigSetting, type RepoHealthMetric, type RepoHealthReport, type RepoHealthProgress } from './devContentOpsApi';
 import {
   REPO_OPTIMIZE_OPTIONS,
   getRepoOptimizeOption,
@@ -417,7 +417,9 @@ function MetricGroupSection({ group, metrics }: { group: string; metrics: RepoHe
 }
 
 export function RepoHealthTab({ siteId, siteName }: { siteId: string; siteName?: string }) {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [loadProgress, setLoadProgress] = useState<RepoHealthProgress | null>(null);
+  const loadAbortRef = useRef<AbortController | null>(null);
   const [optimizing, setOptimizing] = useState<RepoOptimizeOperation | null>(null);
   const [report, setReport] = useState<RepoHealthReport | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -439,27 +441,52 @@ export function RepoHealthTab({ siteId, siteName }: { siteId: string; siteName?:
   );
 
   const load = useCallback(async () => {
+    loadAbortRef.current?.abort();
+    const controller = new AbortController();
+    loadAbortRef.current = controller;
+
     setLoading(true);
     setError(null);
+    setLoadProgress({ phase: 'init', message: 'Starting repository health analysis…', percent: 0 });
     try {
-      const data = await firstValueFrom(fetchRepoHealth(siteId));
-      if (!data.success) {
-        setError(data.error || data.message || 'Analysis failed');
-        setReport(null);
-      } else {
-        setReport(data);
+      const data = await streamRepoHealth(siteId, {
+        signal: controller.signal,
+        onProgress: (progress) => setLoadProgress(progress)
+      });
+      if (controller.signal.aborted) {
+        return;
       }
+      setReport(data);
     } catch (e) {
+      if (controller.signal.aborted || (e instanceof DOMException && e.name === 'AbortError')) {
+        return;
+      }
       setError(e instanceof Error ? e.message : 'Analysis failed');
       setReport(null);
     } finally {
-      setLoading(false);
+      const isCurrentController = loadAbortRef.current === controller;
+      if (isCurrentController) {
+        loadAbortRef.current = null;
+        setLoading(false);
+        setLoadProgress(null);
+      }
     }
   }, [siteId]);
 
   useEffect(() => {
-    load();
-  }, [load]);
+    loadAbortRef.current?.abort();
+    setReport(null);
+    setError(null);
+    setNotice(null);
+    setLoading(false);
+    setLoadProgress(null);
+  }, [siteId]);
+
+  useEffect(() => {
+    return () => {
+      loadAbortRef.current?.abort();
+    };
+  }, []);
 
   const runOptimize = async (operation: RepoOptimizeOperation) => {
     setOptimizing(operation);
@@ -571,12 +598,12 @@ export function RepoHealthTab({ siteId, siteName }: { siteId: string; siteName?:
             </Button>
             <Button
               size="small"
-              variant="outlined"
+              variant={report ? 'outlined' : 'contained'}
               startIcon={loading ? <CircularProgress size={16} /> : <RefreshRoundedIcon />}
               disabled={loading || Boolean(optimizing)}
               onClick={() => load()}
             >
-              Refresh
+              {report ? 'Re-run analysis' : 'Run analysis'}
             </Button>
           </Stack>
         </ToolbarRow>
@@ -648,11 +675,44 @@ export function RepoHealthTab({ siteId, siteName }: { siteId: string; siteName?:
         <Paper variant="outlined" sx={{ ...surfacePaperSx, display: 'flex', flexDirection: 'column' }}>
           <PanelHeader
             title="Health metrics"
-            subtitle={report?.summary ?? 'Run analysis to load repository metrics'}
+            subtitle={
+              loading && loadProgress
+                ? loadProgress.message
+                : report?.summary ?? 'Run analysis to load repository metrics'
+            }
           />
-          {loading && !report ? (
-            <Box sx={{ p: 4, display: 'flex', justifyContent: 'center' }}>
-              <CircularProgress size={32} />
+          {loading ? (
+            <Box sx={{ px: 3, py: 3 }}>
+              <Stack spacing={1.5}>
+                <LinearProgress
+                  variant="determinate"
+                  value={loadProgress?.percent ?? 0}
+                  sx={{ height: 8, borderRadius: 1 }}
+                />
+                <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between">
+                  <Typography variant="body2" color="text.secondary">
+                    {loadProgress?.message ?? 'Analyzing repository…'}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary" sx={{ fontVariantNumeric: 'tabular-nums' }}>
+                    {loadProgress?.percent ?? 0}%
+                  </Typography>
+                </Stack>
+              </Stack>
+            </Box>
+          ) : !report ? (
+            <Box sx={{ px: 3, py: 4, textAlign: 'center' }}>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2, maxWidth: 480, mx: 'auto' }}>
+                Run analysis to load git-sizer-style metrics for this project&apos;s sandbox. Large repositories can
+                take several minutes.
+              </Typography>
+              <Button
+                variant="contained"
+                startIcon={<RefreshRoundedIcon />}
+                disabled={Boolean(optimizing)}
+                onClick={() => load()}
+              >
+                Run analysis
+              </Button>
             </Box>
           ) : (
             <Stack spacing={0} divider={<Box sx={{ borderBottom: 1, borderColor: 'divider' }} />}>

@@ -2,7 +2,7 @@
  * Copyright (C) 2007-2026 Crafter Software Corporation. All Rights Reserved.
  */
 
-import { get, postJSON } from '@craftercms/studio-ui/utils/ajax';
+import { get, getGlobalHeaders, postJSON } from '@craftercms/studio-ui/utils/ajax';
 import { map } from 'rxjs/operators';
 
 export type GitCommit = {
@@ -679,8 +679,118 @@ export type RepoHealthReport = {
 
 export type { RepoOptimizeOperation } from './repoOptimizeOptions';
 
+export type RepoHealthProgress = {
+  phase: string;
+  message: string;
+  percent: number;
+};
+
+type RepoHealthStreamEvent =
+  | { type: 'progress'; phase?: string; message?: string; percent?: number }
+  | { type: 'result'; report?: RepoHealthReport }
+  | { type: 'error'; error?: string }
+  | { type: 'bye' };
+
 export function fetchRepoHealth(siteId: string) {
   return pluginGet<RepoHealthReport>(siteId, pluginUrl('dev-content-ops-git', siteId, 'action=repoHealth'));
+}
+
+/**
+ * Stream repository health analysis with NDJSON progress events (fetch + Bearer auth).
+ */
+export async function streamRepoHealth(
+  siteId: string,
+  opts: {
+    onProgress?: (progress: RepoHealthProgress) => void;
+    signal?: AbortSignal;
+  } = {}
+): Promise<RepoHealthReport> {
+  const url = pluginUrl('dev-content-ops-git', siteId, 'action=repoHealthStream');
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      method: 'GET',
+      credentials: 'include',
+      signal: opts.signal,
+      headers: {
+        ...getGlobalHeaders(),
+        Accept: 'application/x-ndjson'
+      }
+    });
+  } catch (e) {
+    if (opts.signal?.aborted) {
+      throw new DOMException('Aborted', 'AbortError');
+    }
+    throw e;
+  }
+
+  if (!res.ok || !res.body) {
+    let detail = '';
+    try {
+      const body = await res.text();
+      if (body) {
+        try {
+          const parsed = JSON.parse(body) as { error?: string; response?: { message?: string } };
+          detail = parsed.error || parsed.response?.message || body.slice(0, 500);
+        } catch {
+          detail = body.slice(0, 500);
+        }
+      }
+    } catch {
+      /* ignore */
+    }
+    throw new Error(`Repository health analysis failed (HTTP ${res.status})${detail ? `: ${detail}` : ''}`);
+  }
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder('utf-8');
+  let buffer = '';
+  let report: RepoHealthReport | null = null;
+
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) {
+      break;
+    }
+    buffer += decoder.decode(value, { stream: true });
+    let newline = buffer.indexOf('\n');
+    while (newline >= 0) {
+      const line = buffer.slice(0, newline).trim();
+      buffer = buffer.slice(newline + 1);
+      newline = buffer.indexOf('\n');
+      if (!line) {
+        continue;
+      }
+
+      let evt: RepoHealthStreamEvent;
+      try {
+        evt = JSON.parse(line) as RepoHealthStreamEvent;
+      } catch {
+        continue;
+      }
+
+      if (evt.type === 'progress') {
+        opts.onProgress?.({
+          phase: evt.phase ?? '',
+          message: evt.message ?? 'Analyzing repository…',
+          percent: typeof evt.percent === 'number' ? Math.max(0, Math.min(100, evt.percent)) : 0
+        });
+      } else if (evt.type === 'result' && evt.report) {
+        report = evt.report;
+      } else if (evt.type === 'error') {
+        throw new Error(evt.error || 'Analysis failed');
+      }
+    }
+  }
+
+  if (!report) {
+    throw new Error('Repository health analysis ended without a result');
+  }
+  if (!report.success) {
+    throw new Error(report.error || report.message || 'Analysis failed');
+  }
+  return assertSiteScope(siteId, report);
 }
 
 export function postOptimizeRepo(siteId: string, operation: import('./repoOptimizeOptions').RepoOptimizeOperation) {

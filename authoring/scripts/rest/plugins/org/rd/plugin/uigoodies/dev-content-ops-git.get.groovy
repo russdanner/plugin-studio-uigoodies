@@ -143,6 +143,59 @@ try {
                 DevContentOpsRepoHealthSupport.analyzeRepoHealth(helper, siteId, applicationContext) as Map
             )
 
+        case 'repoHealthStream':
+            response.contentType = 'application/x-ndjson'
+            response.characterEncoding = 'UTF-8'
+            response.setHeader('Cache-Control', 'no-cache, no-transform')
+            response.setHeader('Connection', 'keep-alive')
+            response.setHeader('X-Accel-Buffering', 'no')
+            response.flushBuffer()
+
+            PrintWriter ndjsonWriter = response.writer
+            def sendNdjson = { Map payload ->
+                ndjsonWriter.println(groovy.json.JsonOutput.toJson(payload))
+                ndjsonWriter.flush()
+                try {
+                    response.flushBuffer()
+                } catch (Exception ignored) {
+                }
+            }
+
+            def streamProgress = { String phase, String message, int percent ->
+                sendNdjson([
+                    type: 'progress',
+                    phase: DevContentOpsSupport.jsonSafeText(phase),
+                    message: DevContentOpsSupport.jsonSafeText(message),
+                    percent: percent
+                ])
+            }
+
+            try {
+                Map result = DevContentOpsRepoHealthSupport.analyzeRepoHealth(
+                    helper,
+                    siteId,
+                    applicationContext,
+                    streamProgress
+                ) as Map
+
+                if (result.success) {
+                    sendNdjson([type: 'result', report: DevContentOpsSupport.withSiteId(siteId, result)])
+                } else {
+                    sendNdjson([
+                        type: 'error',
+                        error: DevContentOpsSupport.jsonSafeText(result.error ?: result.message ?: 'Analysis failed')
+                    ])
+                }
+            } catch (Exception streamEx) {
+                sendNdjson([
+                    type: 'error',
+                    error: DevContentOpsSupport.jsonSafeText(streamEx.message ?: 'Analysis failed')
+                ])
+            }
+
+            sendNdjson([type: 'bye'])
+            return null
+
         case 'workTree':
             return DevContentOpsWorkTreeSupport.fetchWorkTree(
                 helper, contentRepo, applicationContext, siteId, branch

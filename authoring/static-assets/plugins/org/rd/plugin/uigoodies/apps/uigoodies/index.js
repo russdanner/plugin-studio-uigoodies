@@ -46290,8 +46290,114 @@ function postDevContentOpsAction(siteId, body) {
         return data;
     }));
 }
-function fetchRepoHealth(siteId) {
-    return pluginGet(siteId, pluginUrl('dev-content-ops-git', siteId, 'action=repoHealth'));
+/**
+ * Stream repository health analysis with NDJSON progress events (fetch + Bearer auth).
+ */
+function streamRepoHealth(siteId_1) {
+    return __awaiter(this, arguments, void 0, function (siteId, opts) {
+        var url, res, e_1, detail, body, parsed, reader, decoder, buffer, report, _b, done, value, newline, line, evt;
+        var _c, _d, _e, _f, _g;
+        if (opts === void 0) { opts = {}; }
+        return __generator(this, function (_h) {
+            switch (_h.label) {
+                case 0:
+                    url = pluginUrl('dev-content-ops-git', siteId, 'action=repoHealthStream');
+                    _h.label = 1;
+                case 1:
+                    _h.trys.push([1, 3, , 4]);
+                    return [4 /*yield*/, fetch(url, {
+                            method: 'GET',
+                            credentials: 'include',
+                            signal: opts.signal,
+                            headers: __assign(__assign({}, getGlobalHeaders()), { Accept: 'application/x-ndjson' })
+                        })];
+                case 2:
+                    res = _h.sent();
+                    return [3 /*break*/, 4];
+                case 3:
+                    e_1 = _h.sent();
+                    if ((_c = opts.signal) === null || _c === void 0 ? void 0 : _c.aborted) {
+                        throw new DOMException('Aborted', 'AbortError');
+                    }
+                    throw e_1;
+                case 4:
+                    if (!(!res.ok || !res.body)) return [3 /*break*/, 9];
+                    detail = '';
+                    _h.label = 5;
+                case 5:
+                    _h.trys.push([5, 7, , 8]);
+                    return [4 /*yield*/, res.text()];
+                case 6:
+                    body = _h.sent();
+                    if (body) {
+                        try {
+                            parsed = JSON.parse(body);
+                            detail = parsed.error || ((_d = parsed.response) === null || _d === void 0 ? void 0 : _d.message) || body.slice(0, 500);
+                        }
+                        catch (_j) {
+                            detail = body.slice(0, 500);
+                        }
+                    }
+                    return [3 /*break*/, 8];
+                case 7:
+                    _h.sent();
+                    return [3 /*break*/, 8];
+                case 8: throw new Error("Repository health analysis failed (HTTP ".concat(res.status, ")").concat(detail ? ": ".concat(detail) : ''));
+                case 9:
+                    reader = res.body.getReader();
+                    decoder = new TextDecoder('utf-8');
+                    buffer = '';
+                    report = null;
+                    _h.label = 10;
+                case 10:
+                    return [4 /*yield*/, reader.read()];
+                case 11:
+                    _b = _h.sent(), done = _b.done, value = _b.value;
+                    if (done) {
+                        return [3 /*break*/, 12];
+                    }
+                    buffer += decoder.decode(value, { stream: true });
+                    newline = buffer.indexOf('\n');
+                    while (newline >= 0) {
+                        line = buffer.slice(0, newline).trim();
+                        buffer = buffer.slice(newline + 1);
+                        newline = buffer.indexOf('\n');
+                        if (!line) {
+                            continue;
+                        }
+                        evt = void 0;
+                        try {
+                            evt = JSON.parse(line);
+                        }
+                        catch (_k) {
+                            continue;
+                        }
+                        if (evt.type === 'progress') {
+                            (_e = opts.onProgress) === null || _e === void 0 ? void 0 : _e.call(opts, {
+                                phase: (_f = evt.phase) !== null && _f !== void 0 ? _f : '',
+                                message: (_g = evt.message) !== null && _g !== void 0 ? _g : 'Analyzing repository…',
+                                percent: typeof evt.percent === 'number' ? Math.max(0, Math.min(100, evt.percent)) : 0
+                            });
+                        }
+                        else if (evt.type === 'result' && evt.report) {
+                            report = evt.report;
+                        }
+                        else if (evt.type === 'error') {
+                            throw new Error(evt.error || 'Analysis failed');
+                        }
+                    }
+                    return [3 /*break*/, 10];
+                case 12:
+                    if (!report) {
+                        throw new Error('Repository health analysis ended without a result');
+                    }
+                    if (!report.success) {
+                        throw new Error(report.error || report.message || 'Analysis failed');
+                    }
+                    return [2 /*return*/, assertSiteScope(siteId, report)];
+            }
+        });
+    });
 }
 function postOptimizeRepo(siteId, operation) {
     return postDevContentOpsAction(siteId, {
@@ -48451,56 +48557,82 @@ function MetricGroupSection(_a) {
 }
 function RepoHealthTab(_a) {
     var _this = this;
-    var _b, _c, _d;
+    var _b, _c, _d, _e, _f, _g;
     var siteId = _a.siteId, siteName = _a.siteName;
-    var _e = useState(true), loading = _e[0], setLoading = _e[1];
-    var _f = useState(null), optimizing = _f[0], setOptimizing = _f[1];
-    var _g = useState(null), report = _g[0], setReport = _g[1];
-    var _h = useState(null), error = _h[0], setError = _h[1];
-    var _j = useState(null), notice = _j[0], setNotice = _j[1];
-    var _k = useState('gcAuto'), selectedOperation = _k[0], setSelectedOperation = _k[1];
-    var _l = useState(null), confirmOption = _l[0], setConfirmOption = _l[1];
-    var _m = useState(false), ackChecked = _m[0], setAckChecked = _m[1];
-    var _o = useState(false), learnMoreOpen = _o[0], setLearnMoreOpen = _o[1];
+    var _h = useState(false), loading = _h[0], setLoading = _h[1];
+    var _j = useState(null), loadProgress = _j[0], setLoadProgress = _j[1];
+    var loadAbortRef = useRef(null);
+    var _k = useState(null), optimizing = _k[0], setOptimizing = _k[1];
+    var _l = useState(null), report = _l[0], setReport = _l[1];
+    var _m = useState(null), error = _m[0], setError = _m[1];
+    var _o = useState(null), notice = _o[0], setNotice = _o[1];
+    var _p = useState('gcAuto'), selectedOperation = _p[0], setSelectedOperation = _p[1];
+    var _q = useState(null), confirmOption = _q[0], setConfirmOption = _q[1];
+    var _r = useState(false), ackChecked = _r[0], setAckChecked = _r[1];
+    var _s = useState(false), learnMoreOpen = _s[0], setLearnMoreOpen = _s[1];
     var selectedOptimize = useMemo(function () { var _a; return (_a = getRepoOptimizeOption(selectedOperation)) !== null && _a !== void 0 ? _a : REPO_OPTIMIZE_OPTIONS[0]; }, [selectedOperation]);
     var metricGroups = useMemo(function () { var _a; return groupMetrics((_a = report === null || report === void 0 ? void 0 : report.metrics) !== null && _a !== void 0 ? _a : []); }, [report === null || report === void 0 ? void 0 : report.metrics]);
     var configGroups = useMemo(function () { var _a, _b; return groupConfigSettings((_b = (_a = report === null || report === void 0 ? void 0 : report.repoConfig) === null || _a === void 0 ? void 0 : _a.settings) !== null && _b !== void 0 ? _b : []); }, [(_b = report === null || report === void 0 ? void 0 : report.repoConfig) === null || _b === void 0 ? void 0 : _b.settings]);
     var load = useCallback(function () { return __awaiter(_this, void 0, void 0, function () {
-        var data, e_1;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        var controller, data, e_1;
+        var _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
                 case 0:
+                    (_a = loadAbortRef.current) === null || _a === void 0 ? void 0 : _a.abort();
+                    controller = new AbortController();
+                    loadAbortRef.current = controller;
                     setLoading(true);
                     setError(null);
-                    _a.label = 1;
+                    setLoadProgress({ phase: 'init', message: 'Starting repository health analysis…', percent: 0 });
+                    _b.label = 1;
                 case 1:
-                    _a.trys.push([1, 3, 4, 5]);
-                    return [4 /*yield*/, firstValueFrom(fetchRepoHealth(siteId))];
+                    _b.trys.push([1, 3, 4, 5]);
+                    return [4 /*yield*/, streamRepoHealth(siteId, {
+                            signal: controller.signal,
+                            onProgress: function (progress) { return setLoadProgress(progress); }
+                        })];
                 case 2:
-                    data = _a.sent();
-                    if (!data.success) {
-                        setError(data.error || data.message || 'Analysis failed');
-                        setReport(null);
+                    data = _b.sent();
+                    if (controller.signal.aborted) {
+                        return [2 /*return*/];
                     }
-                    else {
-                        setReport(data);
-                    }
+                    setReport(data);
                     return [3 /*break*/, 5];
                 case 3:
-                    e_1 = _a.sent();
+                    e_1 = _b.sent();
+                    if (controller.signal.aborted || (e_1 instanceof DOMException && e_1.name === 'AbortError')) {
+                        return [2 /*return*/];
+                    }
                     setError(e_1 instanceof Error ? e_1.message : 'Analysis failed');
                     setReport(null);
                     return [3 /*break*/, 5];
                 case 4:
+                    if (loadAbortRef.current === controller) {
+                        loadAbortRef.current = null;
+                    }
                     setLoading(false);
+                    setLoadProgress(null);
                     return [7 /*endfinally*/];
                 case 5: return [2 /*return*/];
             }
         });
     }); }, [siteId]);
     useEffect(function () {
-        load();
-    }, [load]);
+        var _a;
+        (_a = loadAbortRef.current) === null || _a === void 0 ? void 0 : _a.abort();
+        setReport(null);
+        setError(null);
+        setNotice(null);
+        setLoading(false);
+        setLoadProgress(null);
+    }, [siteId]);
+    useEffect(function () {
+        return function () {
+            var _a;
+            (_a = loadAbortRef.current) === null || _a === void 0 ? void 0 : _a.abort();
+        };
+    }, []);
     var runOptimize = function (operation) { return __awaiter(_this, void 0, void 0, function () {
         var result, option_1, parts, option, e_2;
         var _a, _b;
@@ -48583,14 +48715,16 @@ function RepoHealthTab(_a) {
         setNotice('Repository health report downloaded');
     };
     var overall = (_c = report === null || report === void 0 ? void 0 : report.overallConcern) !== null && _c !== void 0 ? _c : 0;
-    return (jsxs(TabShell, { children: [jsxs(TabToolbar, { children: [jsxs(ToolbarRow, { children: [jsxs(Box$1, { sx: { minWidth: 0, flex: '1 1 200px' }, children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, children: "Repository health" }), jsxs(Typography, { variant: "caption", color: "text.secondary", display: "block", children: [siteName ? "".concat(siteName, " (").concat(siteId, ")") : siteId, (report === null || report === void 0 ? void 0 : report.thresholdProfileLabel) ? " \u00B7 Thresholds: ".concat(report.thresholdProfileLabel) : ''] }), (report === null || report === void 0 ? void 0 : report.repoPath) && (jsx(Typography, { variant: "caption", color: "text.secondary", sx: __assign(__assign({}, monoSx), { display: 'block', mt: 0.25 }), noWrap: true, children: report.repoPath }))] }), jsxs(Stack$1, { direction: "row", spacing: 1, flexWrap: "wrap", useFlexGap: true, alignItems: "center", sx: { flexShrink: 0 }, children: [report ? jsx(ConcernIndicator, { concern: overall, compact: true }) : null, jsx(Button$1, { size: "small", variant: "outlined", startIcon: jsx(DownloadRoundedIcon, {}), disabled: !report || loading, onClick: onDownloadReport, children: "Download report" }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: jsx(HelpOutlineRoundedIcon, {}), onClick: function () { return setLearnMoreOpen(true); }, children: "Learn more" }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: loading ? jsx(CircularProgress, { size: 16 }) : jsx(RefreshRoundedIcon, {}), disabled: loading || Boolean(optimizing), onClick: function () { return load(); }, children: "Refresh" })] })] }), jsx(Divider, {}), jsxs(ToolbarGroup, { label: "Optimize", children: [jsxs(FormControl, { size: "small", sx: { minWidth: 220, maxWidth: 320 }, children: [jsx(InputLabel, { children: "Operation" }), jsx(Select, { label: "Operation", value: selectedOperation, onChange: function (e) { return setSelectedOperation(e.target.value); }, disabled: loading || Boolean(optimizing), children: REPO_OPTIMIZE_OPTIONS.map(function (option) { return (jsx(MenuItem$1, { value: option.id, children: option.label }, option.id)); }) })] }), jsx(Chip, { size: "small", label: riskLabel(selectedOptimize.risk), color: riskColor(selectedOptimize.risk) }), jsx(Button$1, { size: "small", variant: "contained", color: selectedOptimize.risk === 'destructive' ? 'error' : 'primary', disabled: loading || Boolean(optimizing), startIcon: optimizing === selectedOperation ? (jsx(CircularProgress, { size: 16, color: "inherit" })) : (jsx(AutoFixHighRoundedIcon, {})), onClick: requestOptimize, children: "Run" })] }), jsx(Box$1, { sx: { minWidth: 0 }, children: jsx(OptimizeRiskDetails, { option: selectedOptimize }) })] }), jsxs(TabAlertStack, { children: [error && (jsx(Alert, { severity: "error", onClose: function () { return setError(null); }, children: error })), notice && (jsx(Alert, { severity: "success", onClose: function () { return setNotice(null); }, children: notice }))] }), jsx(Box$1, { sx: {
+    return (jsxs(TabShell, { children: [jsxs(TabToolbar, { children: [jsxs(ToolbarRow, { children: [jsxs(Box$1, { sx: { minWidth: 0, flex: '1 1 200px' }, children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, children: "Repository health" }), jsxs(Typography, { variant: "caption", color: "text.secondary", display: "block", children: [siteName ? "".concat(siteName, " (").concat(siteId, ")") : siteId, (report === null || report === void 0 ? void 0 : report.thresholdProfileLabel) ? " \u00B7 Thresholds: ".concat(report.thresholdProfileLabel) : ''] }), (report === null || report === void 0 ? void 0 : report.repoPath) && (jsx(Typography, { variant: "caption", color: "text.secondary", sx: __assign(__assign({}, monoSx), { display: 'block', mt: 0.25 }), noWrap: true, children: report.repoPath }))] }), jsxs(Stack$1, { direction: "row", spacing: 1, flexWrap: "wrap", useFlexGap: true, alignItems: "center", sx: { flexShrink: 0 }, children: [report ? jsx(ConcernIndicator, { concern: overall, compact: true }) : null, jsx(Button$1, { size: "small", variant: "outlined", startIcon: jsx(DownloadRoundedIcon, {}), disabled: !report || loading, onClick: onDownloadReport, children: "Download report" }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: jsx(HelpOutlineRoundedIcon, {}), onClick: function () { return setLearnMoreOpen(true); }, children: "Learn more" }), jsx(Button$1, { size: "small", variant: report ? 'outlined' : 'contained', startIcon: loading ? jsx(CircularProgress, { size: 16 }) : jsx(RefreshRoundedIcon, {}), disabled: loading || Boolean(optimizing), onClick: function () { return load(); }, children: report ? 'Re-run analysis' : 'Run analysis' })] })] }), jsx(Divider, {}), jsxs(ToolbarGroup, { label: "Optimize", children: [jsxs(FormControl, { size: "small", sx: { minWidth: 220, maxWidth: 320 }, children: [jsx(InputLabel, { children: "Operation" }), jsx(Select, { label: "Operation", value: selectedOperation, onChange: function (e) { return setSelectedOperation(e.target.value); }, disabled: loading || Boolean(optimizing), children: REPO_OPTIMIZE_OPTIONS.map(function (option) { return (jsx(MenuItem$1, { value: option.id, children: option.label }, option.id)); }) })] }), jsx(Chip, { size: "small", label: riskLabel(selectedOptimize.risk), color: riskColor(selectedOptimize.risk) }), jsx(Button$1, { size: "small", variant: "contained", color: selectedOptimize.risk === 'destructive' ? 'error' : 'primary', disabled: loading || Boolean(optimizing), startIcon: optimizing === selectedOperation ? (jsx(CircularProgress, { size: 16, color: "inherit" })) : (jsx(AutoFixHighRoundedIcon, {})), onClick: requestOptimize, children: "Run" })] }), jsx(Box$1, { sx: { minWidth: 0 }, children: jsx(OptimizeRiskDetails, { option: selectedOptimize }) })] }), jsxs(TabAlertStack, { children: [error && (jsx(Alert, { severity: "error", onClose: function () { return setError(null); }, children: error })), notice && (jsx(Alert, { severity: "success", onClose: function () { return setNotice(null); }, children: notice }))] }), jsx(Box$1, { sx: {
                     flex: 1,
                     minHeight: 0,
                     overflowY: 'auto',
                     overflowX: 'hidden',
                     pr: 0.5,
                     WebkitOverflowScrolling: 'touch'
-                }, children: jsxs(Paper, { variant: "outlined", sx: __assign(__assign({}, surfacePaperSx), { display: 'flex', flexDirection: 'column' }), children: [jsx(PanelHeader, { title: "Health metrics", subtitle: (_d = report === null || report === void 0 ? void 0 : report.summary) !== null && _d !== void 0 ? _d : 'Run analysis to load repository metrics' }), loading && !report ? (jsx(Box$1, { sx: { p: 4, display: 'flex', justifyContent: 'center' }, children: jsx(CircularProgress, { size: 32 }) })) : (jsxs(Stack$1, { spacing: 0, divider: jsx(Box$1, { sx: { borderBottom: 1, borderColor: 'divider' } }), children: [metricGroups.map(function (_a) {
+                }, children: jsxs(Paper, { variant: "outlined", sx: __assign(__assign({}, surfacePaperSx), { display: 'flex', flexDirection: 'column' }), children: [jsx(PanelHeader, { title: "Health metrics", subtitle: loading && loadProgress
+                                ? loadProgress.message
+                                : (_d = report === null || report === void 0 ? void 0 : report.summary) !== null && _d !== void 0 ? _d : 'Run analysis to load repository metrics' }), loading ? (jsx(Box$1, { sx: { px: 3, py: 3 }, children: jsxs(Stack$1, { spacing: 1.5, children: [jsx(LinearProgress, { variant: "determinate", value: (_e = loadProgress === null || loadProgress === void 0 ? void 0 : loadProgress.percent) !== null && _e !== void 0 ? _e : 0, sx: { height: 8, borderRadius: 1 } }), jsxs(Stack$1, { direction: "row", spacing: 1, alignItems: "center", justifyContent: "space-between", children: [jsx(Typography, { variant: "body2", color: "text.secondary", children: (_f = loadProgress === null || loadProgress === void 0 ? void 0 : loadProgress.message) !== null && _f !== void 0 ? _f : 'Analyzing repository…' }), jsxs(Typography, { variant: "caption", color: "text.secondary", sx: { fontVariantNumeric: 'tabular-nums' }, children: [(_g = loadProgress === null || loadProgress === void 0 ? void 0 : loadProgress.percent) !== null && _g !== void 0 ? _g : 0, "%"] })] })] }) })) : !report ? (jsxs(Box$1, { sx: { px: 3, py: 4, textAlign: 'center' }, children: [jsx(Typography, { variant: "body2", color: "text.secondary", sx: { mb: 2, maxWidth: 480, mx: 'auto' }, children: "Run analysis to load git-sizer-style metrics for this project's sandbox. Large repositories can take several minutes." }), jsx(Button$1, { variant: "contained", startIcon: jsx(RefreshRoundedIcon, {}), disabled: Boolean(optimizing), onClick: function () { return load(); }, children: "Run analysis" })] })) : (jsxs(Stack$1, { spacing: 0, divider: jsx(Box$1, { sx: { borderBottom: 1, borderColor: 'divider' } }), children: [metricGroups.map(function (_a) {
                                     var group = _a.group, metrics = _a.metrics;
                                     return (jsx(MetricGroupSection, { group: group, metrics: metrics }, group));
                                 }), configGroups.length > 0 && (jsxs(Box$1, { children: [jsxs(Box$1, { sx: { px: 2, py: 1.5, bgcolor: function (theme) { return alpha(theme.palette.text.primary, 0.03); } }, children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, children: "Repository configuration" }), jsx(Typography, { variant: "caption", color: "text.secondary", display: "block", children: "Git settings and runtime object-store stats that affect GC, repack, status, and Studio commit performance." }), configGroups.some(function (_a) {
