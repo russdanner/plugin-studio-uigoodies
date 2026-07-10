@@ -8,7 +8,7 @@ See also: [Image Studio view](image-studio.md).
 
 **Placement:** under **`craftercms.components.ToolsPanel`** → `configuration` → `widgets`.
 
-The plugin `installation` block in `craftercms-plugin.yaml` auto-wires this on install/upgrade. To add manually, merge the snippet below into `config/studio/ui.xml`.
+Image Studio is **not** auto-wired on plugin install. Merge the snippet below into `config/studio/ui.xml` when you want the sidebar entry (or use `authoring/config/studio/ui-image-studio-widget.append.xml`).
 
 ```xml
 <widget id="org.rd.plugin.uigoodies.openImageStudioPanelButton">

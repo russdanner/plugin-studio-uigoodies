@@ -11,6 +11,7 @@ import plugins.org.rd.plugin.uigoodies.DevContentOpsRepoHealthSupport
 import plugins.org.rd.plugin.uigoodies.DevContentOpsRefsSupport
 import plugins.org.rd.plugin.uigoodies.DevContentOpsWorkTreeSupport
 import plugins.org.rd.plugin.uigoodies.DevContentOpsBlobStoreSupport
+import plugins.org.rd.plugin.uigoodies.DevContentOpsPublishCompareSupport
 
 try {
     def siteResolution = DevContentOpsSupport.resolveRequestSiteId(params.siteId as String)
@@ -18,7 +19,8 @@ try {
         response.status = 400
         return siteResolution.error
     }
-    def siteId = siteResolution.siteId as String
+    def studioSiteId = siteResolution.siteId as String
+    def siteId = DevContentOpsSupport.resolveOperationSiteId(studioSiteId, params)
     def action = DevContentOpsSupport.jsonSafeText(params.action ?: 'status')
 
     def helper = DevContentOpsSupport.gitHelper(applicationContext)
@@ -34,9 +36,19 @@ try {
 
     switch (action) {
         case 'status':
-            return DevContentOpsSupport.fetchRepoStatus(
-                helper, contentRepo, siteId, branch, sitesSvc, applicationContext
-            )
+            try {
+                return DevContentOpsSupport.withSiteId(
+                    siteId,
+                    DevContentOpsSupport.fetchRepoStatus(
+                        helper, contentRepo, siteId, branch, sitesSvc, applicationContext
+                    ) as Map
+                )
+            } catch (Throwable t) {
+                return DevContentOpsSupport.withSiteId(
+                    siteId,
+                    DevContentOpsSupport.failureFromThrowable(t, 'status failed')
+                )
+            }
 
         case 'branches':
             def repo = DevContentOpsSupport.openSandboxRepo(helper, siteId)
@@ -84,7 +96,7 @@ try {
             def order = DevContentOpsSupport.jsonSafeText(params.order ?: 'desc')
             def logRepo = DevContentOpsSupport.openSandboxRepo(helper, siteId)
             return DevContentOpsSupport.fetchGitLog(
-                logRepo, sitesSvc, processedDao, siteId, branchName, skip, limit, since, until, order
+                logRepo, sitesSvc, processedDao, siteId, branchName, skip, limit, since, until, order, contentRepo
             )
 
         case 'commit':
@@ -94,7 +106,7 @@ try {
                 return DevContentOpsSupport.errorMap('commitId is required')
             }
             def detailRepo = DevContentOpsSupport.openSandboxRepo(helper, siteId)
-            return DevContentOpsSupport.fetchCommitDetail(helper, detailRepo, sitesSvc, processedDao, siteId, commitId)
+            return DevContentOpsSupport.fetchCommitDetail(helper, detailRepo, sitesSvc, processedDao, siteId, commitId, contentRepo)
 
         case 'commitFiles':
             def commitId = DevContentOpsSupport.jsonSafeText(params.commitId ?: '')
@@ -197,9 +209,19 @@ try {
             return null
 
         case 'workTree':
-            return DevContentOpsWorkTreeSupport.fetchWorkTree(
-                helper, contentRepo, applicationContext, siteId, branch
-            )
+            try {
+                return DevContentOpsSupport.withSiteId(
+                    siteId,
+                    DevContentOpsWorkTreeSupport.fetchWorkTree(
+                        helper, contentRepo, applicationContext, siteId, branch
+                    ) as Map
+                )
+            } catch (Throwable t) {
+                return DevContentOpsSupport.withSiteId(
+                    siteId,
+                    DevContentOpsSupport.failureFromThrowable(t, 'workTree failed')
+                )
+            }
 
         case 'workTreeDiff':
             def path = DevContentOpsSupport.jsonSafeText(params.path ?: '')
@@ -212,12 +234,19 @@ try {
             return DevContentOpsWorkTreeSupport.fetchWorkTreeDiff(workTreeRepo, path, diffMode)
 
         case 'blobStores':
-            return DevContentOpsSupport.withSiteId(
-                siteId,
-                DevContentOpsBlobStoreSupport.fetchBlobStoreOverview(
-                    applicationContext, siteId, helper, contentRepo
-                ) as Map
-            )
+            try {
+                return DevContentOpsSupport.withSiteId(
+                    siteId,
+                    DevContentOpsBlobStoreSupport.fetchBlobStoreOverview(
+                        applicationContext, siteId, helper, contentRepo
+                    ) as Map
+                )
+            } catch (Throwable t) {
+                return DevContentOpsSupport.withSiteId(
+                    siteId,
+                    DevContentOpsSupport.failureFromThrowable(t, 'blobStores failed')
+                )
+            }
 
         case 'blobStoreChildren':
             def storeId = DevContentOpsSupport.jsonSafeText(params.storeId ?: '')
@@ -226,18 +255,226 @@ try {
                 return DevContentOpsSupport.errorMap('storeId is required')
             }
             def parentPath = DevContentOpsSupport.jsonSafeText(params.path ?: '')
+            try {
+                return DevContentOpsSupport.withSiteId(
+                    siteId,
+                    DevContentOpsBlobStoreSupport.listBlobStoreChildren(
+                        applicationContext, helper, contentRepo, siteId, storeId, parentPath
+                    ) as Map
+                )
+            } catch (Throwable t) {
+                return DevContentOpsSupport.withSiteId(
+                    siteId,
+                    DevContentOpsSupport.failureFromThrowable(t, 'blobStoreChildren failed')
+                )
+            }
+
+        case 'blobStoreVersions':
+            def versionStoreId = DevContentOpsSupport.jsonSafeText(params.storeId ?: '')
+            def versionPath = DevContentOpsSupport.jsonSafeText(params.path ?: '')
+            def versionTarget = DevContentOpsSupport.jsonSafeText(params.target ?: 'preview')
+            if (!versionStoreId) {
+                response.status = 400
+                return DevContentOpsSupport.errorMap('storeId is required')
+            }
+            if (!versionPath) {
+                response.status = 400
+                return DevContentOpsSupport.errorMap('path is required')
+            }
             return DevContentOpsSupport.withSiteId(
                 siteId,
-                DevContentOpsBlobStoreSupport.listBlobStoreChildren(
-                    applicationContext, helper, contentRepo, siteId, storeId, parentPath
+                DevContentOpsBlobStoreSupport.listBlobVersions(
+                    applicationContext, contentRepo, siteId, versionStoreId, versionPath, versionTarget
                 ) as Map
             )
+
+        case 'blobStoreDeleted':
+            def deletedStoreId = DevContentOpsSupport.jsonSafeText(params.storeId ?: '')
+            def deletedTarget = DevContentOpsSupport.jsonSafeText(params.target ?: 'preview')
+            def deletedLimit = DevContentOpsSupport.toLong(params.limit, 200L) as int
+            if (!deletedStoreId) {
+                response.status = 400
+                return DevContentOpsSupport.errorMap('storeId is required')
+            }
+            return DevContentOpsSupport.withSiteId(
+                siteId,
+                DevContentOpsBlobStoreSupport.listDeletedBlobs(
+                    applicationContext, contentRepo, siteId, deletedStoreId, deletedTarget, deletedLimit
+                ) as Map
+            )
+
+        case 'blobStoreVersionPreview':
+            def previewStoreId = DevContentOpsSupport.jsonSafeText(params.storeId ?: '')
+            def previewPath = DevContentOpsSupport.jsonSafeText(params.path ?: '')
+            def previewVersionId = DevContentOpsSupport.jsonSafeText(params.versionId ?: '')
+            def previewTarget = DevContentOpsSupport.jsonSafeText(params.target ?: 'preview')
+            if (!previewStoreId) {
+                response.status = 400
+                return DevContentOpsSupport.errorMap('storeId is required')
+            }
+            if (!previewPath) {
+                response.status = 400
+                return DevContentOpsSupport.errorMap('path is required')
+            }
+            if (!previewVersionId) {
+                response.status = 400
+                return DevContentOpsSupport.errorMap('versionId is required')
+            }
+            return DevContentOpsSupport.withSiteId(
+                siteId,
+                DevContentOpsBlobStoreSupport.getBlobVersionPreviewUrl(
+                    applicationContext,
+                    contentRepo,
+                    siteId,
+                    previewStoreId,
+                    previewPath,
+                    previewVersionId,
+                    previewTarget
+                ) as Map
+            )
+
+        case 'publishCompareOverview':
+            try {
+                return DevContentOpsSupport.withSiteId(
+                    siteId,
+                    DevContentOpsPublishCompareSupport.fetchOverview(
+                        helper, contentRepo, applicationContext, sitesSvc, siteId
+                    ) as Map
+                )
+            } catch (Throwable t) {
+                return DevContentOpsSupport.withSiteId(
+                    siteId,
+                    DevContentOpsSupport.failureFromThrowable(t, 'publishCompareOverview failed')
+                )
+            }
+
+        case 'publishCompare':
+            int compareSkip = (params.skip ?: '0').toString().isInteger() ? params.skip.toInteger() : 0
+            int compareLimit = (params.limit ?: '50').toString().isInteger() ? params.limit.toInteger() : 50
+            def compareTarget = DevContentOpsSupport.jsonSafeText(params.target ?: '')
+            def comparePathPrefix = DevContentOpsSupport.jsonSafeText(params.pathPrefix ?: '')
+            def compareQuery = DevContentOpsSupport.jsonSafeText(params.query ?: '')
+            boolean compareHideNoDiff = DevContentOpsSupport.toBoolean(params.hideNoDiff, true)
+            try {
+                return DevContentOpsSupport.withSiteId(
+                    siteId,
+                    DevContentOpsPublishCompareSupport.compare(
+                        helper,
+                        contentRepo,
+                        sitesSvc,
+                        siteId,
+                        [
+                            target: compareTarget,
+                            pathPrefix: comparePathPrefix,
+                            query: compareQuery,
+                            hideNoDiff: compareHideNoDiff,
+                            skip: compareSkip,
+                            limit: compareLimit
+                        ]
+                    ) as Map
+                )
+            } catch (Throwable t) {
+                return DevContentOpsSupport.withSiteId(
+                    siteId,
+                    DevContentOpsSupport.failureFromThrowable(t, 'publishCompare failed')
+                )
+            }
+
+        case 'publishCompareDiff':
+            def diffPath = DevContentOpsSupport.jsonSafeText(params.path ?: '')
+            if (!diffPath) {
+                response.status = 400
+                return DevContentOpsSupport.errorMap('path is required')
+            }
+            def diffTarget = DevContentOpsSupport.jsonSafeText(params.target ?: '')
+            try {
+                return DevContentOpsSupport.withSiteId(
+                    siteId,
+                    DevContentOpsPublishCompareSupport.fetchFileDiff(
+                        helper, contentRepo, sitesSvc, siteId, diffPath, diffTarget
+                    ) as Map
+                )
+            } catch (Throwable t) {
+                return DevContentOpsSupport.withSiteId(
+                    siteId,
+                    DevContentOpsSupport.failureFromThrowable(t, 'publishCompareDiff failed')
+                )
+            }
+
+        case 'blobStoreVersionContent':
+            def contentStoreId = DevContentOpsSupport.jsonSafeText(params.storeId ?: '')
+            def contentPath = DevContentOpsSupport.jsonSafeText(params.path ?: '')
+            def contentVersionId = DevContentOpsSupport.jsonSafeText(params.versionId ?: '')
+            def contentTarget = DevContentOpsSupport.jsonSafeText(params.target ?: 'preview')
+            if (!contentStoreId) {
+                response.status = 400
+                return DevContentOpsSupport.errorMap('storeId is required')
+            }
+            if (!contentPath) {
+                response.status = 400
+                return DevContentOpsSupport.errorMap('path is required')
+            }
+            if (!contentVersionId) {
+                response.status = 400
+                return DevContentOpsSupport.errorMap('versionId is required')
+            }
+
+            Map openResult = DevContentOpsBlobStoreSupport.openBlobVersionContent(
+                applicationContext,
+                contentRepo,
+                siteId,
+                contentStoreId,
+                contentPath,
+                contentVersionId,
+                contentTarget
+            ) as Map
+            if (openResult.error) {
+                response.status = 400
+                return openResult
+            }
+            if (!Boolean.TRUE.equals(openResult.success)) {
+                response.status = 500
+                return DevContentOpsSupport.errorMap('Failed to open blob version')
+            }
+
+            def objectStream = openResult.inputStream
+            def clientHandle = openResult.s3ClientHandle as Map
+            try {
+                String contentType = DevContentOpsSupport.jsonSafeText(openResult.contentType) ?: 'application/octet-stream'
+                String fileName = DevContentOpsSupport.jsonSafeText(openResult.fileName) ?: 'blob'
+                response.status = 200
+                response.contentType = contentType
+                response.setHeader('Cache-Control', 'private, max-age=60')
+                response.setHeader('Content-Disposition', 'inline; filename="' + fileName.replace('"', '') + '"')
+
+                java.io.OutputStream out = response.outputStream
+                byte[] buffer = new byte[8192]
+                int read
+                while ((read = objectStream.read(buffer)) != -1) {
+                    out.write(buffer, 0, read)
+                }
+                out.flush()
+                response.flushBuffer()
+            } catch (Exception e) {
+                if (!response.isCommitted()) {
+                    response.reset()
+                    response.status = 500
+                    return DevContentOpsSupport.errorMap('Failed to stream blob version: ' + e.message)
+                }
+            } finally {
+                try {
+                    objectStream?.close()
+                } catch (Exception ignored) {
+                }
+                DevContentOpsBlobStoreSupport.releaseS3ClientHandle(clientHandle)
+            }
+            return null
 
         default:
             response.status = 400
             return DevContentOpsSupport.errorMap("Unknown action: ${action}")
     }
-} catch (Exception e) {
+} catch (Throwable t) {
     response.status = 500
-    return DevContentOpsSupport.failureFromThrowable(e, 'dev-content-ops-git GET failed')
+    return DevContentOpsSupport.failureFromThrowable(t, 'dev-content-ops-git GET failed')
 }

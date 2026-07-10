@@ -36,7 +36,7 @@ import { DialogBody, DialogFooter } from '@craftercms/studio-ui';
 import { uploadDataUrl } from '@craftercms/studio-ui/services/content';
 import { showSystemNotification } from '@craftercms/studio-ui/state/actions/system';
 import { updateWidgetDialog } from '@craftercms/studio-ui/state/actions/dialogs';
-import { take } from 'rxjs/operators';
+import { filter, take } from 'rxjs/operators';
 import MyLoadingButton from '../MyLoadingButton';
 import ImageStudioEditor from './ImageStudioEditor';
 import ImageSizeRequirementsPanel from './ImageSizeRequirementsPanel';
@@ -64,6 +64,7 @@ import {
   loadRepoImageAsDataUrl,
   resolveImageConstraints,
   suggestVariantFilename,
+  splitStaticAssetPath,
   createImage
 } from './imageStudioUtils';
 
@@ -109,6 +110,7 @@ export function ImageStudio({ defaultPath = '/static-assets/images' }: ImageStud
   const [saveOpen, setSaveOpen] = useState(false);
   const [browseOpen, setBrowseOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [applyingCrop, setApplyingCrop] = useState(false);
   const [filterPresetId, setFilterPresetId] = useState('normal');
   const [drawState, setDrawState] = useState(EMPTY_DRAW_STATE);
   const [drawTool, setDrawTool] = useState<DrawTool>('brush');
@@ -255,36 +257,75 @@ export function ImageStudio({ defaultPath = '/static-assets/images' }: ImageStud
     return null;
   }, [croppedAreaPixels]);
 
+  const resolveCropArea = useCallback(
+    async (img: HTMLImageElement): Promise<CropArea> => {
+      if (croppedAreaPixels) {
+        return croppedAreaPixels;
+      }
+      if (tool === 'focal') {
+        const ratio = aspect ?? img.naturalWidth / img.naturalHeight;
+        return focalCropArea(img.naturalWidth, img.naturalHeight, focal, ratio);
+      }
+      return fullImageCrop(img.naturalWidth, img.naturalHeight);
+    },
+    [aspect, croppedAreaPixels, focal, tool]
+  );
+
+  const handleApplyCrop = useCallback(async () => {
+    if (!loaded || !croppedAreaPixels) {
+      return;
+    }
+    setApplyingCrop(true);
+    try {
+      const img = await createImage(loaded.dataUrl);
+      const cropArea = await resolveCropArea(img);
+      const blob = await getCroppedImageBlob(
+        loaded.dataUrl,
+        cropArea,
+        DEFAULT_ADJUSTMENTS,
+        undefined,
+        undefined,
+        'image/png',
+        0.92,
+        EMPTY_DRAW_STATE
+      );
+      const dataUrl = await blobToDataUrl(blob);
+      const cropped = await createImage(dataUrl);
+      setLoaded({ ...loaded, dataUrl });
+      setCroppedAreaPixels(fullImageCrop(cropped.naturalWidth, cropped.naturalHeight));
+      setAspect(undefined);
+      setCanvasView(DEFAULT_CANVAS_VIEW);
+      dispatch(
+        showSystemNotification({
+          message: `Crop applied — working image is now ${cropped.naturalWidth} × ${cropped.naturalHeight}px`,
+          options: { variant: 'success' }
+        })
+      );
+    } catch (e) {
+      handleError(`Apply crop failed: ${(e as Error).message}`);
+    } finally {
+      setApplyingCrop(false);
+    }
+  }, [croppedAreaPixels, dispatch, handleError, loaded, resolveCropArea]);
+
   const handleSave = async (options: ImageStudioSaveOptions) => {
     if (!loaded || !siteId) {
       return;
     }
     setSaving(true);
     try {
-      let cropArea = croppedAreaPixels;
-      const img = await new Promise<HTMLImageElement>((resolve, reject) => {
-        const image = new Image();
-        image.onload = () => resolve(image);
-        image.onerror = reject;
-        image.src = loaded.dataUrl;
-      });
-
-      if (!cropArea) {
-        cropArea = {
-          x: 0,
-          y: 0,
-          width: img.naturalWidth,
-          height: img.naturalHeight
-        };
-      }
-
-      if (tool === 'focal') {
-        const ratio = aspect ?? img.naturalWidth / img.naturalHeight;
-        cropArea = focalCropArea(img.naturalWidth, img.naturalHeight, focal, ratio);
-      }
+      const img = await createImage(loaded.dataUrl);
+      const cropArea = await resolveCropArea(img);
 
       const outW = outputWidth === '' ? undefined : Number(outputWidth);
       const outH = outputHeight === '' ? undefined : Number(outputHeight);
+
+      const targetPath = options.fullPath;
+      const { folderPath, fileName } = splitStaticAssetPath(targetPath);
+      const mimeType =
+        options.mode === 'replace' ? mimeTypeForPath(targetPath) ?? options.mimeType : options.mimeType;
+      const ext =
+        mimeType === 'image/jpeg' ? '.jpg' : mimeType === 'image/webp' ? '.webp' : '.png';
 
       const blob = await getCroppedImageBlob(
         loaded.dataUrl,
@@ -292,28 +333,24 @@ export function ImageStudio({ defaultPath = '/static-assets/images' }: ImageStud
         adjustments,
         outW,
         outH,
-        options.mimeType,
+        mimeType,
         options.quality,
         drawState,
         outputBackground
       );
 
-      const ext =
-        options.mimeType === 'image/jpeg'
-          ? '.jpg'
-          : options.mimeType === 'image/webp'
-            ? '.webp'
-            : '.png';
-      const targetPath = options.fullPath;
-      const fileName = targetPath.substring(targetPath.lastIndexOf('/') + 1);
       const savedDataUrl = await blobToDataUrl(blob);
-      const file = dataUrlToFile(
-        savedDataUrl,
-        fileName.endsWith(ext) ? fileName : `${fileName.replace(/\.[^.]+$/, '')}${ext}`,
-        options.mimeType
-      );
+      const uploadFileName = fileName.endsWith(ext) ? fileName : `${fileName.replace(/\.[^.]+$/, '')}${ext}`;
+      const file = dataUrlToFile(savedDataUrl, uploadFileName, mimeType);
 
-      await uploadDataUrl(siteId, file, targetPath, '_csrf').pipe(take(1)).toPromise();
+      await uploadDataUrl(siteId, file, folderPath, '_csrf')
+        .pipe(
+          filter((event: { type?: string }) => event.type === 'complete'),
+          take(1)
+        )
+        .toPromise();
+
+      const savedFullPath = `${folderPath}${uploadFileName}`;
 
       if (options.contentFieldLink && siteId) {
         await updateContentImageField(
@@ -321,7 +358,7 @@ export function ImageStudio({ defaultPath = '/static-assets/images' }: ImageStud
           options.contentFieldLink.contentPath,
           options.contentFieldLink.objectId,
           options.contentFieldLink.fieldId,
-          targetPath
+          savedFullPath
         );
       }
 
@@ -329,16 +366,14 @@ export function ImageStudio({ defaultPath = '/static-assets/images' }: ImageStud
         showSystemNotification({
           message: options.contentFieldLink
             ? `Image saved and ${options.contentFieldLink.fieldTitle} updated`
-            : `Image saved to ${targetPath}`,
+            : `Image saved to ${savedFullPath}`,
           options: { variant: 'success' }
         })
       );
       setSaveOpen(false);
-      if (options.mode === 'replace') {
-        setLoaded({ ...loaded, sourcePath: targetPath, name: fileName });
-      } else {
-        setLoaded({ dataUrl: savedDataUrl, sourcePath: targetPath, name: file.name });
-      }
+      const nextImage = await createImage(savedDataUrl);
+      setLoaded({ dataUrl: savedDataUrl, sourcePath: savedFullPath, name: uploadFileName });
+      setCroppedAreaPixels(fullImageCrop(nextImage.naturalWidth, nextImage.naturalHeight));
     } catch (e) {
       handleError(`Save failed: ${(e as Error).message}`);
     } finally {
@@ -524,6 +559,8 @@ export function ImageStudio({ defaultPath = '/static-assets/images' }: ImageStud
                 onTextFontSizeChange={setTextFontSize}
                 canvasView={canvasView}
                 onCanvasViewChange={setCanvasView}
+                onApplyCrop={handleApplyCrop}
+                applyingCrop={applyingCrop}
               />
             </Box>
           )}
@@ -576,6 +613,20 @@ export function ImageStudio({ defaultPath = '/static-assets/images' }: ImageStud
       />
     </Box>
   );
+}
+
+function mimeTypeForPath(path: string): string | undefined {
+  const ext = path.split('.').pop()?.toLowerCase();
+  if (ext === 'jpg' || ext === 'jpeg') {
+    return 'image/jpeg';
+  }
+  if (ext === 'webp') {
+    return 'image/webp';
+  }
+  if (ext === 'png') {
+    return 'image/png';
+  }
+  return undefined;
 }
 
 export default ImageStudio;

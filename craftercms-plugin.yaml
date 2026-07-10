@@ -13,7 +13,7 @@ plugin:
   version:
     major: 1
     minor: 0
-    patch: 73
+    patch: 77
   description: A plugin to adds some UI goodies to your studio
   documentation: "https://raw.githubusercontent.com/russdanner/plugin-studio-uigoodies/master/README.md"
   website:
@@ -288,40 +288,6 @@ installation:
                       value: uigoodies
                     - name: file
                       value: index.js
-  # Tools Panel (sidebar) — Image Studio
-  - type: preview-app
-    parentXpath: //widget[@id='craftercms.components.ToolsPanel']
-    elementXpath: //widget[@id='org.rd.plugin.uigoodies.openImageStudioPanelButton']
-    element:
-      name: configuration
-      children:
-        - name: widgets
-          children:
-            - name: widget
-              attributes:
-                - name: id
-                  value: org.rd.plugin.uigoodies.openImageStudioPanelButton
-              children:
-                - name: plugin
-                  attributes:
-                    - name: id
-                      value: org.rd.plugin.uigoodies
-                    - name: type
-                      value: apps
-                    - name: name
-                      value: uigoodies
-                    - name: file
-                      value: index.js
-                - name: configuration
-                  children:
-                    - name: title
-                      value: Image Studio
-                    - name: icon
-                      attributes:
-                        - name: id
-                          value: "@mui/icons-material/PhotoLibraryRounded"
-                    - name: defaultPath
-                      value: /static-assets/images
   # Preview toolbar — Translation (locale copy)
   - type: preview-app
     elementXpath: //widget[@id='org.rd.plugin.uigoodies.openTranslationToolbarButton']
@@ -366,6 +332,49 @@ installation:
                           attributes:
                             - name: id
                               value: "@mui/icons-material/TranslateRounded"
+  # Preview toolbar — Link check + WCAG (bundled in uigoodies index.js)
+  - type: preview-app
+    parentXpath: //widget[@id='craftercms.components.PreviewToolbar']/configuration/rightSection/widgets
+    elementXpath: //widget[@id='org.craftercms.studio.linkcheck.toolbar']
+    element:
+      name: widget
+      attributes:
+        - name: id
+          value: org.craftercms.studio.linkcheck.toolbar
+      children:
+        - name: plugin
+          attributes:
+            - name: id
+              value: org.rd.plugin.uigoodies
+            - name: site
+              value: "{site}"
+            - name: type
+              value: apps
+            - name: name
+              value: uigoodies
+            - name: file
+              value: index.js
+  - type: preview-app
+    parentXpath: //widget[@id='craftercms.components.PreviewToolbar']/configuration/rightSection/widgets
+    elementXpath: //widget[@id='org.craftercms.studio.linkcheck.a11y']
+    element:
+      name: widget
+      attributes:
+        - name: id
+          value: org.craftercms.studio.linkcheck.a11y
+      children:
+        - name: plugin
+          attributes:
+            - name: id
+              value: org.rd.plugin.uigoodies
+            - name: site
+              value: "{site}"
+            - name: type
+              value: apps
+            - name: name
+              value: uigoodies
+            - name: file
+              value: index.js
   - type: form-control
     elementXpath: //control/plugin[pluginId='org.rd.plugin.uigoodies' and name='custom-locale']
     element:

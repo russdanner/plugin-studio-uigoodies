@@ -159,6 +159,19 @@ export function dataUrlToFile(dataUrl: string, name: string, type?: string): { n
   return { name, type: mime, dataUrl };
 }
 
+/** Crafter write-content.json expects `path` = parent folder (with trailing slash), `name` = file leaf. */
+export function splitStaticAssetPath(fullPath: string): { folderPath: string; fileName: string } {
+  const normalized = fullPath.startsWith('/') ? fullPath : `/${fullPath}`;
+  const slash = normalized.lastIndexOf('/');
+  if (slash < 0) {
+    return { folderPath: '/', fileName: normalized };
+  }
+  return {
+    folderPath: `${normalized.substring(0, slash + 1)}`,
+    fileName: normalized.substring(slash + 1)
+  };
+}
+
 export async function loadRepoImageAsDataUrl(
   siteId: string,
   assetPath: string,
@@ -166,10 +179,10 @@ export async function loadRepoImageAsDataUrl(
 ): Promise<string> {
   const urls: string[] = [];
   if (guestOrigin) {
-    urls.push(`${guestOrigin.replace(/\/$/, '')}${assetPath}`);
+    urls.push(`${guestOrigin.replace(/\/$/, '')}${assetPath}?t=${Date.now()}`);
   }
   urls.push(
-    `/studio/api/2/content/get_content_by_commit_id?siteId=${encodeURIComponent(siteId)}&path=${encodeURIComponent(assetPath)}`
+    `/studio/api/2/content/get_content_by_commit_id?siteId=${encodeURIComponent(siteId)}&path=${encodeURIComponent(assetPath)}&_=${Date.now()}`
   );
 
   for (const url of urls) {

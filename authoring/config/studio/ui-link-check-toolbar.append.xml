@@ -1,0 +1,14 @@
+                    <widget id="org.craftercms.studio.linkcheck.toolbar">
+                        <plugin id="org.rd.plugin.uigoodies"
+                                site="{site}"
+                                type="apps"
+                                name="uigoodies"
+                                file="index.js"/>
+                    </widget>
+                    <widget id="org.craftercms.studio.linkcheck.a11y">
+                        <plugin id="org.rd.plugin.uigoodies"
+                                site="{site}"
+                                type="apps"
+                                name="uigoodies"
+                                file="index.js"/>
+                    </widget>

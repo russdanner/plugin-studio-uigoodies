@@ -47,12 +47,13 @@ With default settings, this plugin works **without any site-specific Studio conf
 | `applicationEventPublisher` | dev-content-ops-git (fallback `SyncFromRepoEvent` publish if `syncFromRepoTask` unavailable) |
 | `processedCommitsDao` | dev-content-ops-git (processed flag on commits) |
 | `blobStoreResolver` | dev-content-ops-git (blob store overview, tree, preview → staging/live sync) |
+| `crafter.s3ClientFactory` | dev-content-ops-git (S3 blob version list/restore) |
 | `studio.securityService` / `cstudioSecurityService` | dev-content-ops-git blob sync (current user for publish audit) |
 
 If **bean restriction** is enabled (`studio.scripting.restrictBeans: true`), add at least:
 
 ```yaml
-studio.scripting.allowedBeans: cstudioContentService,dependencyServiceInternal,studio.gitRepositoryHelper,studio.gitCli,cstudioGeneralLockService,contentRepository,sitesService,processedCommitsDao,syncFromRepoTask,applicationEventPublisher,blobStoreResolver,studio.securityService
+studio.scripting.allowedBeans: cstudioContentService,dependencyServiceInternal,studio.gitRepositoryHelper,studio.gitCli,cstudioGeneralLockService,contentRepository,sitesService,processedCommitsDao,syncFromRepoTask,applicationEventPublisher,blobStoreResolver,crafter.s3ClientFactory,studio.securityService
 ```
 
 ## Whitelist-enabled environments
@@ -113,4 +114,5 @@ REST responses sanitize path and error strings (`jsonSafeText`) so control chara
 | `DevContentOpsRefsSupport.groovy` | Branch/tag list and CRUD via JGit + sandbox lock |
 | `DevContentOpsRepoHealthSupport.groovy` | GitSizer-style metrics (JGit) and optimize (GitCli + JGit + external hints) |
 | `DevContentOpsRepoConfigSupport.groovy` | Repo config metrics via JGit Config + NIO |
-| `DevContentOpsBlobStoreSupport.groovy` | Blob store config/tree/presence; sync via `DeploymentItemTO` + `StudioBlobStore.publish` (no reflection) |
+| `DevContentOpsBlobStoreSupport.groovy` | Blob store config/tree/presence; sync via `DeploymentItemTO` + `StudioBlobStore.publish`; S3 version list/restore via `crafter.s3ClientFactory` / `S3Utils`; version preview streams through the plugin REST endpoint (no S3 presigner) |
+| `DevContentOpsPublishCompareSupport.groovy` | Cross-repo tree compare: sandbox branch vs published staging/live; per-file text diff |

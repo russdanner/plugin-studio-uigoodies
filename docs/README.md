@@ -35,6 +35,7 @@ Each registered React widget is documented under **[widgets/](widgets/README.md)
 | Image Studio | `openImageStudioPanelButton`, `ImageStudio` | [open-image-studio-panel-button.md](widgets/open-image-studio-panel-button.md), [image-studio.md](widgets/image-studio.md) |
 | Translation (toolbar) | `openTranslationToolbarButton`, `TranslationDialog`, `openTranslationPanelButton` | [translation-tools.md](widgets/translation-tools.md) |
 | Content upload, bulk publish, search, etc. | See [widgets/README.md](widgets/README.md) | — |
+| Bulk Edit (separate plugin) | `org.craftercms.plugin.bulkedit` sidebar widget | [widgets/bulk-edit.md](widgets/bulk-edit.md) |
 
 ### Form controls (separate JS bundles)
 

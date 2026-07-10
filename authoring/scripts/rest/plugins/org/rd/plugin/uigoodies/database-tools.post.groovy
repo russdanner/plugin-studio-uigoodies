@@ -14,7 +14,7 @@ try {
         response.status = 400
         return siteResolution.error
     }
-    def siteId = siteResolution.siteId as String
+    def studioSiteId = siteResolution.siteId as String
 
     def payload = DevContentOpsSupport.readJsonBody(request)
     if (payload == null) {
@@ -22,6 +22,13 @@ try {
         return DevContentOpsSupport.errorMap('Invalid JSON body')
     }
 
+    def bodySiteResolution = DevContentOpsSupport.resolveRequestSiteId(studioSiteId, payload as Map)
+    if (bodySiteResolution.error) {
+        response.status = 400
+        return bodySiteResolution.error
+    }
+
+    def siteId = DevContentOpsSupport.resolveOperationSiteId(studioSiteId, params, payload as Map)
     def action = DevContentOpsSupport.jsonSafeText(payload.action ?: '')
     def access = DevContentOpsDatabaseSupport.requireSystemAdmin(applicationContext, request)
     if (access.success != true) {

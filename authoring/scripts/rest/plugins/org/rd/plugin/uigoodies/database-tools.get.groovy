@@ -15,12 +15,23 @@ try {
         response.status = 400
         return siteResolution.error
     }
-    def siteId = siteResolution.siteId as String
+    def studioSiteId = siteResolution.siteId as String
+    def siteId = DevContentOpsSupport.resolveOperationSiteId(studioSiteId, params)
     def action = DevContentOpsSupport.jsonSafeText(params.action ?: 'access')
 
     switch (action) {
         case 'access':
-            return DevContentOpsSupport.withSiteId(siteId, DevContentOpsDatabaseSupport.checkAccess(applicationContext, request) as Map)
+            try {
+                return DevContentOpsSupport.withSiteId(
+                    siteId,
+                    DevContentOpsDatabaseSupport.checkAccess(applicationContext, request) as Map
+                )
+            } catch (Throwable t) {
+                return DevContentOpsSupport.withSiteId(
+                    siteId,
+                    DevContentOpsSupport.failureFromThrowable(t, 'database access check failed')
+                )
+            }
 
         case 'auditStats':
             def access = DevContentOpsDatabaseSupport.requireSystemAdmin(applicationContext, request)
@@ -54,7 +65,7 @@ try {
 } catch (IllegalArgumentException e) {
     response.status = 400
     return DevContentOpsSupport.errorMap(e.message ?: 'Invalid request')
-} catch (Exception e) {
+} catch (Throwable t) {
     response.status = 500
-    return DevContentOpsSupport.failureFromThrowable(e, 'database-tools GET failed')
+    return DevContentOpsSupport.failureFromThrowable(t, 'database-tools GET failed')
 }

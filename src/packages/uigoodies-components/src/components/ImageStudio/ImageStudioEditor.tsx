@@ -79,6 +79,8 @@ type Props = {
   onTextFontSizeChange: (size: number) => void;
   canvasView: CanvasViewTransform;
   onCanvasViewChange: (view: CanvasViewTransform) => void;
+  onApplyCrop?: () => void;
+  applyingCrop?: boolean;
 };
 
 export function ImageStudioEditor({
@@ -117,7 +119,9 @@ export function ImageStudioEditor({
   textFontSize,
   onTextFontSizeChange,
   canvasView,
-  onCanvasViewChange
+  onCanvasViewChange,
+  onApplyCrop,
+  applyingCrop
 }: Props) {
   const theme = useTheme();
   const [naturalSize, setNaturalSize] = useState({ width: 0, height: 0 });
@@ -187,6 +191,8 @@ export function ImageStudioEditor({
           onAspectChange={onAspectChange}
           canvasView={canvasView}
           onCanvasViewChange={onCanvasViewChange}
+          onApplyCrop={onApplyCrop}
+          applyingCrop={applyingCrop}
         />
       </Box>
     );

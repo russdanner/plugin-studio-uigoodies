@@ -68,6 +68,14 @@ Wraps multiple **Tools Panel** shortcuts in a **single accordion** section (titl
                     </widget>
                 </configuration>
             </widget>
+            <!-- Bulk Edit — separate plugin; see docs/widgets/bulk-edit.md -->
+            <widget id="org.craftercms.plugin.bulkedit.components.reactComponent">
+                <plugin id="org.craftercms.plugin.bulkedit"
+                        site="{site}"
+                        type="sidebar"
+                        name="bulkedit"
+                        file="index.js"/>
+            </widget>
         </widgets>
     </configuration>
 </widget>

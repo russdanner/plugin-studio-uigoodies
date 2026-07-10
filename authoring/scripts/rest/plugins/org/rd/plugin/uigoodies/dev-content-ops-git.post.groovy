@@ -18,7 +18,7 @@ try {
         response.status = 400
         return siteResolution.error
     }
-    def siteId = siteResolution.siteId as String
+    def studioSiteId = siteResolution.siteId as String
 
     def payload = DevContentOpsSupport.readJsonBody(request)
     if (payload == null) {
@@ -26,12 +26,13 @@ try {
         return DevContentOpsSupport.errorMap('Invalid JSON body')
     }
 
-    def bodySiteResolution = DevContentOpsSupport.resolveRequestSiteId(siteId, payload as Map)
+    def bodySiteResolution = DevContentOpsSupport.resolveRequestSiteId(studioSiteId, payload as Map)
     if (bodySiteResolution.error) {
         response.status = 400
         return bodySiteResolution.error
     }
 
+    def siteId = DevContentOpsSupport.resolveOperationSiteId(studioSiteId, params, payload as Map)
     def action = DevContentOpsSupport.jsonSafeText(payload.action ?: '')
     def helper = DevContentOpsSupport.gitHelper(applicationContext)
     def contentRepo = DevContentOpsSupport.contentRepository(applicationContext)
@@ -310,6 +311,34 @@ try {
                     syncTarget,
                     syncPaths,
                     syncStoreId
+                ) as Map
+            )
+
+        case 'restoreBlobVersion':
+            def restoreStoreId = DevContentOpsSupport.jsonSafeText(payload.storeId ?: '')
+            def restorePath = DevContentOpsSupport.jsonSafeText(payload.path ?: '')
+            def restoreVersionId = DevContentOpsSupport.jsonSafeText(payload.versionId ?: '')
+            def restoreTarget = DevContentOpsSupport.jsonSafeText(payload.target ?: 'preview')
+            def restoreDeleteMarker = DevContentOpsSupport.toBoolean(payload.deleteMarker, false)
+            if (!restoreStoreId) {
+                response.status = 400
+                return DevContentOpsSupport.errorMap('storeId is required')
+            }
+            if (!restorePath) {
+                response.status = 400
+                return DevContentOpsSupport.errorMap('path is required')
+            }
+            return DevContentOpsSupport.withSiteId(
+                siteId,
+                DevContentOpsBlobStoreSupport.restoreBlobVersion(
+                    applicationContext,
+                    contentRepo,
+                    siteId,
+                    restoreStoreId,
+                    restorePath,
+                    restoreVersionId,
+                    restoreTarget,
+                    restoreDeleteMarker
                 ) as Map
             )
 

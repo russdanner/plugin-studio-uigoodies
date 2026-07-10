@@ -21,7 +21,7 @@ if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
   echo "  SKIP_YARN_DIST=1       Skip UI build (bundle must already exist)." >&2
   echo "  SKIP_SCRIPT_RELOAD=1   Skip Groovy script reload after copy." >&2
   echo "  SKIP_WHITELIST=1       Do not merge sandbox whitelist fragment (default: skip)." >&2
-  echo "  SKIP_UI_XML=1          Do not merge Image Studio / DevContentOps / Translation into config/studio/ui.xml." >&2
+  echo "  SKIP_UI_XML=1          Do not merge DevContentOps / Translation into config/studio/ui.xml." >&2
   echo "" >&2
   echo "IMPORTANT: marketplace/copy reads 'path' from the Studio server's filesystem." >&2
   echo "  Run this script ON the Studio host (or set path to a clone on that host)." >&2
@@ -37,15 +37,16 @@ PLUGIN_UI_DEPLOY="${PLUGIN_PATH}/authoring/static-assets/plugins/org/rd/plugin/u
 SITE_PLUGIN="${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox/config/studio/static-assets/plugins/org/rd/plugin/uigoodies/apps/uigoodies/index.js"
 WHITELIST="${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox/config/studio/extension/groovy/whitelist"
 WHITELIST_APPEND="${PLUGIN_PATH}/authoring/config/studio/extension/groovy/uigoodies-plugin-whitelist.append"
-UI_XML_FRAGMENT="${PLUGIN_PATH}/authoring/config/studio/ui-image-studio-widget.append.xml"
-IMAGE_STUDIO_WIDGET_ID="org.rd.plugin.uigoodies.openImageStudioPanelButton"
 UI_SITE_TOOLS_FRAGMENT="${PLUGIN_PATH}/authoring/config/studio/ui-dev-content-ops-tools.append.xml"
 UI_TRANSLATION_CONFIG_TOOLS_FRAGMENT="${PLUGIN_PATH}/authoring/config/studio/ui-translation-config-tools.append.xml"
 UI_TRANSLATION_TOOLBAR_FRAGMENT="${PLUGIN_PATH}/authoring/config/studio/ui-translation-toolbar.append.xml"
+UI_LINK_CHECK_TOOLBAR_FRAGMENT="${PLUGIN_PATH}/authoring/config/studio/ui-link-check-toolbar.append.xml"
 UI_SITE_TOOLS_REFERENCE_FRAGMENT="${PLUGIN_PATH}/authoring/config/studio/ui-site-tools-reference.append.xml"
 DEV_CONTENT_OPS_TOOL_ID="org.rd.plugin.uigoodies.DevContentOpsTools"
 TRANSLATION_CONFIG_TOOL_ID="org.rd.plugin.uigoodies.TranslationConfigTools"
 TRANSLATION_TOOLBAR_WIDGET_ID="org.rd.plugin.uigoodies.openTranslationToolbarButton"
+LINK_CHECK_TOOLBAR_WIDGET_ID="org.craftercms.studio.linkcheck.toolbar"
+LINK_CHECK_A11Y_WIDGET_ID="org.craftercms.studio.linkcheck.a11y"
 SITE_TOOLS_REFERENCE_ID="craftercms.siteTools"
 MARKER="# Studio UI Goodies plugin (org.rd.plugin.uigoodies)"
 
@@ -223,47 +224,6 @@ elif [[ "${SKIP_WHITELIST:-1}" != "1" && -f "${WHITELIST_APPEND}" && ! -f "${WHI
 fi
 
 SITE_UI_XML="${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox/config/studio/ui.xml"
-if [[ "${SKIP_UI_XML:-}" != "1" && -f "${SITE_UI_XML}" && -f "${UI_XML_FRAGMENT}" ]]; then
-  if grep -qF "${IMAGE_STUDIO_WIDGET_ID}" "${SITE_UI_XML}" 2>/dev/null; then
-    echo "Image Studio widget already present in ui.xml."
-  else
-    echo "Merging Image Studio widget into config/studio/ui.xml..."
-    python3 - "${SITE_UI_XML}" "${UI_XML_FRAGMENT}" "${IMAGE_STUDIO_WIDGET_ID}" <<'PY'
-import sys
-from pathlib import Path
-
-ui_path = Path(sys.argv[1])
-fragment_path = Path(sys.argv[2])
-widget_id = sys.argv[3]
-text = ui_path.read_text(encoding="utf-8")
-fragment = fragment_path.read_text(encoding="utf-8")
-if widget_id in text:
-    sys.exit(0)
-needle = '<widget id="craftercms.components.ToolsPanel">'
-start = text.find(needle)
-if start == -1:
-    print("Warning: ToolsPanel widget not found in ui.xml — add Image Studio manually.", file=sys.stderr)
-    sys.exit(0)
-widgets_open = text.find("<widgets>", start)
-if widgets_open == -1:
-    print("Warning: ToolsPanel <widgets> not found — add Image Studio manually.", file=sys.stderr)
-    sys.exit(0)
-widgets_close = text.find("</widgets>", widgets_open)
-if widgets_close == -1:
-    print("Warning: ToolsPanel </widgets> not found — add Image Studio manually.", file=sys.stderr)
-    sys.exit(0)
-updated = text[:widgets_close] + fragment + text[widgets_close:]
-ui_path.write_text(updated, encoding="utf-8")
-print("Image Studio widget merged into Tools Panel.")
-PY
-    if git -C "${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-      git -C "${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox" add "config/studio/ui.xml" 2>/dev/null || true
-    fi
-  fi
-elif [[ "${SKIP_UI_XML:-}" != "1" && ! -f "${SITE_UI_XML}" ]]; then
-  echo "Note: site ui.xml not found at ${SITE_UI_XML} — merge Image Studio widget manually."
-fi
-
 if [[ "${SKIP_UI_XML:-}" != "1" && -f "${SITE_UI_XML}" && -f "${UI_SITE_TOOLS_REFERENCE_FRAGMENT}" ]]; then
   if grep -qF "reference id=\"${SITE_TOOLS_REFERENCE_ID}\"" "${SITE_UI_XML}" 2>/dev/null; then
     echo "Project Tools reference (craftercms.siteTools) already present in ui.xml."
@@ -470,6 +430,60 @@ PY
   fi
 elif [[ "${SKIP_UI_XML:-}" != "1" && ! -f "${SITE_UI_XML}" ]]; then
   echo "Note: site ui.xml not found — merge Translation toolbar manually (see docs/widgets/translation-tools.md)."
+fi
+
+if [[ "${SKIP_UI_XML:-}" != "1" && -f "${SITE_UI_XML}" && -f "${UI_LINK_CHECK_TOOLBAR_FRAGMENT}" ]]; then
+  echo "Patching link-check / WCAG toolbar widgets in config/studio/ui.xml..."
+  python3 - "${SITE_UI_XML}" "${UI_LINK_CHECK_TOOLBAR_FRAGMENT}" "${LINK_CHECK_TOOLBAR_WIDGET_ID}" "${LINK_CHECK_A11Y_WIDGET_ID}" <<'PY'
+import re
+import sys
+from pathlib import Path
+
+ui_path = Path(sys.argv[1])
+fragment_path = Path(sys.argv[2])
+toolbar_id = sys.argv[3]
+a11y_id = sys.argv[4]
+
+def normalize_fragment(raw: str) -> str:
+    raw = re.sub(r"^\s*<\?xml[^?]*\?>\s*", "", raw, count=1)
+    raw = re.sub(r"<!--.*?-->", "", raw, flags=re.DOTALL)
+    return raw.strip() + "\n"
+
+text = ui_path.read_text(encoding="utf-8")
+fragment = normalize_fragment(fragment_path.read_text(encoding="utf-8"))
+
+uigoodies_plugin = (
+    '<plugin id="org.rd.plugin.uigoodies"\n'
+    '                                site="{site}"\n'
+    '                                type="apps"\n'
+    '                                name="uigoodies"\n'
+    '                                file="index.js"/>'
+)
+
+for widget_id in (toolbar_id, a11y_id):
+    pattern = re.compile(
+        rf'(<widget id="{re.escape(widget_id)}">\s*)<plugin\b[^>]*/>',
+        re.DOTALL,
+    )
+    text = pattern.sub(rf"\1{uigoodies_plugin}", text)
+
+missing = [wid for wid in (toolbar_id, a11y_id) if wid not in text]
+if missing:
+    needle = '<widget id="craftercms.components.PreviewToolbar">'
+    start = text.find(needle)
+    if start != -1:
+        right_open = text.find("<rightSection>", start)
+        widgets_open = text.find("<widgets>", right_open) if right_open != -1 else -1
+        widgets_close = text.find("</widgets>", widgets_open) if widgets_open != -1 else -1
+        if widgets_close != -1:
+            text = text[:widgets_close] + fragment + text[widgets_close:]
+
+ui_path.write_text(text, encoding="utf-8")
+print("Link-check / WCAG toolbar widgets wired to uigoodies bundle.")
+PY
+  if git -C "${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    git -C "${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox" add "config/studio/ui.xml" 2>/dev/null || true
+  fi
 fi
 
 if [[ -f "${SITE_PLUGIN}" ]]; then

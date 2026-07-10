@@ -11,9 +11,22 @@ import {
   Chip,
   CircularProgress,
   Collapse,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControl,
   IconButton,
+  InputLabel,
+  MenuItem,
   Paper,
+  Select,
   Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
   Tooltip,
   Typography,
   alpha
@@ -21,18 +34,30 @@ import {
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
 import ExpandMoreRoundedIcon from '@mui/icons-material/ExpandMoreRounded';
 import FolderRoundedIcon from '@mui/icons-material/FolderRounded';
+import HistoryRoundedIcon from '@mui/icons-material/HistoryRounded';
 import InsertDriveFileRoundedIcon from '@mui/icons-material/InsertDriveFileRounded';
 import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
 import CloudUploadRoundedIcon from '@mui/icons-material/CloudUploadRounded';
+import RestoreRoundedIcon from '@mui/icons-material/RestoreRounded';
+import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded';
+import OpenInNewRoundedIcon from '@mui/icons-material/OpenInNewRounded';
 import { firstValueFrom } from 'rxjs';
 import {
   fetchBlobStoreChildren,
+  fetchBlobStoreDeleted,
   fetchBlobStoreOverview,
+  fetchBlobStoreVersions,
+  fetchBlobVersionPreview,
+  loadBlobVersionContent,
+  postRestoreBlobVersion,
   postSyncBlobStore,
   type BlobAssetPresence,
+  type BlobDeletedEntry,
+  type BlobObjectVersion,
   type BlobStoreConfig,
   type BlobStoreOverview,
-  type BlobStoreTreeEntry
+  type BlobStoreTreeEntry,
+  type BlobVersionPreviewResponse
 } from './devContentOpsApi';
 import {
   monoSx,
@@ -271,6 +296,647 @@ function BlobStoreTreeBranch({
   );
 }
 
+type BlobPublishingTarget = 'preview' | 'staging' | 'live';
+
+function formatBytes(size: number): string {
+  if (!size || size < 0) {
+    return '0 B';
+  }
+  const units = ['B', 'KB', 'MB', 'GB'];
+  let value = size;
+  let unit = 0;
+  while (value >= 1024 && unit < units.length - 1) {
+    value /= 1024;
+    unit += 1;
+  }
+  return `${value < 10 && unit > 0 ? value.toFixed(1) : Math.round(value)} ${units[unit]}`;
+}
+
+function formatVersionDate(value?: string): string {
+  if (!value) {
+    return '—';
+  }
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? value : date.toLocaleString();
+}
+
+function formatBlobVersionLabel(version: BlobObjectVersion): string {
+  if (version.versionLabel) {
+    return version.versionLabel;
+  }
+  if (version.legacyNullVersion || !version.versionId || version.versionId === 'null') {
+    return 'Original (pre-versioning)';
+  }
+  return version.versionId;
+}
+
+function blobVersionRowKey(version: BlobObjectVersion): string {
+  return `${version.versionId || 'null'}:${version.lastModified || ''}:${version.deleteMarker ? 'deleted' : 'object'}`;
+}
+
+function BlobVersionPreviewPanel({
+  preview,
+  loading,
+  error
+}: {
+  preview: BlobVersionPreviewResponse | null;
+  loading: boolean;
+  error: string | null;
+}) {
+  const [objectUrl, setObjectUrl] = useState<string | null>(null);
+  const [contentLoading, setContentLoading] = useState(false);
+  const [contentError, setContentError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!preview?.previewUrl) {
+      setObjectUrl(null);
+      setContentError(null);
+      return;
+    }
+
+    const ac = new AbortController();
+    setContentLoading(true);
+    setContentError(null);
+
+    loadBlobVersionContent(preview.previewUrl, ac.signal)
+      .then((blob) => {
+        const url = URL.createObjectURL(blob);
+        setObjectUrl((prev) => {
+          if (prev) {
+            URL.revokeObjectURL(prev);
+          }
+          return url;
+        });
+      })
+      .catch((e) => {
+        if (ac.signal.aborted) {
+          return;
+        }
+        setObjectUrl((prev) => {
+          if (prev) {
+            URL.revokeObjectURL(prev);
+          }
+          return null;
+        });
+        setContentError(e instanceof Error ? e.message : 'Failed to load preview');
+      })
+      .finally(() => {
+        if (!ac.signal.aborted) {
+          setContentLoading(false);
+        }
+      });
+
+    return () => {
+      ac.abort();
+      setObjectUrl((prev) => {
+        if (prev) {
+          URL.revokeObjectURL(prev);
+        }
+        return null;
+      });
+    };
+  }, [preview?.previewUrl]);
+
+  if (loading || contentLoading) {
+    return (
+      <Box sx={{ mt: 2, py: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+        <CircularProgress size={20} />
+        <Typography variant="body2" color="text.secondary">Loading preview…</Typography>
+      </Box>
+    );
+  }
+  if (error || contentError) {
+    return (
+      <Alert severity="error" sx={{ mt: 2 }}>
+        {error || contentError}
+      </Alert>
+    );
+  }
+  if (!preview?.previewUrl || !objectUrl) {
+    return null;
+  }
+
+  const contentType = preview.contentType || '';
+  const url = objectUrl;
+
+  return (
+    <Box
+      sx={{
+        mt: 2,
+        p: 1.5,
+        border: 1,
+        borderColor: 'divider',
+        borderRadius: 1,
+        bgcolor: (t) => alpha(t.palette.text.primary, 0.02)
+      }}
+    >
+      <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1} sx={{ mb: 1 }}>
+        <Typography variant="subtitle2">
+          Preview — {formatBlobVersionLabel({
+            versionId: preview.versionId,
+            versionLabel: preview.versionLabel,
+            legacyNullVersion: preview.versionId === 'null'
+          })}
+        </Typography>
+        <Button
+          size="small"
+          onClick={() => window.open(url, '_blank', 'noopener,noreferrer')}
+          startIcon={<OpenInNewRoundedIcon />}
+        >
+          Open in tab
+        </Button>
+      </Stack>
+
+      {contentType.startsWith('image/') ? (
+        <Box sx={{ textAlign: 'center' }}>
+          <Box
+            component="img"
+            src={url}
+            alt=""
+            sx={{ maxWidth: '100%', maxHeight: 360, objectFit: 'contain', borderRadius: 1 }}
+          />
+        </Box>
+      ) : contentType === 'application/pdf' ? (
+        <Box component="iframe" src={url} title="PDF preview" sx={{ width: '100%', height: 360, border: 0, borderRadius: 1 }} />
+      ) : contentType.startsWith('video/') ? (
+        <Box component="video" src={url} controls sx={{ maxWidth: '100%', maxHeight: 360, display: 'block', mx: 'auto' }} />
+      ) : contentType.startsWith('audio/') ? (
+        <Box component="audio" src={url} controls sx={{ width: '100%' }} />
+      ) : (
+        <Alert severity="info">
+          Inline preview is not available for this file type ({contentType || 'unknown'}). Use Open in tab to download or
+          view the object.
+        </Alert>
+      )}
+    </Box>
+  );
+}
+
+function BlobVersionHistoryDialog({
+  siteId,
+  store,
+  assetPath,
+  overview,
+  open,
+  onClose,
+  onRestored
+}: {
+  siteId: string;
+  store: BlobStoreConfig;
+  assetPath: string;
+  overview: BlobStoreOverview;
+  open: boolean;
+  onClose: () => void;
+  onRestored: () => void;
+}) {
+  const targetOptions = useMemo(() => {
+    const options: BlobPublishingTarget[] = ['preview'];
+    if (store.mappings.some((m) => m.publishingTarget.toLowerCase() === 'staging') && overview.stagingEnabled) {
+      options.push('staging');
+    }
+    if (store.mappings.some((m) => m.publishingTarget.toLowerCase() === 'live')) {
+      options.push('live');
+    }
+    return options;
+  }, [store.mappings, overview.stagingEnabled]);
+
+  const [target, setTarget] = useState<BlobPublishingTarget>('preview');
+  const [loading, setLoading] = useState(false);
+  const [restoringId, setRestoringId] = useState<string | null>(null);
+  const [versions, setVersions] = useState<BlobObjectVersion[]>([]);
+  const [objectKey, setObjectKey] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [previewError, setPreviewError] = useState<string | null>(null);
+  const [preview, setPreview] = useState<BlobVersionPreviewResponse | null>(null);
+  const [previewVersionId, setPreviewVersionId] = useState<string | null>(null);
+
+  const loadVersions = useCallback(() => {
+    setLoading(true);
+    setError(null);
+    setPreview(null);
+    setPreviewVersionId(null);
+    setPreviewError(null);
+    firstValueFrom(fetchBlobStoreVersions(siteId, store.id, assetPath, target))
+      .then((data) => {
+        setVersions(data.versions ?? []);
+        setObjectKey(data.objectKey ?? '');
+      })
+      .catch((err: Error) => {
+        setVersions([]);
+        setObjectKey('');
+        setError(err.message);
+      })
+      .finally(() => setLoading(false));
+  }, [siteId, store.id, assetPath, target]);
+
+  useEffect(() => {
+    if (open) {
+      setNotice(null);
+      loadVersions();
+    }
+  }, [open, loadVersions]);
+
+  useEffect(() => {
+    setPreview(null);
+    setPreviewVersionId(null);
+    setPreviewError(null);
+  }, [target]);
+
+  const loadPreview = useCallback(
+    (version: BlobObjectVersion) => {
+      if (version.deleteMarker) {
+        return;
+      }
+      setPreviewLoading(true);
+      setPreviewError(null);
+      setPreviewVersionId(version.versionId);
+      firstValueFrom(fetchBlobVersionPreview(siteId, store.id, assetPath, version.versionId, target))
+        .then((data) => setPreview(data))
+        .catch((err: Error) => {
+          setPreview(null);
+          setPreviewError(err.message);
+        })
+        .finally(() => setPreviewLoading(false));
+    },
+    [siteId, store.id, assetPath, target]
+  );
+
+  const restore = async (version: BlobObjectVersion) => {
+    if (store.readOnly) {
+      return;
+    }
+    const label = version.deleteMarker
+      ? 'delete marker (undelete)'
+      : version.latest
+        ? 'current version'
+        : formatBlobVersionLabel(version);
+    const action = version.deleteMarker
+      ? `Remove the delete marker and restore the previous version in ${target}?`
+      : `Restore this asset from ${label}? This creates a new current version in ${target} storage.`;
+    if (!window.confirm(action)) {
+      return;
+    }
+    setRestoringId(version.versionId);
+    setError(null);
+    setNotice(null);
+    try {
+      const result = await firstValueFrom(
+        postRestoreBlobVersion(siteId, {
+          storeId: store.id,
+          path: assetPath,
+          versionId: version.versionId,
+          target,
+          deleteMarker: Boolean(version.deleteMarker)
+        })
+      );
+      setNotice(result.message || 'Version restored.');
+      loadVersions();
+      onRestored();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Restore failed');
+    } finally {
+      setRestoringId(null);
+    }
+  };
+
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
+      <DialogTitle>Version history</DialogTitle>
+      <DialogContent dividers sx={{ maxHeight: '80vh', overflow: 'auto' }}>
+        <Typography variant="body2" color="text.secondary" sx={{ ...monoSx, mb: 1.5 }} noWrap title={assetPath}>
+          {assetPath}
+        </Typography>
+        {objectKey && (
+          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', ...monoSx, mb: 1.5 }}>
+            S3 key: {objectKey}
+          </Typography>
+        )}
+
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} alignItems={{ sm: 'center' }} sx={{ mb: 1.5 }}>
+          <FormControl size="small" sx={{ minWidth: 160 }}>
+            <InputLabel id="blob-version-target-label">Environment</InputLabel>
+            <Select
+              labelId="blob-version-target-label"
+              label="Environment"
+              value={target}
+              onChange={(e) => setTarget(e.target.value as BlobPublishingTarget)}
+            >
+              {targetOptions.map((option) => (
+                <MenuItem key={option} value={option}>
+                  {option}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <Button size="small" startIcon={<RefreshRoundedIcon />} onClick={loadVersions} disabled={loading}>
+            Refresh
+          </Button>
+        </Stack>
+
+        {notice && (
+          <Alert severity="success" sx={{ mb: 1.5 }} onClose={() => setNotice(null)}>
+            {notice}
+          </Alert>
+        )}
+        {error && (
+          <Alert severity="error" sx={{ mb: 1.5 }} onClose={() => setError(null)}>
+            {error}
+          </Alert>
+        )}
+
+        {loading ? (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 3, justifyContent: 'center' }}>
+            <CircularProgress size={20} />
+            <Typography variant="body2" color="text.secondary">Loading versions…</Typography>
+          </Box>
+        ) : versions.length === 0 ? (
+          <Typography variant="body2" color="text.secondary">
+            No versions found. Ensure bucket versioning is enabled on the S3/MinIO bucket.
+          </Typography>
+        ) : (
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell>Version</TableCell>
+                <TableCell>Modified</TableCell>
+                <TableCell align="right">Size</TableCell>
+                <TableCell align="right">Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {versions.map((version) => (
+                <TableRow
+                  key={blobVersionRowKey(version)}
+                  hover
+                  selected={previewVersionId === version.versionId}
+                  sx={{ cursor: version.deleteMarker ? 'default' : 'pointer' }}
+                  onClick={() => !version.deleteMarker && loadPreview(version)}
+                >
+                  <TableCell sx={{ ...monoSx, maxWidth: 220 }}>
+                    <Stack direction="row" spacing={0.5} alignItems="center" useFlexGap flexWrap="wrap">
+                      <Typography
+                        variant="body2"
+                        sx={version.legacyNullVersion ? undefined : monoSx}
+                        noWrap
+                        title={
+                          version.legacyNullVersion
+                            ? 'Object uploaded before bucket versioning was enabled'
+                            : version.versionId
+                        }
+                      >
+                        {formatBlobVersionLabel(version)}
+                      </Typography>
+                      {version.latest && !version.deleteMarker && (
+                        <Chip size="small" label="Current" color="primary" variant="outlined" />
+                      )}
+                      {version.deleteMarker && (
+                        <Chip size="small" label="Deleted" color="warning" variant="outlined" />
+                      )}
+                    </Stack>
+                  </TableCell>
+                  <TableCell>{formatVersionDate(version.lastModified)}</TableCell>
+                  <TableCell align="right">{version.deleteMarker ? '—' : formatBytes(version.size)}</TableCell>
+                  <TableCell align="right">
+                    <Stack direction="row" spacing={0.5} justifyContent="flex-end" onClick={(e) => e.stopPropagation()}>
+                      <Button
+                        size="small"
+                        variant="text"
+                        startIcon={
+                          previewLoading && previewVersionId === version.versionId ? (
+                            <CircularProgress size={14} />
+                          ) : (
+                            <VisibilityRoundedIcon />
+                          )
+                        }
+                        disabled={Boolean(version.deleteMarker) || previewLoading}
+                        onClick={() => loadPreview(version)}
+                      >
+                        Preview
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        startIcon={
+                          restoringId === version.versionId ? (
+                            <CircularProgress size={14} />
+                          ) : (
+                            <RestoreRoundedIcon />
+                          )
+                        }
+                        disabled={Boolean(store.readOnly) || restoringId !== null}
+                        onClick={() => restore(version)}
+                      >
+                        {version.deleteMarker ? 'Undelete' : 'Restore'}
+                      </Button>
+                    </Stack>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+
+        <BlobVersionPreviewPanel preview={preview} loading={previewLoading} error={previewError} />
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>Close</Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
+function DeletedBlobsPanel({
+  siteId,
+  store,
+  overview,
+  onOpenHistory,
+  onRestored
+}: {
+  siteId: string;
+  store: BlobStoreConfig;
+  overview: BlobStoreOverview;
+  onOpenHistory: (path: string) => void;
+  onRestored: () => void;
+}) {
+  const targetOptions = useMemo(() => {
+    const options: BlobPublishingTarget[] = ['preview'];
+    if (store.mappings.some((m) => m.publishingTarget.toLowerCase() === 'staging') && overview.stagingEnabled) {
+      options.push('staging');
+    }
+    if (store.mappings.some((m) => m.publishingTarget.toLowerCase() === 'live')) {
+      options.push('live');
+    }
+    return options;
+  }, [store.mappings, overview.stagingEnabled]);
+
+  const [target, setTarget] = useState<BlobPublishingTarget>('preview');
+  const [loading, setLoading] = useState(false);
+  const [restoringId, setRestoringId] = useState<string | null>(null);
+  const [entries, setEntries] = useState<BlobDeletedEntry[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+
+  const loadDeleted = useCallback(() => {
+    if (!store.versioningSupported) {
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    firstValueFrom(fetchBlobStoreDeleted(siteId, store.id, target))
+      .then((data) => setEntries(data.entries ?? []))
+      .catch((err: Error) => {
+        setEntries([]);
+        setError(err.message);
+      })
+      .finally(() => setLoading(false));
+  }, [siteId, store.id, store.versioningSupported, target]);
+
+  useEffect(() => {
+    loadDeleted();
+  }, [loadDeleted]);
+
+  const undelete = async (entry: BlobDeletedEntry) => {
+    if (store.readOnly) {
+      return;
+    }
+    if (
+      !window.confirm(
+        `Restore deleted blob ${entry.path}? This removes the delete marker and makes the previous version current in ${target} storage.`
+      )
+    ) {
+      return;
+    }
+    setRestoringId(entry.versionId);
+    setError(null);
+    setNotice(null);
+    try {
+      const result = await firstValueFrom(
+        postRestoreBlobVersion(siteId, {
+          storeId: store.id,
+          path: entry.path,
+          versionId: entry.versionId,
+          target,
+          deleteMarker: true
+        })
+      );
+      setNotice(result.message || 'Blob restored.');
+      loadDeleted();
+      onRestored();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Restore failed');
+    } finally {
+      setRestoringId(null);
+    }
+  };
+
+  if (!store.versioningSupported) {
+    return null;
+  }
+
+  return (
+    <Box sx={{ mt: 2 }}>
+      <SectionLabel>Deleted in storage</SectionLabel>
+      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+        Objects removed from blob storage (S3 delete markers). Restore brings back the latest non-deleted version.
+      </Typography>
+
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} alignItems={{ sm: 'center' }} sx={{ mb: 1 }}>
+        <FormControl size="small" sx={{ minWidth: 160 }}>
+          <InputLabel id={`deleted-target-${store.id}`}>Environment</InputLabel>
+          <Select
+            labelId={`deleted-target-${store.id}`}
+            label="Environment"
+            value={target}
+            onChange={(e) => setTarget(e.target.value as BlobPublishingTarget)}
+          >
+            {targetOptions.map((option) => (
+              <MenuItem key={option} value={option}>
+                {option}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <Button size="small" startIcon={<RefreshRoundedIcon />} onClick={loadDeleted} disabled={loading}>
+          Refresh deleted
+        </Button>
+      </Stack>
+
+      {notice && (
+        <Alert severity="success" sx={{ mb: 1 }} onClose={() => setNotice(null)}>
+          {notice}
+        </Alert>
+      )}
+      {error && (
+        <Alert severity="error" sx={{ mb: 1 }} onClose={() => setError(null)}>
+          {error}
+        </Alert>
+      )}
+
+      <Box
+        sx={{
+          border: 1,
+          borderColor: 'divider',
+          borderRadius: 1,
+          maxHeight: 240,
+          overflow: 'auto',
+          bgcolor: (t) => alpha(t.palette.text.primary, 0.02)
+        }}
+      >
+        {loading ? (
+          <Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+            <CircularProgress size={18} />
+            <Typography variant="body2" color="text.secondary">Loading deleted objects…</Typography>
+          </Box>
+        ) : entries.length === 0 ? (
+          <Typography variant="body2" color="text.secondary" sx={{ p: 2 }}>
+            No deleted blobs found under this store path.
+          </Typography>
+        ) : (
+          <Table size="small" stickyHeader>
+            <TableHead>
+              <TableRow>
+                <TableCell>Path</TableCell>
+                <TableCell>Deleted</TableCell>
+                <TableCell align="right">Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {entries.map((entry) => (
+                <TableRow key={`${entry.path}-${entry.versionId}`} hover>
+                  <TableCell sx={{ ...monoSx, maxWidth: 360 }} title={entry.path}>
+                    {entry.path}
+                  </TableCell>
+                  <TableCell>{formatVersionDate(entry.lastModified)}</TableCell>
+                  <TableCell align="right">
+                    <Stack direction="row" spacing={0.5} justifyContent="flex-end">
+                      <Button size="small" onClick={() => onOpenHistory(entry.path)}>
+                        History
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        startIcon={
+                          restoringId === entry.versionId ? <CircularProgress size={14} /> : <RestoreRoundedIcon />
+                        }
+                        disabled={Boolean(store.readOnly) || restoringId !== null}
+                        onClick={() => undelete(entry)}
+                      >
+                        Restore
+                      </Button>
+                    </Stack>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </Box>
+    </Box>
+  );
+}
+
 function BlobStoreSection({
   siteId,
   store,
@@ -285,20 +951,32 @@ function BlobStoreSection({
   const [syncing, setSyncing] = useState<'staging' | 'live' | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [versionDialogOpen, setVersionDialogOpen] = useState(false);
+  const [versionDialogPath, setVersionDialogPath] = useState<string | null>(null);
 
-  const loadRoot = useCallback(() => {
+  const loadRoot = useCallback((isActive: () => boolean = () => true) => {
     setRootState({ entries: [], loading: true });
     setError(null);
     firstValueFrom(fetchBlobStoreChildren(siteId, store.id, store.treeRoot || '/static-assets'))
-      .then((data) => setRootState({ entries: data.entries, loading: false }))
+      .then((data) => {
+        if (isActive()) {
+          setRootState({ entries: data.entries, loading: false });
+        }
+      })
       .catch((err: Error) => {
-        setRootState({ entries: [], loading: false });
-        setError(err.message);
+        if (isActive()) {
+          setRootState({ entries: [], loading: false });
+          setError(err.message);
+        }
       });
   }, [siteId, store.id, store.treeRoot]);
 
   useEffect(() => {
-    loadRoot();
+    let cancelled = false;
+    loadRoot(() => !cancelled);
+    return () => {
+      cancelled = true;
+    };
   }, [loadRoot]);
 
   const selectedList = useMemo(
@@ -308,6 +986,11 @@ function BlobStoreSection({
 
   const hasStagingMapping = store.mappings.some((m) => m.publishingTarget.toLowerCase() === 'staging');
   const hasLiveMapping = store.mappings.some((m) => m.publishingTarget.toLowerCase() === 'live');
+
+  const openVersionHistory = (path: string) => {
+    setVersionDialogPath(path);
+    setVersionDialogOpen(true);
+  };
 
   const sync = async (target: 'staging' | 'live') => {
     if (!selectedList.length) {
@@ -335,7 +1018,7 @@ function BlobStoreSection({
       <PanelHeader
         title={store.id}
         action={
-          <Button size="small" startIcon={<RefreshRoundedIcon />} onClick={loadRoot}>
+          <Button size="small" startIcon={<RefreshRoundedIcon />} onClick={() => loadRoot()}>
             Refresh tree
           </Button>
         }
@@ -351,14 +1034,11 @@ function BlobStoreSection({
         {store.readOnly && <Chip size="small" label="Read-only" color="warning" variant="outlined" />}
       </Stack>
 
-      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1, ...monoSx }}>
-        Pattern: {store.pattern}
-      </Typography>
-      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', ...monoSx }}>
-        Tree root: {store.treeRoot || '/static-assets'}
+      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
+        Browse files in preview storage, then sync to staging or live when needed.
       </Typography>
 
-      <SectionLabel sx={{ mt: 1.5 }}>Mappings</SectionLabel>
+      <SectionLabel sx={{ mt: 1.5 }}>Storage targets</SectionLabel>
       <Stack direction="row" spacing={0.5} useFlexGap flexWrap="wrap">
         {store.mappings.map((mapping) => (
           <Chip
@@ -372,6 +1052,9 @@ function BlobStoreSection({
       </Stack>
 
       <TabAlertStack sx={{ mt: 1.5 }}>
+        {store.versioningSupported && store.versioningNote && (
+          <Alert severity="warning">{store.versioningNote}</Alert>
+        )}
         {notice && (
           <Alert severity="success" onClose={() => setNotice(null)}>
             {notice}
@@ -393,6 +1076,21 @@ function BlobStoreSection({
           </ToolbarGroup>
           <ToolbarDivider />
           <ToolbarGroup>
+            {store.versioningSupported ? (
+              <Button
+                size="small"
+                variant="outlined"
+                startIcon={<HistoryRoundedIcon />}
+                disabled={selectedList.length !== 1}
+                onClick={() => openVersionHistory(selectedList[0])}
+              >
+                Version history
+              </Button>
+            ) : store.type === 's3BlobStore' ? (
+              <Typography variant="body2" color="text.secondary" sx={{ px: 0.5 }}>
+                Version history requires S3 bucket versioning
+              </Typography>
+            ) : null}
             <Button
               size="small"
               variant="outlined"
@@ -470,6 +1168,41 @@ function BlobStoreSection({
           ))
         )}
       </Box>
+
+      {store.type === 's3BlobStore' && !store.versioningSupported ? (
+        <Box sx={{ mt: 2 }}>
+          <SectionLabel>Version history &amp; deleted blobs</SectionLabel>
+          <Alert severity="info">
+            {store.versioningNote ||
+              'S3 bucket versioning is not enabled. Enable versioning on the blob store bucket to use version history, deleted-blob restore, and version previews.'}
+          </Alert>
+        </Box>
+      ) : (
+        <DeletedBlobsPanel
+          siteId={siteId}
+          store={store}
+          overview={overview}
+          onOpenHistory={openVersionHistory}
+          onRestored={loadRoot}
+        />
+      )}
+
+      {versionDialogPath && (
+        <BlobVersionHistoryDialog
+          siteId={siteId}
+          store={store}
+          assetPath={versionDialogPath}
+          overview={overview}
+          open={versionDialogOpen}
+          onClose={() => {
+            setVersionDialogOpen(false);
+            setVersionDialogPath(null);
+          }}
+          onRestored={() => {
+            loadRoot();
+          }}
+        />
+      )}
     </Paper>
   );
 }
@@ -482,18 +1215,44 @@ export function BlobStoreTab({ siteId }: { siteId: string; siteName?: string }) 
   const loadOverview = useCallback(() => {
     setLoading(true);
     setError(null);
-    firstValueFrom(fetchBlobStoreOverview(siteId))
-      .then((data) => setOverview(data))
+    return firstValueFrom(fetchBlobStoreOverview(siteId))
+      .then((data) => {
+        setOverview(data);
+      })
       .catch((err: Error) => {
         setOverview(null);
         setError(err.message);
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        setLoading(false);
+      });
   }, [siteId]);
 
   useEffect(() => {
-    loadOverview();
-  }, [loadOverview]);
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+    firstValueFrom(fetchBlobStoreOverview(siteId))
+      .then((data) => {
+        if (!cancelled) {
+          setOverview(data);
+        }
+      })
+      .catch((err: Error) => {
+        if (!cancelled) {
+          setOverview(null);
+          setError(err.message);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [siteId]);
 
   return (
     <TabShell>
@@ -501,7 +1260,7 @@ export function BlobStoreTab({ siteId }: { siteId: string; siteName?: string }) 
         <ToolbarRow>
           <ToolbarGroup>
             <Typography variant="body2" color="text.secondary">
-              External blob storage paths, presence across environments, and preview sync.
+              Browse and sync assets in external storage.
             </Typography>
           </ToolbarGroup>
           <ToolbarDivider />
@@ -514,41 +1273,35 @@ export function BlobStoreTab({ siteId }: { siteId: string; siteName?: string }) 
       </TabToolbar>
 
       <TabContentPanel>
-        <TabAlertStack>
-          {error && (
-            <Alert severity="error" onClose={() => setError(null)}>
-              {error}
-            </Alert>
-          )}
-        </TabAlertStack>
+        <Box sx={{ flex: 1, minHeight: 0, overflow: 'auto', p: 2 }}>
+          <TabAlertStack>
+            {error && (
+              <Alert severity="error" onClose={() => setError(null)}>
+                {error}
+              </Alert>
+            )}
+          </TabAlertStack>
 
-        {loading ? (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 4, justifyContent: 'center' }}>
-            <CircularProgress size={22} />
-            <Typography variant="body2" color="text.secondary">Loading blob store configuration…</Typography>
-          </Box>
-        ) : !overview?.configured ? (
-          <Alert severity="info">
-            No blob store is configured for this project. Add blob stores under{' '}
-            <Typography component="span" sx={monoSx}>Configuration → Blob Stores</Typography>
-            {overview?.configPresent === false && ' (config file not found in the repository).'}
-            {overview?.configPresent && overview.stores.length === 0 && ' (config file has no blob store entries).'}
-          </Alert>
-        ) : (
-          <Stack spacing={2}>
-            <Alert severity="info" icon={false}>
-              <Typography variant="body2">
-                <strong>Repo</strong> — sandbox pointer file (.blob) in Git.{' '}
-                <strong>Preview</strong> — asset in preview blob storage.{' '}
-                <strong>Staging / Live</strong> — published pointer on the environment branch (confirms publish state;
-                sync copies preview blobs to the target external storage).
-              </Typography>
+          {loading ? (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 4, justifyContent: 'center' }}>
+              <CircularProgress size={22} />
+              <Typography variant="body2" color="text.secondary">Loading blob store configuration…</Typography>
+            </Box>
+          ) : !overview?.configured ? (
+            <Alert severity="info">
+              No blob store is configured for this project. Add blob stores under{' '}
+              <Typography component="span" sx={monoSx}>Configuration → Blob Stores</Typography>
+              {overview?.configPresent === false && ' (config file not found in the repository).'}
+              {overview?.configPresent && overview.stores.length === 0 && ' (config file has no blob store entries).'}
             </Alert>
-            {overview.stores.map((store) => (
-              <BlobStoreSection key={store.id} siteId={siteId} store={store} overview={overview} />
-            ))}
-          </Stack>
-        )}
+          ) : (
+            <Stack spacing={2}>
+              {overview.stores.map((store) => (
+                <BlobStoreSection key={store.id} siteId={siteId} store={store} overview={overview} />
+              ))}
+            </Stack>
+          )}
+        </Box>
       </TabContentPanel>
     </TabShell>
   );

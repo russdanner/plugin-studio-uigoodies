@@ -15,6 +15,17 @@ All plugin REST calls pass the selected site as `?siteId=` on the URL and `siteI
 | Branches & tags | Local/remote branches and tags; pull/push when remotes exist |
 | Repository health | GitSizer-style metrics; optimize repository (GC, repack, prune) |
 | Site items | Filter items by name, path, type; set or clear workflow state flags |
+| Blob stores | Blob store tree, presence, sync, S3 versions |
+| Publish compare | Diff sandbox vs published repository (staging when enabled, else live) |
+
+## Publish compare features
+
+- Compares the **sandbox** repo (authoring branch) against the **published** repo on staging or live
+- **Auto** target uses staging when `enable-staging-environment` is true and the staging branch exists; otherwise live
+- Filter by path prefix (`/site`, `/static-assets`, etc.)
+- **Filter** text matches repository path or XML `internal-name` (content items)
+- **Hide files with no text diff** (default on) — omits modified files whose text content is identical
+- Lists added, modified, and removed paths with internal name + path columns; text diff per file
 
 ## Git Log features
 
@@ -68,7 +79,7 @@ Manual merge under **`//reference[@id='craftercms.siteTools']/tools`**:
 
 | Endpoint | Method | Purpose |
 |----------|--------|---------|
-| `dev-content-ops-git` | GET | `action=status\|log\|commit\|file\|diff\|patch\|repoHealth` |
+| `dev-content-ops-git` | GET | `action=status\|log\|commit\|file\|diff\|patch\|repoHealth\|publishCompareOverview\|publishCompare\|publishCompareDiff` |
 | `dev-content-ops-git` | POST | `applyPatch`, `setProcessedCommit`, `revertToCommit`, `resetHead`, `filterFile`, `trimHistory`, `buildPatch`, `optimizeRepo` |
 
 ### `filterFile` POST body

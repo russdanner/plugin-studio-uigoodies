@@ -156,6 +156,14 @@ export function ImageStudioSaveDialog({
     if (nextMode === 'replace' && sourcePath) {
       setFolder(sourcePath.substring(0, sourcePath.lastIndexOf('/')));
       setFileName(sourcePath.substring(sourcePath.lastIndexOf('/') + 1));
+      const ext = sourcePath.split('.').pop()?.toLowerCase();
+      if (ext === 'jpg' || ext === 'jpeg') {
+        setMimeType('image/jpeg');
+      } else if (ext === 'webp') {
+        setMimeType('image/webp');
+      } else if (ext === 'png') {
+        setMimeType('image/png');
+      }
     } else if (nextMode === 'variant' && sourcePath) {
       const variantPath = suggestVariantFilename(sourcePath);
       setFolder(variantPath.substring(0, variantPath.lastIndexOf('/')));
@@ -255,13 +263,16 @@ export function ImageStudioSaveDialog({
         )}
 
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-          <FormControl fullWidth size="small">
+          <FormControl fullWidth size="small" disabled={mode === 'replace'}>
             <InputLabel>Format</InputLabel>
             <Select label="Format" value={mimeType} onChange={(e) => setMimeType(e.target.value)}>
               <MenuItem value="image/png">PNG (lossless)</MenuItem>
               <MenuItem value="image/jpeg">JPEG</MenuItem>
               <MenuItem value="image/webp">WebP</MenuItem>
             </Select>
+            {mode === 'replace' && (
+              <FormHelperText>Format matches the original file extension when replacing.</FormHelperText>
+            )}
           </FormControl>
           {mimeType !== 'image/png' && (
             <TextField

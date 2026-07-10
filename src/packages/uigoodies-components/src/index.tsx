@@ -26,6 +26,8 @@ import TranslationDialog from './components/Translation/TranslationDialog';
 import TranslationConfigTools from './components/Translation/TranslationConfigTools';
 import OpenTranslationPanelButton from './components/Translation/components/OpenTranslationPanelButton';
 import OpenTranslationToolbarButton from './components/Translation/components/OpenTranslationToolbarButton';
+import LinkCheckToolbar from './components/LinkCheck/LinkCheckToolbar';
+import A11yToolbar from './components/LinkCheck/A11yToolbar';
 
 const plugin: PluginDescriptor = {
   locales: undefined,
@@ -59,7 +61,9 @@ const plugin: PluginDescriptor = {
     'org.rd.plugin.uigoodies.TranslationConfigTools': TranslationConfigTools,
     'org.rd.plugin.uigoodies.TranslationDialog': TranslationDialog,
     'org.rd.plugin.uigoodies.openTranslationPanelButton': OpenTranslationPanelButton,
-    'org.rd.plugin.uigoodies.openTranslationToolbarButton': OpenTranslationToolbarButton
+    'org.rd.plugin.uigoodies.openTranslationToolbarButton': OpenTranslationToolbarButton,
+    'org.craftercms.studio.linkcheck.toolbar': LinkCheckToolbar,
+    'org.craftercms.studio.linkcheck.a11y': A11yToolbar
   }
 };
 
@@ -90,7 +94,9 @@ export {
   TranslationConfigTools,
   TranslationDialog,
   OpenTranslationPanelButton,
-  OpenTranslationToolbarButton
+  OpenTranslationToolbarButton,
+  LinkCheckToolbar,
+  A11yToolbar
 };
 
 export default plugin;

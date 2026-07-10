@@ -119,6 +119,19 @@ final class DevContentOpsSupport {
     }
 
     /**
+     * Crafter plugin scripts must use the Studio session site as query {@code siteId}.
+     * DevContentOps passes the selected project as {@code targetSiteId} for operations.
+     */
+    static String resolveOperationSiteId(String studioSiteId, Map params, Map payload = null) {
+        String target = jsonSafeText(params?.targetSiteId ?: '')
+        if (!target && payload) {
+            target = jsonSafeText(payload?.targetSiteId ?: '')
+        }
+        String studio = jsonSafeText(studioSiteId ?: '')
+        return target ?: studio
+    }
+
+    /**
      * Resolve the target site from the plugin request query string (required).
      * When a JSON body is present, body.siteId must match the query siteId if supplied.
      */
@@ -137,11 +150,9 @@ final class DevContentOpsSupport {
     }
 
     static Map withSiteId(String siteId, Map payload) {
-        if (!payload) {
-            return [siteId: jsonSafeText(siteId)]
-        }
-        payload.siteId = jsonSafeText(siteId)
-        return payload
+        Map out = payload ? new LinkedHashMap(payload) : new LinkedHashMap()
+        out.siteId = jsonSafeText(siteId)
+        return out
     }
 
     static Map failureFromThrowable(Throwable t, String context) {
@@ -183,6 +194,10 @@ final class DevContentOpsSupport {
 
     static Object processedCommitsDao(def applicationContext) {
         return applicationContext.get('processedCommitsDao')
+    }
+
+    static Object configurationService(def applicationContext) {
+        return safeGetBean(applicationContext, 'configurationService')
     }
 
     static Object gitCli(def applicationContext) {
@@ -252,6 +267,28 @@ final class DevContentOpsSupport {
     }
 
     static Map commitToMap(RevCommit commit, Object sitesSvc, Object processedDao, String siteId) {
+        return commitToMap(commit, sitesSvc, processedDao, siteId, null, null)
+    }
+
+    /**
+     * Build a commit map. A commit is considered processed when it is recorded in the
+     * short-lived processed_commits table OR it is at/before the canonical sync pointer
+     * (site.last_commit_id). The processed_commits table is a transient sync helper that
+     * Studio prunes, so historical commits that were long ago synced are no longer present
+     * there — the canonical pointer is what determines whether a commit has been processed.
+     *
+     * @param lastProcessedCommitId canonical site.last_commit_id (may be null when never synced)
+     * @param unprocessedCommitIds  commit ids strictly between last_commit_id and the branch head
+     *                              (i.e. the commits that are genuinely not yet processed)
+     */
+    static Map commitToMap(
+        RevCommit commit,
+        Object sitesSvc,
+        Object processedDao,
+        String siteId,
+        String lastProcessedCommitId,
+        Set<String> unprocessedCommitIds
+    ) {
         def id = commit.getName()
         def parents = []
         commit.getParents()?.each { RevCommit p ->
@@ -263,6 +300,11 @@ final class DevContentOpsSupport {
         def body = lines.length > 1 ? lines[1]?.trim() : ''
         def author = commit.getAuthorIdent()
         boolean processed = isCommitProcessed(sitesSvc, processedDao, siteId, id)
+        if (!processed && lastProcessedCommitId && !(unprocessedCommitIds?.contains(id))) {
+            // No processed_commits row, but the commit is an ancestor of (or equal to) the
+            // canonical last processed pointer, so it has already been synced/processed.
+            processed = true
+        }
         return [
             id: plainString(id),
             shortId: plainString(id.length() > 8 ? id.substring(0, 8) : id),
@@ -274,6 +316,34 @@ final class DevContentOpsSupport {
             body: jsonSafeText(body),
             processed: processed
         ]
+    }
+
+    /**
+     * Resolve the canonical last processed commit id and the set of commit ids that are still
+     * unprocessed (strictly between last_commit_id and the given branch head).
+     */
+    static Map resolveProcessedState(
+        ContentRepository contentRepo,
+        Object sitesSvc,
+        String siteId,
+        String branchHeadCommitId
+    ) {
+        String lastProcessed = null
+        Set<String> unprocessed = new HashSet<>()
+        if (sitesSvc) {
+            try {
+                lastProcessed = plainString(sitesSvc.getLastCommitId(siteId))
+            } catch (Exception ignored) {
+            }
+        }
+        if (contentRepo && lastProcessed && branchHeadCommitId && lastProcessed != branchHeadCommitId) {
+            try {
+                def between = contentRepo.getCommitIdsBetween(siteId, lastProcessed, branchHeadCommitId)
+                between?.each { unprocessed.add(plainString(it)) }
+            } catch (Exception ignored) {
+            }
+        }
+        return [lastProcessedCommitId: lastProcessed, unprocessedCommitIds: unprocessed]
     }
 
     static String formatCommitDate(long seconds) {
@@ -346,8 +416,8 @@ final class DevContentOpsSupport {
                 gitStatusOk: runtime.gitStatusOk,
                 workTreeClean: runtime.workTreeClean
             ]
-        } catch (Exception e) {
-            return failureFromThrowable(e, 'Failed to load repository status')
+        } catch (Throwable t) {
+            return failureFromThrowable(t, 'Failed to load repository status')
         }
     }
 
@@ -361,13 +431,18 @@ final class DevContentOpsSupport {
         int limit,
         Long sinceEpoch,
         Long untilEpoch,
-        String order
+        String order,
+        ContentRepository contentRepo = null
     ) {
         def branchRef = resolveBranchRef(repo, branch)
         ObjectId startId = repo.resolve(branchRef)
         if (!startId) {
             return errorMap("Branch not found: ${branch}")
         }
+
+        def processedState = resolveProcessedState(contentRepo, sitesSvc, siteId, startId.name)
+        String lastProcessedCommitId = processedState.lastProcessedCommitId as String
+        Set<String> unprocessedCommitIds = processedState.unprocessedCommitIds as Set<String>
 
         boolean ascending = jsonSafeText(order ?: 'desc').toLowerCase() == 'asc'
         List<Map> commits = []
@@ -402,7 +477,9 @@ final class DevContentOpsSupport {
                 if (skip < total) {
                     int end = Math.min(skip + limit, total)
                     matched.subList(skip, end).each { RevCommit commit ->
-                        commits.add(commitToMap(commit, sitesSvc, processedDao, siteId))
+                        commits.add(commitToMap(
+                            commit, sitesSvc, processedDao, siteId, lastProcessedCommitId, unprocessedCommitIds
+                        ))
                     }
                     collected = commits.size()
                     hasMore = skip + collected < total
@@ -418,7 +495,9 @@ final class DevContentOpsSupport {
                         hasMore = true
                         break
                     }
-                    commits.add(commitToMap(commit, sitesSvc, processedDao, siteId))
+                    commits.add(commitToMap(
+                        commit, sitesSvc, processedDao, siteId, lastProcessedCommitId, unprocessedCommitIds
+                    ))
                     collected++
                 }
             }
@@ -427,6 +506,8 @@ final class DevContentOpsSupport {
                 siteId: jsonSafeText(siteId),
                 branch: jsonSafeText(branch),
                 headCommitId: start.getName(),
+                lastProcessedCommitId: jsonSafeText(lastProcessedCommitId ?: ''),
+                unprocessedCount: unprocessedCommitIds ? unprocessedCommitIds.size() : 0,
                 commits: commits,
                 skip: skip,
                 limit: limit,
@@ -546,12 +627,27 @@ final class DevContentOpsSupport {
         }
     }
 
-    static Map fetchCommitDetail(GitRepositoryHelper helper, Repository repo, Object sitesSvc, Object processedDao, String siteId, String commitId) {
+    static Map fetchCommitDetail(GitRepositoryHelper helper, Repository repo, Object sitesSvc, Object processedDao, String siteId, String commitId, ContentRepository contentRepo = null) {
         ObjectId oid = ObjectId.fromString(commitId)
         RevWalk walk = new RevWalk(repo)
         try {
             RevCommit commit = walk.parseCommit(oid)
-            return commitToMap(commit, sitesSvc, processedDao, siteId)
+            String branchHead = null
+            if (contentRepo) {
+                try {
+                    branchHead = plainString(contentRepo.getRepoLastCommitId(siteId))
+                } catch (Exception ignored) {
+                }
+            }
+            def processedState = resolveProcessedState(contentRepo, sitesSvc, siteId, branchHead)
+            return commitToMap(
+                commit,
+                sitesSvc,
+                processedDao,
+                siteId,
+                processedState.lastProcessedCommitId as String,
+                processedState.unprocessedCommitIds as Set<String>
+            )
         } catch (Exception e) {
             return failureFromThrowable(e, 'Failed to load commit detail')
         } finally {

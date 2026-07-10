@@ -1,3 +1,4 @@
+<!-- Optional: merge into Tools Panel widgets when Image Studio sidebar entry is desired -->
             <widget id="org.rd.plugin.uigoodies.openImageStudioPanelButton">
                <plugin id="org.rd.plugin.uigoodies"
                        type="apps"

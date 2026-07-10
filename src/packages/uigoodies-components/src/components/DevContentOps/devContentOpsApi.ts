@@ -101,6 +101,8 @@ export type BlobStoreConfig = {
   mappings: BlobStoreMapping[];
   active?: boolean;
   treeRoot?: string;
+  versioningSupported?: boolean;
+  versioningNote?: string;
 };
 
 export type BlobAssetPresence = {
@@ -152,6 +154,80 @@ export type BlobStoreSyncResult = {
   message?: string;
 };
 
+export type BlobObjectVersion = {
+  versionId: string;
+  versionLabel?: string;
+  legacyNullVersion?: boolean;
+  key: string;
+  lastModified?: string;
+  size: number;
+  latest: boolean;
+  deleteMarker?: boolean;
+  contentType?: string;
+  etag?: string;
+};
+
+export type BlobVersionPreviewResponse = {
+  success?: boolean;
+  storeId: string;
+  path: string;
+  publishingTarget: string;
+  versionId: string;
+  versionLabel?: string;
+  previewUrl: string;
+  contentType?: string;
+  expiresInSeconds?: number;
+  inlinePreview?: boolean;
+  bucket?: string;
+  objectKey?: string;
+};
+
+export type BlobStoreVersionsResponse = {
+  success?: boolean;
+  storeId: string;
+  path: string;
+  publishingTarget: string;
+  bucket?: string;
+  objectKey?: string;
+  currentlyDeleted?: boolean;
+  versionCount?: number;
+  versions: BlobObjectVersion[];
+};
+
+export type BlobDeletedEntry = {
+  path: string;
+  objectKey?: string;
+  versionId: string;
+  lastModified?: string;
+  deleteMarker?: boolean;
+};
+
+export type BlobStoreDeletedResponse = {
+  success?: boolean;
+  storeId: string;
+  publishingTarget: string;
+  bucket?: string;
+  prefix?: string;
+  deletedCount?: number;
+  entries: BlobDeletedEntry[];
+};
+
+export type BlobVersionRestoreResult = {
+  success?: boolean;
+  storeId?: string;
+  path?: string;
+  publishingTarget?: string;
+  bucket?: string;
+  objectKey?: string;
+  restoredFromVersionId?: string;
+  newVersionId?: string;
+  deleteMarkerRemoved?: boolean;
+  pointerRestored?: boolean;
+  pointerPath?: string;
+  pointerError?: string;
+  message?: string;
+};
+
 export type ProcessedCommitUpdate = {
   success?: boolean;
   error?: string;
@@ -182,10 +258,56 @@ export type FilterFileResult = {
 
 export type GitLogOrder = 'asc' | 'desc';
 
+export type PublishCompareTarget = {
+  id: string;
+  branch: string;
+  exists: boolean;
+};
+
+export type PublishCompareOverview = {
+  success?: boolean;
+  siteId?: string;
+  publishedRepositoryExists?: boolean;
+  stagingEnabled?: boolean;
+  stagingTarget?: string;
+  liveTarget?: string;
+  defaultTarget?: string;
+  targets?: PublishCompareTarget[];
+  sandboxBranch?: string;
+  sandboxHeadCommitId?: string;
+  publishHeadCommitId?: string;
+};
+
+export type PublishCompareFile = CommitFileChange & {
+  internalName?: string;
+  hasTextDiff?: boolean;
+};
+
+export type PublishCompareResponse = {
+  success?: boolean;
+  siteId?: string;
+  sandboxBranch?: string;
+  sandboxHeadCommitId?: string;
+  publishTarget?: string;
+  publishHeadCommitId?: string;
+  pathPrefix?: string;
+  hideNoDiff?: boolean;
+  query?: string;
+  files: PublishCompareFile[];
+  total: number;
+  changeCounts?: Record<string, number>;
+  skip: number;
+  limit: number;
+  hasMore: boolean;
+  nextSkip: number;
+};
+
 export type GitLogResponse = {
   siteId?: string;
   branch: string;
   headCommitId: string;
+  lastProcessedCommitId?: string;
+  unprocessedCount?: number;
   commits: GitCommit[];
   skip: number;
   limit: number;
@@ -254,12 +376,27 @@ function normalizeFileDiff(diff: FileDiff): FileDiff {
   };
 }
 
-function pluginUrl(script: string, siteId: string, query = ''): string {
+let devContentOpsStudioSiteId: string | null = null;
+
+/** Studio session site for plugin API auth; DevContentOps tools pass the selected project as targetSiteId. */
+export function setDevContentOpsStudioSiteId(studioSiteId: string | null) {
+  devContentOpsStudioSiteId = studioSiteId?.trim() || null;
+}
+
+function studioSiteFor(targetSiteId: string): string {
+  const studio = devContentOpsStudioSiteId?.trim();
+  return studio || targetSiteId;
+}
+
+function pluginUrl(script: string, targetSiteId: string, query = ''): string {
+  const studioSiteId = studioSiteFor(targetSiteId);
   const base =
     '/studio/api/2/plugin/script/plugins/org/rd/plugin/uigoodies/' +
     script +
     '?siteId=' +
-    encodeURIComponent(siteId);
+    encodeURIComponent(studioSiteId) +
+    '&targetSiteId=' +
+    encodeURIComponent(targetSiteId);
   return query ? base + '&' + query : base;
 }
 
@@ -285,7 +422,11 @@ function isDevContentOpsPayload(obj: Record<string, unknown>): boolean {
     'patch' in obj ||
     'content' in obj ||
     'success' in obj ||
+    'stores' in obj ||
+    'configured' in obj ||
+    'entries' in obj ||
     'fileDiffs' in obj ||
+    'publishTarget' in obj ||
     ('files' in obj && 'total' in obj)
   );
 }
@@ -515,6 +656,7 @@ export function fetchGitLog(
       ...data,
       branch: apiText(data.branch),
       headCommitId: apiText(data.headCommitId),
+      lastProcessedCommitId: data.lastProcessedCommitId ? apiText(data.lastProcessedCommitId) : data.lastProcessedCommitId,
       commits: (data.commits ?? []).map(normalizeCommit)
     }))
   );
@@ -602,6 +744,112 @@ export function fetchGitDiff(siteId: string, fromRef: string, toRef: string, pat
   );
 }
 
+export function fetchPublishCompareOverview(siteId: string) {
+  return pluginGet<PublishCompareOverview>(
+    siteId,
+    pluginUrl('dev-content-ops-git', siteId, 'action=publishCompareOverview')
+  ).pipe(
+    map((data) =>
+      assertSiteScope(siteId, {
+        ...data,
+        stagingTarget: apiText(data.stagingTarget),
+        liveTarget: apiText(data.liveTarget),
+        defaultTarget: apiText(data.defaultTarget),
+        sandboxBranch: apiText(data.sandboxBranch),
+        sandboxHeadCommitId: apiText(data.sandboxHeadCommitId),
+        publishHeadCommitId: apiText(data.publishHeadCommitId),
+        targets: (data.targets ?? []).map((target) => ({
+          id: apiText(target.id),
+          branch: apiText(target.branch),
+          exists: Boolean(target.exists)
+        }))
+      })
+    )
+  );
+}
+
+export function fetchPublishCompare(
+  siteId: string,
+  opts: {
+    target?: string;
+    pathPrefix?: string;
+    query?: string;
+    hideNoDiff?: boolean;
+    skip?: number;
+    limit?: number;
+  } = {}
+) {
+  let q = 'action=publishCompare';
+  if (opts.target) {
+    q += '&target=' + encodeURIComponent(opts.target);
+  }
+  if (opts.pathPrefix) {
+    q += '&pathPrefix=' + encodeURIComponent(opts.pathPrefix);
+  }
+  if (opts.query) {
+    q += '&query=' + encodeURIComponent(opts.query);
+  }
+  if (opts.hideNoDiff != null) {
+    q += '&hideNoDiff=' + (opts.hideNoDiff ? 'true' : 'false');
+  }
+  if (opts.skip != null) {
+    q += '&skip=' + opts.skip;
+  }
+  if (opts.limit != null) {
+    q += '&limit=' + opts.limit;
+  }
+  return pluginGet<PublishCompareResponse>(siteId, pluginUrl('dev-content-ops-git', siteId, q)).pipe(
+    map((data) =>
+      assertSiteScope(siteId, {
+        ...data,
+        sandboxBranch: apiText(data.sandboxBranch),
+        sandboxHeadCommitId: apiText(data.sandboxHeadCommitId),
+        publishTarget: apiText(data.publishTarget),
+        publishHeadCommitId: apiText(data.publishHeadCommitId),
+        pathPrefix: apiText(data.pathPrefix),
+        query: apiText(data.query),
+        hideNoDiff: data.hideNoDiff != null ? Boolean(data.hideNoDiff) : undefined,
+        files: (data.files ?? []).map((file) => ({
+          ...file,
+          changeType: apiText(file.changeType),
+          path: apiText(file.path),
+          internalName: file.internalName ? apiText(file.internalName) : '',
+          hasTextDiff: file.hasTextDiff != null ? Boolean(file.hasTextDiff) : undefined
+        }))
+      })
+    )
+  );
+}
+
+export function fetchPublishCompareDiff(siteId: string, path: string, target?: string) {
+  let q = 'action=publishCompareDiff&path=' + encodeURIComponent(path);
+  if (target) {
+    q += '&target=' + encodeURIComponent(target);
+  }
+  return pluginGet<{
+    path: string;
+    changeType: string;
+    publishTarget?: string;
+    sandboxBranch?: string;
+    from?: string;
+    to?: string;
+    binary?: boolean;
+    message?: string;
+    diff: string;
+    lines: DiffLine[];
+    fileDiffs?: FileDiff[];
+  }>(siteId, pluginUrl('dev-content-ops-git', siteId, q)).pipe(
+    map((data) => ({
+      ...data,
+      path: apiText(data.path),
+      changeType: apiText(data.changeType),
+      diff: apiText(data.diff),
+      message: data.message ? apiText(data.message) : undefined,
+      fileDiffs: (data.fileDiffs ?? []).map(normalizeFileDiff)
+    }))
+  );
+}
+
 export function fetchGitPatch(siteId: string, from: string, to: string) {
   return pluginGet<{ patch: string; commitCount: number }>(
     siteId,
@@ -614,11 +862,10 @@ export function fetchGitPatch(siteId: string, from: string, to: string) {
 }
 
 export function buildPatchFromSelection(siteId: string, selections: PatchSelection[]) {
-  return postJSON(pluginUrl('dev-content-ops-git', siteId), {
-    siteId,
+  return postJSON(pluginUrl('dev-content-ops-git', siteId), pluginPostBody(siteId, {
     action: 'buildPatch',
     selections
-  }).pipe(
+  })).pipe(
     map((r) => {
       const data = unwrapPluginResponse<{ patch: string; selectionCount: number }>(r);
       return { ...data, patch: apiText(data.patch) };
@@ -627,7 +874,7 @@ export function buildPatchFromSelection(siteId: string, selections: PatchSelecti
 }
 
 export function postDevContentOpsAction<T = Record<string, unknown>>(siteId: string, body: Record<string, unknown>) {
-  return postJSON(pluginUrl('dev-content-ops-git', siteId), { siteId, ...body }).pipe(
+  return postJSON(pluginUrl('dev-content-ops-git', siteId), pluginPostBody(siteId, body)).pipe(
     map((r) => {
       const data = unwrapPluginResponse<T & { siteId?: string }>(r);
       assertSiteScope(siteId, data as { siteId?: string });
@@ -936,6 +1183,10 @@ export type ProcessedCommitsStatsResponse = {
   description?: string;
 };
 
+function pluginPostBody(targetSiteId: string, body: Record<string, unknown>) {
+  return { siteId: studioSiteFor(targetSiteId), targetSiteId, ...body };
+}
+
 function databasePluginUrl(siteId: string, query = ''): string {
   return pluginUrl('database-tools', siteId, query);
 }
@@ -961,7 +1212,7 @@ export function postTruncateAudit(
     confirmed: boolean;
   }
 ) {
-  return postJSON(databasePluginUrl(siteId), { siteId, action: 'truncateAudit', ...opts }).pipe(
+  return postJSON(databasePluginUrl(siteId), pluginPostBody(siteId, { action: 'truncateAudit', ...opts })).pipe(
     map((r) => {
       const data = unwrapPluginResponse<{
         success: boolean;
@@ -987,7 +1238,7 @@ export function postTruncateProcessedCommits(
     confirmed: boolean;
   }
 ) {
-  return postJSON(databasePluginUrl(siteId), { siteId, action: 'truncateProcessedCommits', ...opts }).pipe(
+  return postJSON(databasePluginUrl(siteId), pluginPostBody(siteId, { action: 'truncateProcessedCommits', ...opts })).pipe(
     map((r) => {
       const data = unwrapPluginResponse<{
         success: boolean;
@@ -1014,6 +1265,8 @@ export function fetchBlobStoreOverview(siteId: string) {
           type: apiText(store.type),
           pattern: apiText(store.pattern),
           treeRoot: apiText(store.treeRoot),
+          versioningSupported: Boolean(store.versioningSupported),
+          versioningNote: store.versioningNote ? apiText(store.versioningNote) : undefined,
           mappings: (store.mappings ?? []).map((mapping) => ({
             publishingTarget: apiText(mapping.publishingTarget),
             storeTarget: apiText(mapping.storeTarget),
@@ -1068,13 +1321,12 @@ export function postSyncBlobStore(
     storeId?: string;
   }
 ) {
-  return postJSON(pluginUrl('dev-content-ops-git', siteId), {
-    siteId,
+  return postJSON(pluginUrl('dev-content-ops-git', siteId), pluginPostBody(siteId, {
     action: 'syncBlobStore',
     target: opts.target,
     paths: opts.paths,
     storeId: opts.storeId
-  }).pipe(
+  })).pipe(
     map((r) => {
       const data = unwrapPluginResponse<BlobStoreSyncResult>(r);
       assertSiteScope(siteId, data);
@@ -1086,6 +1338,186 @@ export function postSyncBlobStore(
         message: data.message ? apiText(data.message) : undefined,
         syncedPaths: (data.syncedPaths ?? []).map((p) => apiText(p)),
         failedPaths: (data.failedPaths ?? []).map((p) => apiText(p))
+      };
+    })
+  );
+}
+
+export function fetchBlobStoreVersions(
+  siteId: string,
+  storeId: string,
+  path: string,
+  target: 'preview' | 'staging' | 'live' = 'preview'
+) {
+  const q =
+    'action=blobStoreVersions&storeId=' +
+    encodeURIComponent(storeId) +
+    '&path=' +
+    encodeURIComponent(path) +
+    '&target=' +
+    encodeURIComponent(target);
+  return pluginGet<BlobStoreVersionsResponse>(siteId, pluginUrl('dev-content-ops-git', siteId, q)).pipe(
+    map((data) =>
+      assertSiteScope(siteId, {
+        ...data,
+        storeId: apiText(data.storeId) || storeId,
+        path: apiText(data.path),
+        publishingTarget: apiText(data.publishingTarget) || target,
+        bucket: data.bucket ? apiText(data.bucket) : undefined,
+        objectKey: data.objectKey ? apiText(data.objectKey) : undefined,
+        versions: (data.versions ?? []).map((version) => ({
+          versionId: apiText(version.versionId) || 'null',
+          versionLabel: version.versionLabel ? apiText(version.versionLabel) : undefined,
+          legacyNullVersion: Boolean(version.legacyNullVersion),
+          key: apiText(version.key),
+          lastModified: version.lastModified ? apiText(version.lastModified) : undefined,
+          size: Number(version.size) || 0,
+          latest: Boolean(version.latest),
+          deleteMarker: Boolean(version.deleteMarker),
+          contentType: version.contentType ? apiText(version.contentType) : undefined,
+          etag: version.etag ? apiText(version.etag) : undefined
+        }))
+      })
+    )
+  );
+}
+
+export function fetchBlobStoreDeleted(
+  siteId: string,
+  storeId: string,
+  target: 'preview' | 'staging' | 'live' = 'preview',
+  limit = 200
+) {
+  const q =
+    'action=blobStoreDeleted&storeId=' +
+    encodeURIComponent(storeId) +
+    '&target=' +
+    encodeURIComponent(target) +
+    '&limit=' +
+    limit;
+  return pluginGet<BlobStoreDeletedResponse>(siteId, pluginUrl('dev-content-ops-git', siteId, q)).pipe(
+    map((data) =>
+      assertSiteScope(siteId, {
+        ...data,
+        storeId: apiText(data.storeId) || storeId,
+        publishingTarget: apiText(data.publishingTarget) || target,
+        bucket: data.bucket ? apiText(data.bucket) : undefined,
+        prefix: data.prefix ? apiText(data.prefix) : undefined,
+        entries: (data.entries ?? []).map((entry) => ({
+          path: apiText(entry.path),
+          objectKey: entry.objectKey ? apiText(entry.objectKey) : undefined,
+          versionId: apiText(entry.versionId),
+          lastModified: entry.lastModified ? apiText(entry.lastModified) : undefined,
+          deleteMarker: Boolean(entry.deleteMarker)
+        }))
+      })
+    )
+  );
+}
+
+export async function loadBlobVersionContent(previewUrl: string, signal?: AbortSignal): Promise<Blob> {
+  let res: Response;
+  try {
+    res = await fetch(previewUrl, {
+      method: 'GET',
+      credentials: 'include',
+      signal,
+      headers: getGlobalHeaders()
+    });
+  } catch (e) {
+    if (signal?.aborted) {
+      throw new DOMException('Aborted', 'AbortError');
+    }
+    throw e;
+  }
+
+  if (!res.ok) {
+    let detail = '';
+    try {
+      const body = await res.text();
+      if (body) {
+        try {
+          const parsed = JSON.parse(body) as { error?: string };
+          detail = parsed.error || body.slice(0, 500);
+        } catch {
+          detail = body.slice(0, 500);
+        }
+      }
+    } catch {
+      /* ignore */
+    }
+    throw new Error(`Blob version preview failed (HTTP ${res.status})${detail ? `: ${detail}` : ''}`);
+  }
+
+  return res.blob();
+}
+
+export function fetchBlobVersionPreview(
+  siteId: string,
+  storeId: string,
+  path: string,
+  versionId: string,
+  target: 'preview' | 'staging' | 'live' = 'preview'
+) {
+  const q =
+    'action=blobStoreVersionPreview&storeId=' +
+    encodeURIComponent(storeId) +
+    '&path=' +
+    encodeURIComponent(path) +
+    '&versionId=' +
+    encodeURIComponent(versionId) +
+    '&target=' +
+    encodeURIComponent(target);
+  return pluginGet<BlobVersionPreviewResponse>(siteId, pluginUrl('dev-content-ops-git', siteId, q)).pipe(
+    map((data) =>
+      assertSiteScope(siteId, {
+        ...data,
+        storeId: apiText(data.storeId) || storeId,
+        path: apiText(data.path),
+        publishingTarget: apiText(data.publishingTarget) || target,
+        versionId: apiText(data.versionId) || versionId,
+        versionLabel: data.versionLabel ? apiText(data.versionLabel) : undefined,
+        previewUrl: apiText(data.previewUrl),
+        contentType: data.contentType ? apiText(data.contentType) : undefined,
+        bucket: data.bucket ? apiText(data.bucket) : undefined,
+        objectKey: data.objectKey ? apiText(data.objectKey) : undefined,
+        inlinePreview: Boolean(data.inlinePreview)
+      })
+    )
+  );
+}
+
+export function postRestoreBlobVersion(
+  siteId: string,
+  opts: {
+    storeId: string;
+    path: string;
+    versionId: string;
+    target?: 'preview' | 'staging' | 'live';
+    deleteMarker?: boolean;
+  }
+) {
+  return postJSON(pluginUrl('dev-content-ops-git', siteId), pluginPostBody(siteId, {
+    action: 'restoreBlobVersion',
+    storeId: opts.storeId,
+    path: opts.path,
+    versionId: opts.versionId,
+    target: opts.target ?? 'preview',
+    deleteMarker: Boolean(opts.deleteMarker)
+  })).pipe(
+    map((r) => {
+      const data = unwrapPluginResponse<BlobVersionRestoreResult>(r);
+      assertSiteScope(siteId, data);
+      return {
+        ...data,
+        storeId: apiText(data.storeId),
+        path: apiText(data.path),
+        publishingTarget: apiText(data.publishingTarget),
+        restoredFromVersionId: apiText(data.restoredFromVersionId),
+        newVersionId: data.newVersionId ? apiText(data.newVersionId) : undefined,
+        pointerPath: data.pointerPath ? apiText(data.pointerPath) : undefined,
+        pointerError: data.pointerError ? apiText(data.pointerError) : undefined,
+        message: data.message ? apiText(data.message) : undefined
       };
     })
   );

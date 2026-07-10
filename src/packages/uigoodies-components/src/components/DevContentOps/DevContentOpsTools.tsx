@@ -2,7 +2,7 @@
  * Copyright (C) 2007-2026 Crafter Software Corporation. All Rights Reserved.
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Autocomplete,
   Box,
@@ -19,6 +19,7 @@ import {
 import AccountTreeRoundedIcon from '@mui/icons-material/AccountTreeRounded';
 import useActiveSiteId from '@craftercms/studio-ui/hooks/useActiveSiteId';
 import { fetchAll } from '@craftercms/studio-ui/services/sites';
+import { setDevContentOpsStudioSiteId } from './devContentOpsApi';
 import { GitLogTab } from './GitLogTab';
 import { RepoHealthTab } from './RepoHealthTab';
 import { SiteItemsTab } from './SiteItemsTab';
@@ -26,8 +27,9 @@ import { BranchesTab } from './BranchesTab';
 import { DatabaseTab } from './DatabaseTab';
 import { WorkingTreeTab } from './WorkingTreeTab';
 import { BlobStoreTab } from './BlobStoreTab';
+import { PublishCompareTab } from './PublishCompareTab';
 
-type TabId = 'git-log' | 'working-tree' | 'branches' | 'database' | 'repo-health' | 'site-items' | 'blob-stores';
+type TabId = 'git-log' | 'working-tree' | 'branches' | 'database' | 'repo-health' | 'site-items' | 'blob-stores' | 'publish-compare';
 
 type SiteOption = { id: string; name: string };
 
@@ -38,6 +40,11 @@ export function DevContentOpsTools() {
   const [sites, setSites] = useState<SiteOption[]>([]);
   const [sitesLoading, setSitesLoading] = useState(true);
   const [selectedSite, setSelectedSite] = useState<SiteOption | null>(null);
+  const userPickedSiteRef = useRef(false);
+
+  useEffect(() => {
+    setDevContentOpsStudioSiteId(activeSiteId ?? null);
+  }, [activeSiteId]);
 
   useEffect(() => {
     setSitesLoading(true);
@@ -59,15 +66,19 @@ export function DevContentOpsTools() {
     if (!sites.length) {
       return;
     }
-    if (selectedSite && sites.some((site) => site.id === selectedSite.id)) {
-      return;
-    }
-    const preferredId = activeSiteId || sites[0]?.id;
-    const match = sites.find((site) => site.id === preferredId) ?? sites[0] ?? null;
-    setSelectedSite(match);
-  }, [activeSiteId, selectedSite, sites]);
+    setSelectedSite((current) => {
+      if (userPickedSiteRef.current && current) {
+        return sites.find((site) => site.id === current.id) ?? current;
+      }
+      const preferredId = activeSiteId || sites[0]?.id;
+      return sites.find((site) => site.id === preferredId) ?? sites[0] ?? null;
+    });
+  }, [activeSiteId, sites]);
 
-  const siteId = selectedSite?.id;
+  const operatingSite =
+    selectedSite ?? sites.find((site) => site.id === activeSiteId) ?? sites[0] ?? null;
+  const siteId = operatingSite?.id;
+  const projectPickerValue = operatingSite;
 
   return (
     <Box
@@ -128,23 +139,28 @@ export function DevContentOpsTools() {
             </Box>
           ) : sites.length === 0 ? (
             <Chip size="small" label="No accessible projects" color="warning" variant="outlined" />
-          ) : (
+          ) : projectPickerValue ? (
             <Autocomplete
               size="small"
+              disableClearable
               options={sites}
-              value={selectedSite}
-              onChange={(_, value) => setSelectedSite(value)}
+              value={projectPickerValue}
+              onChange={(_, value) => {
+                userPickedSiteRef.current = true;
+                setSelectedSite(value);
+              }}
               getOptionLabel={(option) => `${option.name} (${option.id})`}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               renderInput={(params) => (
                 <TextField
                   {...params}
                   label="Project"
+                  helperText="Tools run against this project; does not change your Studio session"
                   InputLabelProps={{ ...params.InputLabelProps, shrink: true }}
                 />
               )}
             />
-          )}
+          ) : null}
         </Box>
       </Paper>
 
@@ -171,6 +187,7 @@ export function DevContentOpsTools() {
         <Tab value="repo-health" label="Repository health" />
         <Tab value="site-items" label="Site items" />
         <Tab value="blob-stores" label="Blob stores" />
+        <Tab value="publish-compare" label="Publish compare" />
       </Tabs>
 
       <Box sx={{ flex: 1, minHeight: 0, p: 2.5, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
@@ -183,25 +200,28 @@ export function DevContentOpsTools() {
         ) : (
           <>
             {tab === 'git-log' && (
-              <GitLogTab key={siteId} siteId={siteId} siteName={selectedSite.name} sites={sites} />
+              <GitLogTab key={siteId} siteId={siteId} siteName={operatingSite.name} sites={sites} />
             )}
             {tab === 'working-tree' && (
-              <WorkingTreeTab key={siteId} siteId={siteId} siteName={selectedSite.name} />
+              <WorkingTreeTab key={siteId} siteId={siteId} siteName={operatingSite.name} />
             )}
             {tab === 'branches' && (
-              <BranchesTab key={siteId} siteId={siteId} siteName={selectedSite.name} />
+              <BranchesTab key={siteId} siteId={siteId} siteName={operatingSite.name} />
             )}
             {tab === 'database' && (
-              <DatabaseTab key={siteId} siteId={siteId} siteName={selectedSite.name} />
+              <DatabaseTab key={siteId} siteId={siteId} siteName={operatingSite.name} />
             )}
             {tab === 'repo-health' && (
-              <RepoHealthTab key={siteId} siteId={siteId} siteName={selectedSite.name} />
+              <RepoHealthTab key={siteId} siteId={siteId} siteName={operatingSite.name} />
             )}
             {tab === 'site-items' && (
-              <SiteItemsTab key={siteId} siteId={siteId} siteName={selectedSite.name} />
+              <SiteItemsTab key={siteId} siteId={siteId} siteName={operatingSite.name} />
             )}
             {tab === 'blob-stores' && (
-              <BlobStoreTab key={siteId} siteId={siteId} siteName={selectedSite.name} />
+              <BlobStoreTab key={siteId} siteId={siteId} siteName={operatingSite.name} />
+            )}
+            {tab === 'publish-compare' && (
+              <PublishCompareTab key={siteId} siteId={siteId} siteName={operatingSite.name} />
             )}
           </>
         )}

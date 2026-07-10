@@ -41,6 +41,8 @@ final class DevContentOpsStudioGitSupport {
             locked = true
             Map result = work.call() as Map
             return result ?: DevContentOpsSupport.errorMap('Git operation failed')
+        } catch (Throwable t) {
+            return DevContentOpsSupport.failureFromThrowable(t, 'Git sandbox operation failed')
         } finally {
             if (locked) {
                 try {

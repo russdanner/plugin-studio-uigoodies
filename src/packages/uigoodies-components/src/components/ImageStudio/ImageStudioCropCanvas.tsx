@@ -3,7 +3,8 @@
  */
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Box, Paper, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography, alpha, useTheme } from '@mui/material';
+import { Box, Button, Paper, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography, alpha, useTheme } from '@mui/material';
+import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
 import { ASPECT_PRESETS } from './imageStudioUtils';
 import {
   CropArea,
@@ -32,6 +33,8 @@ type Props = {
   onAspectChange: (aspect: number | undefined) => void;
   canvasView: CanvasViewTransform;
   onCanvasViewChange: (view: CanvasViewTransform) => void;
+  onApplyCrop?: () => void;
+  applyingCrop?: boolean;
 };
 
 function hitHandle(
@@ -125,7 +128,9 @@ export function ImageStudioCropCanvas({
   aspect,
   onAspectChange,
   canvasView,
-  onCanvasViewChange
+  onCanvasViewChange,
+  onApplyCrop,
+  applyingCrop = false
 }: Props) {
   const theme = useTheme();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -367,7 +372,24 @@ export function ImageStudioCropCanvas({
               onKeyDown={(e) => e.key === 'Enter' && applyDimensionInputs()}
               sx={{ width: 100 }}
             />
+            <Button size="small" variant="outlined" onClick={applyDimensionInputs} disabled={!cropArea}>
+              Set size
+            </Button>
+            {onApplyCrop && (
+              <Button
+                size="small"
+                variant="contained"
+                startIcon={<CheckRoundedIcon />}
+                onClick={onApplyCrop}
+                disabled={!cropArea || applyingCrop}
+              >
+                {applyingCrop ? 'Applying…' : 'Apply crop'}
+              </Button>
+            )}
           </Stack>
+          <Typography variant="caption" color="text.secondary">
+            Drag handles to adjust the crop, then click <strong>Apply crop</strong> to lock it in before filters or save.
+          </Typography>
         </Stack>
       </Paper>
 

@@ -33,7 +33,6 @@ Hard-refresh Studio (**Ctrl+Shift+R**) after install. Commit sandbox changes in 
 2. **`POST /studio/api/2/marketplace/copy`** — copies plugin into site sandbox (committed).
 3. **Groovy script reload** — `GET /studio/api/2/plugin/script/reload?siteId=...` (unless `SKIP_SCRIPT_RELOAD=1`).
 4. **Optional `ui.xml` merges** (unless `SKIP_UI_XML=1`):
-   - Image Studio tools panel widget
    - DevContentOps Project Tool
    - Translation Project Tool
    - Translation preview toolbar button
@@ -81,7 +80,7 @@ Bump **`patch`** in `craftercms-plugin.yaml` after changes so marketplace copy p
 |------|--------|
 | 1 | Hard-refresh Studio |
 | 2 | **Project Tools** — confirm tools appear (OpenSearch, Log Tail, DevContentOps, Translation, etc.) |
-| 3 | **Tools panel** — Image Studio button (if `ui.xml` merged) |
+| 3 | **Tools panel** — optional widgets (merge fragments manually if desired) |
 | 4 | **Preview toolbar** — Translation button (only when ≥2 locales in `translation-config.xml`) |
 | 5 | **Commit** pending sandbox files (`ui.xml`, static assets, scripts) |
 | 6 | **Translation sites** — follow [TRANSLATION_SETUP.md](TRANSLATION_SETUP.md) |
@@ -96,17 +95,16 @@ Plugin install merges these when Crafter applies the descriptor:
 | Type | What |
 |------|------|
 | `preview-app` | Project Tools entries (Cross Site Copy, OpenSearch, Log Tail, DevContentOps, Translation) |
-| `preview-app` | Image Studio tools panel widget |
 | `preview-app` | Translation preview toolbar button |
 | `form-control` | `custom-locale` and `translation-versions` in Studio form-control registry |
 
 If you manage `config/studio/ui.xml` manually, merge fragments from `authoring/config/studio/`:
 
-- `ui-image-studio-widget.append.xml`
 - `ui-dev-content-ops-tools.append.xml`
 - `ui-translation-config-tools.append.xml`
 - `ui-translation-toolbar.append.xml`
 - `ui-site-tools-reference.append.xml` (site tools reference, if missing)
+- `ui-bulk-edit.append.xml` (optional — **Bulk Edit** plugin [`org.craftercms.plugin.bulkedit`](../docs/widgets/bulk-edit.md); install that plugin first)
 
 ## REST API (plugin scripts)
 

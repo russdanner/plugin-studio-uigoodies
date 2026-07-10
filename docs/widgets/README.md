@@ -36,6 +36,12 @@ Each file in this folder documents one **registered widget** (or embedded view u
 | `org.rd.plugin.uigoodies.openTranslationToolbarButton` | Preview toolbar → translation locale picker. | [translation-tools.md](translation-tools.md) |
 | `org.rd.plugin.uigoodies.openTranslationPanelButton` | Tools panel locale picker + copy actions. | [translation-tools.md](translation-tools.md) |
 
+### Related Studio plugins (not UI Goodies)
+
+| Plugin / widget | Description | Doc |
+|-----------------|-------------|-----|
+| `org.craftercms.plugin.bulkedit` / `…bulkedit.components.reactComponent` | Spreadsheet bulk edit by content type (sidebar). | [bulk-edit.md](bulk-edit.md) |
+
 ### Form controls (separate bundles)
 
 | Control | Field id | Doc |

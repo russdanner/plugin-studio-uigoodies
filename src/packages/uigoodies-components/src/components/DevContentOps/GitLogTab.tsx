@@ -99,6 +99,7 @@ export function GitLogTab({ siteId, sites = [] }: Props) {
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(false);
   const [nextSkip, setNextSkip] = useState(0);
+  const [lastProcessedCommitId, setLastProcessedCommitId] = useState('');
   const [sinceDate, setSinceDate] = useState('');
   const [untilDate, setUntilDate] = useState('');
   const [logOrder, setLogOrder] = useState<GitLogOrder>('desc');
@@ -216,6 +217,7 @@ export function GitLogTab({ siteId, sites = [] }: Props) {
         );
         if (reset) {
           setCommits(data.commits ?? []);
+          setLastProcessedCommitId(data.lastProcessedCommitId ?? '');
         } else {
           setCommits((prev) => {
             const ids = new Set(prev.map((c) => c.id));
@@ -717,6 +719,13 @@ export function GitLogTab({ siteId, sites = [] }: Props) {
             title="Commit history"
             action={
               <Stack direction="row" spacing={1.5} alignItems="center" sx={{ display: { xs: 'none', sm: 'flex' } }}>
+                <Chip
+                  size="small"
+                  variant="outlined"
+                  label={`Last processed: ${lastProcessedCommitId ? lastProcessedCommitId.slice(0, 8) : '—'}`}
+                  title={lastProcessedCommitId || 'No processed commit recorded for this project yet'}
+                  sx={{ ...monoSx }}
+                />
                 <Stack direction="row" spacing={0.5} alignItems="center">
                   <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'success.main' }} />
                   <Typography variant="caption" color="text.secondary">Processed</Typography>

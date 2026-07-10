@@ -301,16 +301,7 @@ export function TranslationConfigTools() {
     if (!siteId || selectedTypeIds.size === 0) {
       return;
     }
-    const targets = typeRows.filter((row) => selectedTypeIds.has(row.id) && !row.status.complete);
-    if (targets.length === 0) {
-      dispatch(
-        showSystemNotification({
-          message: 'No incomplete content types selected.',
-          options: { variant: 'info' }
-        })
-      );
-      return;
-    }
+    const targets = typeRows.filter((row) => selectedTypeIds.has(row.id));
     setApplyLoading(true);
     from(targets)
       .pipe(
@@ -318,11 +309,11 @@ export function TranslationConfigTools() {
           fetchConfigurationXML(siteId, row.formPath, TRANSLATION_CONFIG_MODULE).pipe(
             mergeMap((xml: string) => {
               const patched = patchFormDefinitionWithTranslationFields(xml);
-              if (patched.added.length === 0) {
+              if (!patched.changed) {
                 return of({ id: row.id, skipped: true as const });
               }
               return writeConfiguration(siteId, row.formPath, TRANSLATION_CONFIG_MODULE, patched.xml).pipe(
-                map(() => ({ id: row.id, skipped: false as const, added: patched.added.length }))
+                map(() => ({ id: row.id, skipped: false as const, actions: patched.added.length }))
               );
             })
           )
@@ -336,8 +327,8 @@ export function TranslationConfigTools() {
           dispatch(
             showSystemNotification({
               message: updated
-                ? `Added translation fields to ${updated} content type(s).`
-                : 'Selected content types already had translation fields.',
+                ? `Fixed translation setup on ${updated} content type(s).`
+                : 'Selected content types already match the translation form layout.',
               options: { variant: 'success' }
             })
           );
@@ -564,15 +555,34 @@ export function TranslationConfigTools() {
               onClick={applyTranslationFields}
               disabled={applyLoading || selectedTypeIds.size === 0}
             >
-              Add translation fields to selected
+              Fix translation setup on selected
             </Button>
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={typeRows.length > 0 && selectedTypeIds.size === typeRows.filter((row) => !row.status.complete).length}
+                  checked={typeRows.length > 0 && selectedTypeIds.size === typeRows.length}
+                  indeterminate={selectedTypeIds.size > 0 && selectedTypeIds.size < typeRows.length}
+                  onChange={(event) => {
+                    if (event.target.checked) {
+                      setSelectedTypeIds(new Set(typeRows.map((row) => row.id)));
+                    } else {
+                      setSelectedTypeIds(new Set());
+                    }
+                  }}
+                />
+              }
+              label="Select all"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={
+                    typeRows.filter((row) => !row.status.complete).length > 0 &&
+                    typeRows.filter((row) => !row.status.complete).every((row) => selectedTypeIds.has(row.id))
+                  }
                   indeterminate={
-                    selectedTypeIds.size > 0 &&
-                    selectedTypeIds.size < typeRows.filter((row) => !row.status.complete).length
+                    typeRows.some((row) => !row.status.complete && selectedTypeIds.has(row.id)) &&
+                    !typeRows.filter((row) => !row.status.complete).every((row) => selectedTypeIds.has(row.id))
                   }
                   onChange={(event) => {
                     if (event.target.checked) {
@@ -588,8 +598,13 @@ export function TranslationConfigTools() {
           </Box>
           {typesError && <Alert severity="error">{typesError}</Alert>}
           <Alert severity="info" sx={{ mb: 2 }}>
-            Each content type must include:{' '}
-            {TRANSLATION_FORM_REQUIREMENTS.map((req) => req.label).join('; ')}.
+            Each content type must have exactly one Translation section (last on the form, collapsed by default)
+            containing{' '}
+            {TRANSLATION_FORM_REQUIREMENTS.filter((req) => req.id !== 'translation-section')
+              .map((req) => req.label)
+              .join('; ')}
+            . The translations control renders at the top of the form. Use <strong>Fix translation setup</strong> to
+            move stray fields, remove duplicates, and repair broken layouts.
           </Alert>
           {!typesLoading && typeRows.length === 0 && !typesError && (
             <Alert severity="info">Scan content types to see which definitions need Translation fields.</Alert>
@@ -613,7 +628,6 @@ export function TranslationConfigTools() {
                         <TableCell padding="checkbox">
                           <Checkbox
                             checked={checked}
-                            disabled={row.status.complete}
                             onChange={(event) => {
                               setSelectedTypeIds((prev) => {
                                 const next = new Set(prev);

@@ -1,5 +1,5 @@
 const { jsx, Fragment, jsxs } = craftercms.libs.reactJsxRuntime;
-const { useSelector, useDispatch } = craftercms.libs.ReactRedux;
+const { useSelector, useDispatch, useStore } = craftercms.libs.ReactRedux;
 const { Tooltip, useTheme, accordionClasses, accordionSummaryClasses, Accordion, AccordionSummary, Typography, AccordionDetails, Button: Button$1, CircularProgress, alpha, buttonClasses, Backdrop, Alert, Paper, Box: Box$1, AlertTitle, Stepper, Step, StepLabel, Autocomplete, TextField: TextField$1, FormControlLabel, Checkbox, List, ListItem, Dialog, FormControl, InputAdornment, IconButton: IconButton$1, FormHelperText, Stack: Stack$1, TableRow, TableCell, Menu: Menu$1, MenuItem: MenuItem$1, Divider, Chip, Table, TableHead, TableBody, ListItemText, DialogTitle, DialogContent, DialogActions, Collapse: Collapse$1, useMediaQuery, Tabs, Tab, Slider, ToggleButtonGroup, ToggleButton, InputLabel, Select, Switch, ButtonGroup, ListItemButton, RadioGroup, Radio, Breadcrumbs, Link, ListItemIcon, LinearProgress, TableContainer, TablePagination } = craftercms.libs.MaterialUI;
 const IconButton = craftercms.libs.MaterialUI.IconButton && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.IconButton, 'default') ? craftercms.libs.MaterialUI.IconButton['default'] : craftercms.libs.MaterialUI.IconButton;
 const Button = craftercms.libs.MaterialUI.Button && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Button, 'default') ? craftercms.libs.MaterialUI.Button['default'] : craftercms.libs.MaterialUI.Button;
@@ -18,13 +18,13 @@ const { writeContent, fetchChildrenByPath, checkPathExistence, fetchDetailedItem
 const { DialogFooter, PathNavigator } = craftercms.components;
 const ToolsPanelListItemButton = craftercms.components.ToolsPanelListItemButton && Object.prototype.hasOwnProperty.call(craftercms.components.ToolsPanelListItemButton, 'default') ? craftercms.components.ToolsPanelListItemButton['default'] : craftercms.components.ToolsPanelListItemButton;
 const Tooltip$1 = craftercms.libs.MaterialUI.Tooltip && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Tooltip, 'default') ? craftercms.libs.MaterialUI.Tooltip['default'] : craftercms.libs.MaterialUI.Tooltip;
-const { pull, push, fetchRepositories } = craftercms.services.repositories;
+const { pull, push: push$1, fetchRepositories } = craftercms.services.repositories;
 const DownloadIcon = craftercms.utils.constants.components.get('@mui/icons-material/DownloadOutlined') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/DownloadOutlined'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/DownloadOutlined')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/DownloadOutlined');
 const PublishIcon = craftercms.utils.constants.components.get('@mui/icons-material/PublishOutlined') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/PublishOutlined'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/PublishOutlined')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/PublishOutlined');
 const Snackbar = craftercms.libs.MaterialUI.Snackbar && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Snackbar, 'default') ? craftercms.libs.MaterialUI.Snackbar['default'] : craftercms.libs.MaterialUI.Snackbar;
 const { FormattedMessage } = craftercms.libs.ReactIntl;
 const { of, from, concatMap: concatMap$1, forkJoin, Subject, firstValueFrom } = craftercms.libs.rxjs;
-const { concatMap, expand, toArray, catchError, switchMap, takeUntil, map, take, debounceTime, distinctUntilChanged, mergeMap } = craftercms.libs.rxjs;
+const { concatMap, expand, toArray, catchError, switchMap, takeUntil, map, take, filter, debounceTime, distinctUntilChanged, mergeMap } = craftercms.libs.rxjs;
 const { fetchUnpublished, fetchMyActivity } = craftercms.services.dashboard;
 const { nou } = craftercms.utils.object;
 const { lookupItemByPath } = craftercms.utils.content;
@@ -40,7 +40,7 @@ const { createSvgIcon } = craftercms.libs.MaterialUI;
 const ItemPublishingTargetIcon = craftercms.components.ItemPublishingTargetIcon && Object.prototype.hasOwnProperty.call(craftercms.components.ItemPublishingTargetIcon, 'default') ? craftercms.components.ItemPublishingTargetIcon['default'] : craftercms.components.ItemPublishingTargetIcon;
 const ItemStateIcon = craftercms.components.ItemStateIcon && Object.prototype.hasOwnProperty.call(craftercms.components.ItemStateIcon, 'default') ? craftercms.components.ItemStateIcon['default'] : craftercms.components.ItemStateIcon;
 const ItemTypeIcon = craftercms.components.ItemTypeIcon && Object.prototype.hasOwnProperty.call(craftercms.components.ItemTypeIcon, 'default') ? craftercms.components.ItemTypeIcon['default'] : craftercms.components.ItemTypeIcon;
-const CheckRounded = craftercms.utils.constants.components.get('@mui/icons-material/CheckRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/CheckRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/CheckRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/CheckRounded');
+const CheckRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/CheckRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/CheckRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/CheckRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/CheckRounded');
 const ErrorRounded = craftercms.utils.constants.components.get('@mui/icons-material/ErrorRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ErrorRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ErrorRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ErrorRounded');
 const KeyboardArrowLeftRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/KeyboardArrowLeftRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/KeyboardArrowLeftRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/KeyboardArrowLeftRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/KeyboardArrowLeftRounded');
 const ArrowRightRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/ArrowRightRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ArrowRightRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ArrowRightRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ArrowRightRounded');
@@ -128,6 +128,7 @@ const CleaningServicesRoundedIcon = craftercms.utils.constants.components.get('@
 const PlaylistAddCheckRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/PlaylistAddCheckRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/PlaylistAddCheckRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/PlaylistAddCheckRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/PlaylistAddCheckRounded');
 const CommitRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/CommitRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/CommitRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/CommitRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/CommitRounded');
 const InsertDriveFileRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/InsertDriveFileRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/InsertDriveFileRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/InsertDriveFileRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/InsertDriveFileRounded');
+const OpenInNewRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/OpenInNewRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/OpenInNewRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/OpenInNewRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/OpenInNewRounded');
 const Divider$1 = craftercms.libs.MaterialUI.Divider && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Divider, 'default') ? craftercms.libs.MaterialUI.Divider['default'] : craftercms.libs.MaterialUI.Divider;
 const Stack$2 = craftercms.libs.MaterialUI.Stack && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Stack, 'default') ? craftercms.libs.MaterialUI.Stack['default'] : craftercms.libs.MaterialUI.Stack;
 const Card = craftercms.libs.MaterialUI.Card && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Card, 'default') ? craftercms.libs.MaterialUI.Card['default'] : craftercms.libs.MaterialUI.Card;
@@ -146,6 +147,12 @@ const DialogActions$1 = craftercms.libs.MaterialUI.DialogActions && Object.proto
 const DialogContent$1 = craftercms.libs.MaterialUI.DialogContent && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.DialogContent, 'default') ? craftercms.libs.MaterialUI.DialogContent['default'] : craftercms.libs.MaterialUI.DialogContent;
 const DialogTitle$1 = craftercms.libs.MaterialUI.DialogTitle && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.DialogTitle, 'default') ? craftercms.libs.MaterialUI.DialogTitle['default'] : craftercms.libs.MaterialUI.DialogTitle;
 const FormControlLabel$1 = craftercms.libs.MaterialUI.FormControlLabel && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.FormControlLabel, 'default') ? craftercms.libs.MaterialUI.FormControlLabel['default'] : craftercms.libs.MaterialUI.FormControlLabel;
+const List$1 = craftercms.libs.MaterialUI.List && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.List, 'default') ? craftercms.libs.MaterialUI.List['default'] : craftercms.libs.MaterialUI.List;
+const ListItem$1 = craftercms.libs.MaterialUI.ListItem && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.ListItem, 'default') ? craftercms.libs.MaterialUI.ListItem['default'] : craftercms.libs.MaterialUI.ListItem;
+const ListItemText$1 = craftercms.libs.MaterialUI.ListItemText && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.ListItemText, 'default') ? craftercms.libs.MaterialUI.ListItemText['default'] : craftercms.libs.MaterialUI.ListItemText;
+const LinkRounded = craftercms.utils.constants.components.get('@mui/icons-material/LinkRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/LinkRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/LinkRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/LinkRounded');
+const { getHostToGuestBus, getHostToHostBus, getGuestToHostBus } = craftercms.utils.subjects;
+const AccessibilityNewRounded = craftercms.utils.constants.components.get('@mui/icons-material/AccessibilityNewRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/AccessibilityNewRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/AccessibilityNewRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/AccessibilityNewRounded');
 
 /*
  * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
@@ -1722,7 +1729,7 @@ function PullPushRemoteButtons(props) {
     };
     var handlePushClick = function (event) {
         setProgressShow(true);
-        push(siteId, remoteName, pushBranch, false).subscribe({
+        push$1(siteId, remoteName, pushBranch, false).subscribe({
             next: function () {
                 onPushSuccess();
             },
@@ -2096,6 +2103,14 @@ function isFolder(item) {
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+const sortItemOperationComplete = /*#__PURE__*/ createAction('SORT_ITEM_OPERATION_COMPLETE');
+const insertOperationComplete = /*#__PURE__*/ createAction('INSERT_COMPONENT_OPERATION_COMPLETE');
+const insertItemOperationComplete = /*#__PURE__*/ createAction('INSERT_ITEM_OPERATION_COMPLETE');
+const duplicateItemOperationComplete = /*#__PURE__*/ createAction('DUPLICATE_ITEM_OPERATION_COMPLETE');
+const moveItemOperationComplete = /*#__PURE__*/ createAction('MOVE_ITEM_OPERATION_COMPLETE');
+const deleteItemOperationComplete = /*#__PURE__*/ createAction('DELETE_ITEM_OPERATION_COMPLETE');
+const updateFieldValueOperationComplete = /*#__PURE__*/ createAction('UPDATE_FIELD_VALUE_OPERATION_COMPLETE');
+const reloadRequest = /*#__PURE__*/ createAction('RELOAD_REQUEST');
 const contentTypeDropTargetsResponse = /*#__PURE__*/ createAction('CONTENT_TYPE_DROP_TARGETS_RESPONSE');
 const FETCH_CONTENT_TYPES = 'FETCH_CONTENT_TYPES';
 const CHANGE_CURRENT_URL = 'CHANGE_CURRENT_URL';
@@ -7727,7 +7742,7 @@ function SourcePathSelectionInput(_a) {
                     setPathExists(null);
                 }, error: pathExists === false, label: jsx(FormattedMessage, { id: "words.path", defaultMessage: "Path" }), InputProps: {
                     startAdornment: rootPath ? (jsxs(InputAdornment, { position: "start", sx: { mr: 0 }, children: [allowSwitchingRootPath && onChangeRoot ? (jsx(Tooltip, { title: jsx(FormattedMessage, { id: "pathSelectionDialog.changeRootButtonLabel", defaultMessage: "Change root" }), children: jsx(IconButton$1, { sx: { mr: 0.5 }, onClick: onChangeRoot, size: "small", children: jsx(KeyboardArrowLeftRoundedIcon, {}) }) })) : null, rootPath] })) : undefined,
-                    endAdornment: isChecking ? (jsx(InputAdornment, { position: "end", children: jsx(CircularProgress, { size: 20 }) })) : pathExists === true ? (jsx(InputAdornment, { position: "end", children: jsx(CheckRounded, { color: "success" }) })) : pathExists === false ? (jsx(InputAdornment, { position: "end", children: jsx(ErrorRounded, { color: "error" }) })) : undefined
+                    endAdornment: isChecking ? (jsx(InputAdornment, { position: "end", children: jsx(CircularProgress, { size: 20 }) })) : pathExists === true ? (jsx(InputAdornment, { position: "end", children: jsx(CheckRoundedIcon, { color: "success" }) })) : pathExists === false ? (jsx(InputAdornment, { position: "end", children: jsx(ErrorRounded, { color: "error" }) })) : undefined
                 } }), jsx(FormHelperText, { error: pathExists === false, children: pathExists ? (jsx(FormattedMessage, { id: "pathSelectionInput.found", defaultMessage: "Path found" })) : pathExists === false ? (jsx(FormattedMessage, { id: "pathSelectionInput.invalidPath", defaultMessage: "The entered path doesn't exist" })) : (jsx(FormattedMessage, { id: "pathSelectionInput.description", defaultMessage: "Enter a path and press `enter` to validate" })) })] }));
 }
 function SiteTreeItem(_a) {
@@ -43330,6 +43345,18 @@ function dataUrlToFile(dataUrl, name, type) {
     var mime = (_b = type !== null && type !== void 0 ? type : (_a = dataUrl.match(/^data:([^;]+);/)) === null || _a === void 0 ? void 0 : _a[1]) !== null && _b !== void 0 ? _b : 'image/png';
     return { name: name, type: mime, dataUrl: dataUrl };
 }
+/** Crafter write-content.json expects `path` = parent folder (with trailing slash), `name` = file leaf. */
+function splitStaticAssetPath(fullPath) {
+    var normalized = fullPath.startsWith('/') ? fullPath : "/".concat(fullPath);
+    var slash = normalized.lastIndexOf('/');
+    if (slash < 0) {
+        return { folderPath: '/', fileName: normalized };
+    }
+    return {
+        folderPath: "".concat(normalized.substring(0, slash + 1)),
+        fileName: normalized.substring(slash + 1)
+    };
+}
 function loadRepoImageAsDataUrl(siteId, assetPath, guestOrigin) {
     return __awaiter(this, void 0, void 0, function () {
         var urls, _i, urls_1, url, response, blob;
@@ -43338,9 +43365,9 @@ function loadRepoImageAsDataUrl(siteId, assetPath, guestOrigin) {
                 case 0:
                     urls = [];
                     if (guestOrigin) {
-                        urls.push("".concat(guestOrigin.replace(/\/$/, '')).concat(assetPath));
+                        urls.push("".concat(guestOrigin.replace(/\/$/, '')).concat(assetPath, "?t=").concat(Date.now()));
                     }
-                    urls.push("/studio/api/2/content/get_content_by_commit_id?siteId=".concat(encodeURIComponent(siteId), "&path=").concat(encodeURIComponent(assetPath)));
+                    urls.push("/studio/api/2/content/get_content_by_commit_id?siteId=".concat(encodeURIComponent(siteId), "&path=").concat(encodeURIComponent(assetPath), "&_=").concat(Date.now()));
                     _i = 0, urls_1 = urls;
                     _b.label = 1;
                 case 1:
@@ -44489,15 +44516,15 @@ function resizeCrop(crop, handle, pointer, startCrop, startPointer, imageWidth, 
 }
 function ImageStudioCropCanvas(_a) {
     var _b;
-    var imageSrc = _a.imageSrc, cropArea = _a.cropArea, onCropAreaChange = _a.onCropAreaChange, aspect = _a.aspect, onAspectChange = _a.onAspectChange, canvasView = _a.canvasView, onCanvasViewChange = _a.onCanvasViewChange;
+    var imageSrc = _a.imageSrc, cropArea = _a.cropArea, onCropAreaChange = _a.onCropAreaChange, aspect = _a.aspect, onAspectChange = _a.onAspectChange, canvasView = _a.canvasView, onCanvasViewChange = _a.onCanvasViewChange, onApplyCrop = _a.onApplyCrop, _c = _a.applyingCrop, applyingCrop = _c === void 0 ? false : _c;
     var theme = useTheme();
     var containerRef = useRef(null);
     var canvasRef = useRef(null);
     var imageRef = useRef(null);
-    var _c = useState({ width: 0, height: 0 }), naturalSize = _c[0], setNaturalSize = _c[1];
+    var _d = useState({ width: 0, height: 0 }), naturalSize = _d[0], setNaturalSize = _d[1];
     var dragRef = useRef(null);
-    var _d = useState(''), cropWidthInput = _d[0], setCropWidthInput = _d[1];
-    var _e = useState(''), cropHeightInput = _e[0], setCropHeightInput = _e[1];
+    var _e = useState(''), cropWidthInput = _e[0], setCropWidthInput = _e[1];
+    var _f = useState(''), cropHeightInput = _f[0], setCropHeightInput = _f[1];
     var viewInteraction = useImageCanvasView(containerRef, naturalSize, canvasView, onCanvasViewChange);
     useEffect(function () {
         var cancelled = false;
@@ -44664,7 +44691,7 @@ function ImageStudioCropCanvas(_a) {
                                     }, children: ASPECT_PRESETS.map(function (preset) {
                                         var _a;
                                         return (jsx(ToggleButton, { value: (_a = preset.value) !== null && _a !== void 0 ? _a : 'free', children: preset.label }, preset.label));
-                                    }) }), jsx(TextField$1, { size: "small", label: "W (px)", type: "number", value: cropWidthInput, onChange: function (e) { return setCropWidthInput(e.target.value); }, onKeyDown: function (e) { return e.key === 'Enter' && applyDimensionInputs(); }, sx: { width: 100 } }), jsx(TextField$1, { size: "small", label: "H (px)", type: "number", value: cropHeightInput, onChange: function (e) { return setCropHeightInput(e.target.value); }, onKeyDown: function (e) { return e.key === 'Enter' && applyDimensionInputs(); }, sx: { width: 100 } })] })] }) }), jsx(Paper, { ref: containerRef, elevation: 0, onWheel: viewInteraction.handleWheel, sx: {
+                                    }) }), jsx(TextField$1, { size: "small", label: "W (px)", type: "number", value: cropWidthInput, onChange: function (e) { return setCropWidthInput(e.target.value); }, onKeyDown: function (e) { return e.key === 'Enter' && applyDimensionInputs(); }, sx: { width: 100 } }), jsx(TextField$1, { size: "small", label: "H (px)", type: "number", value: cropHeightInput, onChange: function (e) { return setCropHeightInput(e.target.value); }, onKeyDown: function (e) { return e.key === 'Enter' && applyDimensionInputs(); }, sx: { width: 100 } }), jsx(Button$1, { size: "small", variant: "outlined", onClick: applyDimensionInputs, disabled: !cropArea, children: "Set size" }), onApplyCrop && (jsx(Button$1, { size: "small", variant: "contained", startIcon: jsx(CheckRoundedIcon, {}), onClick: onApplyCrop, disabled: !cropArea || applyingCrop, children: applyingCrop ? 'Applying…' : 'Apply crop' }))] }), jsxs(Typography, { variant: "caption", color: "text.secondary", children: ["Drag handles to adjust the crop, then click ", jsx("strong", { children: "Apply crop" }), " to lock it in before filters or save."] })] }) }), jsx(Paper, { ref: containerRef, elevation: 0, onWheel: viewInteraction.handleWheel, sx: {
                     flex: 1,
                     minHeight: 0,
                     display: 'flex',
@@ -44685,7 +44712,7 @@ function ImageStudioCropCanvas(_a) {
 
 function ImageStudioEditor(_a) {
     var _b, _c;
-    var imageSrc = _a.imageSrc, tool = _a.tool, adjustments = _a.adjustments, onAdjustmentsChange = _a.onAdjustmentsChange, focal = _a.focal, onFocalChange = _a.onFocalChange, croppedAreaPixels = _a.croppedAreaPixels, onCroppedAreaPixelsChange = _a.onCroppedAreaPixelsChange, aspect = _a.aspect, onAspectChange = _a.onAspectChange, outputWidth = _a.outputWidth, outputHeight = _a.outputHeight, onOutputWidthChange = _a.onOutputWidthChange, onOutputHeightChange = _a.onOutputHeightChange, lockOutputAspect = _a.lockOutputAspect, onLockOutputAspectChange = _a.onLockOutputAspectChange, outputBackground = _a.outputBackground, onOutputBackgroundChange = _a.onOutputBackgroundChange, onReset = _a.onReset, filterPresetId = _a.filterPresetId, onSelectFilterPreset = _a.onSelectFilterPreset, onTintChange = _a.onTintChange, drawState = _a.drawState, onDrawStateChange = _a.onDrawStateChange, drawTool = _a.drawTool, onDrawToolChange = _a.onDrawToolChange, brushColor = _a.brushColor, onBrushColorChange = _a.onBrushColorChange, brushSize = _a.brushSize, onBrushSizeChange = _a.onBrushSizeChange, textFontFamily = _a.textFontFamily, onTextFontFamilyChange = _a.onTextFontFamilyChange, textFontSize = _a.textFontSize, onTextFontSizeChange = _a.onTextFontSizeChange, canvasView = _a.canvasView, onCanvasViewChange = _a.onCanvasViewChange;
+    var imageSrc = _a.imageSrc, tool = _a.tool, adjustments = _a.adjustments, onAdjustmentsChange = _a.onAdjustmentsChange, focal = _a.focal, onFocalChange = _a.onFocalChange, croppedAreaPixels = _a.croppedAreaPixels, onCroppedAreaPixelsChange = _a.onCroppedAreaPixelsChange, aspect = _a.aspect, onAspectChange = _a.onAspectChange, outputWidth = _a.outputWidth, outputHeight = _a.outputHeight, onOutputWidthChange = _a.onOutputWidthChange, onOutputHeightChange = _a.onOutputHeightChange, lockOutputAspect = _a.lockOutputAspect, onLockOutputAspectChange = _a.onLockOutputAspectChange, outputBackground = _a.outputBackground, onOutputBackgroundChange = _a.onOutputBackgroundChange, onReset = _a.onReset, filterPresetId = _a.filterPresetId, onSelectFilterPreset = _a.onSelectFilterPreset, onTintChange = _a.onTintChange, drawState = _a.drawState, onDrawStateChange = _a.onDrawStateChange, drawTool = _a.drawTool, onDrawToolChange = _a.onDrawToolChange, brushColor = _a.brushColor, onBrushColorChange = _a.onBrushColorChange, brushSize = _a.brushSize, onBrushSizeChange = _a.onBrushSizeChange, textFontFamily = _a.textFontFamily, onTextFontFamilyChange = _a.onTextFontFamilyChange, textFontSize = _a.textFontSize, onTextFontSizeChange = _a.onTextFontSizeChange, canvasView = _a.canvasView, onCanvasViewChange = _a.onCanvasViewChange, onApplyCrop = _a.onApplyCrop, applyingCrop = _a.applyingCrop;
     var theme = useTheme();
     var _d = useState({ width: 0, height: 0 }), naturalSize = _d[0], setNaturalSize = _d[1];
     useEffect(function () {
@@ -44720,7 +44747,7 @@ function ImageStudioEditor(_a) {
         return (jsx(Box$1, { sx: { display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }, children: jsx(ImageStudioFiltersPanel, { imageSrc: imageSrc, activePresetId: filterPresetId, adjustments: adjustments, onSelectPreset: onSelectFilterPreset, onTintChange: onTintChange }) }));
     }
     if (tool === 'crop') {
-        return (jsx(Box$1, { sx: { display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }, children: jsx(ImageStudioCropCanvas, { imageSrc: imageSrc, cropArea: croppedAreaPixels, onCropAreaChange: onCroppedAreaPixelsChange, aspect: aspect, onAspectChange: onAspectChange, canvasView: canvasView, onCanvasViewChange: onCanvasViewChange }) }));
+        return (jsx(Box$1, { sx: { display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }, children: jsx(ImageStudioCropCanvas, { imageSrc: imageSrc, cropArea: croppedAreaPixels, onCropAreaChange: onCroppedAreaPixelsChange, aspect: aspect, onAspectChange: onAspectChange, canvasView: canvasView, onCanvasViewChange: onCanvasViewChange, onApplyCrop: onApplyCrop, applyingCrop: applyingCrop }) }));
     }
     if (tool === 'draw') {
         return (jsx(Box$1, { sx: { display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }, children: jsx(ImageStudioDrawCanvas, { imageSrc: imageSrc, adjustments: adjustments, drawState: drawState, onDrawStateChange: onDrawStateChange, drawTool: drawTool, onDrawToolChange: onDrawToolChange, brushColor: brushColor, onBrushColorChange: onBrushColorChange, brushSize: brushSize, onBrushSizeChange: onBrushSizeChange, textFontFamily: textFontFamily, onTextFontFamilyChange: onTextFontFamilyChange, textFontSize: textFontSize, onTextFontSizeChange: onTextFontSizeChange, canvasView: canvasView, onCanvasViewChange: onCanvasViewChange }) }));
@@ -45071,7 +45098,7 @@ function ImageSizeRequirementsPanel(_a) {
             overflow: 'hidden'
         }, children: [jsx(Typography, { variant: "subtitle1", gutterBottom: true, children: "Image size requirements" }), jsx(Typography, { variant: "body2", color: "text.secondary", sx: { mb: 2 }, children: "Choose a content type to see image-picker width and height constraints for its fields." }), currentWidth && currentHeight && (jsx(Box$1, { sx: { mb: 2 }, children: jsxs(Typography, { variant: "body2", children: ["Current image: ", jsxs("strong", { children: [currentWidth, " \u00D7 ", currentHeight, "px"] })] }) })), jsx(Autocomplete, { size: "small", options: contentTypes, value: selectedType, onChange: function (_, value) { return setSelectedType(value); }, getOptionLabel: function (opt) { return opt.label; }, isOptionEqualToValue: function (a, b) { return a.formPath === b.formPath; }, loading: loadingTypes, disabled: loadingTypes || !contentTypes.length, renderInput: function (params) { return (jsx(TextField$1, __assign({}, params, { label: "Content type", placeholder: "Search content types\u2026", InputProps: __assign(__assign({}, params.InputProps), { endAdornment: (jsxs(Fragment, { children: [loadingTypes ? jsx(CircularProgress, { color: "inherit", size: 18 }) : null, params.InputProps.endAdornment] })) }) }))); }, sx: { mb: 2 } }), selectedType && (jsx(Typography, { variant: "caption", color: "text.secondary", display: "block", sx: { mb: 1 }, children: selectedType.contentType })), selectedType && (jsxs(Stack$1, { direction: "row", spacing: 1, alignItems: "center", sx: { mb: 2 }, flexWrap: "wrap", useFlexGap: true, children: [jsx(TextField$1, { size: "small", fullWidth: true, placeholder: "Filter image fields\u2026", value: filter, onChange: function (e) { return setFilter(e.target.value); }, sx: { flex: 1, minWidth: 200 }, InputProps: {
                             startAdornment: (jsx(InputAdornment, { position: "start", children: jsx(SearchRoundedIcon, { fontSize: "small" }) }))
-                        } }), onApplyConstraints && (jsx(Button$1, { size: "small", variant: "contained", startIcon: jsx(CheckRounded, {}), disabled: !applyEnabled, onClick: function () { return selectedRequirement && onApplyConstraints(selectedRequirement); }, children: "Apply constraints" }))] })), selectedType && selectedRequirement && !hasApplicableConstraints(selectedRequirement) && (jsx(Typography, { variant: "caption", color: "text.secondary", display: "block", sx: { mb: 1 }, children: "Selected field has no width or height constraints to apply." })), selectedType && !selectedRequirement && requirements.length > 0 && (jsx(Typography, { variant: "caption", color: "text.secondary", display: "block", sx: { mb: 1 }, children: "Click a field row, then apply constraints to crop, resize, and output size." })), error && (jsx(Typography, { color: "error", variant: "body2", children: error })), !loadingTypes && !error && !contentTypes.length && (jsx(Typography, { variant: "body2", color: "text.secondary", children: "No content types found in this site." })), !selectedType && !loadingTypes && contentTypes.length > 0 && (jsx(Typography, { variant: "body2", color: "text.secondary", sx: { py: 2 }, children: "Select a content type above to load its image field requirements." })), selectedType && !error && (jsx(Box$1, { sx: { flex: 1, minHeight: 0, overflow: 'auto' }, children: jsxs(Table, { size: "small", stickyHeader: true, children: [jsx(TableHead, { children: jsxs(TableRow, { children: [jsx(TableCell, { children: "Field" }), jsx(TableCell, { children: "Requirements" }), currentWidth && currentHeight ? jsx(TableCell, { children: "Match" }) : null] }) }), jsxs(TableBody, { children: [filtered.map(function (req) {
+                        } }), onApplyConstraints && (jsx(Button$1, { size: "small", variant: "contained", startIcon: jsx(CheckRoundedIcon, {}), disabled: !applyEnabled, onClick: function () { return selectedRequirement && onApplyConstraints(selectedRequirement); }, children: "Apply constraints" }))] })), selectedType && selectedRequirement && !hasApplicableConstraints(selectedRequirement) && (jsx(Typography, { variant: "caption", color: "text.secondary", display: "block", sx: { mb: 1 }, children: "Selected field has no width or height constraints to apply." })), selectedType && !selectedRequirement && requirements.length > 0 && (jsx(Typography, { variant: "caption", color: "text.secondary", display: "block", sx: { mb: 1 }, children: "Click a field row, then apply constraints to crop, resize, and output size." })), error && (jsx(Typography, { color: "error", variant: "body2", children: error })), !loadingTypes && !error && !contentTypes.length && (jsx(Typography, { variant: "body2", color: "text.secondary", children: "No content types found in this site." })), !selectedType && !loadingTypes && contentTypes.length > 0 && (jsx(Typography, { variant: "body2", color: "text.secondary", sx: { py: 2 }, children: "Select a content type above to load its image field requirements." })), selectedType && !error && (jsx(Box$1, { sx: { flex: 1, minHeight: 0, overflow: 'auto' }, children: jsxs(Table, { size: "small", stickyHeader: true, children: [jsx(TableHead, { children: jsxs(TableRow, { children: [jsx(TableCell, { children: "Field" }), jsx(TableCell, { children: "Requirements" }), currentWidth && currentHeight ? jsx(TableCell, { children: "Match" }) : null] }) }), jsxs(TableBody, { children: [filtered.map(function (req) {
                                     var matches = currentWidth && currentHeight
                                         ? imageMatchesRequirement(currentWidth, currentHeight, req)
                                         : null;
@@ -45432,10 +45459,21 @@ function ImageStudioSaveDialog(_a) {
         return "".concat(normalizedFolder, "/").concat(name);
     }, [folder, fileName]);
     var handleModeChange = function (nextMode) {
+        var _a;
         setMode(nextMode);
         if (nextMode === 'replace' && sourcePath) {
             setFolder(sourcePath.substring(0, sourcePath.lastIndexOf('/')));
             setFileName(sourcePath.substring(sourcePath.lastIndexOf('/') + 1));
+            var ext = (_a = sourcePath.split('.').pop()) === null || _a === void 0 ? void 0 : _a.toLowerCase();
+            if (ext === 'jpg' || ext === 'jpeg') {
+                setMimeType('image/jpeg');
+            }
+            else if (ext === 'webp') {
+                setMimeType('image/webp');
+            }
+            else if (ext === 'png') {
+                setMimeType('image/png');
+            }
         }
         else if (nextMode === 'variant' && sourcePath) {
             var variantPath = suggestVariantFilename(sourcePath);
@@ -45484,7 +45522,7 @@ function ImageStudioSaveDialog(_a) {
             contentFieldLink: contentFieldLink
         });
     };
-    return (jsxs(Dialog, { open: open, onClose: onClose, maxWidth: "md", fullWidth: true, children: [jsx(DialogTitle, { children: "Save image" }), jsxs(DialogContent, { sx: { display: 'flex', flexDirection: 'column', gap: 2 }, children: [sourcePath && (jsxs(Box$1, { children: [jsx(Typography, { variant: "subtitle2", gutterBottom: true, children: "Save as" }), jsxs(RadioGroup, { value: mode, onChange: function (e) { return handleModeChange(e.target.value); }, children: [jsx(FormControlLabel, { value: "replace", control: jsx(Radio, {}), label: "Replace original image" }), jsx(FormControlLabel, { value: "variant", control: jsx(Radio, {}), label: "Save as new variant (recommended)" }), jsx(FormControlLabel, { value: "new", control: jsx(Radio, {}), label: "Save to a new path" })] })] })), mode !== 'replace' && (jsxs(Stack$1, { direction: "row", spacing: 1, alignItems: "flex-start", children: [jsx(TextField$1, { label: "Folder", fullWidth: true, size: "small", value: folder, onChange: function (e) { return setFolder(e.target.value); }, helperText: "Repository folder under /static-assets" }), jsx(Button$1, { variant: "outlined", onClick: handleSelectFolder, sx: { mt: 1, minWidth: 100 }, children: "Browse" })] })), mode !== 'replace' && (jsx(TextField$1, { label: "File name", fullWidth: true, size: "small", value: fileName, onChange: function (e) { return setFileName(e.target.value); }, helperText: "Use letters, numbers, dots, dashes, and underscores" })), jsxs(Stack$1, { direction: { xs: 'column', sm: 'row' }, spacing: 2, children: [jsxs(FormControl, { fullWidth: true, size: "small", children: [jsx(InputLabel, { children: "Format" }), jsxs(Select, { label: "Format", value: mimeType, onChange: function (e) { return setMimeType(e.target.value); }, children: [jsx(MenuItem$1, { value: "image/png", children: "PNG (lossless)" }), jsx(MenuItem$1, { value: "image/jpeg", children: "JPEG" }), jsx(MenuItem$1, { value: "image/webp", children: "WebP" })] })] }), mimeType !== 'image/png' && (jsx(TextField$1, { label: "Quality", type: "number", size: "small", fullWidth: true, inputProps: { min: 0.1, max: 1, step: 0.05 }, value: quality, onChange: function (e) { return setQuality(Number(e.target.value)); } }))] }), jsxs(FormHelperText, { sx: { mt: 0 }, children: ["Destination: ", jsx("strong", { children: mode === 'replace' && sourcePath ? sourcePath : fullPath })] }), jsxs(Box$1, { sx: { borderTop: 1, borderColor: 'divider', pt: 2 }, children: [jsx(FormControlLabel, { control: jsx(Checkbox, { checked: linkEnabled, onChange: function (e) { return setLinkEnabled(e.target.checked); } }), label: "Update a content item image field after save" }), jsx(Collapse$1, { in: linkEnabled, children: jsxs(Stack$1, { spacing: 1.5, sx: { mt: 1 }, children: [jsxs(Stack$1, { direction: "row", spacing: 1, alignItems: "center", flexWrap: "wrap", useFlexGap: true, children: [jsx(Button$1, { variant: "outlined", size: "small", onClick: function () { return setContentPickerOpen(true); }, children: selectedContent ? 'Change content…' : 'Choose content…' }), selectedContent ? (jsxs(Box$1, { sx: { minWidth: 0, flex: 1 }, children: [jsx(Typography, { variant: "body2", noWrap: true, fontWeight: 500, children: selectedContent.label }), jsx(Typography, { variant: "caption", color: "text.secondary", noWrap: true, display: "block", children: selectedContent.path })] })) : (jsx(Typography, { variant: "body2", color: "text.secondary", children: "Browse, pick recent or unpublished items, or search" }))] }), selectedContent && (jsxs(FormControl, { fullWidth: true, size: "small", disabled: fieldsLoading || !imageFields.length, children: [jsx(InputLabel, { children: "Image field" }), jsx(Select, { label: "Image field", value: (_b = selectedField === null || selectedField === void 0 ? void 0 : selectedField.fieldId) !== null && _b !== void 0 ? _b : '', onChange: function (e) {
+    return (jsxs(Dialog, { open: open, onClose: onClose, maxWidth: "md", fullWidth: true, children: [jsx(DialogTitle, { children: "Save image" }), jsxs(DialogContent, { sx: { display: 'flex', flexDirection: 'column', gap: 2 }, children: [sourcePath && (jsxs(Box$1, { children: [jsx(Typography, { variant: "subtitle2", gutterBottom: true, children: "Save as" }), jsxs(RadioGroup, { value: mode, onChange: function (e) { return handleModeChange(e.target.value); }, children: [jsx(FormControlLabel, { value: "replace", control: jsx(Radio, {}), label: "Replace original image" }), jsx(FormControlLabel, { value: "variant", control: jsx(Radio, {}), label: "Save as new variant (recommended)" }), jsx(FormControlLabel, { value: "new", control: jsx(Radio, {}), label: "Save to a new path" })] })] })), mode !== 'replace' && (jsxs(Stack$1, { direction: "row", spacing: 1, alignItems: "flex-start", children: [jsx(TextField$1, { label: "Folder", fullWidth: true, size: "small", value: folder, onChange: function (e) { return setFolder(e.target.value); }, helperText: "Repository folder under /static-assets" }), jsx(Button$1, { variant: "outlined", onClick: handleSelectFolder, sx: { mt: 1, minWidth: 100 }, children: "Browse" })] })), mode !== 'replace' && (jsx(TextField$1, { label: "File name", fullWidth: true, size: "small", value: fileName, onChange: function (e) { return setFileName(e.target.value); }, helperText: "Use letters, numbers, dots, dashes, and underscores" })), jsxs(Stack$1, { direction: { xs: 'column', sm: 'row' }, spacing: 2, children: [jsxs(FormControl, { fullWidth: true, size: "small", disabled: mode === 'replace', children: [jsx(InputLabel, { children: "Format" }), jsxs(Select, { label: "Format", value: mimeType, onChange: function (e) { return setMimeType(e.target.value); }, children: [jsx(MenuItem$1, { value: "image/png", children: "PNG (lossless)" }), jsx(MenuItem$1, { value: "image/jpeg", children: "JPEG" }), jsx(MenuItem$1, { value: "image/webp", children: "WebP" })] }), mode === 'replace' && (jsx(FormHelperText, { children: "Format matches the original file extension when replacing." }))] }), mimeType !== 'image/png' && (jsx(TextField$1, { label: "Quality", type: "number", size: "small", fullWidth: true, inputProps: { min: 0.1, max: 1, step: 0.05 }, value: quality, onChange: function (e) { return setQuality(Number(e.target.value)); } }))] }), jsxs(FormHelperText, { sx: { mt: 0 }, children: ["Destination: ", jsx("strong", { children: mode === 'replace' && sourcePath ? sourcePath : fullPath })] }), jsxs(Box$1, { sx: { borderTop: 1, borderColor: 'divider', pt: 2 }, children: [jsx(FormControlLabel, { control: jsx(Checkbox, { checked: linkEnabled, onChange: function (e) { return setLinkEnabled(e.target.checked); } }), label: "Update a content item image field after save" }), jsx(Collapse$1, { in: linkEnabled, children: jsxs(Stack$1, { spacing: 1.5, sx: { mt: 1 }, children: [jsxs(Stack$1, { direction: "row", spacing: 1, alignItems: "center", flexWrap: "wrap", useFlexGap: true, children: [jsx(Button$1, { variant: "outlined", size: "small", onClick: function () { return setContentPickerOpen(true); }, children: selectedContent ? 'Change content…' : 'Choose content…' }), selectedContent ? (jsxs(Box$1, { sx: { minWidth: 0, flex: 1 }, children: [jsx(Typography, { variant: "body2", noWrap: true, fontWeight: 500, children: selectedContent.label }), jsx(Typography, { variant: "caption", color: "text.secondary", noWrap: true, display: "block", children: selectedContent.path })] })) : (jsx(Typography, { variant: "body2", color: "text.secondary", children: "Browse, pick recent or unpublished items, or search" }))] }), selectedContent && (jsxs(FormControl, { fullWidth: true, size: "small", disabled: fieldsLoading || !imageFields.length, children: [jsx(InputLabel, { children: "Image field" }), jsx(Select, { label: "Image field", value: (_b = selectedField === null || selectedField === void 0 ? void 0 : selectedField.fieldId) !== null && _b !== void 0 ? _b : '', onChange: function (e) {
                                                         var field = imageFields.find(function (f) { return f.fieldId === e.target.value; });
                                                         setSelectedField(field !== null && field !== void 0 ? field : null);
                                                     }, children: imageFields.map(function (field) { return (jsxs(MenuItem$1, { value: field.fieldId, children: [field.fieldTitle, " (", field.fieldId, ")"] }, field.fieldId)); }) }), !fieldsLoading && fieldsError && (jsx(FormHelperText, { error: true, children: fieldsError })), !fieldsLoading && !fieldsError && imageFields.length === 0 && (jsx(FormHelperText, { children: "No image-picker fields on this content type." })), fieldsLoading ? (jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', gap: 1, py: 0.5 }, children: [jsx(CircularProgress, { size: 16 }), jsx(Typography, { variant: "caption", color: "text.secondary", children: "Loading fields\u2026" })] })) : null] }))] }) })] })] }), jsx(ImageStudioContentPickerDialog, { open: contentPickerOpen, onClose: function () { return setContentPickerOpen(false); }, initialPath: selectedContent === null || selectedContent === void 0 ? void 0 : selectedContent.path, onSelect: function (selection) {
@@ -45716,15 +45754,16 @@ function ImageStudio(_a) {
     var _q = useState(false), saveOpen = _q[0], setSaveOpen = _q[1];
     var _r = useState(false), browseOpen = _r[0], setBrowseOpen = _r[1];
     var _s = useState(false), saving = _s[0], setSaving = _s[1];
-    var _t = useState('normal'), filterPresetId = _t[0], setFilterPresetId = _t[1];
-    var _u = useState(EMPTY_DRAW_STATE), drawState = _u[0], setDrawState = _u[1];
-    var _v = useState('brush'), drawTool = _v[0], setDrawTool = _v[1];
-    var _w = useState('#ffffff'), brushColor = _w[0], setBrushColor = _w[1];
-    var _x = useState(8), brushSize = _x[0], setBrushSize = _x[1];
-    var _y = useState(DEFAULT_TEXT_FONT_FAMILY), textFontFamily = _y[0], setTextFontFamily = _y[1];
-    var _z = useState(DEFAULT_TEXT_FONT_SIZE), textFontSize = _z[0], setTextFontSize = _z[1];
-    var _0 = useState(DEFAULT_CANVAS_VIEW), canvasView = _0[0], setCanvasView = _0[1];
-    var _1 = useState(null), appliedFieldId = _1[0], setAppliedFieldId = _1[1];
+    var _t = useState(false), applyingCrop = _t[0], setApplyingCrop = _t[1];
+    var _u = useState('normal'), filterPresetId = _u[0], setFilterPresetId = _u[1];
+    var _v = useState(EMPTY_DRAW_STATE), drawState = _v[0], setDrawState = _v[1];
+    var _w = useState('brush'), drawTool = _w[0], setDrawTool = _w[1];
+    var _x = useState('#ffffff'), brushColor = _x[0], setBrushColor = _x[1];
+    var _y = useState(8), brushSize = _y[0], setBrushSize = _y[1];
+    var _z = useState(DEFAULT_TEXT_FONT_FAMILY), textFontFamily = _z[0], setTextFontFamily = _z[1];
+    var _0 = useState(DEFAULT_TEXT_FONT_SIZE), textFontSize = _0[0], setTextFontSize = _0[1];
+    var _1 = useState(DEFAULT_CANVAS_VIEW), canvasView = _1[0], setCanvasView = _1[1];
+    var _2 = useState(null), appliedFieldId = _2[0], setAppliedFieldId = _2[1];
     var loadRepoImage = useCallback(function (path) { return loadRepoImageAsDataUrl(siteId, path, guestOrigin); }, [siteId, guestOrigin]);
     var resetEdits = useCallback(function () {
         setAdjustments(DEFAULT_ADJUSTMENTS);
@@ -45862,86 +45901,132 @@ function ImageStudio(_a) {
         }
         return null;
     }, [croppedAreaPixels]);
-    var handleSave = function (options) { return __awaiter(_this, void 0, void 0, function () {
-        var cropArea, img, ratio, outW, outH, blob, ext, targetPath, fileName, savedDataUrl, file, e_2;
+    var resolveCropArea = useCallback(function (img) { return __awaiter(_this, void 0, void 0, function () {
+        var ratio;
+        return __generator(this, function (_a) {
+            if (croppedAreaPixels) {
+                return [2 /*return*/, croppedAreaPixels];
+            }
+            if (tool === 'focal') {
+                ratio = aspect !== null && aspect !== void 0 ? aspect : img.naturalWidth / img.naturalHeight;
+                return [2 /*return*/, focalCropArea(img.naturalWidth, img.naturalHeight, focal, ratio)];
+            }
+            return [2 /*return*/, fullImageCrop(img.naturalWidth, img.naturalHeight)];
+        });
+    }); }, [aspect, croppedAreaPixels, focal, tool]);
+    var handleApplyCrop = useCallback(function () { return __awaiter(_this, void 0, void 0, function () {
+        var img, cropArea, blob, dataUrl, cropped, e_2;
         return __generator(this, function (_a) {
             switch (_a.label) {
+                case 0:
+                    if (!loaded || !croppedAreaPixels) {
+                        return [2 /*return*/];
+                    }
+                    setApplyingCrop(true);
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 7, 8, 9]);
+                    return [4 /*yield*/, createImage(loaded.dataUrl)];
+                case 2:
+                    img = _a.sent();
+                    return [4 /*yield*/, resolveCropArea(img)];
+                case 3:
+                    cropArea = _a.sent();
+                    return [4 /*yield*/, getCroppedImageBlob(loaded.dataUrl, cropArea, DEFAULT_ADJUSTMENTS, undefined, undefined, 'image/png', 0.92, EMPTY_DRAW_STATE)];
+                case 4:
+                    blob = _a.sent();
+                    return [4 /*yield*/, blobToDataUrl(blob)];
+                case 5:
+                    dataUrl = _a.sent();
+                    return [4 /*yield*/, createImage(dataUrl)];
+                case 6:
+                    cropped = _a.sent();
+                    setLoaded(__assign(__assign({}, loaded), { dataUrl: dataUrl }));
+                    setCroppedAreaPixels(fullImageCrop(cropped.naturalWidth, cropped.naturalHeight));
+                    setAspect(undefined);
+                    setCanvasView(DEFAULT_CANVAS_VIEW);
+                    dispatch(showSystemNotification({
+                        message: "Crop applied \u2014 working image is now ".concat(cropped.naturalWidth, " \u00D7 ").concat(cropped.naturalHeight, "px"),
+                        options: { variant: 'success' }
+                    }));
+                    return [3 /*break*/, 9];
+                case 7:
+                    e_2 = _a.sent();
+                    handleError("Apply crop failed: ".concat(e_2.message));
+                    return [3 /*break*/, 9];
+                case 8:
+                    setApplyingCrop(false);
+                    return [7 /*endfinally*/];
+                case 9: return [2 /*return*/];
+            }
+        });
+    }); }, [croppedAreaPixels, dispatch, handleError, loaded, resolveCropArea]);
+    var handleSave = function (options) { return __awaiter(_this, void 0, void 0, function () {
+        var img, cropArea, outW, outH, targetPath, _a, folderPath, fileName, mimeType, ext, blob, savedDataUrl, uploadFileName, file, savedFullPath, nextImage, e_3;
+        var _b;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
                 case 0:
                     if (!loaded || !siteId) {
                         return [2 /*return*/];
                     }
                     setSaving(true);
-                    _a.label = 1;
+                    _c.label = 1;
                 case 1:
-                    _a.trys.push([1, 8, 9, 10]);
-                    cropArea = croppedAreaPixels;
-                    return [4 /*yield*/, new Promise(function (resolve, reject) {
-                            var image = new Image();
-                            image.onload = function () { return resolve(image); };
-                            image.onerror = reject;
-                            image.src = loaded.dataUrl;
-                        })];
+                    _c.trys.push([1, 10, 11, 12]);
+                    return [4 /*yield*/, createImage(loaded.dataUrl)];
                 case 2:
-                    img = _a.sent();
-                    if (!cropArea) {
-                        cropArea = {
-                            x: 0,
-                            y: 0,
-                            width: img.naturalWidth,
-                            height: img.naturalHeight
-                        };
-                    }
-                    if (tool === 'focal') {
-                        ratio = aspect !== null && aspect !== void 0 ? aspect : img.naturalWidth / img.naturalHeight;
-                        cropArea = focalCropArea(img.naturalWidth, img.naturalHeight, focal, ratio);
-                    }
+                    img = _c.sent();
+                    return [4 /*yield*/, resolveCropArea(img)];
+                case 3:
+                    cropArea = _c.sent();
                     outW = outputWidth === '' ? undefined : Number(outputWidth);
                     outH = outputHeight === '' ? undefined : Number(outputHeight);
-                    return [4 /*yield*/, getCroppedImageBlob(loaded.dataUrl, cropArea, adjustments, outW, outH, options.mimeType, options.quality, drawState, outputBackground)];
-                case 3:
-                    blob = _a.sent();
-                    ext = options.mimeType === 'image/jpeg'
-                        ? '.jpg'
-                        : options.mimeType === 'image/webp'
-                            ? '.webp'
-                            : '.png';
                     targetPath = options.fullPath;
-                    fileName = targetPath.substring(targetPath.lastIndexOf('/') + 1);
-                    return [4 /*yield*/, blobToDataUrl(blob)];
+                    _a = splitStaticAssetPath(targetPath), folderPath = _a.folderPath, fileName = _a.fileName;
+                    mimeType = options.mode === 'replace' ? (_b = mimeTypeForPath(targetPath)) !== null && _b !== void 0 ? _b : options.mimeType : options.mimeType;
+                    ext = mimeType === 'image/jpeg' ? '.jpg' : mimeType === 'image/webp' ? '.webp' : '.png';
+                    return [4 /*yield*/, getCroppedImageBlob(loaded.dataUrl, cropArea, adjustments, outW, outH, mimeType, options.quality, drawState, outputBackground)];
                 case 4:
-                    savedDataUrl = _a.sent();
-                    file = dataUrlToFile(savedDataUrl, fileName.endsWith(ext) ? fileName : "".concat(fileName.replace(/\.[^.]+$/, '')).concat(ext), options.mimeType);
-                    return [4 /*yield*/, uploadDataUrl(siteId, file, targetPath, '_csrf').pipe(take(1)).toPromise()];
+                    blob = _c.sent();
+                    return [4 /*yield*/, blobToDataUrl(blob)];
                 case 5:
-                    _a.sent();
-                    if (!(options.contentFieldLink && siteId)) return [3 /*break*/, 7];
-                    return [4 /*yield*/, updateContentImageField(siteId, options.contentFieldLink.contentPath, options.contentFieldLink.objectId, options.contentFieldLink.fieldId, targetPath)];
+                    savedDataUrl = _c.sent();
+                    uploadFileName = fileName.endsWith(ext) ? fileName : "".concat(fileName.replace(/\.[^.]+$/, '')).concat(ext);
+                    file = dataUrlToFile(savedDataUrl, uploadFileName, mimeType);
+                    return [4 /*yield*/, uploadDataUrl(siteId, file, folderPath, '_csrf')
+                            .pipe(filter(function (event) { return event.type === 'complete'; }), take(1))
+                            .toPromise()];
                 case 6:
-                    _a.sent();
-                    _a.label = 7;
+                    _c.sent();
+                    savedFullPath = "".concat(folderPath).concat(uploadFileName);
+                    if (!(options.contentFieldLink && siteId)) return [3 /*break*/, 8];
+                    return [4 /*yield*/, updateContentImageField(siteId, options.contentFieldLink.contentPath, options.contentFieldLink.objectId, options.contentFieldLink.fieldId, savedFullPath)];
                 case 7:
+                    _c.sent();
+                    _c.label = 8;
+                case 8:
                     dispatch(showSystemNotification({
                         message: options.contentFieldLink
                             ? "Image saved and ".concat(options.contentFieldLink.fieldTitle, " updated")
-                            : "Image saved to ".concat(targetPath),
+                            : "Image saved to ".concat(savedFullPath),
                         options: { variant: 'success' }
                     }));
                     setSaveOpen(false);
-                    if (options.mode === 'replace') {
-                        setLoaded(__assign(__assign({}, loaded), { sourcePath: targetPath, name: fileName }));
-                    }
-                    else {
-                        setLoaded({ dataUrl: savedDataUrl, sourcePath: targetPath, name: file.name });
-                    }
-                    return [3 /*break*/, 10];
-                case 8:
-                    e_2 = _a.sent();
-                    handleError("Save failed: ".concat(e_2.message));
-                    return [3 /*break*/, 10];
+                    return [4 /*yield*/, createImage(savedDataUrl)];
                 case 9:
+                    nextImage = _c.sent();
+                    setLoaded({ dataUrl: savedDataUrl, sourcePath: savedFullPath, name: uploadFileName });
+                    setCroppedAreaPixels(fullImageCrop(nextImage.naturalWidth, nextImage.naturalHeight));
+                    return [3 /*break*/, 12];
+                case 10:
+                    e_3 = _c.sent();
+                    handleError("Save failed: ".concat(e_3.message));
+                    return [3 /*break*/, 12];
+                case 11:
                     setSaving(false);
                     return [7 /*endfinally*/];
-                case 10: return [2 /*return*/];
+                case 12: return [2 /*return*/];
             }
         });
     }); };
@@ -45982,45 +46067,27 @@ function ImageStudio(_a) {
                                                     color: 'primary.main'
                                                 }
                                             }
-                                        }, children: TOOL_OPTIONS.map(function (opt) { return (jsxs(ToggleButton, { value: opt.value, children: [opt.icon, opt.label] }, opt.value)); }) })] }))] }), jsxs(Box$1, { sx: { flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }, children: [mainTab === 'requirements' && (jsx(Box$1, { sx: { flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', p: 1.5, overflow: 'hidden' }, children: jsx(ImageSizeRequirementsPanel, { active: mainTab === 'requirements', appliedFieldId: appliedFieldId, onApplyConstraints: handleApplyConstraints, currentWidth: previewDimensions === null || previewDimensions === void 0 ? void 0 : previewDimensions.width, currentHeight: previewDimensions === null || previewDimensions === void 0 ? void 0 : previewDimensions.height }) })), mainTab === 'studio' && !loaded && (jsx(ImageStudioWelcome, { onFile: handleLocalFile, onBrowseRequest: function () { return setBrowseOpen(true); } })), mainTab === 'studio' && loaded && (jsx(Box$1, { sx: { flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', px: 1.5, py: 1 }, children: jsx(ImageStudioEditor, { imageSrc: loaded.dataUrl, tool: tool, adjustments: adjustments, onAdjustmentsChange: handleAdjustmentsChange, focal: focal, onFocalChange: setFocal, croppedAreaPixels: croppedAreaPixels, onCroppedAreaPixelsChange: setCroppedAreaPixels, aspect: aspect, onAspectChange: setAspect, outputWidth: outputWidth, outputHeight: outputHeight, onOutputWidthChange: setOutputWidth, onOutputHeightChange: setOutputHeight, lockOutputAspect: lockOutputAspect, onLockOutputAspectChange: setLockOutputAspect, outputBackground: outputBackground, onOutputBackgroundChange: setOutputBackground, onReset: resetEdits, filterPresetId: filterPresetId, onSelectFilterPreset: handleSelectFilterPreset, onTintChange: handleTintChange, drawState: drawState, onDrawStateChange: setDrawState, drawTool: drawTool, onDrawToolChange: setDrawTool, brushColor: brushColor, onBrushColorChange: setBrushColor, brushSize: brushSize, onBrushSizeChange: setBrushSize, textFontFamily: textFontFamily, onTextFontFamilyChange: setTextFontFamily, textFontSize: textFontSize, onTextFontSizeChange: setTextFontSize, canvasView: canvasView, onCanvasViewChange: setCanvasView }) }))] })] }), jsx(Divider, {}), jsx(DialogFooter$1, { sx: { px: 2.5, py: 1.5, bgcolor: 'background.paper' }, children: jsxs(Stack$1, { direction: "row", alignItems: "center", justifyContent: "space-between", width: "100%", children: [loaded && previewDimensions ? (jsx(Chip, { size: "small", variant: "outlined", label: "".concat(previewDimensions.width, " \u00D7 ").concat(previewDimensions.height, "px"), sx: { fontWeight: 500 } })) : (jsx(Box$1, {})), jsx(MyLoadingButton, { variant: "contained", startIcon: jsx(SaveRoundedIcon, {}), disabled: !loaded, loading: saving, onClick: function () { return loaded && setSaveOpen(true); }, children: "Save image" })] }) }), jsx(ImageRepoBrowserDialog, { open: browseOpen, onClose: function () { return setBrowseOpen(false); }, defaultPath: defaultPath, onImageSelected: handleImageSelected, onError: handleError, loadRepoImage: loadRepoImage }), jsx(ImageStudioSaveDialog, { open: saveOpen, onClose: function () { return setSaveOpen(false); }, onSave: handleSave, saving: saving, defaultFolder: (loaded === null || loaded === void 0 ? void 0 : loaded.sourcePath) ? loaded.sourcePath.substring(0, loaded.sourcePath.lastIndexOf('/')) : defaultPath, sourcePath: loaded === null || loaded === void 0 ? void 0 : loaded.sourcePath, suggestedName: suggestedSaveName })] }));
+                                        }, children: TOOL_OPTIONS.map(function (opt) { return (jsxs(ToggleButton, { value: opt.value, children: [opt.icon, opt.label] }, opt.value)); }) })] }))] }), jsxs(Box$1, { sx: { flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }, children: [mainTab === 'requirements' && (jsx(Box$1, { sx: { flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', p: 1.5, overflow: 'hidden' }, children: jsx(ImageSizeRequirementsPanel, { active: mainTab === 'requirements', appliedFieldId: appliedFieldId, onApplyConstraints: handleApplyConstraints, currentWidth: previewDimensions === null || previewDimensions === void 0 ? void 0 : previewDimensions.width, currentHeight: previewDimensions === null || previewDimensions === void 0 ? void 0 : previewDimensions.height }) })), mainTab === 'studio' && !loaded && (jsx(ImageStudioWelcome, { onFile: handleLocalFile, onBrowseRequest: function () { return setBrowseOpen(true); } })), mainTab === 'studio' && loaded && (jsx(Box$1, { sx: { flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', px: 1.5, py: 1 }, children: jsx(ImageStudioEditor, { imageSrc: loaded.dataUrl, tool: tool, adjustments: adjustments, onAdjustmentsChange: handleAdjustmentsChange, focal: focal, onFocalChange: setFocal, croppedAreaPixels: croppedAreaPixels, onCroppedAreaPixelsChange: setCroppedAreaPixels, aspect: aspect, onAspectChange: setAspect, outputWidth: outputWidth, outputHeight: outputHeight, onOutputWidthChange: setOutputWidth, onOutputHeightChange: setOutputHeight, lockOutputAspect: lockOutputAspect, onLockOutputAspectChange: setLockOutputAspect, outputBackground: outputBackground, onOutputBackgroundChange: setOutputBackground, onReset: resetEdits, filterPresetId: filterPresetId, onSelectFilterPreset: handleSelectFilterPreset, onTintChange: handleTintChange, drawState: drawState, onDrawStateChange: setDrawState, drawTool: drawTool, onDrawToolChange: setDrawTool, brushColor: brushColor, onBrushColorChange: setBrushColor, brushSize: brushSize, onBrushSizeChange: setBrushSize, textFontFamily: textFontFamily, onTextFontFamilyChange: setTextFontFamily, textFontSize: textFontSize, onTextFontSizeChange: setTextFontSize, canvasView: canvasView, onCanvasViewChange: setCanvasView, onApplyCrop: handleApplyCrop, applyingCrop: applyingCrop }) }))] })] }), jsx(Divider, {}), jsx(DialogFooter$1, { sx: { px: 2.5, py: 1.5, bgcolor: 'background.paper' }, children: jsxs(Stack$1, { direction: "row", alignItems: "center", justifyContent: "space-between", width: "100%", children: [loaded && previewDimensions ? (jsx(Chip, { size: "small", variant: "outlined", label: "".concat(previewDimensions.width, " \u00D7 ").concat(previewDimensions.height, "px"), sx: { fontWeight: 500 } })) : (jsx(Box$1, {})), jsx(MyLoadingButton, { variant: "contained", startIcon: jsx(SaveRoundedIcon, {}), disabled: !loaded, loading: saving, onClick: function () { return loaded && setSaveOpen(true); }, children: "Save image" })] }) }), jsx(ImageRepoBrowserDialog, { open: browseOpen, onClose: function () { return setBrowseOpen(false); }, defaultPath: defaultPath, onImageSelected: handleImageSelected, onError: handleError, loadRepoImage: loadRepoImage }), jsx(ImageStudioSaveDialog, { open: saveOpen, onClose: function () { return setSaveOpen(false); }, onSave: handleSave, saving: saving, defaultFolder: (loaded === null || loaded === void 0 ? void 0 : loaded.sourcePath) ? loaded.sourcePath.substring(0, loaded.sourcePath.lastIndexOf('/')) : defaultPath, sourcePath: loaded === null || loaded === void 0 ? void 0 : loaded.sourcePath, suggestedName: suggestedSaveName })] }));
+}
+function mimeTypeForPath(path) {
+    var _a;
+    var ext = (_a = path.split('.').pop()) === null || _a === void 0 ? void 0 : _a.toLowerCase();
+    if (ext === 'jpg' || ext === 'jpeg') {
+        return 'image/jpeg';
+    }
+    if (ext === 'webp') {
+        return 'image/webp';
+    }
+    if (ext === 'png') {
+        return 'image/png';
+    }
+    return undefined;
 }
 
 function OpenImageStudioPanelButton(props) {
     var _a = props.title, title = _a === void 0 ? IMAGE_STUDIO_DEFAULTS.title : _a, _b = props.icon, icon = _b === void 0 ? IMAGE_STUDIO_DEFAULTS.icon : _b, _c = props.dialogTitle, dialogTitle = _c === void 0 ? title : _c, defaultPath = props.defaultPath;
     var handleClick = useOpenImageStudio({ title: dialogTitle, defaultPath: defaultPath });
     return jsx(ToolsPanelListItemButton, { icon: icon, title: title, onClick: handleClick });
-}
-
-function CommitGraphMarker(_a) {
-    var commit = _a.commit, isSelected = _a.isSelected, isFirst = _a.isFirst, isLast = _a.isLast;
-    var theme = useTheme();
-    var primary = theme.palette.primary.main;
-    var lineColor = alpha(theme.palette.text.primary, 0.12);
-    var processedColor = theme.palette.success.main;
-    var unprocessedColor = theme.palette.warning.main;
-    var nodeColor = commit.processed ? processedColor : unprocessedColor;
-    var radius = isSelected ? 6 : 4.5;
-    return (jsxs(Box$1, { sx: {
-            width: 32,
-            minWidth: 32,
-            flexShrink: 0,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            alignSelf: 'stretch',
-            py: 0.75
-        }, children: [!isFirst && jsx(Box$1, { sx: { width: 2, flex: 1, minHeight: 8, bgcolor: lineColor, borderRadius: 1 } }), jsx(Box$1, { sx: {
-                    width: radius * 2,
-                    height: radius * 2,
-                    borderRadius: '50%',
-                    bgcolor: isSelected ? primary : nodeColor,
-                    border: isSelected ? "2px solid ".concat(alpha(primary, 0.35)) : "2px solid ".concat(alpha(nodeColor, 0.35)),
-                    boxShadow: isSelected ? "0 0 0 3px ".concat(alpha(primary, 0.15)) : 'none',
-                    boxSizing: 'border-box',
-                    flexShrink: 0,
-                    transition: 'box-shadow 0.15s ease, transform 0.15s ease',
-                    transform: isSelected ? 'scale(1.05)' : 'none'
-                } }), !isLast && jsx(Box$1, { sx: { width: 2, flex: 1, minHeight: 8, bgcolor: lineColor, borderRadius: 1 } })] }));
 }
 
 /*
@@ -46064,12 +46131,24 @@ function normalizeFileDiff(diff) {
     var _a;
     return __assign(__assign({}, diff), { changeType: apiText(diff.changeType), path: apiText(diff.path), oldPath: diff.oldPath ? apiText(diff.oldPath) : diff.oldPath, newPath: diff.newPath ? apiText(diff.newPath) : diff.newPath, diff: apiText(diff.diff), lines: ((_a = diff.lines) !== null && _a !== void 0 ? _a : []).map(function (line) { return (__assign(__assign({}, line), { content: apiText(line.content) })); }) });
 }
-function pluginUrl(script, siteId, query) {
+var devContentOpsStudioSiteId = null;
+/** Studio session site for plugin API auth; DevContentOps tools pass the selected project as targetSiteId. */
+function setDevContentOpsStudioSiteId(studioSiteId) {
+    devContentOpsStudioSiteId = (studioSiteId === null || studioSiteId === void 0 ? void 0 : studioSiteId.trim()) || null;
+}
+function studioSiteFor(targetSiteId) {
+    var studio = devContentOpsStudioSiteId === null || devContentOpsStudioSiteId === void 0 ? void 0 : devContentOpsStudioSiteId.trim();
+    return studio || targetSiteId;
+}
+function pluginUrl(script, targetSiteId, query) {
     if (query === void 0) { query = ''; }
+    var studioSiteId = studioSiteFor(targetSiteId);
     var base = '/studio/api/2/plugin/script/plugins/org/rd/plugin/uigoodies/' +
         script +
         '?siteId=' +
-        encodeURIComponent(siteId);
+        encodeURIComponent(studioSiteId) +
+        '&targetSiteId=' +
+        encodeURIComponent(targetSiteId);
     return query ? base + '&' + query : base;
 }
 /** Reject responses scoped to a different site than the selected project. */
@@ -46091,7 +46170,11 @@ function isDevContentOpsPayload(obj) {
         'patch' in obj ||
         'content' in obj ||
         'success' in obj ||
+        'stores' in obj ||
+        'configured' in obj ||
+        'entries' in obj ||
         'fileDiffs' in obj ||
+        'publishTarget' in obj ||
         ('files' in obj && 'total' in obj));
 }
 function unwrapPluginResponse(raw) {
@@ -46237,7 +46320,7 @@ function fetchGitLog(siteId, opts) {
     }
     return pluginGet(siteId, pluginUrl('dev-content-ops-git', siteId, q)).pipe(map(function (data) {
         var _a;
-        return (__assign(__assign({}, data), { branch: apiText(data.branch), headCommitId: apiText(data.headCommitId), commits: ((_a = data.commits) !== null && _a !== void 0 ? _a : []).map(normalizeCommit) }));
+        return (__assign(__assign({}, data), { branch: apiText(data.branch), headCommitId: apiText(data.headCommitId), lastProcessedCommitId: data.lastProcessedCommitId ? apiText(data.lastProcessedCommitId) : data.lastProcessedCommitId, commits: ((_a = data.commits) !== null && _a !== void 0 ? _a : []).map(normalizeCommit) }));
     }));
 }
 function fetchGitCommitDetail(siteId, commitId) {
@@ -46273,18 +46356,63 @@ function fetchGitDiff(siteId, fromRef, toRef, path) {
         return (__assign(__assign({}, data), { diff: apiText(data.diff), from: apiText(data.from), to: apiText(data.to), path: data.path ? apiText(data.path) : data.path, fileDiffs: ((_a = data.fileDiffs) !== null && _a !== void 0 ? _a : []).map(normalizeFileDiff) }));
     }));
 }
+function fetchPublishCompareOverview(siteId) {
+    return pluginGet(siteId, pluginUrl('dev-content-ops-git', siteId, 'action=publishCompareOverview')).pipe(map(function (data) {
+        var _a;
+        return assertSiteScope(siteId, __assign(__assign({}, data), { stagingTarget: apiText(data.stagingTarget), liveTarget: apiText(data.liveTarget), defaultTarget: apiText(data.defaultTarget), sandboxBranch: apiText(data.sandboxBranch), sandboxHeadCommitId: apiText(data.sandboxHeadCommitId), publishHeadCommitId: apiText(data.publishHeadCommitId), targets: ((_a = data.targets) !== null && _a !== void 0 ? _a : []).map(function (target) { return ({
+                id: apiText(target.id),
+                branch: apiText(target.branch),
+                exists: Boolean(target.exists)
+            }); }) }));
+    }));
+}
+function fetchPublishCompare(siteId, opts) {
+    if (opts === void 0) { opts = {}; }
+    var q = 'action=publishCompare';
+    if (opts.target) {
+        q += '&target=' + encodeURIComponent(opts.target);
+    }
+    if (opts.pathPrefix) {
+        q += '&pathPrefix=' + encodeURIComponent(opts.pathPrefix);
+    }
+    if (opts.query) {
+        q += '&query=' + encodeURIComponent(opts.query);
+    }
+    if (opts.hideNoDiff != null) {
+        q += '&hideNoDiff=' + (opts.hideNoDiff ? 'true' : 'false');
+    }
+    if (opts.skip != null) {
+        q += '&skip=' + opts.skip;
+    }
+    if (opts.limit != null) {
+        q += '&limit=' + opts.limit;
+    }
+    return pluginGet(siteId, pluginUrl('dev-content-ops-git', siteId, q)).pipe(map(function (data) {
+        var _a;
+        return assertSiteScope(siteId, __assign(__assign({}, data), { sandboxBranch: apiText(data.sandboxBranch), sandboxHeadCommitId: apiText(data.sandboxHeadCommitId), publishTarget: apiText(data.publishTarget), publishHeadCommitId: apiText(data.publishHeadCommitId), pathPrefix: apiText(data.pathPrefix), query: apiText(data.query), hideNoDiff: data.hideNoDiff != null ? Boolean(data.hideNoDiff) : undefined, files: ((_a = data.files) !== null && _a !== void 0 ? _a : []).map(function (file) { return (__assign(__assign({}, file), { changeType: apiText(file.changeType), path: apiText(file.path), internalName: file.internalName ? apiText(file.internalName) : '', hasTextDiff: file.hasTextDiff != null ? Boolean(file.hasTextDiff) : undefined })); }) }));
+    }));
+}
+function fetchPublishCompareDiff(siteId, path, target) {
+    var q = 'action=publishCompareDiff&path=' + encodeURIComponent(path);
+    if (target) {
+        q += '&target=' + encodeURIComponent(target);
+    }
+    return pluginGet(siteId, pluginUrl('dev-content-ops-git', siteId, q)).pipe(map(function (data) {
+        var _a;
+        return (__assign(__assign({}, data), { path: apiText(data.path), changeType: apiText(data.changeType), diff: apiText(data.diff), message: data.message ? apiText(data.message) : undefined, fileDiffs: ((_a = data.fileDiffs) !== null && _a !== void 0 ? _a : []).map(normalizeFileDiff) }));
+    }));
+}
 function buildPatchFromSelection(siteId, selections) {
-    return postJSON(pluginUrl('dev-content-ops-git', siteId), {
-        siteId: siteId,
+    return postJSON(pluginUrl('dev-content-ops-git', siteId), pluginPostBody(siteId, {
         action: 'buildPatch',
         selections: selections
-    }).pipe(map(function (r) {
+    })).pipe(map(function (r) {
         var data = unwrapPluginResponse(r);
         return __assign(__assign({}, data), { patch: apiText(data.patch) });
     }));
 }
 function postDevContentOpsAction(siteId, body) {
-    return postJSON(pluginUrl('dev-content-ops-git', siteId), __assign({ siteId: siteId }, body)).pipe(map(function (r) {
+    return postJSON(pluginUrl('dev-content-ops-git', siteId), pluginPostBody(siteId, body)).pipe(map(function (r) {
         var data = unwrapPluginResponse(r);
         assertSiteScope(siteId, data);
         return data;
@@ -46428,6 +46556,9 @@ function postDeleteBranch(siteId, opts) {
 function postDeleteTag(siteId, opts) {
     return postDevContentOpsAction(siteId, __assign({ action: 'deleteTag' }, opts));
 }
+function pluginPostBody(targetSiteId, body) {
+    return __assign({ siteId: studioSiteFor(targetSiteId), targetSiteId: targetSiteId }, body);
+}
 function databasePluginUrl(siteId, query) {
     if (query === void 0) { query = ''; }
     return pluginUrl('database-tools', siteId, query);
@@ -46443,7 +46574,7 @@ function fetchAuditStats(siteId, opts) {
     return pluginGet(siteId, databasePluginUrl(siteId, q));
 }
 function postTruncateAudit(siteId, opts) {
-    return postJSON(databasePluginUrl(siteId), __assign({ siteId: siteId, action: 'truncateAudit' }, opts)).pipe(map(function (r) {
+    return postJSON(databasePluginUrl(siteId), pluginPostBody(siteId, __assign({ action: 'truncateAudit' }, opts))).pipe(map(function (r) {
         var data = unwrapPluginResponse(r);
         assertSiteScope(siteId, data);
         return data;
@@ -46454,7 +46585,7 @@ function fetchProcessedCommitsStats(siteId, opts) {
     return pluginGet(siteId, databasePluginUrl(siteId, q));
 }
 function postTruncateProcessedCommits(siteId, opts) {
-    return postJSON(databasePluginUrl(siteId), __assign({ siteId: siteId, action: 'truncateProcessedCommits' }, opts)).pipe(map(function (r) {
+    return postJSON(databasePluginUrl(siteId), pluginPostBody(siteId, __assign({ action: 'truncateProcessedCommits' }, opts))).pipe(map(function (r) {
         var data = unwrapPluginResponse(r);
         assertSiteScope(siteId, data);
         return data;
@@ -46465,7 +46596,7 @@ function fetchBlobStoreOverview(siteId) {
         var _a;
         return assertSiteScope(siteId, __assign(__assign({}, data), { configured: Boolean(data.configured), stores: ((_a = data.stores) !== null && _a !== void 0 ? _a : []).map(function (store) {
                 var _a;
-                return (__assign(__assign({}, store), { id: apiText(store.id), type: apiText(store.type), pattern: apiText(store.pattern), treeRoot: apiText(store.treeRoot), mappings: ((_a = store.mappings) !== null && _a !== void 0 ? _a : []).map(function (mapping) { return ({
+                return (__assign(__assign({}, store), { id: apiText(store.id), type: apiText(store.type), pattern: apiText(store.pattern), treeRoot: apiText(store.treeRoot), versioningSupported: Boolean(store.versioningSupported), versioningNote: store.versioningNote ? apiText(store.versioningNote) : undefined, mappings: ((_a = store.mappings) !== null && _a !== void 0 ? _a : []).map(function (mapping) { return ({
                         publishingTarget: apiText(mapping.publishingTarget),
                         storeTarget: apiText(mapping.storeTarget),
                         prefix: mapping.prefix ? apiText(mapping.prefix) : undefined
@@ -46493,18 +46624,172 @@ function fetchBlobStoreChildren(siteId, storeId, path) {
     }));
 }
 function postSyncBlobStore(siteId, opts) {
-    return postJSON(pluginUrl('dev-content-ops-git', siteId), {
-        siteId: siteId,
+    return postJSON(pluginUrl('dev-content-ops-git', siteId), pluginPostBody(siteId, {
         action: 'syncBlobStore',
         target: opts.target,
         paths: opts.paths,
         storeId: opts.storeId
-    }).pipe(map(function (r) {
+    })).pipe(map(function (r) {
         var _a, _b;
         var data = unwrapPluginResponse(r);
         assertSiteScope(siteId, data);
         return __assign(__assign({}, data), { target: apiText(data.target), publishingTarget: apiText(data.publishingTarget), storeId: apiText(data.storeId), message: data.message ? apiText(data.message) : undefined, syncedPaths: ((_a = data.syncedPaths) !== null && _a !== void 0 ? _a : []).map(function (p) { return apiText(p); }), failedPaths: ((_b = data.failedPaths) !== null && _b !== void 0 ? _b : []).map(function (p) { return apiText(p); }) });
     }));
+}
+function fetchBlobStoreVersions(siteId, storeId, path, target) {
+    if (target === void 0) { target = 'preview'; }
+    var q = 'action=blobStoreVersions&storeId=' +
+        encodeURIComponent(storeId) +
+        '&path=' +
+        encodeURIComponent(path) +
+        '&target=' +
+        encodeURIComponent(target);
+    return pluginGet(siteId, pluginUrl('dev-content-ops-git', siteId, q)).pipe(map(function (data) {
+        var _a;
+        return assertSiteScope(siteId, __assign(__assign({}, data), { storeId: apiText(data.storeId) || storeId, path: apiText(data.path), publishingTarget: apiText(data.publishingTarget) || target, bucket: data.bucket ? apiText(data.bucket) : undefined, objectKey: data.objectKey ? apiText(data.objectKey) : undefined, versions: ((_a = data.versions) !== null && _a !== void 0 ? _a : []).map(function (version) { return ({
+                versionId: apiText(version.versionId) || 'null',
+                versionLabel: version.versionLabel ? apiText(version.versionLabel) : undefined,
+                legacyNullVersion: Boolean(version.legacyNullVersion),
+                key: apiText(version.key),
+                lastModified: version.lastModified ? apiText(version.lastModified) : undefined,
+                size: Number(version.size) || 0,
+                latest: Boolean(version.latest),
+                deleteMarker: Boolean(version.deleteMarker),
+                contentType: version.contentType ? apiText(version.contentType) : undefined,
+                etag: version.etag ? apiText(version.etag) : undefined
+            }); }) }));
+    }));
+}
+function fetchBlobStoreDeleted(siteId, storeId, target, limit) {
+    if (target === void 0) { target = 'preview'; }
+    if (limit === void 0) { limit = 200; }
+    var q = 'action=blobStoreDeleted&storeId=' +
+        encodeURIComponent(storeId) +
+        '&target=' +
+        encodeURIComponent(target) +
+        '&limit=' +
+        limit;
+    return pluginGet(siteId, pluginUrl('dev-content-ops-git', siteId, q)).pipe(map(function (data) {
+        var _a;
+        return assertSiteScope(siteId, __assign(__assign({}, data), { storeId: apiText(data.storeId) || storeId, publishingTarget: apiText(data.publishingTarget) || target, bucket: data.bucket ? apiText(data.bucket) : undefined, prefix: data.prefix ? apiText(data.prefix) : undefined, entries: ((_a = data.entries) !== null && _a !== void 0 ? _a : []).map(function (entry) { return ({
+                path: apiText(entry.path),
+                objectKey: entry.objectKey ? apiText(entry.objectKey) : undefined,
+                versionId: apiText(entry.versionId),
+                lastModified: entry.lastModified ? apiText(entry.lastModified) : undefined,
+                deleteMarker: Boolean(entry.deleteMarker)
+            }); }) }));
+    }));
+}
+function loadBlobVersionContent(previewUrl, signal) {
+    return __awaiter(this, void 0, void 0, function () {
+        var res, e_2, detail, body, parsed;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    _b.trys.push([0, 2, , 3]);
+                    return [4 /*yield*/, fetch(previewUrl, {
+                            method: 'GET',
+                            credentials: 'include',
+                            signal: signal,
+                            headers: getGlobalHeaders()
+                        })];
+                case 1:
+                    res = _b.sent();
+                    return [3 /*break*/, 3];
+                case 2:
+                    e_2 = _b.sent();
+                    if (signal === null || signal === void 0 ? void 0 : signal.aborted) {
+                        throw new DOMException('Aborted', 'AbortError');
+                    }
+                    throw e_2;
+                case 3:
+                    if (!!res.ok) return [3 /*break*/, 8];
+                    detail = '';
+                    _b.label = 4;
+                case 4:
+                    _b.trys.push([4, 6, , 7]);
+                    return [4 /*yield*/, res.text()];
+                case 5:
+                    body = _b.sent();
+                    if (body) {
+                        try {
+                            parsed = JSON.parse(body);
+                            detail = parsed.error || body.slice(0, 500);
+                        }
+                        catch (_c) {
+                            detail = body.slice(0, 500);
+                        }
+                    }
+                    return [3 /*break*/, 7];
+                case 6:
+                    _b.sent();
+                    return [3 /*break*/, 7];
+                case 7: throw new Error("Blob version preview failed (HTTP ".concat(res.status, ")").concat(detail ? ": ".concat(detail) : ''));
+                case 8: return [2 /*return*/, res.blob()];
+            }
+        });
+    });
+}
+function fetchBlobVersionPreview(siteId, storeId, path, versionId, target) {
+    if (target === void 0) { target = 'preview'; }
+    var q = 'action=blobStoreVersionPreview&storeId=' +
+        encodeURIComponent(storeId) +
+        '&path=' +
+        encodeURIComponent(path) +
+        '&versionId=' +
+        encodeURIComponent(versionId) +
+        '&target=' +
+        encodeURIComponent(target);
+    return pluginGet(siteId, pluginUrl('dev-content-ops-git', siteId, q)).pipe(map(function (data) {
+        return assertSiteScope(siteId, __assign(__assign({}, data), { storeId: apiText(data.storeId) || storeId, path: apiText(data.path), publishingTarget: apiText(data.publishingTarget) || target, versionId: apiText(data.versionId) || versionId, versionLabel: data.versionLabel ? apiText(data.versionLabel) : undefined, previewUrl: apiText(data.previewUrl), contentType: data.contentType ? apiText(data.contentType) : undefined, bucket: data.bucket ? apiText(data.bucket) : undefined, objectKey: data.objectKey ? apiText(data.objectKey) : undefined, inlinePreview: Boolean(data.inlinePreview) }));
+    }));
+}
+function postRestoreBlobVersion(siteId, opts) {
+    var _a;
+    return postJSON(pluginUrl('dev-content-ops-git', siteId), pluginPostBody(siteId, {
+        action: 'restoreBlobVersion',
+        storeId: opts.storeId,
+        path: opts.path,
+        versionId: opts.versionId,
+        target: (_a = opts.target) !== null && _a !== void 0 ? _a : 'preview',
+        deleteMarker: Boolean(opts.deleteMarker)
+    })).pipe(map(function (r) {
+        var data = unwrapPluginResponse(r);
+        assertSiteScope(siteId, data);
+        return __assign(__assign({}, data), { storeId: apiText(data.storeId), path: apiText(data.path), publishingTarget: apiText(data.publishingTarget), restoredFromVersionId: apiText(data.restoredFromVersionId), newVersionId: data.newVersionId ? apiText(data.newVersionId) : undefined, pointerPath: data.pointerPath ? apiText(data.pointerPath) : undefined, pointerError: data.pointerError ? apiText(data.pointerError) : undefined, message: data.message ? apiText(data.message) : undefined });
+    }));
+}
+
+function CommitGraphMarker(_a) {
+    var commit = _a.commit, isSelected = _a.isSelected, isFirst = _a.isFirst, isLast = _a.isLast;
+    var theme = useTheme();
+    var primary = theme.palette.primary.main;
+    var lineColor = alpha(theme.palette.text.primary, 0.12);
+    var processedColor = theme.palette.success.main;
+    var unprocessedColor = theme.palette.warning.main;
+    var nodeColor = commit.processed ? processedColor : unprocessedColor;
+    var radius = isSelected ? 6 : 4.5;
+    return (jsxs(Box$1, { sx: {
+            width: 32,
+            minWidth: 32,
+            flexShrink: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            alignSelf: 'stretch',
+            py: 0.75
+        }, children: [!isFirst && jsx(Box$1, { sx: { width: 2, flex: 1, minHeight: 8, bgcolor: lineColor, borderRadius: 1 } }), jsx(Box$1, { sx: {
+                    width: radius * 2,
+                    height: radius * 2,
+                    borderRadius: '50%',
+                    bgcolor: isSelected ? primary : nodeColor,
+                    border: isSelected ? "2px solid ".concat(alpha(primary, 0.35)) : "2px solid ".concat(alpha(nodeColor, 0.35)),
+                    boxShadow: isSelected ? "0 0 0 3px ".concat(alpha(primary, 0.15)) : 'none',
+                    boxSizing: 'border-box',
+                    flexShrink: 0,
+                    transition: 'box-shadow 0.15s ease, transform 0.15s ease',
+                    transform: isSelected ? 'scale(1.05)' : 'none'
+                } }), !isLast && jsx(Box$1, { sx: { width: 2, flex: 1, minHeight: 8, bgcolor: lineColor, borderRadius: 1 } })] }));
 }
 
 var monoSx = {
@@ -46934,22 +47219,23 @@ function GitLogTab(_a) {
     var _l = useState(false), loadingMore = _l[0], setLoadingMore = _l[1];
     var _m = useState(false), hasMore = _m[0], setHasMore = _m[1];
     var _o = useState(0), nextSkip = _o[0], setNextSkip = _o[1];
-    var _p = useState(''), sinceDate = _p[0], setSinceDate = _p[1];
-    var _q = useState(''), untilDate = _q[0], setUntilDate = _q[1];
-    var _r = useState('desc'), logOrder = _r[0], setLogOrder = _r[1];
-    var _s = useState(null), fileContent = _s[0], setFileContent = _s[1];
-    var _t = useState(''), diffFrom = _t[0], setDiffFrom = _t[1];
-    var _u = useState(''), diffTo = _u[0], setDiffTo = _u[1];
-    var _v = useState(null), diffView = _v[0], setDiffView = _v[1];
-    var _w = useState([]), patchSelections = _w[0], setPatchSelections = _w[1];
-    var _x = useState(''), patchPreview = _x[0], setPatchPreview = _x[1];
-    var _y = useState(''), patchText = _y[0], setPatchText = _y[1];
-    var _z = useState(siteId), patchApplyTargetSiteId = _z[0], setPatchApplyTargetSiteId = _z[1];
-    var _0 = useState(false), buildingPatch = _0[0], setBuildingPatch = _0[1];
-    var _1 = useState(false), diffDialogOpen = _1[0], setDiffDialogOpen = _1[1];
-    var _2 = useState(null), confirmDialog = _2[0], setConfirmDialog = _2[1];
-    var _3 = useState(null), apiError = _3[0], setApiError = _3[1];
-    var _4 = useState(null), filterFileResult = _4[0], setFilterFileResult = _4[1];
+    var _p = useState(''), lastProcessedCommitId = _p[0], setLastProcessedCommitId = _p[1];
+    var _q = useState(''), sinceDate = _q[0], setSinceDate = _q[1];
+    var _r = useState(''), untilDate = _r[0], setUntilDate = _r[1];
+    var _s = useState('desc'), logOrder = _s[0], setLogOrder = _s[1];
+    var _t = useState(null), fileContent = _t[0], setFileContent = _t[1];
+    var _u = useState(''), diffFrom = _u[0], setDiffFrom = _u[1];
+    var _v = useState(''), diffTo = _v[0], setDiffTo = _v[1];
+    var _w = useState(null), diffView = _w[0], setDiffView = _w[1];
+    var _x = useState([]), patchSelections = _x[0], setPatchSelections = _x[1];
+    var _y = useState(''), patchPreview = _y[0], setPatchPreview = _y[1];
+    var _z = useState(''), patchText = _z[0], setPatchText = _z[1];
+    var _0 = useState(siteId), patchApplyTargetSiteId = _0[0], setPatchApplyTargetSiteId = _0[1];
+    var _1 = useState(false), buildingPatch = _1[0], setBuildingPatch = _1[1];
+    var _2 = useState(false), diffDialogOpen = _2[0], setDiffDialogOpen = _2[1];
+    var _3 = useState(null), confirmDialog = _3[0], setConfirmDialog = _3[1];
+    var _4 = useState(null), apiError = _4[0], setApiError = _4[1];
+    var _5 = useState(null), filterFileResult = _5[0], setFilterFileResult = _5[1];
     var listRef = useRef(null);
     var loadMoreRef = useRef(null);
     var loadingMoreRef = useRef(false);
@@ -47027,10 +47313,10 @@ function GitLogTab(_a) {
         }
         return __awaiter(_this, __spreadArray([], args_1, true), void 0, function (reset, explicitSkip) {
             var skip, since, until, data_1, e_2, message;
-            var _a;
+            var _a, _b;
             if (reset === void 0) { reset = true; }
-            return __generator(this, function (_b) {
-                switch (_b.label) {
+            return __generator(this, function (_c) {
+                switch (_c.label) {
                     case 0:
                         if (!branch) {
                             return [2 /*return*/];
@@ -47042,17 +47328,18 @@ function GitLogTab(_a) {
                         else {
                             setLoadingMore(true);
                         }
-                        _b.label = 1;
+                        _c.label = 1;
                     case 1:
-                        _b.trys.push([1, 3, 4, 5]);
+                        _c.trys.push([1, 3, 4, 5]);
                         setApiError(null);
                         since = parseEpoch(sinceDate);
                         until = parseEpoch(untilDate);
                         return [4 /*yield*/, firstValueFrom(fetchGitLog(siteId, { branch: branch, skip: skip, limit: LOG_LIMIT, since: since, until: until, order: logOrder }))];
                     case 2:
-                        data_1 = _b.sent();
+                        data_1 = _c.sent();
                         if (reset) {
                             setCommits((_a = data_1.commits) !== null && _a !== void 0 ? _a : []);
+                            setLastProcessedCommitId((_b = data_1.lastProcessedCommitId) !== null && _b !== void 0 ? _b : '');
                         }
                         else {
                             setCommits(function (prev) {
@@ -47066,7 +47353,7 @@ function GitLogTab(_a) {
                         setNextSkip(data_1.nextSkip);
                         return [3 /*break*/, 5];
                     case 3:
-                        e_2 = _b.sent();
+                        e_2 = _c.sent();
                         message = e_2.message || 'Failed to load git log';
                         setApiError(message);
                         notify(message, 'error');
@@ -47527,7 +47814,7 @@ function GitLogTab(_a) {
                     minHeight: 0,
                     minWidth: 0,
                     overflow: 'hidden'
-                }, children: [jsxs(Paper, { variant: "outlined", sx: __assign(__assign({}, surfacePaperSx), { flex: '1 1 0', minWidth: 0, minHeight: 0, display: 'flex', flexDirection: 'column' }), children: [jsx(PanelHeader, { title: "Commit history", action: jsxs(Stack$1, { direction: "row", spacing: 1.5, alignItems: "center", sx: { display: { xs: 'none', sm: 'flex' } }, children: [jsxs(Stack$1, { direction: "row", spacing: 0.5, alignItems: "center", children: [jsx(Box$1, { sx: { width: 8, height: 8, borderRadius: '50%', bgcolor: 'success.main' } }), jsx(Typography, { variant: "caption", color: "text.secondary", children: "Processed" })] }), jsxs(Stack$1, { direction: "row", spacing: 0.5, alignItems: "center", children: [jsx(Box$1, { sx: { width: 8, height: 8, borderRadius: '50%', bgcolor: 'warning.main' } }), jsx(Typography, { variant: "caption", color: "text.secondary", children: "Unprocessed" })] })] }) }), loading && !commits.length ? (jsx(Box$1, { sx: { p: 5, display: 'flex', justifyContent: 'center' }, children: jsx(CircularProgress, { size: 32 }) })) : commits.length === 0 ? (jsx(Box$1, { sx: { p: 4, textAlign: 'center' }, children: jsx(Typography, { variant: "body2", color: "text.secondary", children: "No commits" }) })) : (jsx(Box$1, { ref: listRef, sx: {
+                }, children: [jsxs(Paper, { variant: "outlined", sx: __assign(__assign({}, surfacePaperSx), { flex: '1 1 0', minWidth: 0, minHeight: 0, display: 'flex', flexDirection: 'column' }), children: [jsx(PanelHeader, { title: "Commit history", action: jsxs(Stack$1, { direction: "row", spacing: 1.5, alignItems: "center", sx: { display: { xs: 'none', sm: 'flex' } }, children: [jsx(Chip, { size: "small", variant: "outlined", label: "Last processed: ".concat(lastProcessedCommitId ? lastProcessedCommitId.slice(0, 8) : '—'), title: lastProcessedCommitId || 'No processed commit recorded for this project yet', sx: __assign({}, monoSx) }), jsxs(Stack$1, { direction: "row", spacing: 0.5, alignItems: "center", children: [jsx(Box$1, { sx: { width: 8, height: 8, borderRadius: '50%', bgcolor: 'success.main' } }), jsx(Typography, { variant: "caption", color: "text.secondary", children: "Processed" })] }), jsxs(Stack$1, { direction: "row", spacing: 0.5, alignItems: "center", children: [jsx(Box$1, { sx: { width: 8, height: 8, borderRadius: '50%', bgcolor: 'warning.main' } }), jsx(Typography, { variant: "caption", color: "text.secondary", children: "Unprocessed" })] })] }) }), loading && !commits.length ? (jsx(Box$1, { sx: { p: 5, display: 'flex', justifyContent: 'center' }, children: jsx(CircularProgress, { size: 32 }) })) : commits.length === 0 ? (jsx(Box$1, { sx: { p: 4, textAlign: 'center' }, children: jsx(Typography, { variant: "body2", color: "text.secondary", children: "No commits" }) })) : (jsx(Box$1, { ref: listRef, sx: {
                                     flex: 1,
                                     overflowY: 'auto',
                                     overflowX: 'hidden',
@@ -48574,7 +48861,7 @@ function RepoHealthTab(_a) {
     var metricGroups = useMemo(function () { var _a; return groupMetrics((_a = report === null || report === void 0 ? void 0 : report.metrics) !== null && _a !== void 0 ? _a : []); }, [report === null || report === void 0 ? void 0 : report.metrics]);
     var configGroups = useMemo(function () { var _a, _b; return groupConfigSettings((_b = (_a = report === null || report === void 0 ? void 0 : report.repoConfig) === null || _a === void 0 ? void 0 : _a.settings) !== null && _b !== void 0 ? _b : []); }, [(_b = report === null || report === void 0 ? void 0 : report.repoConfig) === null || _b === void 0 ? void 0 : _b.settings]);
     var load = useCallback(function () { return __awaiter(_this, void 0, void 0, function () {
-        var controller, data, e_1;
+        var controller, data, e_1, isCurrentController;
         var _a;
         return __generator(this, function (_b) {
             switch (_b.label) {
@@ -48608,11 +48895,12 @@ function RepoHealthTab(_a) {
                     setReport(null);
                     return [3 /*break*/, 5];
                 case 4:
-                    if (loadAbortRef.current === controller) {
+                    isCurrentController = loadAbortRef.current === controller;
+                    if (isCurrentController) {
                         loadAbortRef.current = null;
+                        setLoading(false);
+                        setLoadProgress(null);
                     }
-                    setLoading(false);
-                    setLoadProgress(null);
                     return [7 /*endfinally*/];
                 case 5: return [2 /*return*/];
             }
@@ -49510,7 +49798,7 @@ function BranchesTab(_a) {
                     _c.label = 1;
                 case 1:
                     _c.trys.push([1, 3, 4, 5]);
-                    return [4 /*yield*/, firstValueFrom(push(siteId, remoteName, syncBranch, false).pipe(take(1)))];
+                    return [4 /*yield*/, firstValueFrom(push$1(siteId, remoteName, syncBranch, false).pipe(take(1)))];
                 case 2:
                     _c.sent();
                     setNotice("Pushed ".concat(syncBranch, " to ").concat(remoteName));
@@ -50294,6 +50582,324 @@ function BlobStoreTreeBranch(_a) {
     }, [siteId, store.id]);
     return (jsx(BlobStoreTreeNode, { siteId: siteId, store: store, entry: entry, depth: depth, expanded: expanded, onToggle: function () { return setExpanded(function (v) { return !v; }); }, folderState: entry.folder ? folderCache[entry.path] : undefined, onLoadFolder: loadFolder, selectedPaths: selectedPaths, onToggleSelect: onToggleSelect }));
 }
+function formatBytes(size) {
+    if (!size || size < 0) {
+        return '0 B';
+    }
+    var units = ['B', 'KB', 'MB', 'GB'];
+    var value = size;
+    var unit = 0;
+    while (value >= 1024 && unit < units.length - 1) {
+        value /= 1024;
+        unit += 1;
+    }
+    return "".concat(value < 10 && unit > 0 ? value.toFixed(1) : Math.round(value), " ").concat(units[unit]);
+}
+function formatVersionDate(value) {
+    if (!value) {
+        return '—';
+    }
+    var date = new Date(value);
+    return Number.isNaN(date.getTime()) ? value : date.toLocaleString();
+}
+function formatBlobVersionLabel(version) {
+    if (version.versionLabel) {
+        return version.versionLabel;
+    }
+    if (version.legacyNullVersion || !version.versionId || version.versionId === 'null') {
+        return 'Original (pre-versioning)';
+    }
+    return version.versionId;
+}
+function blobVersionRowKey(version) {
+    return "".concat(version.versionId || 'null', ":").concat(version.lastModified || '', ":").concat(version.deleteMarker ? 'deleted' : 'object');
+}
+function BlobVersionPreviewPanel(_a) {
+    var preview = _a.preview, loading = _a.loading, error = _a.error;
+    var _b = useState(null), objectUrl = _b[0], setObjectUrl = _b[1];
+    var _c = useState(false), contentLoading = _c[0], setContentLoading = _c[1];
+    var _d = useState(null), contentError = _d[0], setContentError = _d[1];
+    useEffect(function () {
+        if (!(preview === null || preview === void 0 ? void 0 : preview.previewUrl)) {
+            setObjectUrl(null);
+            setContentError(null);
+            return;
+        }
+        var ac = new AbortController();
+        setContentLoading(true);
+        setContentError(null);
+        loadBlobVersionContent(preview.previewUrl, ac.signal)
+            .then(function (blob) {
+            var url = URL.createObjectURL(blob);
+            setObjectUrl(function (prev) {
+                if (prev) {
+                    URL.revokeObjectURL(prev);
+                }
+                return url;
+            });
+        })
+            .catch(function (e) {
+            if (ac.signal.aborted) {
+                return;
+            }
+            setObjectUrl(function (prev) {
+                if (prev) {
+                    URL.revokeObjectURL(prev);
+                }
+                return null;
+            });
+            setContentError(e instanceof Error ? e.message : 'Failed to load preview');
+        })
+            .finally(function () {
+            if (!ac.signal.aborted) {
+                setContentLoading(false);
+            }
+        });
+        return function () {
+            ac.abort();
+            setObjectUrl(function (prev) {
+                if (prev) {
+                    URL.revokeObjectURL(prev);
+                }
+                return null;
+            });
+        };
+    }, [preview === null || preview === void 0 ? void 0 : preview.previewUrl]);
+    if (loading || contentLoading) {
+        return (jsxs(Box$1, { sx: { mt: 2, py: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }, children: [jsx(CircularProgress, { size: 20 }), jsx(Typography, { variant: "body2", color: "text.secondary", children: "Loading preview\u2026" })] }));
+    }
+    if (error || contentError) {
+        return (jsx(Alert, { severity: "error", sx: { mt: 2 }, children: error || contentError }));
+    }
+    if (!(preview === null || preview === void 0 ? void 0 : preview.previewUrl) || !objectUrl) {
+        return null;
+    }
+    var contentType = preview.contentType || '';
+    var url = objectUrl;
+    return (jsxs(Box$1, { sx: {
+            mt: 2,
+            p: 1.5,
+            border: 1,
+            borderColor: 'divider',
+            borderRadius: 1,
+            bgcolor: function (t) { return alpha(t.palette.text.primary, 0.02); }
+        }, children: [jsxs(Stack$1, { direction: "row", alignItems: "center", justifyContent: "space-between", spacing: 1, sx: { mb: 1 }, children: [jsxs(Typography, { variant: "subtitle2", children: ["Preview \u2014 ", formatBlobVersionLabel({
+                                versionId: preview.versionId,
+                                versionLabel: preview.versionLabel,
+                                legacyNullVersion: preview.versionId === 'null'
+                            })] }), jsx(Button$1, { size: "small", onClick: function () { return window.open(url, '_blank', 'noopener,noreferrer'); }, startIcon: jsx(OpenInNewRoundedIcon, {}), children: "Open in tab" })] }), contentType.startsWith('image/') ? (jsx(Box$1, { sx: { textAlign: 'center' }, children: jsx(Box$1, { component: "img", src: url, alt: "", sx: { maxWidth: '100%', maxHeight: 360, objectFit: 'contain', borderRadius: 1 } }) })) : contentType === 'application/pdf' ? (jsx(Box$1, { component: "iframe", src: url, title: "PDF preview", sx: { width: '100%', height: 360, border: 0, borderRadius: 1 } })) : contentType.startsWith('video/') ? (jsx(Box$1, { component: "video", src: url, controls: true, sx: { maxWidth: '100%', maxHeight: 360, display: 'block', mx: 'auto' } })) : contentType.startsWith('audio/') ? (jsx(Box$1, { component: "audio", src: url, controls: true, sx: { width: '100%' } })) : (jsxs(Alert, { severity: "info", children: ["Inline preview is not available for this file type (", contentType || 'unknown', "). Use Open in tab to download or view the object."] }))] }));
+}
+function BlobVersionHistoryDialog(_a) {
+    var _this = this;
+    var siteId = _a.siteId, store = _a.store, assetPath = _a.assetPath, overview = _a.overview, open = _a.open, onClose = _a.onClose, onRestored = _a.onRestored;
+    var targetOptions = useMemo(function () {
+        var options = ['preview'];
+        if (store.mappings.some(function (m) { return m.publishingTarget.toLowerCase() === 'staging'; }) && overview.stagingEnabled) {
+            options.push('staging');
+        }
+        if (store.mappings.some(function (m) { return m.publishingTarget.toLowerCase() === 'live'; })) {
+            options.push('live');
+        }
+        return options;
+    }, [store.mappings, overview.stagingEnabled]);
+    var _b = useState('preview'), target = _b[0], setTarget = _b[1];
+    var _c = useState(false), loading = _c[0], setLoading = _c[1];
+    var _d = useState(null), restoringId = _d[0], setRestoringId = _d[1];
+    var _e = useState([]), versions = _e[0], setVersions = _e[1];
+    var _f = useState(''), objectKey = _f[0], setObjectKey = _f[1];
+    var _g = useState(null), error = _g[0], setError = _g[1];
+    var _h = useState(null), notice = _h[0], setNotice = _h[1];
+    var _j = useState(false), previewLoading = _j[0], setPreviewLoading = _j[1];
+    var _k = useState(null), previewError = _k[0], setPreviewError = _k[1];
+    var _l = useState(null), preview = _l[0], setPreview = _l[1];
+    var _m = useState(null), previewVersionId = _m[0], setPreviewVersionId = _m[1];
+    var loadVersions = useCallback(function () {
+        setLoading(true);
+        setError(null);
+        setPreview(null);
+        setPreviewVersionId(null);
+        setPreviewError(null);
+        firstValueFrom(fetchBlobStoreVersions(siteId, store.id, assetPath, target))
+            .then(function (data) {
+            var _a, _b;
+            setVersions((_a = data.versions) !== null && _a !== void 0 ? _a : []);
+            setObjectKey((_b = data.objectKey) !== null && _b !== void 0 ? _b : '');
+        })
+            .catch(function (err) {
+            setVersions([]);
+            setObjectKey('');
+            setError(err.message);
+        })
+            .finally(function () { return setLoading(false); });
+    }, [siteId, store.id, assetPath, target]);
+    useEffect(function () {
+        if (open) {
+            setNotice(null);
+            loadVersions();
+        }
+    }, [open, loadVersions]);
+    useEffect(function () {
+        setPreview(null);
+        setPreviewVersionId(null);
+        setPreviewError(null);
+    }, [target]);
+    var loadPreview = useCallback(function (version) {
+        if (version.deleteMarker) {
+            return;
+        }
+        setPreviewLoading(true);
+        setPreviewError(null);
+        setPreviewVersionId(version.versionId);
+        firstValueFrom(fetchBlobVersionPreview(siteId, store.id, assetPath, version.versionId, target))
+            .then(function (data) { return setPreview(data); })
+            .catch(function (err) {
+            setPreview(null);
+            setPreviewError(err.message);
+        })
+            .finally(function () { return setPreviewLoading(false); });
+    }, [siteId, store.id, assetPath, target]);
+    var restore = function (version) { return __awaiter(_this, void 0, void 0, function () {
+        var label, action, result, err_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    if (store.readOnly) {
+                        return [2 /*return*/];
+                    }
+                    label = version.deleteMarker
+                        ? 'delete marker (undelete)'
+                        : version.latest
+                            ? 'current version'
+                            : formatBlobVersionLabel(version);
+                    action = version.deleteMarker
+                        ? "Remove the delete marker and restore the previous version in ".concat(target, "?")
+                        : "Restore this asset from ".concat(label, "? This creates a new current version in ").concat(target, " storage.");
+                    if (!window.confirm(action)) {
+                        return [2 /*return*/];
+                    }
+                    setRestoringId(version.versionId);
+                    setError(null);
+                    setNotice(null);
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 3, 4, 5]);
+                    return [4 /*yield*/, firstValueFrom(postRestoreBlobVersion(siteId, {
+                            storeId: store.id,
+                            path: assetPath,
+                            versionId: version.versionId,
+                            target: target,
+                            deleteMarker: Boolean(version.deleteMarker)
+                        }))];
+                case 2:
+                    result = _a.sent();
+                    setNotice(result.message || 'Version restored.');
+                    loadVersions();
+                    onRestored();
+                    return [3 /*break*/, 5];
+                case 3:
+                    err_1 = _a.sent();
+                    setError(err_1 instanceof Error ? err_1.message : 'Restore failed');
+                    return [3 /*break*/, 5];
+                case 4:
+                    setRestoringId(null);
+                    return [7 /*endfinally*/];
+                case 5: return [2 /*return*/];
+            }
+        });
+    }); };
+    return (jsxs(Dialog, { open: open, onClose: onClose, maxWidth: "lg", fullWidth: true, children: [jsx(DialogTitle, { children: "Version history" }), jsxs(DialogContent, { dividers: true, sx: { maxHeight: '80vh', overflow: 'auto' }, children: [jsx(Typography, { variant: "body2", color: "text.secondary", sx: __assign(__assign({}, monoSx), { mb: 1.5 }), noWrap: true, title: assetPath, children: assetPath }), objectKey && (jsxs(Typography, { variant: "caption", color: "text.secondary", sx: __assign(__assign({ display: 'block' }, monoSx), { mb: 1.5 }), children: ["S3 key: ", objectKey] })), jsxs(Stack$1, { direction: { xs: 'column', sm: 'row' }, spacing: 1, alignItems: { sm: 'center' }, sx: { mb: 1.5 }, children: [jsxs(FormControl, { size: "small", sx: { minWidth: 160 }, children: [jsx(InputLabel, { id: "blob-version-target-label", children: "Environment" }), jsx(Select, { labelId: "blob-version-target-label", label: "Environment", value: target, onChange: function (e) { return setTarget(e.target.value); }, children: targetOptions.map(function (option) { return (jsx(MenuItem$1, { value: option, children: option }, option)); }) })] }), jsx(Button$1, { size: "small", startIcon: jsx(RefreshRoundedIcon, {}), onClick: loadVersions, disabled: loading, children: "Refresh" })] }), notice && (jsx(Alert, { severity: "success", sx: { mb: 1.5 }, onClose: function () { return setNotice(null); }, children: notice })), error && (jsx(Alert, { severity: "error", sx: { mb: 1.5 }, onClose: function () { return setError(null); }, children: error })), loading ? (jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', gap: 1, py: 3, justifyContent: 'center' }, children: [jsx(CircularProgress, { size: 20 }), jsx(Typography, { variant: "body2", color: "text.secondary", children: "Loading versions\u2026" })] })) : versions.length === 0 ? (jsx(Typography, { variant: "body2", color: "text.secondary", children: "No versions found. Ensure bucket versioning is enabled on the S3/MinIO bucket." })) : (jsxs(Table, { size: "small", children: [jsx(TableHead, { children: jsxs(TableRow, { children: [jsx(TableCell, { children: "Version" }), jsx(TableCell, { children: "Modified" }), jsx(TableCell, { align: "right", children: "Size" }), jsx(TableCell, { align: "right", children: "Actions" })] }) }), jsx(TableBody, { children: versions.map(function (version) { return (jsxs(TableRow, { hover: true, selected: previewVersionId === version.versionId, sx: { cursor: version.deleteMarker ? 'default' : 'pointer' }, onClick: function () { return !version.deleteMarker && loadPreview(version); }, children: [jsx(TableCell, { sx: __assign(__assign({}, monoSx), { maxWidth: 220 }), children: jsxs(Stack$1, { direction: "row", spacing: 0.5, alignItems: "center", useFlexGap: true, flexWrap: "wrap", children: [jsx(Typography, { variant: "body2", sx: version.legacyNullVersion ? undefined : monoSx, noWrap: true, title: version.legacyNullVersion
+                                                            ? 'Object uploaded before bucket versioning was enabled'
+                                                            : version.versionId, children: formatBlobVersionLabel(version) }), version.latest && !version.deleteMarker && (jsx(Chip, { size: "small", label: "Current", color: "primary", variant: "outlined" })), version.deleteMarker && (jsx(Chip, { size: "small", label: "Deleted", color: "warning", variant: "outlined" }))] }) }), jsx(TableCell, { children: formatVersionDate(version.lastModified) }), jsx(TableCell, { align: "right", children: version.deleteMarker ? '—' : formatBytes(version.size) }), jsx(TableCell, { align: "right", children: jsxs(Stack$1, { direction: "row", spacing: 0.5, justifyContent: "flex-end", onClick: function (e) { return e.stopPropagation(); }, children: [jsx(Button$1, { size: "small", variant: "text", startIcon: previewLoading && previewVersionId === version.versionId ? (jsx(CircularProgress, { size: 14 })) : (jsx(VisibilityRoundedIcon, {})), disabled: Boolean(version.deleteMarker) || previewLoading, onClick: function () { return loadPreview(version); }, children: "Preview" }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: restoringId === version.versionId ? (jsx(CircularProgress, { size: 14 })) : (jsx(RestoreRoundedIcon, {})), disabled: Boolean(store.readOnly) || restoringId !== null, onClick: function () { return restore(version); }, children: version.deleteMarker ? 'Undelete' : 'Restore' })] }) })] }, blobVersionRowKey(version))); }) })] })), jsx(BlobVersionPreviewPanel, { preview: preview, loading: previewLoading, error: previewError })] }), jsx(DialogActions, { children: jsx(Button$1, { onClick: onClose, children: "Close" }) })] }));
+}
+function DeletedBlobsPanel(_a) {
+    var _this = this;
+    var siteId = _a.siteId, store = _a.store, overview = _a.overview, onOpenHistory = _a.onOpenHistory, onRestored = _a.onRestored;
+    var targetOptions = useMemo(function () {
+        var options = ['preview'];
+        if (store.mappings.some(function (m) { return m.publishingTarget.toLowerCase() === 'staging'; }) && overview.stagingEnabled) {
+            options.push('staging');
+        }
+        if (store.mappings.some(function (m) { return m.publishingTarget.toLowerCase() === 'live'; })) {
+            options.push('live');
+        }
+        return options;
+    }, [store.mappings, overview.stagingEnabled]);
+    var _b = useState('preview'), target = _b[0], setTarget = _b[1];
+    var _c = useState(false), loading = _c[0], setLoading = _c[1];
+    var _d = useState(null), restoringId = _d[0], setRestoringId = _d[1];
+    var _e = useState([]), entries = _e[0], setEntries = _e[1];
+    var _f = useState(null), error = _f[0], setError = _f[1];
+    var _g = useState(null), notice = _g[0], setNotice = _g[1];
+    var loadDeleted = useCallback(function () {
+        if (!store.versioningSupported) {
+            return;
+        }
+        setLoading(true);
+        setError(null);
+        firstValueFrom(fetchBlobStoreDeleted(siteId, store.id, target))
+            .then(function (data) { var _a; return setEntries((_a = data.entries) !== null && _a !== void 0 ? _a : []); })
+            .catch(function (err) {
+            setEntries([]);
+            setError(err.message);
+        })
+            .finally(function () { return setLoading(false); });
+    }, [siteId, store.id, store.versioningSupported, target]);
+    useEffect(function () {
+        loadDeleted();
+    }, [loadDeleted]);
+    var undelete = function (entry) { return __awaiter(_this, void 0, void 0, function () {
+        var result, err_2;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    if (store.readOnly) {
+                        return [2 /*return*/];
+                    }
+                    if (!window.confirm("Restore deleted blob ".concat(entry.path, "? This removes the delete marker and makes the previous version current in ").concat(target, " storage."))) {
+                        return [2 /*return*/];
+                    }
+                    setRestoringId(entry.versionId);
+                    setError(null);
+                    setNotice(null);
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 3, 4, 5]);
+                    return [4 /*yield*/, firstValueFrom(postRestoreBlobVersion(siteId, {
+                            storeId: store.id,
+                            path: entry.path,
+                            versionId: entry.versionId,
+                            target: target,
+                            deleteMarker: true
+                        }))];
+                case 2:
+                    result = _a.sent();
+                    setNotice(result.message || 'Blob restored.');
+                    loadDeleted();
+                    onRestored();
+                    return [3 /*break*/, 5];
+                case 3:
+                    err_2 = _a.sent();
+                    setError(err_2 instanceof Error ? err_2.message : 'Restore failed');
+                    return [3 /*break*/, 5];
+                case 4:
+                    setRestoringId(null);
+                    return [7 /*endfinally*/];
+                case 5: return [2 /*return*/];
+            }
+        });
+    }); };
+    if (!store.versioningSupported) {
+        return null;
+    }
+    return (jsxs(Box$1, { sx: { mt: 2 }, children: [jsx(SectionLabel, { children: "Deleted in storage" }), jsx(Typography, { variant: "caption", color: "text.secondary", sx: { display: 'block', mb: 1 }, children: "Objects removed from blob storage (S3 delete markers). Restore brings back the latest non-deleted version." }), jsxs(Stack$1, { direction: { xs: 'column', sm: 'row' }, spacing: 1, alignItems: { sm: 'center' }, sx: { mb: 1 }, children: [jsxs(FormControl, { size: "small", sx: { minWidth: 160 }, children: [jsx(InputLabel, { id: "deleted-target-".concat(store.id), children: "Environment" }), jsx(Select, { labelId: "deleted-target-".concat(store.id), label: "Environment", value: target, onChange: function (e) { return setTarget(e.target.value); }, children: targetOptions.map(function (option) { return (jsx(MenuItem$1, { value: option, children: option }, option)); }) })] }), jsx(Button$1, { size: "small", startIcon: jsx(RefreshRoundedIcon, {}), onClick: loadDeleted, disabled: loading, children: "Refresh deleted" })] }), notice && (jsx(Alert, { severity: "success", sx: { mb: 1 }, onClose: function () { return setNotice(null); }, children: notice })), error && (jsx(Alert, { severity: "error", sx: { mb: 1 }, onClose: function () { return setError(null); }, children: error })), jsx(Box$1, { sx: {
+                    border: 1,
+                    borderColor: 'divider',
+                    borderRadius: 1,
+                    maxHeight: 240,
+                    overflow: 'auto',
+                    bgcolor: function (t) { return alpha(t.palette.text.primary, 0.02); }
+                }, children: loading ? (jsxs(Box$1, { sx: { p: 2, display: 'flex', alignItems: 'center', gap: 1 }, children: [jsx(CircularProgress, { size: 18 }), jsx(Typography, { variant: "body2", color: "text.secondary", children: "Loading deleted objects\u2026" })] })) : entries.length === 0 ? (jsx(Typography, { variant: "body2", color: "text.secondary", sx: { p: 2 }, children: "No deleted blobs found under this store path." })) : (jsxs(Table, { size: "small", stickyHeader: true, children: [jsx(TableHead, { children: jsxs(TableRow, { children: [jsx(TableCell, { children: "Path" }), jsx(TableCell, { children: "Deleted" }), jsx(TableCell, { align: "right", children: "Actions" })] }) }), jsx(TableBody, { children: entries.map(function (entry) { return (jsxs(TableRow, { hover: true, children: [jsx(TableCell, { sx: __assign(__assign({}, monoSx), { maxWidth: 360 }), title: entry.path, children: entry.path }), jsx(TableCell, { children: formatVersionDate(entry.lastModified) }), jsx(TableCell, { align: "right", children: jsxs(Stack$1, { direction: "row", spacing: 0.5, justifyContent: "flex-end", children: [jsx(Button$1, { size: "small", onClick: function () { return onOpenHistory(entry.path); }, children: "History" }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: restoringId === entry.versionId ? jsx(CircularProgress, { size: 14 }) : jsx(RestoreRoundedIcon, {}), disabled: Boolean(store.readOnly) || restoringId !== null, onClick: function () { return undelete(entry); }, children: "Restore" })] }) })] }, "".concat(entry.path, "-").concat(entry.versionId))); }) })] })) })] }));
+}
 function BlobStoreSection(_a) {
     var _this = this;
     var siteId = _a.siteId, store = _a.store, overview = _a.overview;
@@ -50302,24 +50908,41 @@ function BlobStoreSection(_a) {
     var _d = useState(null), syncing = _d[0], setSyncing = _d[1];
     var _e = useState(null), notice = _e[0], setNotice = _e[1];
     var _f = useState(null), error = _f[0], setError = _f[1];
-    var loadRoot = useCallback(function () {
+    var _g = useState(false), versionDialogOpen = _g[0], setVersionDialogOpen = _g[1];
+    var _h = useState(null), versionDialogPath = _h[0], setVersionDialogPath = _h[1];
+    var loadRoot = useCallback(function (isActive) {
+        if (isActive === void 0) { isActive = function () { return true; }; }
         setRootState({ entries: [], loading: true });
         setError(null);
         firstValueFrom(fetchBlobStoreChildren(siteId, store.id, store.treeRoot || '/static-assets'))
-            .then(function (data) { return setRootState({ entries: data.entries, loading: false }); })
+            .then(function (data) {
+            if (isActive()) {
+                setRootState({ entries: data.entries, loading: false });
+            }
+        })
             .catch(function (err) {
-            setRootState({ entries: [], loading: false });
-            setError(err.message);
+            if (isActive()) {
+                setRootState({ entries: [], loading: false });
+                setError(err.message);
+            }
         });
     }, [siteId, store.id, store.treeRoot]);
     useEffect(function () {
-        loadRoot();
+        var cancelled = false;
+        loadRoot(function () { return !cancelled; });
+        return function () {
+            cancelled = true;
+        };
     }, [loadRoot]);
     var selectedList = useMemo(function () { return Object.keys(selectedPaths).filter(function (path) { return selectedPaths[path]; }); }, [selectedPaths]);
     var hasStagingMapping = store.mappings.some(function (m) { return m.publishingTarget.toLowerCase() === 'staging'; });
     var hasLiveMapping = store.mappings.some(function (m) { return m.publishingTarget.toLowerCase() === 'live'; });
+    var openVersionHistory = function (path) {
+        setVersionDialogPath(path);
+        setVersionDialogOpen(true);
+    };
     var sync = function (target) { return __awaiter(_this, void 0, void 0, function () {
-        var result, err_1;
+        var result, err_3;
         var _a;
         return __generator(this, function (_b) {
             switch (_b.label) {
@@ -50341,8 +50964,8 @@ function BlobStoreSection(_a) {
                     loadRoot();
                     return [3 /*break*/, 5];
                 case 3:
-                    err_1 = _b.sent();
-                    setError(err_1 instanceof Error ? err_1.message : 'Sync failed');
+                    err_3 = _b.sent();
+                    setError(err_3 instanceof Error ? err_3.message : 'Sync failed');
                     return [3 /*break*/, 5];
                 case 4:
                     setSyncing(null);
@@ -50351,7 +50974,7 @@ function BlobStoreSection(_a) {
             }
         });
     }); };
-    return (jsxs(Paper, { elevation: 0, sx: __assign(__assign({}, surfacePaperSx), { p: 2 }), children: [jsx(PanelHeader, { title: store.id, action: jsx(Button$1, { size: "small", startIcon: jsx(RefreshRoundedIcon, {}), onClick: loadRoot, children: "Refresh tree" }) }), jsxs(Stack$1, { direction: "row", spacing: 0.5, useFlexGap: true, flexWrap: "wrap", sx: { mt: 0.5 }, children: [jsx(Chip, { size: "small", label: store.type, variant: "outlined" }), jsx(Chip, { size: "small", label: store.active ? 'Active' : 'Inactive', color: store.active ? 'success' : 'default', variant: "outlined" }), store.readOnly && jsx(Chip, { size: "small", label: "Read-only", color: "warning", variant: "outlined" })] }), jsxs(Typography, { variant: "caption", color: "text.secondary", sx: __assign({ display: 'block', mt: 1 }, monoSx), children: ["Pattern: ", store.pattern] }), jsxs(Typography, { variant: "caption", color: "text.secondary", sx: __assign({ display: 'block' }, monoSx), children: ["Tree root: ", store.treeRoot || '/static-assets'] }), jsx(SectionLabel, { sx: { mt: 1.5 }, children: "Mappings" }), jsx(Stack$1, { direction: "row", spacing: 0.5, useFlexGap: true, flexWrap: "wrap", children: store.mappings.map(function (mapping) { return (jsx(Chip, { size: "small", variant: "outlined", label: "".concat(mapping.publishingTarget, ": ").concat(mapping.storeTarget).concat(mapping.prefix ? " (".concat(mapping.prefix, ")") : ''), sx: { maxWidth: '100%', '& .MuiChip-label': __assign(__assign({}, monoSx), { fontSize: '0.72rem' }) } }, mapping.publishingTarget)); }) }), jsxs(TabAlertStack, { sx: { mt: 1.5 }, children: [notice && (jsx(Alert, { severity: "success", onClose: function () { return setNotice(null); }, children: notice })), error && (jsx(Alert, { severity: "error", onClose: function () { return setError(null); }, children: error }))] }), jsx(TabToolbar, { sx: { mt: 1.5, px: 0 }, children: jsxs(ToolbarRow, { children: [jsx(ToolbarGroup, { children: jsxs(Typography, { variant: "body2", color: "text.secondary", children: [selectedList.length, " selected"] }) }), jsx(ToolbarDivider, {}), jsxs(ToolbarGroup, { children: [jsx(Button$1, { size: "small", variant: "outlined", startIcon: syncing === 'staging' ? jsx(CircularProgress, { size: 14 }) : jsx(CloudUploadRoundedIcon, {}), disabled: !selectedList.length ||
+    return (jsxs(Paper, { elevation: 0, sx: __assign(__assign({}, surfacePaperSx), { p: 2 }), children: [jsx(PanelHeader, { title: store.id, action: jsx(Button$1, { size: "small", startIcon: jsx(RefreshRoundedIcon, {}), onClick: function () { return loadRoot(); }, children: "Refresh tree" }) }), jsxs(Stack$1, { direction: "row", spacing: 0.5, useFlexGap: true, flexWrap: "wrap", sx: { mt: 0.5 }, children: [jsx(Chip, { size: "small", label: store.type, variant: "outlined" }), jsx(Chip, { size: "small", label: store.active ? 'Active' : 'Inactive', color: store.active ? 'success' : 'default', variant: "outlined" }), store.readOnly && jsx(Chip, { size: "small", label: "Read-only", color: "warning", variant: "outlined" })] }), jsx(Typography, { variant: "caption", color: "text.secondary", sx: { display: 'block', mt: 1 }, children: "Browse files in preview storage, then sync to staging or live when needed." }), jsx(SectionLabel, { sx: { mt: 1.5 }, children: "Storage targets" }), jsx(Stack$1, { direction: "row", spacing: 0.5, useFlexGap: true, flexWrap: "wrap", children: store.mappings.map(function (mapping) { return (jsx(Chip, { size: "small", variant: "outlined", label: "".concat(mapping.publishingTarget, ": ").concat(mapping.storeTarget).concat(mapping.prefix ? " (".concat(mapping.prefix, ")") : ''), sx: { maxWidth: '100%', '& .MuiChip-label': __assign(__assign({}, monoSx), { fontSize: '0.72rem' }) } }, mapping.publishingTarget)); }) }), jsxs(TabAlertStack, { sx: { mt: 1.5 }, children: [store.versioningSupported && store.versioningNote && (jsx(Alert, { severity: "warning", children: store.versioningNote })), notice && (jsx(Alert, { severity: "success", onClose: function () { return setNotice(null); }, children: notice })), error && (jsx(Alert, { severity: "error", onClose: function () { return setError(null); }, children: error }))] }), jsx(TabToolbar, { sx: { mt: 1.5, px: 0 }, children: jsxs(ToolbarRow, { children: [jsx(ToolbarGroup, { children: jsxs(Typography, { variant: "body2", color: "text.secondary", children: [selectedList.length, " selected"] }) }), jsx(ToolbarDivider, {}), jsxs(ToolbarGroup, { children: [store.versioningSupported ? (jsx(Button$1, { size: "small", variant: "outlined", startIcon: jsx(HistoryRoundedIcon, {}), disabled: selectedList.length !== 1, onClick: function () { return openVersionHistory(selectedList[0]); }, children: "Version history" })) : store.type === 's3BlobStore' ? (jsx(Typography, { variant: "body2", color: "text.secondary", sx: { px: 0.5 }, children: "Version history requires S3 bucket versioning" })) : null, jsx(Button$1, { size: "small", variant: "outlined", startIcon: syncing === 'staging' ? jsx(CircularProgress, { size: 14 }) : jsx(CloudUploadRoundedIcon, {}), disabled: !selectedList.length ||
                                         syncing !== null ||
                                         !overview.stagingEnabled ||
                                         !hasStagingMapping, onClick: function () { return sync('staging'); }, children: "Preview \u2192 staging" }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: syncing === 'live' ? jsx(CircularProgress, { size: 14 }) : jsx(CloudUploadRoundedIcon, {}), disabled: !selectedList.length || syncing !== null || !hasLiveMapping, onClick: function () { return sync('live'); }, children: "Preview \u2192 live" })] })] }) }), !overview.stagingEnabled && (jsx(Typography, { variant: "caption", color: "text.secondary", sx: { display: 'block', mb: 1 }, children: "Staging environment is not enabled for this project." })), jsx(Box$1, { sx: {
@@ -50373,7 +50996,13 @@ function BlobStoreSection(_a) {
                             }
                             return next;
                         });
-                    } }, entry.path)); })) })] }));
+                    } }, entry.path)); })) }), store.type === 's3BlobStore' && !store.versioningSupported ? (jsxs(Box$1, { sx: { mt: 2 }, children: [jsx(SectionLabel, { children: "Version history & deleted blobs" }), jsx(Alert, { severity: "info", children: store.versioningNote ||
+                            'S3 bucket versioning is not enabled. Enable versioning on the blob store bucket to use version history, deleted-blob restore, and version previews.' })] })) : (jsx(DeletedBlobsPanel, { siteId: siteId, store: store, overview: overview, onOpenHistory: openVersionHistory, onRestored: loadRoot })), versionDialogPath && (jsx(BlobVersionHistoryDialog, { siteId: siteId, store: store, assetPath: versionDialogPath, overview: overview, open: versionDialogOpen, onClose: function () {
+                    setVersionDialogOpen(false);
+                    setVersionDialogPath(null);
+                }, onRestored: function () {
+                    loadRoot();
+                } }))] }));
 }
 function BlobStoreTab(_a) {
     var siteId = _a.siteId;
@@ -50383,27 +51012,249 @@ function BlobStoreTab(_a) {
     var loadOverview = useCallback(function () {
         setLoading(true);
         setError(null);
-        firstValueFrom(fetchBlobStoreOverview(siteId))
-            .then(function (data) { return setOverview(data); })
+        return firstValueFrom(fetchBlobStoreOverview(siteId))
+            .then(function (data) {
+            setOverview(data);
+        })
             .catch(function (err) {
             setOverview(null);
             setError(err.message);
         })
-            .finally(function () { return setLoading(false); });
+            .finally(function () {
+            setLoading(false);
+        });
     }, [siteId]);
     useEffect(function () {
-        loadOverview();
-    }, [loadOverview]);
-    return (jsxs(TabShell, { children: [jsx(TabToolbar, { children: jsxs(ToolbarRow, { children: [jsx(ToolbarGroup, { children: jsx(Typography, { variant: "body2", color: "text.secondary", children: "External blob storage paths, presence across environments, and preview sync." }) }), jsx(ToolbarDivider, {}), jsx(ToolbarGroup, { children: jsx(Button$1, { size: "small", startIcon: jsx(RefreshRoundedIcon, {}), onClick: loadOverview, disabled: loading, children: "Refresh" }) })] }) }), jsxs(TabContentPanel, { children: [jsx(TabAlertStack, { children: error && (jsx(Alert, { severity: "error", onClose: function () { return setError(null); }, children: error })) }), loading ? (jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', gap: 1, py: 4, justifyContent: 'center' }, children: [jsx(CircularProgress, { size: 22 }), jsx(Typography, { variant: "body2", color: "text.secondary", children: "Loading blob store configuration\u2026" })] })) : !(overview === null || overview === void 0 ? void 0 : overview.configured) ? (jsxs(Alert, { severity: "info", children: ["No blob store is configured for this project. Add blob stores under", ' ', jsx(Typography, { component: "span", sx: monoSx, children: "Configuration \u2192 Blob Stores" }), (overview === null || overview === void 0 ? void 0 : overview.configPresent) === false && ' (config file not found in the repository).', (overview === null || overview === void 0 ? void 0 : overview.configPresent) && overview.stores.length === 0 && ' (config file has no blob store entries).'] })) : (jsxs(Stack$1, { spacing: 2, children: [jsx(Alert, { severity: "info", icon: false, children: jsxs(Typography, { variant: "body2", children: [jsx("strong", { children: "Repo" }), " \u2014 sandbox pointer file (.blob) in Git.", ' ', jsx("strong", { children: "Preview" }), " \u2014 asset in preview blob storage.", ' ', jsx("strong", { children: "Staging / Live" }), " \u2014 published pointer on the environment branch (confirms publish state; sync copies preview blobs to the target external storage)."] }) }), overview.stores.map(function (store) { return (jsx(BlobStoreSection, { siteId: siteId, store: store, overview: overview }, store.id)); })] }))] })] }));
+        var cancelled = false;
+        setLoading(true);
+        setError(null);
+        firstValueFrom(fetchBlobStoreOverview(siteId))
+            .then(function (data) {
+            if (!cancelled) {
+                setOverview(data);
+            }
+        })
+            .catch(function (err) {
+            if (!cancelled) {
+                setOverview(null);
+                setError(err.message);
+            }
+        })
+            .finally(function () {
+            if (!cancelled) {
+                setLoading(false);
+            }
+        });
+        return function () {
+            cancelled = true;
+        };
+    }, [siteId]);
+    return (jsxs(TabShell, { children: [jsx(TabToolbar, { children: jsxs(ToolbarRow, { children: [jsx(ToolbarGroup, { children: jsx(Typography, { variant: "body2", color: "text.secondary", children: "Browse and sync assets in external storage." }) }), jsx(ToolbarDivider, {}), jsx(ToolbarGroup, { children: jsx(Button$1, { size: "small", startIcon: jsx(RefreshRoundedIcon, {}), onClick: loadOverview, disabled: loading, children: "Refresh" }) })] }) }), jsx(TabContentPanel, { children: jsxs(Box$1, { sx: { flex: 1, minHeight: 0, overflow: 'auto', p: 2 }, children: [jsx(TabAlertStack, { children: error && (jsx(Alert, { severity: "error", onClose: function () { return setError(null); }, children: error })) }), loading ? (jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', gap: 1, py: 4, justifyContent: 'center' }, children: [jsx(CircularProgress, { size: 22 }), jsx(Typography, { variant: "body2", color: "text.secondary", children: "Loading blob store configuration\u2026" })] })) : !(overview === null || overview === void 0 ? void 0 : overview.configured) ? (jsxs(Alert, { severity: "info", children: ["No blob store is configured for this project. Add blob stores under", ' ', jsx(Typography, { component: "span", sx: monoSx, children: "Configuration \u2192 Blob Stores" }), (overview === null || overview === void 0 ? void 0 : overview.configPresent) === false && ' (config file not found in the repository).', (overview === null || overview === void 0 ? void 0 : overview.configPresent) && overview.stores.length === 0 && ' (config file has no blob store entries).'] })) : (jsx(Stack$1, { spacing: 2, children: overview.stores.map(function (store) { return (jsx(BlobStoreSection, { siteId: siteId, store: store, overview: overview }, store.id)); }) }))] }) })] }));
+}
+
+var PAGE_SIZE = 50;
+var PATH_PRESETS = ['/site', '/static-assets', '/config'];
+var selectMenuProps = { disablePortal: true };
+function PublishCompareTab(_a) {
+    var _this = this;
+    var _b, _c, _d;
+    var siteId = _a.siteId, siteName = _a.siteName;
+    var _e = useState(null), overview = _e[0], setOverview = _e[1];
+    var _f = useState(null), data = _f[0], setData = _f[1];
+    var _g = useState(true), loading = _g[0], setLoading = _g[1];
+    var _h = useState(false), loadingMore = _h[0], setLoadingMore = _h[1];
+    var _j = useState(''), error = _j[0], setError = _j[1];
+    var _k = useState('/site'), pathPrefix = _k[0], setPathPrefix = _k[1];
+    var _l = useState(''), searchQuery = _l[0], setSearchQuery = _l[1];
+    var _m = useState(true), hideNoDiff = _m[0], setHideNoDiff = _m[1];
+    var _o = useState('auto'), targetMode = _o[0], setTargetMode = _o[1];
+    var _p = useState(false), diffOpen = _p[0], setDiffOpen = _p[1];
+    var _q = useState(false), diffLoading = _q[0], setDiffLoading = _q[1];
+    var _r = useState(''), diffTitle = _r[0], setDiffTitle = _r[1];
+    var _s = useState([]), fileDiffs = _s[0], setFileDiffs = _s[1];
+    var _t = useState(''), diffNotice = _t[0], setDiffNotice = _t[1];
+    var requestGenRef = useRef(0);
+    var targetParam = targetMode === 'auto' ? '' : targetMode;
+    var publishLabel = useMemo(function () {
+        if (!overview) {
+            return '';
+        }
+        if (targetMode === 'staging') {
+            return overview.stagingTarget || 'staging';
+        }
+        if (targetMode === 'live') {
+            return overview.liveTarget || 'live';
+        }
+        return overview.defaultTarget || overview.liveTarget || 'live';
+    }, [overview, targetMode]);
+    var loadOverview = useCallback(function (requestGen) { return __awaiter(_this, void 0, void 0, function () {
+        var result;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, firstValueFrom(fetchPublishCompareOverview(siteId))];
+                case 1:
+                    result = _a.sent();
+                    if (requestGen !== requestGenRef.current) {
+                        return [2 /*return*/, null];
+                    }
+                    setOverview(result);
+                    return [2 /*return*/, result];
+            }
+        });
+    }); }, [siteId]);
+    var loadCompare = useCallback(function () {
+        var args_1 = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args_1[_i] = arguments[_i];
+        }
+        return __awaiter(_this, __spreadArray([], args_1, true), void 0, function (opts) {
+            var append, requestGen, result_1, e_1;
+            var _a;
+            if (opts === void 0) { opts = {}; }
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        append = Boolean(opts.append);
+                        requestGen = append ? requestGenRef.current : ++requestGenRef.current;
+                        if (append) {
+                            setLoadingMore(true);
+                        }
+                        else {
+                            setLoading(true);
+                            setError('');
+                        }
+                        _b.label = 1;
+                    case 1:
+                        _b.trys.push([1, 5, 6, 7]);
+                        if (!!append) return [3 /*break*/, 3];
+                        return [4 /*yield*/, loadOverview(requestGen)];
+                    case 2:
+                        _b.sent();
+                        _b.label = 3;
+                    case 3: return [4 /*yield*/, firstValueFrom(fetchPublishCompare(siteId, {
+                            target: targetParam,
+                            pathPrefix: pathPrefix,
+                            query: searchQuery.trim(),
+                            hideNoDiff: hideNoDiff,
+                            skip: (_a = opts.skip) !== null && _a !== void 0 ? _a : 0,
+                            limit: PAGE_SIZE
+                        }))];
+                    case 4:
+                        result_1 = _b.sent();
+                        if (requestGen !== requestGenRef.current) {
+                            return [2 /*return*/];
+                        }
+                        setData(function (prev) {
+                            var _a, _b;
+                            if (!append || !prev) {
+                                return result_1;
+                            }
+                            return __assign(__assign({}, result_1), { files: __spreadArray(__spreadArray([], ((_a = prev.files) !== null && _a !== void 0 ? _a : []), true), ((_b = result_1.files) !== null && _b !== void 0 ? _b : []), true) });
+                        });
+                        return [3 /*break*/, 7];
+                    case 5:
+                        e_1 = _b.sent();
+                        if (requestGen !== requestGenRef.current) {
+                            return [2 /*return*/];
+                        }
+                        setError(e_1 instanceof Error ? e_1.message : 'Failed to load publish compare');
+                        if (!append) {
+                            setData(null);
+                        }
+                        return [3 /*break*/, 7];
+                    case 6:
+                        if (requestGen === requestGenRef.current) {
+                            setLoading(false);
+                            setLoadingMore(false);
+                        }
+                        return [7 /*endfinally*/];
+                    case 7: return [2 /*return*/];
+                }
+            });
+        });
+    }, [siteId, targetParam, pathPrefix, searchQuery, hideNoDiff, loadOverview]);
+    useEffect(function () {
+        requestGenRef.current += 1;
+        setOverview(null);
+        setData(null);
+        setError('');
+        void loadCompare();
+    }, [siteId, targetMode]);
+    var openDiff = useCallback(function (file) { return __awaiter(_this, void 0, void 0, function () {
+        var result, diffs, e_2;
+        var _a, _b, _c;
+        return __generator(this, function (_d) {
+            switch (_d.label) {
+                case 0:
+                    setDiffOpen(true);
+                    setDiffLoading(true);
+                    setDiffTitle(file.internalName ? "".concat(file.internalName, " \u2014 ").concat(file.path) : file.path);
+                    setFileDiffs([]);
+                    setDiffNotice('');
+                    _d.label = 1;
+                case 1:
+                    _d.trys.push([1, 3, 4, 5]);
+                    return [4 /*yield*/, firstValueFrom(fetchPublishCompareDiff(siteId, file.path, targetParam || undefined))];
+                case 2:
+                    result = _d.sent();
+                    if (result.binary) {
+                        setDiffNotice(result.message || 'Binary file cannot be diffed as text');
+                        return [2 /*return*/];
+                    }
+                    if (!((_a = result.diff) === null || _a === void 0 ? void 0 : _a.trim()) && ((_b = result.lines) === null || _b === void 0 ? void 0 : _b.length) === 0) {
+                        setDiffNotice('No text differences between published and sandbox versions.');
+                        return [2 /*return*/];
+                    }
+                    diffs = ((_c = result.fileDiffs) === null || _c === void 0 ? void 0 : _c.length)
+                        ? result.fileDiffs
+                        : [
+                            {
+                                changeType: result.changeType || file.changeType,
+                                path: file.path,
+                                diff: result.diff || '',
+                                lines: result.lines || []
+                            }
+                        ];
+                    setFileDiffs(diffs);
+                    return [3 /*break*/, 5];
+                case 3:
+                    e_2 = _d.sent();
+                    setDiffNotice(e_2 instanceof Error ? e_2.message : 'Failed to load diff');
+                    return [3 /*break*/, 5];
+                case 4:
+                    setDiffLoading(false);
+                    return [7 /*endfinally*/];
+                case 5: return [2 /*return*/];
+            }
+        });
+    }); }, [siteId, targetParam]);
+    var files = (_b = data === null || data === void 0 ? void 0 : data.files) !== null && _b !== void 0 ? _b : [];
+    var hasMore = Boolean(data === null || data === void 0 ? void 0 : data.hasMore);
+    var changeCounts = (_c = data === null || data === void 0 ? void 0 : data.changeCounts) !== null && _c !== void 0 ? _c : {};
+    var activeFilter = searchQuery.trim() || (data === null || data === void 0 ? void 0 : data.query);
+    return (jsxs(TabShell, { children: [jsxs(TabToolbar, { children: [jsxs(Typography, { variant: "body2", color: "text.secondary", children: ["Compare sandbox (authoring) against the published repository", siteName ? " for ".concat(siteName) : '', ". Uses staging when enabled and available; otherwise live."] }), jsxs(ToolbarRow, { children: [jsxs(FormControl, { size: "small", sx: { minWidth: 140 }, children: [jsx(InputLabel, { id: "publish-compare-target-label", children: "Published branch" }), jsxs(Select, { labelId: "publish-compare-target-label", label: "Published branch", value: targetMode, onChange: function (e) { return setTargetMode(e.target.value); }, MenuProps: selectMenuProps, children: [jsx(MenuItem$1, { value: "auto", children: "Auto (staging \u2192 live)" }), (overview === null || overview === void 0 ? void 0 : overview.stagingEnabled) ? jsx(MenuItem$1, { value: "staging", children: "Staging" }) : null, jsx(MenuItem$1, { value: "live", children: "Live" })] })] }), jsx(TextField$1, { size: "small", label: "Path prefix", value: pathPrefix, onChange: function (e) { return setPathPrefix(e.target.value); }, placeholder: "/site", sx: { minWidth: 160 } }), jsx(TextField$1, { size: "small", label: "Filter path or internal name", value: searchQuery, onChange: function (e) { return setSearchQuery(e.target.value); }, onKeyDown: function (e) {
+                                    if (e.key === 'Enter') {
+                                        void loadCompare();
+                                    }
+                                }, placeholder: "e.g. home, /site/website/about", sx: { minWidth: 240 } }), jsx(FormControlLabel, { control: jsx(Switch, { size: "small", checked: hideNoDiff, onChange: function (e) { return setHideNoDiff(e.target.checked); } }), label: "Hide files with no text diff", sx: { ml: 0.5, mr: 0 } }), jsx(Stack$1, { direction: "row", spacing: 0.5, alignItems: "center", flexWrap: "wrap", useFlexGap: true, children: PATH_PRESETS.map(function (preset) { return (jsx(Chip, { size: "small", label: preset, variant: pathPrefix === preset ? 'filled' : 'outlined', onClick: function () { return setPathPrefix(preset); } }, preset)); }) }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: loading ? jsx(CircularProgress, { size: 16 }) : jsx(RefreshRoundedIcon, {}), onClick: function () { return void loadCompare(); }, disabled: loading, children: "Apply / refresh" })] })] }), jsxs(TabAlertStack, { children: [error ? jsx(Alert, { severity: "error", children: error }) : null, overview && !overview.publishedRepositoryExists ? (jsx(Alert, { severity: "info", children: "No published repository exists for this site yet." })) : null] }), jsx(TabContentPanel, { children: loading && !data ? (jsx(Box$1, { sx: { display: 'flex', justifyContent: 'center', py: 6 }, children: jsx(CircularProgress, {}) })) : (jsxs(Stack$1, { spacing: 2, sx: { minHeight: 0, flex: 1 }, children: [jsxs(Stack$1, { direction: "row", spacing: 1, flexWrap: "wrap", useFlexGap: true, alignItems: "center", children: [jsx(Chip, { size: "small", variant: "outlined", label: "Sandbox: ".concat((data === null || data === void 0 ? void 0 : data.sandboxBranch) || (overview === null || overview === void 0 ? void 0 : overview.sandboxBranch) || 'master'), sx: monoSx }), jsx(Chip, { size: "small", variant: "outlined", label: "Published: ".concat(publishLabel), color: "primary", sx: monoSx }), (data === null || data === void 0 ? void 0 : data.sandboxHeadCommitId) ? (jsx(Chip, { size: "small", label: "sandbox @ ".concat(data.sandboxHeadCommitId.slice(0, 8)), sx: monoSx })) : null, (data === null || data === void 0 ? void 0 : data.publishHeadCommitId) ? (jsx(Chip, { size: "small", label: "published @ ".concat(data.publishHeadCommitId.slice(0, 8)), sx: monoSx })) : null, data ? (jsxs(Fragment, { children: [jsx(Chip, { size: "small", variant: "outlined", label: "".concat((_d = data.total) !== null && _d !== void 0 ? _d : files.length, " differences") }), jsx(FileChangeSummary, { counts: changeCounts })] })) : null] }), jsx(Box$1, { sx: { flex: 1, minHeight: 0, overflow: 'auto', border: 1, borderColor: 'divider', borderRadius: 2 }, children: jsxs(Table, { size: "small", stickyHeader: true, children: [jsx(TableHead, { children: jsxs(TableRow, { children: [jsx(TableCell, { width: 96, children: "Change" }), jsx(TableCell, { width: "28%", children: "Internal name" }), jsx(TableCell, { children: "Path" }), jsx(TableCell, { width: 120, align: "right", children: "Actions" })] }) }), jsx(TableBody, { children: files.length === 0 ? (jsx(TableRow, { children: jsx(TableCell, { colSpan: 4, children: jsx(Typography, { variant: "body2", color: "text.secondary", sx: { py: 3, textAlign: 'center' }, children: !(overview === null || overview === void 0 ? void 0 : overview.publishedRepositoryExists)
+                                                        ? 'Publish content to create a published repository, then compare again.'
+                                                        : activeFilter
+                                                            ? 'No matching differences for the current filter.'
+                                                            : 'No differences between sandbox and the selected published branch for this path prefix.' }) }) })) : (files.map(function (file) { return (jsxs(TableRow, { hover: true, children: [jsx(TableCell, { children: jsx(FileChangeTypeChip, { changeType: file.changeType }) }), jsx(TableCell, { children: file.internalName ? (jsx(Typography, { variant: "body2", sx: { fontWeight: 600 }, children: file.internalName })) : (jsx(Typography, { variant: "body2", color: "text.disabled", children: "\u2014" })) }), jsx(TableCell, { sx: monoSx, children: file.path }), jsx(TableCell, { align: "right", children: jsx(Button$1, { size: "small", startIcon: jsx(CompareArrowsRoundedIcon, {}), onClick: function () { return void openDiff(file); }, disabled: file.changeType === 'DELETE' || file.hasTextDiff === false, children: "Diff" }) })] }, file.path)); })) })] }) }), hasMore ? (jsx(Box$1, { sx: { display: 'flex', justifyContent: 'center' }, children: jsx(Button$1, { variant: "outlined", disabled: loadingMore, startIcon: loadingMore ? jsx(CircularProgress, { size: 16 }) : undefined, onClick: function () { var _a; return void loadCompare({ append: true, skip: (_a = data === null || data === void 0 ? void 0 : data.nextSkip) !== null && _a !== void 0 ? _a : files.length }); }, children: "Load more" }) })) : null] })) }), jsxs(Dialog, { open: diffOpen, onClose: function () { return setDiffOpen(false); }, maxWidth: "lg", fullWidth: true, children: [jsx(DialogTitle, { sx: monoSx, children: diffTitle }), jsx(DialogContent, { dividers: true, sx: { minHeight: 320, display: 'flex', flexDirection: 'column' }, children: diffLoading ? (jsx(Box$1, { sx: { display: 'flex', justifyContent: 'center', py: 4 }, children: jsx(CircularProgress, {}) })) : diffNotice ? (jsx(Alert, { severity: "info", children: diffNotice })) : (jsx(DiffViewer, { title: "Published (".concat(publishLabel, ") \u2192 sandbox (").concat((data === null || data === void 0 ? void 0 : data.sandboxBranch) || 'master', ")"), fileDiffs: fileDiffs })) })] })] }));
 }
 
 function DevContentOpsTools() {
+    var _a, _b;
     var theme = useTheme();
     var activeSiteId = useActiveSiteId();
-    var _a = useState('git-log'), tab = _a[0], setTab = _a[1];
-    var _b = useState([]), sites = _b[0], setSites = _b[1];
-    var _c = useState(true), sitesLoading = _c[0], setSitesLoading = _c[1];
-    var _d = useState(null), selectedSite = _d[0], setSelectedSite = _d[1];
+    var _c = useState('git-log'), tab = _c[0], setTab = _c[1];
+    var _d = useState([]), sites = _d[0], setSites = _d[1];
+    var _e = useState(true), sitesLoading = _e[0], setSitesLoading = _e[1];
+    var _f = useState(null), selectedSite = _f[0], setSelectedSite = _f[1];
+    var userPickedSiteRef = useRef(false);
+    useEffect(function () {
+        setDevContentOpsStudioSiteId(activeSiteId !== null && activeSiteId !== void 0 ? activeSiteId : null);
+    }, [activeSiteId]);
     useEffect(function () {
         setSitesLoading(true);
         var sub = fetchAll({ limit: 500, offset: 0 }).subscribe({
@@ -50420,18 +51271,21 @@ function DevContentOpsTools() {
         return function () { return sub.unsubscribe(); };
     }, []);
     useEffect(function () {
-        var _a, _b, _c;
         if (!sites.length) {
             return;
         }
-        if (selectedSite && sites.some(function (site) { return site.id === selectedSite.id; })) {
-            return;
-        }
-        var preferredId = activeSiteId || ((_a = sites[0]) === null || _a === void 0 ? void 0 : _a.id);
-        var match = (_c = (_b = sites.find(function (site) { return site.id === preferredId; })) !== null && _b !== void 0 ? _b : sites[0]) !== null && _c !== void 0 ? _c : null;
-        setSelectedSite(match);
-    }, [activeSiteId, selectedSite, sites]);
-    var siteId = selectedSite === null || selectedSite === void 0 ? void 0 : selectedSite.id;
+        setSelectedSite(function (current) {
+            var _a, _b, _c, _d;
+            if (userPickedSiteRef.current && current) {
+                return (_a = sites.find(function (site) { return site.id === current.id; })) !== null && _a !== void 0 ? _a : current;
+            }
+            var preferredId = activeSiteId || ((_b = sites[0]) === null || _b === void 0 ? void 0 : _b.id);
+            return (_d = (_c = sites.find(function (site) { return site.id === preferredId; })) !== null && _c !== void 0 ? _c : sites[0]) !== null && _d !== void 0 ? _d : null;
+        });
+    }, [activeSiteId, sites]);
+    var operatingSite = (_b = (_a = selectedSite !== null && selectedSite !== void 0 ? selectedSite : sites.find(function (site) { return site.id === activeSiteId; })) !== null && _a !== void 0 ? _a : sites[0]) !== null && _b !== void 0 ? _b : null;
+    var siteId = operatingSite === null || operatingSite === void 0 ? void 0 : operatingSite.id;
+    var projectPickerValue = operatingSite;
     return (jsxs(Box$1, { sx: {
             height: '100%',
             minHeight: 0,
@@ -50462,7 +51316,10 @@ function DevContentOpsTools() {
                                     bgcolor: alpha(theme.palette.primary.main, 0.12),
                                     color: 'primary.main',
                                     flexShrink: 0
-                                }, children: jsx(AccountTreeRoundedIcon, { fontSize: "small" }) }), jsx(Typography, { variant: "h6", fontWeight: 700, lineHeight: 1.25, letterSpacing: "-0.01em", sx: { minWidth: 0 }, children: "DevContentOps Tools" })] }), jsx(Box$1, { sx: { minWidth: { xs: '100%', sm: 280 }, maxWidth: 360, flex: { sm: '0 1 360px' }, pt: 0.5 }, children: sitesLoading ? (jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', gap: 1, justifyContent: { xs: 'flex-start', sm: 'flex-end' } }, children: [jsx(CircularProgress, { size: 18 }), jsx(Typography, { variant: "body2", color: "text.secondary", children: "Loading projects\u2026" })] })) : sites.length === 0 ? (jsx(Chip, { size: "small", label: "No accessible projects", color: "warning", variant: "outlined" })) : (jsx(Autocomplete, { size: "small", options: sites, value: selectedSite, onChange: function (_, value) { return setSelectedSite(value); }, getOptionLabel: function (option) { return "".concat(option.name, " (").concat(option.id, ")"); }, isOptionEqualToValue: function (option, value) { return option.id === value.id; }, renderInput: function (params) { return (jsx(TextField$1, __assign({}, params, { label: "Project", InputLabelProps: __assign(__assign({}, params.InputLabelProps), { shrink: true }) }))); } })) })] }), jsxs(Tabs, { value: tab, onChange: function (_, v) { return setTab(v); }, variant: "scrollable", scrollButtons: "auto", allowScrollButtonsMobile: true, sx: {
+                                }, children: jsx(AccountTreeRoundedIcon, { fontSize: "small" }) }), jsx(Typography, { variant: "h6", fontWeight: 700, lineHeight: 1.25, letterSpacing: "-0.01em", sx: { minWidth: 0 }, children: "DevContentOps Tools" })] }), jsx(Box$1, { sx: { minWidth: { xs: '100%', sm: 280 }, maxWidth: 360, flex: { sm: '0 1 360px' }, pt: 0.5 }, children: sitesLoading ? (jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', gap: 1, justifyContent: { xs: 'flex-start', sm: 'flex-end' } }, children: [jsx(CircularProgress, { size: 18 }), jsx(Typography, { variant: "body2", color: "text.secondary", children: "Loading projects\u2026" })] })) : sites.length === 0 ? (jsx(Chip, { size: "small", label: "No accessible projects", color: "warning", variant: "outlined" })) : projectPickerValue ? (jsx(Autocomplete, { size: "small", disableClearable: true, options: sites, value: projectPickerValue, onChange: function (_, value) {
+                                userPickedSiteRef.current = true;
+                                setSelectedSite(value);
+                            }, getOptionLabel: function (option) { return "".concat(option.name, " (").concat(option.id, ")"); }, isOptionEqualToValue: function (option, value) { return option.id === value.id; }, renderInput: function (params) { return (jsx(TextField$1, __assign({}, params, { label: "Project", helperText: "Tools run against this project; does not change your Studio session", InputLabelProps: __assign(__assign({}, params.InputLabelProps), { shrink: true }) }))); } })) : null })] }), jsxs(Tabs, { value: tab, onChange: function (_, v) { return setTab(v); }, variant: "scrollable", scrollButtons: "auto", allowScrollButtonsMobile: true, sx: {
                     px: 2.5,
                     borderBottom: 1,
                     borderColor: 'divider',
@@ -50470,7 +51327,7 @@ function DevContentOpsTools() {
                     minHeight: 44,
                     flexShrink: 0,
                     '& .MuiTab-root': { minHeight: 44, textTransform: 'none', fontWeight: 600, fontSize: '0.875rem' }
-                }, children: [jsx(Tab, { value: "git-log", label: "Git log" }), jsx(Tab, { value: "working-tree", label: "Working tree" }), jsx(Tab, { value: "branches", label: "Branches" }), jsx(Tab, { value: "database", label: "Database" }), jsx(Tab, { value: "repo-health", label: "Repository health" }), jsx(Tab, { value: "site-items", label: "Site items" }), jsx(Tab, { value: "blob-stores", label: "Blob stores" })] }), jsx(Box$1, { sx: { flex: 1, minHeight: 0, p: 2.5, display: 'flex', flexDirection: 'column', overflow: 'hidden' }, children: !siteId ? (jsx(Box$1, { sx: { flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 240 }, children: jsx(Typography, { color: "text.secondary", variant: "body1", children: sitesLoading ? 'Loading projects…' : 'Select a project to continue.' }) })) : (jsxs(Fragment, { children: [tab === 'git-log' && (jsx(GitLogTab, { siteId: siteId, siteName: selectedSite.name, sites: sites }, siteId)), tab === 'working-tree' && (jsx(WorkingTreeTab, { siteId: siteId, siteName: selectedSite.name }, siteId)), tab === 'branches' && (jsx(BranchesTab, { siteId: siteId, siteName: selectedSite.name }, siteId)), tab === 'database' && (jsx(DatabaseTab, { siteId: siteId, siteName: selectedSite.name }, siteId)), tab === 'repo-health' && (jsx(RepoHealthTab, { siteId: siteId, siteName: selectedSite.name }, siteId)), tab === 'site-items' && (jsx(SiteItemsTab, { siteId: siteId, siteName: selectedSite.name }, siteId)), tab === 'blob-stores' && (jsx(BlobStoreTab, { siteId: siteId, siteName: selectedSite.name }, siteId))] })) })] }));
+                }, children: [jsx(Tab, { value: "git-log", label: "Git log" }), jsx(Tab, { value: "working-tree", label: "Working tree" }), jsx(Tab, { value: "branches", label: "Branches" }), jsx(Tab, { value: "database", label: "Database" }), jsx(Tab, { value: "repo-health", label: "Repository health" }), jsx(Tab, { value: "site-items", label: "Site items" }), jsx(Tab, { value: "blob-stores", label: "Blob stores" }), jsx(Tab, { value: "publish-compare", label: "Publish compare" })] }), jsx(Box$1, { sx: { flex: 1, minHeight: 0, p: 2.5, display: 'flex', flexDirection: 'column', overflow: 'hidden' }, children: !siteId ? (jsx(Box$1, { sx: { flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 240 }, children: jsx(Typography, { color: "text.secondary", variant: "body1", children: sitesLoading ? 'Loading projects…' : 'Select a project to continue.' }) })) : (jsxs(Fragment, { children: [tab === 'git-log' && (jsx(GitLogTab, { siteId: siteId, siteName: operatingSite.name, sites: sites }, siteId)), tab === 'working-tree' && (jsx(WorkingTreeTab, { siteId: siteId, siteName: operatingSite.name }, siteId)), tab === 'branches' && (jsx(BranchesTab, { siteId: siteId, siteName: operatingSite.name }, siteId)), tab === 'database' && (jsx(DatabaseTab, { siteId: siteId, siteName: operatingSite.name }, siteId)), tab === 'repo-health' && (jsx(RepoHealthTab, { siteId: siteId, siteName: operatingSite.name }, siteId)), tab === 'site-items' && (jsx(SiteItemsTab, { siteId: siteId, siteName: operatingSite.name }, siteId)), tab === 'blob-stores' && (jsx(BlobStoreTab, { siteId: siteId, siteName: operatingSite.name }, siteId)), tab === 'publish-compare' && (jsx(PublishCompareTab, { siteId: siteId, siteName: operatingSite.name }, siteId))] })) })] }));
 }
 
 /*
@@ -51936,8 +52793,8 @@ function fieldType(field) {
 function fieldPropertyValue(field, propName) {
     var _a, _b;
     var properties = field.querySelectorAll(':scope > properties > property');
-    for (var _i = 0, properties_1 = properties; _i < properties_1.length; _i++) {
-        var property = properties_1[_i];
+    for (var _i = 0, _c = Array.from(properties); _i < _c.length; _i++) {
+        var property = _c[_i];
         var name_1 = (((_a = property.querySelector('name')) === null || _a === void 0 ? void 0 : _a.textContent) || '').trim();
         if (name_1 === propName) {
             return (((_b = property.querySelector('value')) === null || _b === void 0 ? void 0 : _b.textContent) || '').trim();
@@ -51955,13 +52812,73 @@ function isReadonlyInputField(field) {
     }
     return ((_a = fieldPropertyValue(field, 'readonly')) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === 'true';
 }
+var TRANSLATION_FIELD_IDS = [
+    'translations',
+    'localeSourceId_s',
+    'localeCode_s',
+    'sourceLocaleCode_s'
+];
+var CANONICAL_FIELD_ORDER = __spreadArray([], TRANSLATION_FIELD_IDS, true);
 function allFormFields(doc) {
-    return Array.from(doc.querySelectorAll('form sections section fields field'));
+    return Array.from(doc.querySelectorAll('form field')).filter(function (field) { return field.querySelector(':scope > id'); });
+}
+function allTranslationSections(doc) {
+    var sections = doc.querySelector('form > sections');
+    if (!sections) {
+        return [];
+    }
+    return Array.from(sections.querySelectorAll(':scope > section')).filter(function (section) {
+        var _a;
+        var title = (((_a = section.querySelector(':scope > title')) === null || _a === void 0 ? void 0 : _a.textContent) || '').trim().toLowerCase();
+        return title === 'translation';
+    });
+}
+function findTranslationSection(doc) {
+    var _a;
+    var matches = allTranslationSections(doc);
+    return (_a = matches[0]) !== null && _a !== void 0 ? _a : null;
+}
+function translationSectionFieldElements(section) {
+    if (!section) {
+        return [];
+    }
+    return Array.from(section.querySelectorAll(':scope > fields > field'));
+}
+function fieldsById(doc, id) {
+    return allFormFields(doc).filter(function (field) { return fieldId(field) === id; });
 }
 function fieldById(fields, id) {
     return fields.find(function (field) { return fieldId(field) === id; });
 }
+function isCanonicalTranslationsField(field) {
+    return (Boolean(field) &&
+        fieldType(field) === 'translation-versions' &&
+        pluginName(field, 'translation-versions'));
+}
+function isCanonicalLocaleSourceIdField(field) {
+    return Boolean(field) && fieldType(field) === 'custom-locale' && pluginName(field, 'custom-locale');
+}
+function isTranslationSectionCollapsed(section) {
+    var _a;
+    var defaultOpen = (((_a = section.querySelector(':scope > defaultOpen')) === null || _a === void 0 ? void 0 : _a.textContent) || '').trim().toLowerCase();
+    return defaultOpen === 'false';
+}
+function isTranslationSectionLast(doc, section) {
+    if (!section) {
+        return false;
+    }
+    var sections = doc.querySelector('form > sections');
+    if (!sections) {
+        return false;
+    }
+    var allSections = sections.querySelectorAll(':scope > section');
+    if (allSections.length === 0) {
+        return false;
+    }
+    return allSections[allSections.length - 1] === section;
+}
 function analyzeFormDefinition(xml) {
+    var _a;
     var doc = new DOMParser().parseFromString(String(xml || ''), 'application/xml');
     if (doc.querySelector('parsererror')) {
         return {
@@ -51976,22 +52893,43 @@ function analyzeFormDefinition(xml) {
             missing: ['Invalid form-definition XML']
         };
     }
-    var hasTranslationSection = findTranslationSection(doc) !== null;
-    var fields = allFormFields(doc);
-    var localeCodeField = fieldById(fields, 'localeCode_s');
-    var sourceLocaleCodeField = fieldById(fields, 'sourceLocaleCode_s');
-    var localeSourceIdField = fieldById(fields, 'localeSourceId_s');
-    var translationsField = fieldById(fields, 'translations');
+    var translationSections = allTranslationSections(doc);
+    var translationSection = (_a = translationSections[0]) !== null && _a !== void 0 ? _a : null;
+    var hasTranslationSection = translationSection !== null;
+    var sectionFields = translationSectionFieldElements(translationSection);
+    var localeCodeField = fieldById(sectionFields, 'localeCode_s');
+    var sourceLocaleCodeField = fieldById(sectionFields, 'sourceLocaleCode_s');
+    var localeSourceIdField = fieldById(sectionFields, 'localeSourceId_s');
+    var translationsField = fieldById(sectionFields, 'translations');
     var hasLocaleCode = isReadonlyInputField(localeCodeField);
     var hasSourceLocaleCode = isReadonlyInputField(sourceLocaleCodeField);
     var hasLocaleSourceId = Boolean(localeSourceIdField);
-    var hasCustomLocaleControl = Boolean(localeSourceIdField) && fieldType(localeSourceIdField) === 'custom-locale' && pluginName(localeSourceIdField, 'custom-locale');
+    var hasCustomLocaleControl = isCanonicalLocaleSourceIdField(localeSourceIdField);
     var hasTranslationsField = Boolean(translationsField);
-    var hasTranslationVersions = Boolean(translationsField) && fieldType(translationsField) === 'translation-versions' && pluginName(translationsField, 'translation-versions');
+    var hasTranslationVersions = isCanonicalTranslationsField(translationsField);
     var missing = [];
     if (!hasTranslationSection) {
         missing.push('Translation section');
     }
+    if (translationSections.length > 1) {
+        missing.push("Multiple Translation sections (".concat(translationSections.length, ")"));
+    }
+    if (translationSection && !isTranslationSectionLast(doc, translationSection)) {
+        missing.push('Translation section must be last');
+    }
+    if (translationSection && !isTranslationSectionCollapsed(translationSection)) {
+        missing.push('Translation section must default closed');
+    }
+    TRANSLATION_FIELD_IDS.forEach(function (id) {
+        var matches = fieldsById(doc, id);
+        if (matches.length > 1) {
+            missing.push("Duplicate ".concat(id, " field (").concat(matches.length, ")"));
+        }
+        var outsideSection = matches.filter(function (field) { return !translationSection || !translationSection.contains(field); });
+        if (outsideSection.length > 0) {
+            missing.push("".concat(id, " outside Translation section"));
+        }
+    });
     if (!localeCodeField) {
         missing.push('localeCode_s (readonly input)');
     }
@@ -52016,6 +52954,18 @@ function analyzeFormDefinition(xml) {
     else if (!hasTranslationVersions) {
         missing.push('translations (must use translation-versions control)');
     }
+    if (translationSection && sectionFields.length === CANONICAL_FIELD_ORDER.length) {
+        var orderedIds = sectionFields.map(function (field) { return fieldId(field); });
+        if (orderedIds.join(',') !== CANONICAL_FIELD_ORDER.join(',')) {
+            missing.push('Translation fields must be ordered: translations, localeSourceId_s, localeCode_s, sourceLocaleCode_s');
+        }
+    }
+    else if (translationSection && sectionFields.length > 0) {
+        missing.push('Translation section must contain exactly 4 fields');
+    }
+    else if (translationSection && sectionFields.length === 0) {
+        missing.push('Translation section is empty');
+    }
     return {
         hasTranslationSection: hasTranslationSection,
         hasLocaleCode: hasLocaleCode,
@@ -52038,48 +52988,121 @@ function parseFieldFragment(fragment) {
     }
     return doc.documentElement.firstElementChild;
 }
-function ensureTranslationSection(doc) {
+function removeTranslationSections(doc) {
+    var removed = 0;
+    allTranslationSections(doc).forEach(function (section) {
+        var _a;
+        (_a = section.parentNode) === null || _a === void 0 ? void 0 : _a.removeChild(section);
+        removed += 1;
+    });
+    return removed;
+}
+function removeTranslationFieldsEverywhere(doc) {
+    var removed = [];
+    allFormFields(doc).forEach(function (field) {
+        var _a;
+        var id = fieldId(field);
+        if (TRANSLATION_FIELD_IDS.includes(id)) {
+            removed.push(id);
+            (_a = field.parentNode) === null || _a === void 0 ? void 0 : _a.removeChild(field);
+        }
+    });
+    return removed;
+}
+function harvestTranslationFields(doc) {
+    var harvested = new Map();
+    allFormFields(doc).forEach(function (field) {
+        var id = fieldId(field);
+        if (!TRANSLATION_FIELD_IDS.includes(id)) {
+            return;
+        }
+        if (!harvested.has(id)) {
+            harvested.set(id, field);
+        }
+    });
+    return harvested;
+}
+function canonicalFieldTemplate(id) {
+    switch (id) {
+        case 'translations':
+            return TRANSLATION_VERSIONS_FIELD;
+        case 'localeSourceId_s':
+            return CUSTOM_LOCALE_FIELD;
+        case 'localeCode_s':
+            return READONLY_INPUT_FIELD('localeCode_s', 'Locale Code');
+        case 'sourceLocaleCode_s':
+            return READONLY_INPUT_FIELD('sourceLocaleCode_s', 'Source Locale Code');
+        default:
+            throw new Error("Unknown translation field id: ".concat(id));
+    }
+}
+function isCanonicalTranslationField(field, id) {
+    switch (id) {
+        case 'translations':
+            return isCanonicalTranslationsField(field);
+        case 'localeSourceId_s':
+            return isCanonicalLocaleSourceIdField(field);
+        case 'localeCode_s':
+        case 'sourceLocaleCode_s':
+            return isReadonlyInputField(field);
+        default:
+            return false;
+    }
+}
+function buildCanonicalTranslationField(doc, id, harvested) {
+    var existing = harvested.get(id);
+    if (existing && isCanonicalTranslationField(existing, id)) {
+        return doc.importNode(existing, true);
+    }
+    return doc.importNode(parseFieldFragment(canonicalFieldTemplate(id)), true);
+}
+function ensureTranslationSectionCollapsed(doc, section) {
+    var _a;
+    var defaultOpen = section.querySelector(':scope > defaultOpen');
+    if (!defaultOpen) {
+        defaultOpen = doc.createElement('defaultOpen');
+        var description = section.querySelector(':scope > description');
+        if (description === null || description === void 0 ? void 0 : description.nextSibling) {
+            section.insertBefore(defaultOpen, description.nextSibling);
+        }
+        else if (description) {
+            description.after(defaultOpen);
+        }
+        else {
+            var title = section.querySelector(':scope > title');
+            if (title === null || title === void 0 ? void 0 : title.nextSibling) {
+                section.insertBefore(defaultOpen, title.nextSibling);
+            }
+            else {
+                section.prepend(defaultOpen);
+            }
+        }
+        defaultOpen.textContent = 'false';
+        return true;
+    }
+    if (((_a = defaultOpen.textContent) === null || _a === void 0 ? void 0 : _a.trim().toLowerCase()) !== 'false') {
+        defaultOpen.textContent = 'false';
+        return true;
+    }
+    return false;
+}
+function createTranslationSectionAtBottom(doc) {
     var sections = doc.querySelector('form > sections');
     if (!sections) {
         throw new Error('form-definition.xml has no <sections> element.');
     }
-    var existing = findTranslationSection(doc);
-    if (existing) {
-        var fields_1 = existing.querySelector(':scope > fields');
-        if (!fields_1) {
-            fields_1 = doc.createElement('fields');
-            existing.appendChild(fields_1);
-        }
-        return fields_1;
-    }
     var section = doc.createElement('section');
-    section.innerHTML = "\n\t\t\t<title>Translation</title>\n\t\t\t<description></description>\n\t\t\t<defaultOpen>true</defaultOpen>\n\t\t\t<fields>\n\t\t\t</fields>";
-    var firstSection = sections.querySelector(':scope > section');
-    if (firstSection) {
-        sections.insertBefore(section, firstSection);
-    }
-    else {
-        sections.appendChild(section);
-    }
-    var fields = section.querySelector('fields');
-    if (!fields) {
-        throw new Error('Unable to create Translation section.');
-    }
+    var title = doc.createElement('title');
+    title.textContent = 'Translation';
+    var description = doc.createElement('description');
+    var defaultOpen = doc.createElement('defaultOpen');
+    defaultOpen.textContent = 'false';
+    var fields = doc.createElement('fields');
+    section.append(title, description, defaultOpen, fields);
+    sections.appendChild(section);
     return fields;
 }
-function findTranslationSection(doc) {
-    var _a;
-    var sections = doc.querySelector('form > sections');
-    if (!sections) {
-        return null;
-    }
-    return (_a = Array.from(sections.querySelectorAll(':scope > section')).find(function (section) {
-        var _a;
-        var title = (((_a = section.querySelector(':scope > title')) === null || _a === void 0 ? void 0 : _a.textContent) || '').trim().toLowerCase();
-        return title === 'translation';
-    })) !== null && _a !== void 0 ? _a : null;
-}
-/** Move Translation section to the top and put translation-versions first inside it. */
+/** Move Translation section to the bottom and put translation-versions first inside it. */
 function ensureTranslationFormLayout(doc) {
     var sections = doc.querySelector('form > sections');
     if (!sections) {
@@ -52090,15 +53113,17 @@ function ensureTranslationFormLayout(doc) {
         return false;
     }
     var changed = false;
-    var firstSection = sections.querySelector(':scope > section');
-    if (firstSection && firstSection !== translationSection) {
-        sections.insertBefore(translationSection, firstSection);
+    if (!isTranslationSectionLast(doc, translationSection)) {
+        sections.appendChild(translationSection);
+        changed = true;
+    }
+    if (ensureTranslationSectionCollapsed(doc, translationSection)) {
         changed = true;
     }
     var fields = translationSection.querySelector(':scope > fields');
     if (fields) {
         var translationField = Array.from(fields.querySelectorAll(':scope > field')).find(function (field) {
-            return pluginName(field, 'translation-versions');
+            return fieldId(field) === 'translations';
         });
         var firstField = fields.querySelector(':scope > field');
         if (translationField && firstField && translationField !== firstField) {
@@ -52108,35 +53133,61 @@ function ensureTranslationFormLayout(doc) {
     }
     return changed;
 }
+function consolidateTranslationForm(doc) {
+    var actions = [];
+    var harvested = harvestTranslationFields(doc);
+    var movedFromElsewhere = TRANSLATION_FIELD_IDS.filter(function (id) {
+        var _a;
+        var field = harvested.get(id);
+        if (!field) {
+            return false;
+        }
+        var section = field.closest('section');
+        var title = (((_a = section === null || section === void 0 ? void 0 : section.querySelector(':scope > title')) === null || _a === void 0 ? void 0 : _a.textContent) || '').trim().toLowerCase();
+        return title !== 'translation';
+    });
+    if (movedFromElsewhere.length > 0) {
+        actions.push("Moved translation fields into Translation section: ".concat(movedFromElsewhere.join(', ')));
+    }
+    var removedSections = removeTranslationSections(doc);
+    if (removedSections > 0) {
+        actions.push(removedSections === 1 ? 'Rebuilt Translation section' : "Rebuilt ".concat(removedSections, " Translation sections"));
+    }
+    var removedFields = removeTranslationFieldsEverywhere(doc);
+    if (removedFields.length > 0 && movedFromElsewhere.length === 0) {
+        var unique = Array.from(new Set(removedFields));
+        actions.push("Removed stray translation fields: ".concat(unique.join(', ')));
+    }
+    var fieldsContainer = createTranslationSectionAtBottom(doc);
+    var added = [];
+    CANONICAL_FIELD_ORDER.forEach(function (id) {
+        if (!harvested.has(id)) {
+            added.push(id);
+        }
+        fieldsContainer.appendChild(buildCanonicalTranslationField(doc, id, harvested));
+    });
+    if (added.length > 0) {
+        actions.push("Added missing translation fields: ".concat(added.join(', ')));
+    }
+    ensureTranslationFormLayout(doc);
+    return actions;
+}
 function patchFormDefinitionWithTranslationFields(xml) {
-    var doc = new DOMParser().parseFromString(String(xml || ''), 'application/xml');
+    var originalXml = String(xml || '');
+    var doc = new DOMParser().parseFromString(originalXml, 'application/xml');
     if (doc.querySelector('parsererror')) {
         throw new Error('Unable to parse form-definition.xml.');
     }
-    var status = analyzeFormDefinition(xml);
-    var layoutChanged = ensureTranslationFormLayout(doc);
-    if (status.complete) {
-        var serialized = new XMLSerializer().serializeToString(doc);
-        return {
-            xml: serialized,
-            added: layoutChanged ? ['Translation section moved to top of form'] : []
-        };
-    }
-    var fieldsContainer = ensureTranslationSection(doc);
-    var added = [];
-    var appendIfMissing = function (fragment, label, present) {
-        if (present) {
-            return;
-        }
-        fieldsContainer.appendChild(doc.importNode(parseFieldFragment(fragment), true));
-        added.push(label);
+    var beforeStatus = analyzeFormDefinition(originalXml);
+    var actions = consolidateTranslationForm(doc);
+    var serialized = new XMLSerializer().serializeToString(doc);
+    var afterStatus = analyzeFormDefinition(serialized);
+    var changed = serialized !== originalXml || !beforeStatus.complete;
+    return {
+        xml: serialized,
+        added: actions.length > 0 ? actions : changed ? ['Normalized translation form layout'] : [],
+        changed: changed || !afterStatus.complete
     };
-    appendIfMissing(CUSTOM_LOCALE_FIELD, 'localeSourceId_s (custom-locale)', status.hasCustomLocaleControl);
-    appendIfMissing(READONLY_INPUT_FIELD('localeCode_s', 'Locale Code'), 'localeCode_s', status.hasLocaleCode);
-    appendIfMissing(READONLY_INPUT_FIELD('sourceLocaleCode_s', 'Source Locale Code'), 'sourceLocaleCode_s', status.hasSourceLocaleCode);
-    appendIfMissing(TRANSLATION_VERSIONS_FIELD, 'translations (translation-versions)', status.hasTranslationVersions);
-    ensureTranslationFormLayout(doc);
-    return { xml: new XMLSerializer().serializeToString(doc), added: added };
 }
 
 var GLOBAL_HOME_PATH = '/site/website/index.xml';
@@ -52812,23 +53863,16 @@ function TranslationConfigTools() {
         if (!siteId || selectedTypeIds.size === 0) {
             return;
         }
-        var targets = typeRows.filter(function (row) { return selectedTypeIds.has(row.id) && !row.status.complete; });
-        if (targets.length === 0) {
-            dispatch(showSystemNotification({
-                message: 'No incomplete content types selected.',
-                options: { variant: 'info' }
-            }));
-            return;
-        }
+        var targets = typeRows.filter(function (row) { return selectedTypeIds.has(row.id); });
         setApplyLoading(true);
         from(targets)
             .pipe(concatMap(function (row) {
             return fetchConfigurationXML(siteId, row.formPath, TRANSLATION_CONFIG_MODULE).pipe(mergeMap(function (xml) {
                 var patched = patchFormDefinitionWithTranslationFields(xml);
-                if (patched.added.length === 0) {
+                if (!patched.changed) {
                     return of({ id: row.id, skipped: true });
                 }
-                return writeConfiguration(siteId, row.formPath, TRANSLATION_CONFIG_MODULE, patched.xml).pipe(map(function () { return ({ id: row.id, skipped: false, added: patched.added.length }); }));
+                return writeConfiguration(siteId, row.formPath, TRANSLATION_CONFIG_MODULE, patched.xml).pipe(map(function () { return ({ id: row.id, skipped: false, actions: patched.added.length }); }));
             }));
         }), toArray())
             .subscribe({
@@ -52837,8 +53881,8 @@ function TranslationConfigTools() {
                 var updated = results.filter(function (result) { return !result.skipped; }).length;
                 dispatch(showSystemNotification({
                     message: updated
-                        ? "Added translation fields to ".concat(updated, " content type(s).")
-                        : 'Selected content types already had translation fields.',
+                        ? "Fixed translation setup on ".concat(updated, " content type(s).")
+                        : 'Selected content types already match the translation form layout.',
                     options: { variant: 'success' }
                 }));
                 scanContentTypes();
@@ -52907,17 +53951,27 @@ function TranslationConfigTools() {
                                     fontSize: '0.75rem',
                                     overflow: 'auto',
                                     whiteSpace: 'pre-wrap'
-                                }, children: localePreview || 'Add locales and save the config first.' })] }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: function () { return setScaffoldOpen(false); }, disabled: scaffoldLoading, children: "Cancel" }), jsx(Button$1, { variant: "contained", onClick: function () { return void runScaffold(); }, disabled: scaffoldLoading || configModel.languages.length < 2, startIcon: scaffoldLoading ? jsx(CircularProgress, { size: 16, color: "inherit" }) : jsx(HomeWorkOutlinedIcon, {}), children: scaffoldLoading ? 'Creating…' : 'Create structure' })] })] }), tab === 'content-types' && (jsxs(Paper, { sx: { p: 2, display: 'flex', flexDirection: 'column', gap: 2, minHeight: 0, flex: 1 }, children: [jsxs(Box$1, { sx: { display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }, children: [jsx(Button$1, { variant: "outlined", startIcon: typesLoading ? jsx(CircularProgress, { size: 16 }) : jsx(RefreshRoundedIcon, {}), onClick: scanContentTypes, disabled: typesLoading || !siteId, children: "Scan content types" }), jsx(Button$1, { variant: "contained", startIcon: applyLoading ? jsx(CircularProgress, { size: 16, color: "inherit" }) : jsx(PlaylistAddRoundedIcon, {}), onClick: applyTranslationFields, disabled: applyLoading || selectedTypeIds.size === 0, children: "Add translation fields to selected" }), jsx(FormControlLabel, { control: jsx(Checkbox, { checked: typeRows.length > 0 && selectedTypeIds.size === typeRows.filter(function (row) { return !row.status.complete; }).length, indeterminate: selectedTypeIds.size > 0 &&
-                                        selectedTypeIds.size < typeRows.filter(function (row) { return !row.status.complete; }).length, onChange: function (event) {
+                                }, children: localePreview || 'Add locales and save the config first.' })] }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: function () { return setScaffoldOpen(false); }, disabled: scaffoldLoading, children: "Cancel" }), jsx(Button$1, { variant: "contained", onClick: function () { return void runScaffold(); }, disabled: scaffoldLoading || configModel.languages.length < 2, startIcon: scaffoldLoading ? jsx(CircularProgress, { size: 16, color: "inherit" }) : jsx(HomeWorkOutlinedIcon, {}), children: scaffoldLoading ? 'Creating…' : 'Create structure' })] })] }), tab === 'content-types' && (jsxs(Paper, { sx: { p: 2, display: 'flex', flexDirection: 'column', gap: 2, minHeight: 0, flex: 1 }, children: [jsxs(Box$1, { sx: { display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }, children: [jsx(Button$1, { variant: "outlined", startIcon: typesLoading ? jsx(CircularProgress, { size: 16 }) : jsx(RefreshRoundedIcon, {}), onClick: scanContentTypes, disabled: typesLoading || !siteId, children: "Scan content types" }), jsx(Button$1, { variant: "contained", startIcon: applyLoading ? jsx(CircularProgress, { size: 16, color: "inherit" }) : jsx(PlaylistAddRoundedIcon, {}), onClick: applyTranslationFields, disabled: applyLoading || selectedTypeIds.size === 0, children: "Fix translation setup on selected" }), jsx(FormControlLabel, { control: jsx(Checkbox, { checked: typeRows.length > 0 && selectedTypeIds.size === typeRows.length, indeterminate: selectedTypeIds.size > 0 && selectedTypeIds.size < typeRows.length, onChange: function (event) {
+                                        if (event.target.checked) {
+                                            setSelectedTypeIds(new Set(typeRows.map(function (row) { return row.id; })));
+                                        }
+                                        else {
+                                            setSelectedTypeIds(new Set());
+                                        }
+                                    } }), label: "Select all" }), jsx(FormControlLabel, { control: jsx(Checkbox, { checked: typeRows.filter(function (row) { return !row.status.complete; }).length > 0 &&
+                                        typeRows.filter(function (row) { return !row.status.complete; }).every(function (row) { return selectedTypeIds.has(row.id); }), indeterminate: typeRows.some(function (row) { return !row.status.complete && selectedTypeIds.has(row.id); }) &&
+                                        !typeRows.filter(function (row) { return !row.status.complete; }).every(function (row) { return selectedTypeIds.has(row.id); }), onChange: function (event) {
                                         if (event.target.checked) {
                                             setSelectedTypeIds(new Set(typeRows.filter(function (row) { return !row.status.complete; }).map(function (row) { return row.id; })));
                                         }
                                         else {
                                             setSelectedTypeIds(new Set());
                                         }
-                                    } }), label: "Select incomplete" })] }), typesError && jsx(Alert, { severity: "error", children: typesError }), jsxs(Alert, { severity: "info", sx: { mb: 2 }, children: ["Each content type must include:", ' ', TRANSLATION_FORM_REQUIREMENTS.map(function (req) { return req.label; }).join('; '), "."] }), !typesLoading && typeRows.length === 0 && !typesError && (jsx(Alert, { severity: "info", children: "Scan content types to see which definitions need Translation fields." })), typeRows.length > 0 && (jsx(Box$1, { sx: { overflow: 'auto' }, children: jsxs(Table, { size: "small", stickyHeader: true, children: [jsx(TableHead, { children: jsxs(TableRow, { children: [jsx(TableCell, { padding: "checkbox" }), jsx(TableCell, { children: "Content type" }), jsx(TableCell, { children: "Status" }), jsx(TableCell, { children: "Missing" })] }) }), jsx(TableBody, { children: typeRows.map(function (row) {
+                                    } }), label: "Select incomplete" })] }), typesError && jsx(Alert, { severity: "error", children: typesError }), jsxs(Alert, { severity: "info", sx: { mb: 2 }, children: ["Each content type must have exactly one Translation section (last on the form, collapsed by default) containing", ' ', TRANSLATION_FORM_REQUIREMENTS.filter(function (req) { return req.id !== 'translation-section'; })
+                                .map(function (req) { return req.label; })
+                                .join('; '), ". The translations control renders at the top of the form. Use ", jsx("strong", { children: "Fix translation setup" }), " to move stray fields, remove duplicates, and repair broken layouts."] }), !typesLoading && typeRows.length === 0 && !typesError && (jsx(Alert, { severity: "info", children: "Scan content types to see which definitions need Translation fields." })), typeRows.length > 0 && (jsx(Box$1, { sx: { overflow: 'auto' }, children: jsxs(Table, { size: "small", stickyHeader: true, children: [jsx(TableHead, { children: jsxs(TableRow, { children: [jsx(TableCell, { padding: "checkbox" }), jsx(TableCell, { children: "Content type" }), jsx(TableCell, { children: "Status" }), jsx(TableCell, { children: "Missing" })] }) }), jsx(TableBody, { children: typeRows.map(function (row) {
                                         var checked = selectedTypeIds.has(row.id);
-                                        return (jsxs(TableRow, { hover: true, selected: checked, children: [jsx(TableCell, { padding: "checkbox", children: jsx(Checkbox, { checked: checked, disabled: row.status.complete, onChange: function (event) {
+                                        return (jsxs(TableRow, { hover: true, selected: checked, children: [jsx(TableCell, { padding: "checkbox", children: jsx(Checkbox, { checked: checked, onChange: function (event) {
                                                             setSelectedTypeIds(function (prev) {
                                                                 var next = new Set(prev);
                                                                 if (event.target.checked) {
@@ -53518,6 +54572,1312 @@ function OpenTranslationToolbarButton(props) {
                                                 } }), label: jsxs(Box, { children: [jsx(Typography$1, { variant: "body2", children: c.internalName || '(no internal name)' }), jsx(Typography$1, { variant: "caption", color: "text.secondary", sx: { wordBreak: 'break-all' }, children: c.path })] }), sx: { alignItems: 'flex-start', ml: 0, display: 'flex' } }, c.path)); })] })) : null, jsx(Typography$1, { variant: "caption", color: "warning.main", sx: { display: 'block', mt: 2 }, children: "The translated page will be deleted. This cannot be undone." })] }), jsxs(DialogActions$1, { children: [jsx(Button, { onClick: closeRemoveDialog, disabled: Boolean(removeDialog.submitting), children: "Cancel" }), jsx(Button, { color: "error", variant: "contained", disabled: Boolean(removeDialog.loading || removeDialog.submitting), onClick: function () { return void confirmRemoveTranslation(); }, children: removeDialog.submitting ? 'Removing…' : 'Remove translation' })] })] })) : null })] }));
 }
 
+/**
+ * Build a stable CSS selector for an element inside parsed preview HTML.
+ * Prefer #id when present; otherwise use a short nth-of-type path from the root.
+ */
+function cssSelectorForElement(el) {
+    var _a, _b, _c;
+    if (!el || el.nodeType !== 1) {
+        return undefined;
+    }
+    var id = (_a = el.getAttribute('id')) === null || _a === void 0 ? void 0 : _a.trim();
+    if (id) {
+        return "#".concat(escapeCssIdent(id));
+    }
+    var parts = [];
+    var current = el;
+    var stopAt = (_c = (_b = el.ownerDocument) === null || _b === void 0 ? void 0 : _b.documentElement) !== null && _c !== void 0 ? _c : null;
+    while (current && current !== stopAt && current.parentElement) {
+        var parent_1 = current.parentElement;
+        var tag = current.tagName.toLowerCase();
+        var sameTagSiblings = Array.from(parent_1.children).filter(function (child) { return child.tagName === current.tagName; });
+        if (sameTagSiblings.length === 1) {
+            parts.unshift(tag);
+        }
+        else {
+            var index = sameTagSiblings.indexOf(current) + 1;
+            parts.unshift("".concat(tag, ":nth-of-type(").concat(index, ")"));
+        }
+        current = parent_1;
+    }
+    return parts.length > 0 ? parts.join(' > ') : tagNameSelector(el);
+}
+function tagNameSelector(el) {
+    return el.tagName.toLowerCase();
+}
+function escapeCssIdent(value) {
+    if (typeof CSS !== 'undefined' && typeof CSS.escape === 'function') {
+        return CSS.escape(value);
+    }
+    return value.replace(/[^a-zA-Z0-9_-]/g, '\\$&');
+}
+
+function getPreviewHtml(pageUrl) {
+    return __awaiter(this, void 0, void 0, function () {
+        var iframe, root, res;
+        var _b;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
+                case 0:
+                    iframe = document.getElementById('crafterCMSPreviewIframe');
+                    try {
+                        root = (_b = iframe === null || iframe === void 0 ? void 0 : iframe.contentDocument) === null || _b === void 0 ? void 0 : _b.documentElement;
+                        if (root) {
+                            return [2 /*return*/, root.outerHTML];
+                        }
+                    }
+                    catch (_d) {
+                        // cross-origin iframe
+                    }
+                    _c.label = 1;
+                case 1:
+                    _c.trys.push([1, 4, , 5]);
+                    return [4 /*yield*/, fetch(pageUrl, {
+                            credentials: 'include',
+                            mode: 'cors',
+                            cache: 'no-store'
+                        })];
+                case 2:
+                    res = _c.sent();
+                    if (!res.ok) {
+                        return [2 /*return*/, null];
+                    }
+                    return [4 /*yield*/, res.text()];
+                case 3: return [2 /*return*/, _c.sent()];
+                case 4:
+                    _c.sent();
+                    return [2 /*return*/, null];
+                case 5: return [2 /*return*/];
+            }
+        });
+    });
+}
+/**
+ * Collect unique absolute http(s) URLs from anchor hrefs (fragments stripped for the request).
+ */
+function extractHttpUrlsFromAnchors(html, baseUrl) {
+    var parser = new DOMParser();
+    var doc = parser.parseFromString(html, 'text/html');
+    var base;
+    try {
+        base = new URL(baseUrl);
+    }
+    catch (_a) {
+        return [];
+    }
+    var seen = new Set();
+    doc.querySelectorAll('a[href]').forEach(function (el) {
+        var _a;
+        var href = (_a = el.getAttribute('href')) === null || _a === void 0 ? void 0 : _a.trim();
+        if (!href) {
+            return;
+        }
+        var lower = href.toLowerCase();
+        if (lower.startsWith('javascript:') ||
+            lower.startsWith('mailto:') ||
+            lower.startsWith('tel:') ||
+            lower.startsWith('data:')) {
+            return;
+        }
+        if (href === '#' || (href.startsWith('#') && !href.includes('://'))) {
+            return;
+        }
+        try {
+            var abs = new URL(href, base);
+            var u = abs.href;
+            var noHash = u.split('#')[0];
+            if (noHash.startsWith('http:') || noHash.startsWith('https:')) {
+                seen.add(noHash);
+            }
+        }
+        catch (_b) {
+            /* ignore invalid */
+        }
+    });
+    return Array.from(seen);
+}
+/**
+ * Map each same-origin http(s) anchor target to one or more CSS selectors in the parsed HTML.
+ */
+function extractAnchorUrlRefs(html, baseUrl) {
+    var parser = new DOMParser();
+    var doc = parser.parseFromString(html, 'text/html');
+    var base;
+    try {
+        base = new URL(baseUrl);
+    }
+    catch (_a) {
+        return [];
+    }
+    var refs = [];
+    var seen = new Set();
+    doc.querySelectorAll('a[href]').forEach(function (node) {
+        var _a;
+        var el = node;
+        var href = (_a = el.getAttribute('href')) === null || _a === void 0 ? void 0 : _a.trim();
+        if (!href) {
+            return;
+        }
+        var lower = href.toLowerCase();
+        if (lower.startsWith('javascript:') ||
+            lower.startsWith('mailto:') ||
+            lower.startsWith('tel:') ||
+            lower.startsWith('data:')) {
+            return;
+        }
+        if (href === '#' || (href.startsWith('#') && !href.includes('://'))) {
+            return;
+        }
+        try {
+            var abs = new URL(href, base);
+            var noHash = abs.href.split('#')[0];
+            if (!noHash.startsWith('http:') && !noHash.startsWith('https:')) {
+                return;
+            }
+            var selector = cssSelectorForElement(el);
+            if (!selector) {
+                return;
+            }
+            var key = "".concat(noHash, "\0").concat(selector);
+            if (seen.has(key)) {
+                return;
+            }
+            seen.add(key);
+            refs.push({ url: noHash, selector: selector, href: href });
+        }
+        catch (_b) {
+            /* ignore invalid */
+        }
+    });
+    return refs;
+}
+function selectorsByUrl(refs) {
+    var map = new Map();
+    refs.forEach(function (ref) {
+        var _a;
+        var list = (_a = map.get(ref.url)) !== null && _a !== void 0 ? _a : [];
+        if (!list.includes(ref.selector)) {
+            list.push(ref.selector);
+        }
+        map.set(ref.url, list);
+    });
+    return map;
+}
+function guestPageUrl(guest) {
+    if (!(guest === null || guest === void 0 ? void 0 : guest.origin) || guest.url == null) {
+        return null;
+    }
+    return guest.origin + guest.url;
+}
+
+function englishHttpDetail(status) {
+    var ctx = '(checked in your browser from the plugin bundle)';
+    if (status === 401) {
+        return "Unauthorized (HTTP 401) ".concat(ctx, " \u2014 the target returned 401. Preview URLs may require an active preview session.");
+    }
+    if (status === 403) {
+        return "Forbidden (HTTP 403) ".concat(ctx, " \u2014 access denied for this URL.");
+    }
+    if (status === 404) {
+        return "Not found (HTTP 404) ".concat(ctx, " \u2014 no resource at this URL.");
+    }
+    if (status >= 500 && status < 600) {
+        return "Server error (HTTP ".concat(status, ") ").concat(ctx, " \u2014 the target server failed while handling the request.");
+    }
+    if (status >= 400) {
+        return "Client or policy error (HTTP ".concat(status, ") ").concat(ctx, " \u2014 the request was not satisfied.");
+    }
+    return "Unexpected status (HTTP ".concat(status, ") ").concat(ctx, ".");
+}
+function checkUrlInBrowser(url) {
+    return __awaiter(this, void 0, void 0, function () {
+        var res, ok, e_1, msg;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 2, , 3]);
+                    return [4 /*yield*/, fetch(url, {
+                            method: 'GET',
+                            credentials: 'include',
+                            cache: 'no-store',
+                            redirect: 'follow',
+                            mode: 'same-origin'
+                        })];
+                case 1:
+                    res = _a.sent();
+                    ok = res.status >= 200 && res.status < 400;
+                    return [2 /*return*/, __assign({ url: url, ok: ok, status: res.status, checkedBy: 'browser' }, (!ok && { detail: englishHttpDetail(res.status), error: "HTTP ".concat(res.status) }))];
+                case 2:
+                    e_1 = _a.sent();
+                    msg = e_1 instanceof Error ? e_1.message : String(e_1);
+                    return [2 /*return*/, {
+                            url: url,
+                            ok: false,
+                            checkedBy: 'browser',
+                            error: msg,
+                            detail: "Could not fetch this URL in the browser (".concat(msg, ").")
+                        }];
+                case 3: return [2 /*return*/];
+            }
+        });
+    });
+}
+/**
+ * Keep only URLs that share the preview page origin (same site as the guest iframe).
+ * External links are not validated — all checks run only from the plugin bundle in-browser.
+ */
+function filterSameOriginPreviewUrls(urls, previewOrigin) {
+    if (!previewOrigin) {
+        return [];
+    }
+    var base;
+    try {
+        base = new URL(previewOrigin);
+    }
+    catch (_a) {
+        return [];
+    }
+    var out = [];
+    var seen = new Set();
+    for (var _i = 0, urls_1 = urls; _i < urls_1.length; _i++) {
+        var u = urls_1[_i];
+        try {
+            if (new URL(u).origin === base.origin && !seen.has(u)) {
+                seen.add(u);
+                out.push(u);
+            }
+        }
+        catch (_b) {
+            /* skip invalid */
+        }
+    }
+    return out;
+}
+/**
+ * Validates links using **only** the bundled toolbar code: same-origin-as-preview URLs are checked
+ * with `fetch` in the browser. No Studio REST script, no server-side requests to arbitrary URLs.
+ * External (different-origin) links are ignored.
+ */
+function validateAllLinks(urls, opts) {
+    return __awaiter(this, void 0, void 0, function () {
+        var previewOrigin, toCheck, results;
+        var _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    previewOrigin = (_a = opts === null || opts === void 0 ? void 0 : opts.previewOrigin) !== null && _a !== void 0 ? _a : null;
+                    toCheck = filterSameOriginPreviewUrls(urls, previewOrigin);
+                    if (urls.length > 0 && toCheck.length === 0) {
+                        return [2 /*return*/, {
+                                results: [],
+                                message: 'No links on the preview origin to check. This plugin validates only same-origin URLs; external links are skipped.'
+                            }];
+                    }
+                    return [4 /*yield*/, Promise.all(toCheck.map(function (u) { return checkUrlInBrowser(u); }))];
+                case 1:
+                    results = _b.sent();
+                    return [2 /*return*/, { results: results }];
+            }
+        });
+    });
+}
+
+/** Guest iframe → Studio messages use `type` or legacy `topic` (see Host.js postMessage normalizer). */
+function previewIntercomType(action) {
+    var _a;
+    if (!action || typeof action !== 'object') {
+        return undefined;
+    }
+    var a = action;
+    return (_a = a.type) !== null && _a !== void 0 ? _a : a.topic;
+}
+var GUEST_WRITE_ACTION_TYPES = new Set([
+    'UPDATE_FIELD_VALUE_OPERATION',
+    'INSERT_COMPONENT_OPERATION',
+    'INSERT_ITEM_OPERATION',
+    'DUPLICATE_ITEM_OPERATION',
+    'MOVE_ITEM_OPERATION',
+    'DELETE_ITEM_OPERATION',
+    'SORT_ITEM_OPERATION'
+]);
+/**
+ * Debounced re-run when preview navigates, content reloads, or XB/ICE buses fire.
+ * Shared by link-check and accessibility toolbar widgets.
+ */
+function usePreviewToolbarAutoRecheck(runCheckRef, guest) {
+    var store = useStore();
+    React.useEffect(function () {
+        if (!(guest === null || guest === void 0 ? void 0 : guest.url)) {
+            return;
+        }
+        var t = window.setTimeout(function () {
+            void runCheckRef.current();
+        }, 700);
+        return function () { return window.clearTimeout(t); };
+    }, [guest === null || guest === void 0 ? void 0 : guest.url, guest === null || guest === void 0 ? void 0 : guest.path, guest === null || guest === void 0 ? void 0 : guest.models]);
+    React.useEffect(function () {
+        var guestPath = guest === null || guest === void 0 ? void 0 : guest.path;
+        if (!(guest === null || guest === void 0 ? void 0 : guest.url) || !guestPath) {
+            return;
+        }
+        var debounceTimer;
+        var schedule = function () {
+            window.clearTimeout(debounceTimer);
+            debounceTimer = window.setTimeout(function () { return void runCheckRef.current(); }, 900);
+        };
+        var read = function () {
+            var _a, _b, _c, _d, _e;
+            var s = store.getState();
+            var g = (_a = s.preview) === null || _a === void 0 ? void 0 : _a.guest;
+            var modelId = g === null || g === void 0 ? void 0 : g.modelId;
+            var model = modelId && (g === null || g === void 0 ? void 0 : g.models) && Object.prototype.hasOwnProperty.call(g.models, modelId)
+                ? g.models[modelId]
+                : undefined;
+            return {
+                item: (_c = (_b = s.content) === null || _b === void 0 ? void 0 : _b.itemsByPath) === null || _c === void 0 ? void 0 : _c[guestPath],
+                fetching: (_e = (_d = s.content) === null || _d === void 0 ? void 0 : _d.itemsBeingFetchedByPath) === null || _e === void 0 ? void 0 : _e[guestPath],
+                model: model
+            };
+        };
+        var prev = read();
+        var unsubscribe = store.subscribe(function () {
+            var _a, _b;
+            var s = store.getState();
+            if (((_b = (_a = s.preview) === null || _a === void 0 ? void 0 : _a.guest) === null || _b === void 0 ? void 0 : _b.path) !== guestPath) {
+                return;
+            }
+            var next = read();
+            if (next.item !== prev.item || next.fetching !== prev.fetching || next.model !== prev.model) {
+                prev = next;
+                schedule();
+            }
+        });
+        return function () {
+            unsubscribe();
+            window.clearTimeout(debounceTimer);
+        };
+    }, [guest === null || guest === void 0 ? void 0 : guest.url, guest === null || guest === void 0 ? void 0 : guest.path, store]);
+    React.useEffect(function () {
+        var debounceTimer;
+        var schedule = function () {
+            window.clearTimeout(debounceTimer);
+            debounceTimer = window.setTimeout(function () { return void runCheckRef.current(); }, 900);
+        };
+        var previewContentChangedMatchers = [
+            reloadRequest,
+            updateFieldValueOperationComplete,
+            insertOperationComplete,
+            insertItemOperationComplete,
+            duplicateItemOperationComplete,
+            moveItemOperationComplete,
+            sortItemOperationComplete,
+            deleteItemOperationComplete
+        ];
+        var onHostIntercom = function (action) {
+            if (previewContentChangedMatchers.some(function (m) { return m.match(action); })) {
+                schedule();
+            }
+        };
+        var onGuestToHost = function (action) {
+            var t = previewIntercomType(action);
+            if (t && GUEST_WRITE_ACTION_TYPES.has(t)) {
+                schedule();
+            }
+        };
+        var h2g = getHostToGuestBus();
+        var h2h = getHostToHostBus();
+        var g2h = getGuestToHostBus();
+        var s1 = h2g.subscribe(onHostIntercom);
+        var s2 = h2h.subscribe(onHostIntercom);
+        var s3 = g2h.subscribe(onGuestToHost);
+        return function () {
+            s1.unsubscribe();
+            s2.unsubscribe();
+            s3.unsubscribe();
+            window.clearTimeout(debounceTimer);
+        };
+    }, []);
+}
+
+var HIGHLIGHT_CLASS = 'crafter-linkcheck-issue-highlight';
+var STYLE_ID = 'crafter-linkcheck-issue-highlight-style';
+var activeHighlightEl = null;
+var activeHighlightTimer;
+function getPreviewDocument() {
+    var _a;
+    var iframe = document.getElementById('crafterCMSPreviewIframe');
+    try {
+        return (_a = iframe === null || iframe === void 0 ? void 0 : iframe.contentDocument) !== null && _a !== void 0 ? _a : null;
+    }
+    catch (_b) {
+        return null;
+    }
+}
+function ensureHighlightStyle(doc) {
+    var _a;
+    if (doc.getElementById(STYLE_ID)) {
+        return;
+    }
+    var style = doc.createElement('style');
+    style.id = STYLE_ID;
+    style.textContent = "\n.".concat(HIGHLIGHT_CLASS, " {\n  outline: 3px solid #e53935 !important;\n  outline-offset: 2px !important;\n  box-shadow: 0 0 0 4px rgba(229, 57, 53, 0.22) !important;\n  scroll-margin: 64px 16px !important;\n}");
+    ((_a = doc.head) !== null && _a !== void 0 ? _a : doc.documentElement).appendChild(style);
+}
+function clearHighlight() {
+    if (activeHighlightEl) {
+        activeHighlightEl.classList.remove(HIGHLIGHT_CLASS);
+        activeHighlightEl = null;
+    }
+    if (activeHighlightTimer != null) {
+        window.clearTimeout(activeHighlightTimer);
+        activeHighlightTimer = undefined;
+    }
+}
+function highlightBriefly(el) {
+    clearHighlight();
+    var doc = el.ownerDocument;
+    ensureHighlightStyle(doc);
+    el.classList.add(HIGHLIGHT_CLASS);
+    activeHighlightEl = el;
+    activeHighlightTimer = window.setTimeout(function () { return clearHighlight(); }, 2200);
+}
+function jumpToPreviewElement(el) {
+    if (!el || el.nodeType !== 1) {
+        return false;
+    }
+    try {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+        highlightBriefly(el);
+        return true;
+    }
+    catch (_a) {
+        return false;
+    }
+}
+function jumpToPreviewSelector(selector) {
+    var trimmed = String(selector || '').trim();
+    if (!trimmed) {
+        return false;
+    }
+    var doc = getPreviewDocument();
+    if (!doc) {
+        return false;
+    }
+    var el = null;
+    try {
+        el = doc.querySelector(trimmed);
+    }
+    catch (_a) {
+        return false;
+    }
+    return jumpToPreviewElement(el);
+}
+/** Resolve a selector captured from parsed HTML against the live preview document. */
+function jumpToPreviewSelectorFromParsedHtml(selector) {
+    if (jumpToPreviewSelector(selector)) {
+        return true;
+    }
+    var doc = getPreviewDocument();
+    if (!doc || !selector) {
+        return false;
+    }
+    if (selector.startsWith('#')) {
+        var id = selector.slice(1).replace(/\\/g, '');
+        return jumpToPreviewElement(doc.getElementById(id));
+    }
+    return false;
+}
+
+function JumpToPreviewButton(_a) {
+    var selector = _a.selector, disabled = _a.disabled, onJump = _a.onJump;
+    var canJump = Boolean(selector === null || selector === void 0 ? void 0 : selector.trim()) && !disabled;
+    return (jsx(Tooltip$1, { title: canJump ? 'Scroll preview to this element' : 'No element to jump to in preview', children: jsx("span", { children: jsx(Button, { size: "small", color: "primary", variant: "outlined", disabled: !canJump, onClick: function (event) {
+                    event.stopPropagation();
+                    if (jumpToPreviewSelectorFromParsedHtml(selector)) {
+                        onJump === null || onJump === void 0 ? void 0 : onJump();
+                    }
+                }, sx: { minWidth: 72, flexShrink: 0, py: 0.25 }, children: "Jump to" }) }) }));
+}
+
+var RUNNING_BLUE$1 = '#1976d2';
+var OK_GREEN$1 = '#2e7d32';
+var FAIL_RED$1 = '#c62828';
+function LinkCheckToolbar() {
+    var _this = this;
+    var _a;
+    var guest = usePreviewGuest();
+    var siteId = (_a = useActiveSiteId()) !== null && _a !== void 0 ? _a : '';
+    var _b = React.useState(false), running = _b[0], setRunning = _b[1];
+    var _c = React.useState(0), progress = _c[0], setProgress = _c[1];
+    var _d = React.useState([]), broken = _d[0], setBroken = _d[1];
+    var _e = React.useState(null), lastOk = _e[0], setLastOk = _e[1];
+    var _f = React.useState(null), errorMsg = _f[0], setErrorMsg = _f[1];
+    var _g = React.useState(null), anchorMenu = _g[0], setAnchorMenu = _g[1];
+    var runSeq = React.useRef(0);
+    var chevronRef = React.useRef(null);
+    var pageUrl = guestPageUrl(guest);
+    var runCheck = React.useCallback(function () { return __awaiter(_this, void 0, void 0, function () {
+        var seq, html, urls, anchorRefs, urlSelectors_1, _a, results, bad, e_1;
+        var _b;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
+                case 0:
+                    if (!siteId || !pageUrl) {
+                        setErrorMsg('No preview page loaded.');
+                        setLastOk(null);
+                        return [2 /*return*/];
+                    }
+                    seq = ++runSeq.current;
+                    setRunning(true);
+                    setProgress(0);
+                    setErrorMsg(null);
+                    setBroken([]);
+                    setLastOk(null);
+                    _c.label = 1;
+                case 1:
+                    _c.trys.push([1, 4, 5, 6]);
+                    return [4 /*yield*/, getPreviewHtml(pageUrl)];
+                case 2:
+                    html = _c.sent();
+                    if (seq !== runSeq.current) {
+                        return [2 /*return*/];
+                    }
+                    if (!html) {
+                        setErrorMsg('Could not read preview markup (try again after preview loads).');
+                        setBroken([]);
+                        setLastOk(false);
+                        return [2 /*return*/];
+                    }
+                    urls = extractHttpUrlsFromAnchors(html, pageUrl);
+                    anchorRefs = extractAnchorUrlRefs(html, pageUrl);
+                    urlSelectors_1 = selectorsByUrl(anchorRefs);
+                    if (urls.length === 0) {
+                        setProgress(100);
+                        setLastOk(true);
+                        return [2 /*return*/];
+                    }
+                    setProgress(25);
+                    return [4 /*yield*/, validateAllLinks(urls, {
+                            previewOrigin: (_b = guest === null || guest === void 0 ? void 0 : guest.origin) !== null && _b !== void 0 ? _b : null
+                        })];
+                case 3:
+                    _a = (_c.sent()).results, results = _a === void 0 ? [] : _a;
+                    if (seq !== runSeq.current) {
+                        return [2 /*return*/];
+                    }
+                    setProgress(100);
+                    /** All hrefs were external (different origin) — nothing to validate in-browser; counts as OK. */
+                    if (urls.length > 0 && results.length === 0) {
+                        setBroken([]);
+                        setLastOk(true);
+                        return [2 /*return*/];
+                    }
+                    bad = results
+                        .filter(function (r) { return r && r.ok !== true; })
+                        .map(function (row) {
+                        var _a;
+                        return (__assign(__assign({}, row), { selectors: (_a = urlSelectors_1.get(row.url)) !== null && _a !== void 0 ? _a : [] }));
+                    });
+                    setBroken(bad);
+                    setLastOk(bad.length === 0);
+                    return [3 /*break*/, 6];
+                case 4:
+                    e_1 = _c.sent();
+                    if (seq !== runSeq.current) {
+                        return [2 /*return*/];
+                    }
+                    setBroken([]);
+                    setErrorMsg(e_1 instanceof Error ? e_1.message : String(e_1));
+                    setLastOk(false);
+                    return [3 /*break*/, 6];
+                case 5:
+                    if (seq === runSeq.current) {
+                        setRunning(false);
+                    }
+                    return [7 /*endfinally*/];
+                case 6: return [2 /*return*/];
+            }
+        });
+    }); }, [siteId, pageUrl, guest]);
+    var runCheckRef = React.useRef(runCheck);
+    runCheckRef.current = runCheck;
+    usePreviewToolbarAutoRecheck(runCheckRef, guest);
+    var openMenu = Boolean(anchorMenu);
+    /** Any failed check: broken links and/or errorMsg (not “no preview” pre-check which sets lastOk null). */
+    var showChevron = !running && lastOk === false;
+    var iconColor = running ? RUNNING_BLUE$1 : lastOk === true ? OK_GREEN$1 : lastOk === false ? FAIL_RED$1 : 'action.active';
+    return (jsxs(Stack$2, { direction: "row", alignItems: "center", spacing: 0, sx: { flexShrink: 0, minWidth: 'fit-content', overflow: 'visible' }, children: [jsx(Tooltip$1, { title: errorMsg
+                    ? errorMsg
+                    : running
+                        ? 'Checking links…'
+                        : lastOk === true
+                            ? 'All links responded successfully'
+                            : lastOk === false
+                                ? errorMsg
+                                    ? errorMsg + ' — use the chevron for details'
+                                    : 'Some links failed — use the chevron for details'
+                                : 'Check links on the current preview page', children: jsxs(Box, { sx: __assign({ position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 40, height: 40 }, (running && {
+                        color: RUNNING_BLUE$1,
+                        '& .MuiSvgIcon-root': { color: RUNNING_BLUE$1 }
+                    })), children: [running && (jsx(Box, { sx: {
+                                position: 'absolute',
+                                inset: 0,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                pointerEvents: 'none'
+                            }, children: jsxs(Box, { component: "svg", viewBox: "0 0 40 40", sx: {
+                                    width: 36,
+                                    height: 36,
+                                    transform: 'rotate(-90deg)',
+                                    color: RUNNING_BLUE$1
+                                }, children: [jsx("circle", { cx: "20", cy: "20", r: "16", fill: "none", stroke: "currentColor", strokeWidth: "3", opacity: 0.2 }), jsx("circle", { cx: "20", cy: "20", r: "16", fill: "none", stroke: "currentColor", strokeWidth: "3", strokeDasharray: 2 * Math.PI * 16, strokeDashoffset: (2 * Math.PI * 16 * (100 - progress)) / 100, strokeLinecap: "round" })] }) })), jsx(IconButton, { size: "small", onClick: function () { return void runCheck(); }, disabled: !pageUrl, "aria-label": "Check links on preview page", sx: {
+                                color: iconColor,
+                                '&:hover': { color: running ? RUNNING_BLUE$1 : iconColor }
+                            }, children: jsx(LinkRounded, { fontSize: "small" }) })] }) }), showChevron && (jsx(Tooltip$1, { title: broken.length > 0 ? 'Show broken links report' : 'Show error details', children: jsx(IconButton, { ref: chevronRef, size: "small", onClick: function (e) { return setAnchorMenu(e.currentTarget); }, "aria-label": "Open link check report", sx: {
+                        ml: 0,
+                        flexShrink: 0,
+                        color: FAIL_RED$1,
+                        minWidth: 32,
+                        width: 32,
+                        height: 32
+                    }, children: jsx(KeyboardArrowDownRoundedIcon, { fontSize: "small" }) }) })), jsxs(Popover, { open: openMenu, anchorEl: anchorMenu, onClose: function () { return setAnchorMenu(null); }, anchorOrigin: { vertical: 'bottom', horizontal: 'right' }, transformOrigin: { vertical: 'top', horizontal: 'right' }, sx: { zIndex: 2000 }, PaperProps: {
+                    sx: { maxWidth: 480, maxHeight: 360, mt: 0.5 }
+                }, children: [jsx(Box, { sx: { px: 2, py: 1.5, borderBottom: 1, borderColor: 'divider' }, children: jsx(Typography$1, { variant: "subtitle2", children: broken.length > 0 ? "Broken links (".concat(broken.length, ")") : 'Link check' }) }), jsx(List$1, { dense: true, disablePadding: true, sx: { py: 0 }, children: broken.length > 0 ? (broken.map(function (row) {
+                            var _a;
+                            return (jsxs(ListItem$1, { alignItems: "flex-start", sx: { py: 1.5, px: 2, display: 'flex', gap: 1 }, children: [jsx(ListItemText$1, { sx: { flex: 1, minWidth: 0, m: 0 }, primary: jsx(Typography$1, { variant: "body2", sx: { wordBreak: 'break-all' }, children: row.url }), secondary: row.detail ||
+                                            (row.status != null
+                                                ? "HTTP ".concat(row.status) +
+                                                    (row.checkedBy ? " (checked ".concat(row.checkedBy, ")") : '')
+                                                : row.error || 'Request failed') }), jsx(Box, { sx: { flexShrink: 0, alignSelf: 'flex-start' }, children: jsx(JumpToPreviewButton, { selector: (_a = row.selectors) === null || _a === void 0 ? void 0 : _a[0], onJump: function () { return setAnchorMenu(null); } }) })] }, row.url));
+                        })) : (jsx(ListItem$1, { sx: { py: 1.5, px: 2 }, children: jsx(ListItemText$1, { primary: jsx(Typography$1, { variant: "body2", color: "text.secondary", children: errorMsg || 'No per-URL results. Try running the check again.' }) }) })) })] })] }));
+}
+
+/**
+ * Bundled accessibility heuristics (WCAG-aligned hints). Not a full audit — manual testing still required.
+ *
+ * Implementation is original to this plugin (MIT). Checks are aligned with WCAG 2.1 success criteria as
+ * described in public W3C guidance (facts are not copyrightable). We do not ship or embed third-party
+ * rule engines (e.g. axe-core); rules are maintained here for a small, dependency-free bundle.
+ */
+function push(issues, issue) {
+    issues.push(issue);
+}
+function pushForElement(issues, el, issue) {
+    push(issues, __assign(__assign({}, issue), { selector: cssSelectorForElement(el) }));
+}
+function idExists(doc, id) {
+    return Boolean(id && doc.getElementById(id));
+}
+function normalizeText(s) {
+    return s.replace(/\s+/g, ' ').trim().toLowerCase();
+}
+/** Suspicious link text (sole link content) — common anti-pattern per public WCAG technique guidance. */
+var SUSPICIOUS_LINK_TEXT = new Set([
+    'click here',
+    'read more',
+    'here',
+    'more',
+    'learn more',
+    'link',
+    'details',
+    'this',
+    'more here',
+    'download'
+]);
+function checkAriaTokenRefs(doc, issues, el, attr, ruleId, wcag) {
+    var _a;
+    var raw = (_a = el.getAttribute(attr)) === null || _a === void 0 ? void 0 : _a.trim();
+    if (!raw) {
+        return;
+    }
+    var tokens = raw.split(/\s+/).filter(Boolean);
+    for (var _i = 0, tokens_1 = tokens; _i < tokens_1.length; _i++) {
+        var token = tokens_1[_i];
+        if (!idExists(doc, token)) {
+            pushForElement(issues, el, {
+                ruleId: ruleId,
+                severity: 'serious',
+                wcag: wcag,
+                message: "".concat(attr, " references id \"").concat(token, "\" but no element with that id exists in the document."),
+                context: el.tagName.toLowerCase()
+            });
+        }
+    }
+}
+function metaViewportRestrictsZoom(content) {
+    var c = content.toLowerCase().replace(/\s+/g, '');
+    return (c.includes('user-scalable=no') ||
+        c.includes('user-scalable=0') ||
+        /maximum-scale=1(\.0)?(?![0-9])/.test(c) ||
+        c.includes('maximum-scale=1;'));
+}
+/**
+ * Parse preview HTML and collect issues. Runs entirely in the bundled toolbar (no network).
+ */
+function runA11yChecks(html) {
+    var _a, _b, _c;
+    var parser = new DOMParser();
+    var doc = parser.parseFromString(html, 'text/html');
+    var issues = [];
+    var root = doc.documentElement;
+    if (root && root.tagName.toLowerCase() === 'html' && !((_a = root.getAttribute('lang')) === null || _a === void 0 ? void 0 : _a.trim())) {
+        push(issues, {
+            ruleId: 'html-lang',
+            severity: 'serious',
+            wcag: '3.1.1',
+            message: 'The root <html> element should have a lang attribute.',
+            context: 'html',
+            selector: 'html'
+        });
+    }
+    var titleEl = doc.querySelector('title');
+    var titleText = (_c = (_b = titleEl === null || titleEl === void 0 ? void 0 : titleEl.textContent) === null || _b === void 0 ? void 0 : _b.replace(/\s+/g, ' ').trim()) !== null && _c !== void 0 ? _c : '';
+    if (!titleText) {
+        push(issues, {
+            ruleId: 'document-title',
+            severity: 'serious',
+            wcag: '2.4.2',
+            message: 'The page should have a non-empty <title> in <head>.',
+            context: 'title',
+            selector: 'head'
+        });
+    }
+    var head = doc.querySelector('head');
+    var hasCharset = doc.querySelector('meta[charset]') !== null ||
+        doc.querySelector('meta[http-equiv="Content-Type" i]') !== null;
+    if (head && !hasCharset) {
+        push(issues, {
+            ruleId: 'html-charset',
+            severity: 'moderate',
+            wcag: '4.1.1',
+            message: 'Declare character encoding (e.g. <meta charset="utf-8">) in <head>.',
+            context: 'head',
+            selector: 'head'
+        });
+    }
+    doc.querySelectorAll('meta[name="viewport" i]').forEach(function (meta) {
+        var _a;
+        var content = (_a = meta.getAttribute('content')) !== null && _a !== void 0 ? _a : '';
+        if (metaViewportRestrictsZoom(content)) {
+            pushForElement(issues, meta, {
+                ruleId: 'meta-viewport-zoom',
+                severity: 'moderate',
+                wcag: '1.4.10',
+                message: 'Viewport meta should not disable zoom (avoid user-scalable=no or maximum-scale=1) unless you have a documented exception.',
+                context: 'meta[name=viewport]'
+            });
+        }
+    });
+    doc.querySelectorAll('meta[http-equiv="refresh" i]').forEach(function (meta) {
+        var _a;
+        var c = (_a = meta.getAttribute('content')) !== null && _a !== void 0 ? _a : '';
+        if (/\d+\s*;\s*url\s*=/i.test(c) || /^\d+\s*$/i.test(c.trim())) {
+            pushForElement(issues, meta, {
+                ruleId: 'meta-refresh',
+                severity: 'moderate',
+                wcag: '2.2.1',
+                message: 'Avoid auto-refresh redirects; they can disorient users and interfere with reading time.',
+                context: 'meta[http-equiv=refresh]'
+            });
+        }
+    });
+    doc.querySelectorAll('img').forEach(function (img) {
+        if (!img.hasAttribute('alt')) {
+            pushForElement(issues, img, {
+                ruleId: 'img-missing-alt',
+                severity: 'serious',
+                wcag: '1.1.1',
+                message: 'Images must have an alt attribute (use alt="" if decorative).',
+                context: 'img'
+            });
+        }
+    });
+    doc.querySelectorAll('input[type="image" i]').forEach(function (inp) {
+        if (!inp.hasAttribute('alt')) {
+            pushForElement(issues, inp, {
+                ruleId: 'input-image-alt',
+                severity: 'serious',
+                wcag: '1.1.1',
+                message: 'input[type=image] must have an alt attribute describing the button.',
+                context: 'input[type=image]'
+            });
+        }
+    });
+    doc.querySelectorAll('a[href]').forEach(function (a) {
+        var _a, _b;
+        var text = (a.textContent || '').replace(/\s+/g, ' ').trim();
+        var aria = (_a = a.getAttribute('aria-label')) === null || _a === void 0 ? void 0 : _a.trim();
+        var title = (_b = a.getAttribute('title')) === null || _b === void 0 ? void 0 : _b.trim();
+        if (!text && !aria && !title) {
+            pushForElement(issues, a, {
+                ruleId: 'link-name',
+                severity: 'serious',
+                wcag: '2.4.4',
+                message: 'Links should have visible text, aria-label, or title.',
+                context: 'a'
+            });
+        }
+        else if (text && !aria && !title) {
+            var norm = normalizeText(text);
+            if (SUSPICIOUS_LINK_TEXT.has(norm)) {
+                pushForElement(issues, a, {
+                    ruleId: 'link-suspicious-text',
+                    severity: 'moderate',
+                    wcag: '2.4.4',
+                    message: 'Link text is vague; use descriptive text that makes sense out of context.',
+                    context: 'a'
+                });
+            }
+        }
+    });
+    doc.querySelectorAll('button').forEach(function (btn) {
+        var _a;
+        var text = (btn.textContent || '').replace(/\s+/g, ' ').trim();
+        var aria = (_a = btn.getAttribute('aria-label')) === null || _a === void 0 ? void 0 : _a.trim();
+        if (!text && !aria) {
+            pushForElement(issues, btn, {
+                ruleId: 'button-name',
+                severity: 'serious',
+                wcag: '4.1.2',
+                message: 'Buttons should have visible text or aria-label.',
+                context: 'button'
+            });
+        }
+    });
+    var h1s = doc.querySelectorAll('h1');
+    if (h1s.length > 1) {
+        pushForElement(issues, h1s[0], {
+            ruleId: 'heading-multiple-h1',
+            severity: 'moderate',
+            wcag: '1.3.1',
+            message: 'Multiple <h1> elements found; prefer a single top-level heading per page unless using a documented pattern.',
+            context: 'h1'
+        });
+    }
+    var firstHeading = doc.querySelector('h1, h2, h3, h4, h5, h6');
+    if (firstHeading && firstHeading.tagName.toLowerCase() !== 'h1') {
+        pushForElement(issues, firstHeading, {
+            ruleId: 'heading-no-h1',
+            severity: 'minor',
+            wcag: '1.3.1',
+            message: 'First heading is not <h1>; consider starting the main outline with an h1 for consistency.',
+            context: firstHeading.tagName.toLowerCase()
+        });
+    }
+    var idCounts = new Map();
+    doc.querySelectorAll('[id]').forEach(function (el) {
+        var _a;
+        var id = el.id;
+        if (id) {
+            idCounts.set(id, ((_a = idCounts.get(id)) !== null && _a !== void 0 ? _a : 0) + 1);
+        }
+    });
+    idCounts.forEach(function (count, id) {
+        if (count > 1) {
+            var first = doc.getElementById(id);
+            push(issues, {
+                ruleId: 'duplicate-id',
+                severity: 'serious',
+                wcag: '4.1.1',
+                message: "Duplicate id \"".concat(id, "\" appears ").concat(count, " times; ids must be unique."),
+                context: "#".concat(id),
+                selector: first ? cssSelectorForElement(first) : "#".concat(id)
+            });
+        }
+    });
+    doc.querySelectorAll('[aria-label]').forEach(function (el) {
+        var v = el.getAttribute('aria-label');
+        if (v !== null && v.trim() === '') {
+            pushForElement(issues, el, {
+                ruleId: 'aria-label-empty',
+                severity: 'moderate',
+                wcag: '4.1.2',
+                message: 'aria-label is present but empty; remove it or provide a meaningful name.',
+                context: el.tagName.toLowerCase()
+            });
+        }
+    });
+    doc.querySelectorAll('[aria-labelledby], [aria-describedby]').forEach(function (el) {
+        checkAriaTokenRefs(doc, issues, el, 'aria-labelledby', 'aria-labelledby-missing', '1.3.1');
+        checkAriaTokenRefs(doc, issues, el, 'aria-describedby', 'aria-describedby-missing', '1.3.1');
+    });
+    doc.querySelectorAll('[tabindex]').forEach(function (el) {
+        var t = el.getAttribute('tabindex');
+        if (t == null) {
+            return;
+        }
+        var n = parseInt(t, 10);
+        if (!Number.isNaN(n) && n > 0) {
+            pushForElement(issues, el, {
+                ruleId: 'tabindex-positive',
+                severity: 'moderate',
+                wcag: '2.4.3',
+                message: 'Positive tabindex values can disrupt focus order; prefer natural DOM order or tabindex="0".',
+                context: el.tagName.toLowerCase()
+            });
+        }
+    });
+    doc.querySelectorAll('iframe').forEach(function (frame) {
+        var _a;
+        var t = (_a = frame.getAttribute('title')) === null || _a === void 0 ? void 0 : _a.trim();
+        if (!t) {
+            pushForElement(issues, frame, {
+                ruleId: 'iframe-title',
+                severity: 'serious',
+                wcag: '4.1.2',
+                message: 'Frames should have a title attribute describing their purpose.',
+                context: 'iframe'
+            });
+        }
+    });
+    doc.querySelectorAll('object, embed').forEach(function (el) {
+        var _a, _b;
+        var tag = el.tagName.toLowerCase();
+        var title = (_a = el.getAttribute('title')) === null || _a === void 0 ? void 0 : _a.trim();
+        var aria = (_b = el.getAttribute('aria-label')) === null || _b === void 0 ? void 0 : _b.trim();
+        if (!title && !aria) {
+            pushForElement(issues, el, {
+                ruleId: "".concat(tag, "-name"),
+                severity: 'serious',
+                wcag: '4.1.2',
+                message: "<".concat(tag, "> should have a title or aria-label describing the embedded content."),
+                context: tag
+            });
+        }
+    });
+    doc.querySelectorAll('svg').forEach(function (svg) {
+        var _a, _b, _c, _d;
+        var role = (_a = svg.getAttribute('role')) === null || _a === void 0 ? void 0 : _a.toLowerCase();
+        if (role === 'img') {
+            var aria = (_b = svg.getAttribute('aria-label')) === null || _b === void 0 ? void 0 : _b.trim();
+            var title = (_d = (_c = svg.querySelector('title')) === null || _c === void 0 ? void 0 : _c.textContent) === null || _d === void 0 ? void 0 : _d.trim();
+            if (!aria && !title) {
+                pushForElement(issues, svg, {
+                    ruleId: 'svg-img-name',
+                    severity: 'serious',
+                    wcag: '1.1.1',
+                    message: 'SVG with role="img" should have aria-label or a <title> child.',
+                    context: 'svg'
+                });
+            }
+        }
+    });
+    doc.querySelectorAll('fieldset').forEach(function (fs) {
+        if (!fs.querySelector('legend')) {
+            pushForElement(issues, fs, {
+                ruleId: 'fieldset-legend',
+                severity: 'moderate',
+                wcag: '1.3.1',
+                message: '<fieldset> should include a <legend> describing the group.',
+                context: 'fieldset'
+            });
+        }
+    });
+    doc.querySelectorAll('table').forEach(function (table) {
+        var _a;
+        var role = (_a = table.getAttribute('role')) === null || _a === void 0 ? void 0 : _a.toLowerCase();
+        if (role === 'presentation' || role === 'none') {
+            return;
+        }
+        var hasTh = table.querySelector('th') !== null;
+        if (!hasTh) {
+            pushForElement(issues, table, {
+                ruleId: 'table-headers',
+                severity: 'moderate',
+                wcag: '1.3.1',
+                message: 'Data tables should use <th> for headers (or verify this is a layout table with role presentation).',
+                context: 'table'
+            });
+        }
+    });
+    doc.querySelectorAll('video').forEach(function (video) {
+        if (video.hasAttribute('muted') && video.hasAttribute('autoplay')) {
+            return;
+        }
+        var hasCaptions = video.querySelector('track[kind="captions" i]') !== null ||
+            video.querySelector('track[kind="subtitles" i]') !== null;
+        if (!hasCaptions) {
+            pushForElement(issues, video, {
+                ruleId: 'video-captions',
+                severity: 'moderate',
+                wcag: '1.2.2',
+                message: 'Prerecorded video should include captions (e.g. <track kind="captions">) unless exempt.',
+                context: 'video'
+            });
+        }
+    });
+    doc.querySelectorAll('audio').forEach(function (audio) {
+        if (!audio.hasAttribute('controls')) {
+            pushForElement(issues, audio, {
+                ruleId: 'audio-controls',
+                severity: 'minor',
+                wcag: '1.1.1',
+                message: 'Audio elements should expose controls so users can adjust playback.',
+                context: 'audio'
+            });
+        }
+    });
+    doc.querySelectorAll('blink, marquee').forEach(function (el) {
+        pushForElement(issues, el, {
+            ruleId: 'deprecated-element',
+            severity: 'moderate',
+            wcag: '2.2.2',
+            message: "Avoid deprecated <".concat(el.tagName.toLowerCase(), ">; it can distract users or cause seizures."),
+            context: el.tagName.toLowerCase()
+        });
+    });
+    doc.querySelectorAll('[accesskey]').forEach(function (el) {
+        pushForElement(issues, el, {
+            ruleId: 'accesskey',
+            severity: 'minor',
+            wcag: '2.1.4',
+            message: 'accesskey can conflict with assistive tech and browser shortcuts; use sparingly.',
+            context: el.tagName.toLowerCase()
+        });
+    });
+    doc.querySelectorAll('a button, a input, a textarea, a select').forEach(function (el) {
+        pushForElement(issues, el, {
+            ruleId: 'interactive-nested-in-link',
+            severity: 'moderate',
+            wcag: '4.1.2',
+            message: 'Avoid nesting interactive elements inside a link; use a single focusable control.',
+            context: el.tagName.toLowerCase()
+        });
+    });
+    doc.querySelectorAll('figure').forEach(function (fig) {
+        if ((fig.querySelector('img') || fig.querySelector('picture')) && !fig.querySelector('figcaption')) {
+            pushForElement(issues, fig, {
+                ruleId: 'figure-figcaption',
+                severity: 'moderate',
+                wcag: '1.1.1',
+                message: 'Figures with images should include a <figcaption> or ensure the image alt is sufficient in context.',
+                context: 'figure'
+            });
+        }
+    });
+    doc.querySelectorAll('ul, ol').forEach(function (list) {
+        var invalidChild = Array.from(list.children).some(function (child) {
+            var t = child.tagName.toLowerCase();
+            return t !== 'li' && t !== 'script' && t !== 'template';
+        });
+        if (invalidChild) {
+            pushForElement(issues, list, {
+                ruleId: 'list-structure',
+                severity: 'moderate',
+                wcag: '1.3.1',
+                message: 'List elements should only contain <li>, <script>, or <template> as direct children.',
+                context: list.tagName.toLowerCase()
+            });
+        }
+    });
+    doc.querySelectorAll('abbr').forEach(function (abbr) {
+        var _a;
+        if (!((_a = abbr.getAttribute('title')) === null || _a === void 0 ? void 0 : _a.trim())) {
+            pushForElement(issues, abbr, {
+                ruleId: 'abbr-title',
+                severity: 'minor',
+                wcag: '3.1.4',
+                message: 'Abbreviations should provide expansion via a title attribute (or surrounding text).',
+                context: 'abbr'
+            });
+        }
+    });
+    doc.querySelectorAll('area[href]').forEach(function (area) {
+        if (!area.hasAttribute('alt')) {
+            pushForElement(issues, area, {
+                ruleId: 'area-alt',
+                severity: 'serious',
+                wcag: '1.1.1',
+                message: 'Image map <area> elements should have an alt attribute describing the destination.',
+                context: 'area'
+            });
+        }
+    });
+    doc.querySelectorAll('canvas').forEach(function (canvas) {
+        var _a, _b, _c;
+        var aria = (_a = canvas.getAttribute('aria-label')) === null || _a === void 0 ? void 0 : _a.trim();
+        var labelledby = (_b = canvas.getAttribute('aria-labelledby')) === null || _b === void 0 ? void 0 : _b.trim();
+        var fallback = (_c = canvas.textContent) === null || _c === void 0 ? void 0 : _c.replace(/\s+/g, ' ').trim();
+        if (!aria && !labelledby && !fallback) {
+            pushForElement(issues, canvas, {
+                ruleId: 'canvas-fallback',
+                severity: 'moderate',
+                wcag: '1.1.1',
+                message: 'Canvas should have accessible text (aria-label, aria-labelledby, or fallback content).',
+                context: 'canvas'
+            });
+        }
+    });
+    doc.querySelectorAll('[autofocus]').forEach(function (el) {
+        pushForElement(issues, el, {
+            ruleId: 'autofocus',
+            severity: 'minor',
+            wcag: '2.4.3',
+            message: 'autofocus moves focus on load and can disorient users; use only when intentional.',
+            context: el.tagName.toLowerCase()
+        });
+    });
+    doc.querySelectorAll('input, select, textarea').forEach(function (control) {
+        var _a, _b, _c, _d;
+        if (control.tagName.toLowerCase() === 'input') {
+            var type = (_b = (_a = control.type) === null || _a === void 0 ? void 0 : _a.toLowerCase()) !== null && _b !== void 0 ? _b : 'text';
+            if (type === 'hidden' || type === 'button' || type === 'submit' || type === 'reset') {
+                return;
+            }
+        }
+        var wrappedInLabel = control.closest('label');
+        var id = control.getAttribute('id');
+        var labelByFor = id &&
+            Array.from(doc.querySelectorAll('label[for]')).find(function (l) { return l.getAttribute('for') === id; });
+        var ariaLabel = (_c = control.getAttribute('aria-label')) === null || _c === void 0 ? void 0 : _c.trim();
+        var ariaLabelledby = (_d = control.getAttribute('aria-labelledby')) === null || _d === void 0 ? void 0 : _d.trim();
+        var hasVisibleLabel = !!(wrappedInLabel || labelByFor);
+        var hasAccessibleName = !!(hasVisibleLabel || ariaLabel || ariaLabelledby);
+        if (!hasAccessibleName) {
+            pushForElement(issues, control, {
+                ruleId: 'form-label',
+                severity: 'moderate',
+                wcag: '1.3.1',
+                message: 'Form controls should have an accessible name (label, aria-label, or aria-labelledby). Do not rely on placeholder alone.',
+                context: control.tagName.toLowerCase()
+            });
+        }
+    });
+    return issues;
+}
+
+var RUNNING_BLUE = '#1976d2';
+var OK_GREEN = '#2e7d32';
+var FAIL_RED = '#c62828';
+var SEVERITY_COLOR = {
+    critical: 'error',
+    serious: 'error',
+    moderate: 'warning',
+    minor: 'info'
+};
+function A11yToolbar() {
+    var _this = this;
+    var _a;
+    var guest = usePreviewGuest();
+    var siteId = (_a = useActiveSiteId()) !== null && _a !== void 0 ? _a : '';
+    var _b = React.useState(false), running = _b[0], setRunning = _b[1];
+    var _c = React.useState(0), progress = _c[0], setProgress = _c[1];
+    var _d = React.useState([]), issues = _d[0], setIssues = _d[1];
+    var _e = React.useState(null), lastOk = _e[0], setLastOk = _e[1];
+    var _f = React.useState(null), errorMsg = _f[0], setErrorMsg = _f[1];
+    var _g = React.useState(null), anchorMenu = _g[0], setAnchorMenu = _g[1];
+    var runSeq = React.useRef(0);
+    var chevronRef = React.useRef(null);
+    var pageUrl = guestPageUrl(guest);
+    var runCheck = React.useCallback(function () { return __awaiter(_this, void 0, void 0, function () {
+        var seq, html, found, e_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    if (!siteId || !pageUrl) {
+                        setErrorMsg('No preview page loaded.');
+                        setLastOk(null);
+                        return [2 /*return*/];
+                    }
+                    seq = ++runSeq.current;
+                    setRunning(true);
+                    setProgress(0);
+                    setErrorMsg(null);
+                    setIssues([]);
+                    setLastOk(null);
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 3, 4, 5]);
+                    return [4 /*yield*/, getPreviewHtml(pageUrl)];
+                case 2:
+                    html = _a.sent();
+                    if (seq !== runSeq.current) {
+                        return [2 /*return*/];
+                    }
+                    if (!html) {
+                        setErrorMsg('Could not read preview markup (try again after preview loads).');
+                        setIssues([]);
+                        setLastOk(false);
+                        return [2 /*return*/];
+                    }
+                    setProgress(40);
+                    found = runA11yChecks(html);
+                    if (seq !== runSeq.current) {
+                        return [2 /*return*/];
+                    }
+                    setProgress(100);
+                    setIssues(found);
+                    setLastOk(found.length === 0);
+                    return [3 /*break*/, 5];
+                case 3:
+                    e_1 = _a.sent();
+                    if (seq !== runSeq.current) {
+                        return [2 /*return*/];
+                    }
+                    setIssues([]);
+                    setErrorMsg(e_1 instanceof Error ? e_1.message : String(e_1));
+                    setLastOk(false);
+                    return [3 /*break*/, 5];
+                case 4:
+                    if (seq === runSeq.current) {
+                        setRunning(false);
+                    }
+                    return [7 /*endfinally*/];
+                case 5: return [2 /*return*/];
+            }
+        });
+    }); }, [siteId, pageUrl]);
+    var runCheckRef = React.useRef(runCheck);
+    runCheckRef.current = runCheck;
+    usePreviewToolbarAutoRecheck(runCheckRef, guest);
+    var openMenu = Boolean(anchorMenu);
+    var showChevron = !running && lastOk === false;
+    var iconColor = running ? RUNNING_BLUE : lastOk === true ? OK_GREEN : lastOk === false ? FAIL_RED : 'action.active';
+    return (jsxs(Stack$2, { direction: "row", alignItems: "center", spacing: 0, sx: { flexShrink: 0, minWidth: 'fit-content', overflow: 'visible' }, children: [jsx(Tooltip$1, { title: errorMsg
+                    ? errorMsg
+                    : running
+                        ? 'Running accessibility checks…'
+                        : lastOk === true
+                            ? 'No issues found (bundle rules only)'
+                            : lastOk === false
+                                ? errorMsg
+                                    ? errorMsg + ' — use the chevron for details'
+                                    : 'Some checks failed — use the chevron for details'
+                                : 'Check preview page for accessibility (bundled rules)', children: jsxs(Box, { sx: __assign({ position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 40, height: 40 }, (running && {
+                        color: RUNNING_BLUE,
+                        '& .MuiSvgIcon-root': { color: RUNNING_BLUE }
+                    })), children: [running && (jsx(Box, { sx: {
+                                position: 'absolute',
+                                inset: 0,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                pointerEvents: 'none'
+                            }, children: jsxs(Box, { component: "svg", viewBox: "0 0 40 40", sx: {
+                                    width: 36,
+                                    height: 36,
+                                    transform: 'rotate(-90deg)',
+                                    color: RUNNING_BLUE
+                                }, children: [jsx("circle", { cx: "20", cy: "20", r: "16", fill: "none", stroke: "currentColor", strokeWidth: "3", opacity: 0.2 }), jsx("circle", { cx: "20", cy: "20", r: "16", fill: "none", stroke: "currentColor", strokeWidth: "3", strokeDasharray: 2 * Math.PI * 16, strokeDashoffset: (2 * Math.PI * 16 * (100 - progress)) / 100, strokeLinecap: "round" })] }) })), jsx(IconButton, { size: "small", onClick: function () { return void runCheck(); }, disabled: !pageUrl, "aria-label": "Run accessibility checks on preview page", sx: {
+                                color: iconColor,
+                                '&:hover': { color: running ? RUNNING_BLUE : iconColor }
+                            }, children: jsx(AccessibilityNewRounded, { fontSize: "small" }) })] }) }), showChevron && (jsx(Tooltip$1, { title: issues.length > 0 ? 'Show accessibility report' : 'Show error details', children: jsx(IconButton, { ref: chevronRef, size: "small", onClick: function (e) { return setAnchorMenu(e.currentTarget); }, "aria-label": "Open accessibility report", sx: {
+                        ml: 0,
+                        flexShrink: 0,
+                        color: FAIL_RED,
+                        minWidth: 32,
+                        width: 32,
+                        height: 32
+                    }, children: jsx(KeyboardArrowDownRoundedIcon, { fontSize: "small" }) }) })), jsxs(Popover, { open: openMenu, anchorEl: anchorMenu, onClose: function () { return setAnchorMenu(null); }, anchorOrigin: { vertical: 'bottom', horizontal: 'right' }, transformOrigin: { vertical: 'top', horizontal: 'right' }, sx: { zIndex: 2000 }, PaperProps: {
+                    sx: { maxWidth: 500, maxHeight: 400, mt: 0.5 }
+                }, children: [jsx(Box, { sx: { px: 2, py: 1.5, borderBottom: 1, borderColor: 'divider' }, children: jsx(Typography$1, { variant: "subtitle2", children: issues.length > 0 ? "Issues (".concat(issues.length, ")") : 'Accessibility check' }) }), jsx(List$1, { dense: true, disablePadding: true, sx: { py: 0 }, children: issues.length > 0 ? (issues.map(function (issue, idx) {
+                            var _a, _b;
+                            return (jsxs(ListItem$1, { alignItems: "flex-start", sx: { py: 1.5, px: 2, display: 'flex', gap: 1 }, children: [jsx(ListItemText$1, { sx: { flex: 1, minWidth: 0, m: 0 }, primary: jsxs(Stack$2, { direction: "row", alignItems: "center", spacing: 1, flexWrap: "wrap", sx: { mb: 0.5 }, children: [jsx(Chip$1, { size: "small", label: issue.severity, color: (_a = SEVERITY_COLOR[issue.severity]) !== null && _a !== void 0 ? _a : 'default', variant: "outlined" }), issue.wcag && (jsxs(Typography$1, { component: "span", variant: "caption", color: "text.secondary", children: ["WCAG ", issue.wcag] }))] }), secondary: jsxs(Fragment, { children: [jsx(Typography$1, { variant: "body2", component: "span", display: "block", children: issue.message }), jsxs(Typography$1, { variant: "caption", color: "text.secondary", children: [issue.ruleId, issue.context ? " \u00B7 ".concat(issue.context) : ''] })] }) }), jsx(Box, { sx: { flexShrink: 0, alignSelf: 'flex-start' }, children: jsx(JumpToPreviewButton, { selector: issue.selector, onJump: function () { return setAnchorMenu(null); } }) })] }, "".concat(issue.ruleId, "-").concat((_b = issue.selector) !== null && _b !== void 0 ? _b : 'none', "-").concat(idx)));
+                        })) : (jsx(ListItem$1, { sx: { py: 1.5, px: 2 }, children: jsx(ListItemText$1, { primary: jsx(Typography$1, { variant: "body2", color: "text.secondary", children: errorMsg || 'No rule results. Run the check again.' }) }) })) })] })] }));
+}
+
 var plugin = {
     locales: undefined,
     scripts: undefined,
@@ -53550,8 +55910,10 @@ var plugin = {
         'org.rd.plugin.uigoodies.TranslationConfigTools': TranslationConfigTools,
         'org.rd.plugin.uigoodies.TranslationDialog': TranslationDialog,
         'org.rd.plugin.uigoodies.openTranslationPanelButton': OpenTranslationPanelButton,
-        'org.rd.plugin.uigoodies.openTranslationToolbarButton': OpenTranslationToolbarButton
+        'org.rd.plugin.uigoodies.openTranslationToolbarButton': OpenTranslationToolbarButton,
+        'org.craftercms.studio.linkcheck.toolbar': LinkCheckToolbar,
+        'org.craftercms.studio.linkcheck.a11y': A11yToolbar
     }
 };
 
-export { AudienceTargetingFlyoutToolbarButton, BulkPublishView, ComponentPreviewPathNavigator, ContentUpload, CopyCurrentPageUrl, CrossSiteContentCopy, CrossSiteContentTypeCopy, DevContentOpsTools, DeviceSimulatorFlyoutToolbarButton, EditOrViewCurrent, ImageStudio, LogTail, OpenBulkPublishPanelButton, OpenBulkPublishToolbarButton, OpenCannedSearchPanelButton, OpenCannedSearchToolbarButton, OpenContentUploadPanelButton, OpenContentUploadToolbarButton, OpenImageStudioPanelButton, OpenSearchPlayground, OpenTranslationPanelButton, OpenTranslationToolbarButton, PublishOrRequestPublish, PullPushRemoteButtons, ToolPanelAccordion, TranslationConfigTools, TranslationDialog, plugin as default };
+export { A11yToolbar, AudienceTargetingFlyoutToolbarButton, BulkPublishView, ComponentPreviewPathNavigator, ContentUpload, CopyCurrentPageUrl, CrossSiteContentCopy, CrossSiteContentTypeCopy, DevContentOpsTools, DeviceSimulatorFlyoutToolbarButton, EditOrViewCurrent, ImageStudio, LinkCheckToolbar, LogTail, OpenBulkPublishPanelButton, OpenBulkPublishToolbarButton, OpenCannedSearchPanelButton, OpenCannedSearchToolbarButton, OpenContentUploadPanelButton, OpenContentUploadToolbarButton, OpenImageStudioPanelButton, OpenSearchPlayground, OpenTranslationPanelButton, OpenTranslationToolbarButton, PublishOrRequestPublish, PullPushRemoteButtons, ToolPanelAccordion, TranslationConfigTools, TranslationDialog, plugin as default };
