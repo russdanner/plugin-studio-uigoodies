@@ -27,6 +27,7 @@ import {
   TableCell,
   TableHead,
   TableRow,
+  TextField,
   Tooltip,
   Typography,
   alpha
@@ -775,27 +776,68 @@ function DeletedBlobsPanel({
   const [loading, setLoading] = useState(false);
   const [restoringId, setRestoringId] = useState<string | null>(null);
   const [entries, setEntries] = useState<BlobDeletedEntry[]>([]);
+  const [keyword, setKeyword] = useState('');
+  const [appliedKeyword, setAppliedKeyword] = useState('');
+  const [listMeta, setListMeta] = useState<{
+    totalDeletedFound?: number;
+    truncated?: boolean;
+    scanComplete?: boolean;
+  }>({});
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
-  const loadDeleted = useCallback(() => {
+  const loadDeleted = useCallback(
+    (searchKeyword?: string) => {
+      if (!store.versioningSupported) {
+        return;
+      }
+      const q = (searchKeyword ?? appliedKeyword).trim();
+      setLoading(true);
+      setError(null);
+      firstValueFrom(fetchBlobStoreDeleted(siteId, store.id, target, 500, q))
+        .then((data) => {
+          setEntries(data.entries ?? []);
+          setListMeta({
+            totalDeletedFound: data.totalDeletedFound ?? data.entries?.length ?? 0,
+            truncated: data.truncated,
+            scanComplete: data.scanComplete
+          });
+          setAppliedKeyword(q);
+        })
+        .catch((err: Error) => {
+          setEntries([]);
+          setListMeta({});
+          setError(err.message);
+        })
+        .finally(() => setLoading(false));
+    },
+    [appliedKeyword, siteId, store.id, store.versioningSupported, target]
+  );
+
+  useEffect(() => {
+    setKeyword('');
+    setAppliedKeyword('');
     if (!store.versioningSupported) {
       return;
     }
     setLoading(true);
     setError(null);
-    firstValueFrom(fetchBlobStoreDeleted(siteId, store.id, target))
-      .then((data) => setEntries(data.entries ?? []))
+    firstValueFrom(fetchBlobStoreDeleted(siteId, store.id, target, 500, ''))
+      .then((data) => {
+        setEntries(data.entries ?? []);
+        setListMeta({
+          totalDeletedFound: data.totalDeletedFound ?? data.entries?.length ?? 0,
+          truncated: data.truncated,
+          scanComplete: data.scanComplete
+        });
+      })
       .catch((err: Error) => {
         setEntries([]);
+        setListMeta({});
         setError(err.message);
       })
       .finally(() => setLoading(false));
   }, [siteId, store.id, store.versioningSupported, target]);
-
-  useEffect(() => {
-    loadDeleted();
-  }, [loadDeleted]);
 
   const undelete = async (entry: BlobDeletedEntry) => {
     if (store.readOnly) {
@@ -839,7 +881,9 @@ function DeletedBlobsPanel({
     <Box sx={{ mt: 2 }}>
       <SectionLabel>Deleted in storage</SectionLabel>
       <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
-        Objects removed from blob storage (S3 delete markers). Restore brings back the latest non-deleted version.
+        Lists objects whose current S3 version is a delete marker (currently removed in this environment). Version
+        history may also show older delete markers from past delete/restore cycles — those are not listed here unless
+        the object is deleted again.
       </Typography>
 
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} alignItems={{ sm: 'center' }} sx={{ mb: 1 }}>
@@ -858,10 +902,44 @@ function DeletedBlobsPanel({
             ))}
           </Select>
         </FormControl>
-        <Button size="small" startIcon={<RefreshRoundedIcon />} onClick={loadDeleted} disabled={loading}>
+        <Button size="small" startIcon={<RefreshRoundedIcon />} onClick={() => loadDeleted(keyword)} disabled={loading}>
           Refresh deleted
         </Button>
+        <TextField
+          size="small"
+          label="Search path"
+          placeholder="Search path…"
+          value={keyword}
+          onChange={(e) => setKeyword(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              loadDeleted(keyword);
+            }
+          }}
+          sx={{ minWidth: 220, flex: '1 1 180px', maxWidth: 360 }}
+          inputProps={{ 'aria-label': 'Search deleted blobs by path' }}
+        />
+        <Button size="small" variant="outlined" onClick={() => loadDeleted(keyword)} disabled={loading}>
+          Search
+        </Button>
+        {entries.length > 0 && (
+          <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+            {listMeta.totalDeletedFound != null && listMeta.totalDeletedFound > entries.length
+              ? `Showing ${entries.length} of ${listMeta.totalDeletedFound} deleted`
+              : appliedKeyword
+                ? `${entries.length} match`
+                : `${entries.length} deleted`}
+          </Typography>
+        )}
       </Stack>
+
+      {listMeta.truncated && (
+        <Alert severity="info" sx={{ mb: 1 }}>
+          {listMeta.scanComplete === false
+            ? 'Scan stopped early on a large bucket. Use Search with a path fragment to find a specific deleted object.'
+            : `More than ${entries.length} currently deleted objects match this store. Refine Search or increase the limit.`}
+        </Alert>
+      )}
 
       {notice && (
         <Alert severity="success" sx={{ mb: 1 }} onClose={() => setNotice(null)}>
@@ -891,7 +969,9 @@ function DeletedBlobsPanel({
           </Box>
         ) : entries.length === 0 ? (
           <Typography variant="body2" color="text.secondary" sx={{ p: 2 }}>
-            No deleted blobs found under this store path.
+            {appliedKeyword
+              ? `No currently deleted blobs match "${appliedKeyword}" in ${target}.`
+              : `No currently deleted blobs found under this store path in ${target}.`}
           </Typography>
         ) : (
           <Table size="small" stickyHeader>

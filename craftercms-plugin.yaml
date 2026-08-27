@@ -13,7 +13,7 @@ plugin:
   version:
     major: 1
     minor: 0
-    patch: 77
+    patch: 91
   description: A plugin to adds some UI goodies to your studio
   documentation: "https://raw.githubusercontent.com/russdanner/plugin-studio-uigoodies/master/README.md"
   website:
@@ -332,49 +332,9 @@ installation:
                           attributes:
                             - name: id
                               value: "@mui/icons-material/TranslateRounded"
-  # Preview toolbar — Link check + WCAG (bundled in uigoodies index.js)
-  - type: preview-app
-    parentXpath: //widget[@id='craftercms.components.PreviewToolbar']/configuration/rightSection/widgets
-    elementXpath: //widget[@id='org.craftercms.studio.linkcheck.toolbar']
-    element:
-      name: widget
-      attributes:
-        - name: id
-          value: org.craftercms.studio.linkcheck.toolbar
-      children:
-        - name: plugin
-          attributes:
-            - name: id
-              value: org.rd.plugin.uigoodies
-            - name: site
-              value: "{site}"
-            - name: type
-              value: apps
-            - name: name
-              value: uigoodies
-            - name: file
-              value: index.js
-  - type: preview-app
-    parentXpath: //widget[@id='craftercms.components.PreviewToolbar']/configuration/rightSection/widgets
-    elementXpath: //widget[@id='org.craftercms.studio.linkcheck.a11y']
-    element:
-      name: widget
-      attributes:
-        - name: id
-          value: org.craftercms.studio.linkcheck.a11y
-      children:
-        - name: plugin
-          attributes:
-            - name: id
-              value: org.rd.plugin.uigoodies
-            - name: site
-              value: "{site}"
-            - name: type
-              value: apps
-            - name: name
-              value: uigoodies
-            - name: file
-              value: index.js
+  # Link check + WCAG toolbar widgets are NOT installed by default.
+  # Opt in via: INSTALL_LINK_CHECK_TOOLBAR=1 ./scripts/install-plugin.sh <siteId>
+  # Fragment: authoring/config/studio/ui-link-check-toolbar.append.xml
   - type: form-control
     elementXpath: //control/plugin[pluginId='org.rd.plugin.uigoodies' and name='custom-locale']
     element:

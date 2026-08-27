@@ -7,7 +7,7 @@ Locale-aware copy and translation management for multi-language CrafterCMS sites
 ## Features
 
 - **Preview toolbar** — Copy current page into another locale (mirrored path). Hidden until ≥2 locales exist in `translation-config.xml`.
-- **Form controls** — `custom-locale` (lineage) and `translation-versions` (siblings, compare, translate, remove)
+- **Form controls** — `custom-locale` (lineage) and `translation-versions` (siblings, compare, translate, remove). The Translations panel at the top of the form is collapsible; open/closed is stored per site in `localStorage` and shared across all forms for that site.
 - **REST API** — Server-side copy with new `objectId` and locale field normalization
 - **Translation Project Tool** — See [translation-config-tools.md](translation-config-tools.md)
 

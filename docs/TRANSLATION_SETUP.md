@@ -31,6 +31,16 @@ Related docs:
 
 File: `/config/studio/translation-config.xml` (module `studio`)
 
+Locale codes should match first-segment folder names under `/site/website` and `/site/components`.
+The plugin catalog includes:
+
+- **ISO 639-1** language codes (e.g. `de`, `fr`, `ja`)
+- **Common regional tags** (e.g. `en-gb`, `pt-br`, `zh-cn`)
+- **ISO 3166-1 country/market folder codes** when not already a language code (e.g. `jp`, `dk`, `se`)
+- **CMS aliases** such as `us`, `uk`, `br`, `cn`, `shared`, `global`, `common`
+
+Note: `uk` is English (UK) for folders; use `ua` / `uk-ua` for Ukrainian. Some rare ISO language codes that collide with market folders (`br`, `ae`, `sa`, `tw`, …) prefer the market label.
+
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <translation-config>
@@ -51,13 +61,13 @@ Each translatable content type needs **all** of the following in `form-definitio
 
 | Requirement | Field / control | Notes |
 |-------------|-----------------|-------|
-| Translation section | Section title `Translation` | Should be the **first** section (scaffold / bulk-add places it first) |
+| Locale / translation section | Default title `Translation` | Prefer existing titles (default: `Alternative Locale Properties`) when present; Fix keeps other fields in that section. Section is placed **last** and collapsed by default. |
 | Locale code | `localeCode_s` | `input`, **readonly** |
 | Source locale | `sourceLocaleCode_s` | `input`, **readonly** |
 | Lineage id | `localeSourceId_s` | **`custom-locale`** control (plugin) |
 | Translations UI | `translations` | **`translation-versions`** control (plugin) |
 
-**Project Tools → Translation → Content types tab** scans every content type and lists anything missing. Use **Add translation fields to selected** to bulk-add the standard section and fields.
+**Project Tools → Translation → Content types tab** scans every content type and lists anything missing. Set the form section title / preferred existing titles, then use **Fix translation setup on selected**.
 
 ### Form control plugin blocks
 
@@ -130,11 +140,13 @@ Re-run scaffold after changing locales or to fix sites that previously shared on
 
 ### Content Form
 
-Open any translatable item. The **Translations** control (first in the Translation section) shows:
+Open any translatable item. The **Translations** control (pinned at the top of the form) shows:
 
 - Locale shortcuts and translation list
 - Filter, translate, compare, remove actions
 - Links to open sibling locale items
+
+The panel is **collapsible**. Collapse/expand is remembered **per site** in the browser (`localStorage`) and applies to all forms for that site.
 
 If the control is missing: scroll to the **Translation** section, hard-refresh, verify form-definition is committed, check the browser console for `[translation-versions]` errors.
 

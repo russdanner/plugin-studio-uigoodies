@@ -79,14 +79,17 @@ export function detectLocaleFolderNames(
   return Array.from(new Set(names));
 }
 
-/** At least two configured locale folders on disk, including the site default locale (from config or `en`). */
+/** At least two locale folders on disk. When {@code baseLocale} is set, it must be among them. */
 export function isMultiLocaleLayout(localeFolders: string[], baseLocale?: string): boolean {
   if (localeFolders.length < 2) {
     return false;
   }
-  const base = (baseLocale || MULTI_LOCALE_BASE_LOCALE).toLowerCase();
-  const lower = localeFolders.map((s) => s.toLowerCase());
-  return lower.includes(base);
+  if (!baseLocale || !String(baseLocale).trim()) {
+    return true;
+  }
+  const base = String(baseLocale).trim().toLowerCase().replace(/_/g, '-');
+  const lower = localeFolders.map((s) => s.toLowerCase().replace(/_/g, '-'));
+  return lower.some((seg) => localeSegmentsCompatible(seg, base));
 }
 
 export function baseLocaleRootPath(rootDir: string, baseLocale: string = MULTI_LOCALE_BASE_LOCALE): string {

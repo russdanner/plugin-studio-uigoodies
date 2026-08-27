@@ -597,6 +597,7 @@ export function ImageStudio({ defaultPath = '/static-assets/images' }: ImageStud
         open={browseOpen}
         onClose={() => setBrowseOpen(false)}
         defaultPath={defaultPath}
+        guestOrigin={guestOrigin}
         onImageSelected={handleImageSelected}
         onError={handleError}
         loadRepoImage={loadRepoImage}

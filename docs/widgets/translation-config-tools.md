@@ -18,8 +18,11 @@
 - Scans all content types and reports Translation readiness against **all** required form pieces
 - Status **Ready** only when every requirement is present and correctly typed
 - Shows missing items, e.g. `localeCode_s (readonly input)`, `translations (translation-versions control)`
-- Bulk-adds a **Translation** section (first in form) with standard fields to selected content types
-- Re-running **Add translation fields** also reorders the Translation section to the top when needed
+- Bulk-fixes a locale/translation form section with standard fields on selected content types
+- **Form section options** (before Scan / Fix):
+  - **Section title when creating new** — default `Translation`
+  - **Prefer existing section if present** — default includes `Alternative Locale Properties` (Smart Copy). If that section already exists, Fix reuses it and **preserves** other fields in the section
+- Re-running **Fix translation setup** also moves the section last and collapses it when needed
 
 Uses Studio configuration APIs (`fetchConfigurationXML` / `writeConfiguration`) — no custom Groovy on this tab.
 
@@ -27,7 +30,7 @@ Uses Studio configuration APIs (`fetchConfigurationXML` / `writeConfiguration`) 
 
 | Requirement | Details |
 |-------------|---------|
-| Translation section | Section title `Translation` |
+| Locale / translation section | Default title `Translation`, or a preferred existing title such as `Alternative Locale Properties` |
 | `localeCode_s` | `input`, readonly `true` |
 | `sourceLocaleCode_s` | `input`, readonly `true` |
 | `localeSourceId_s` | `custom-locale` plugin control |

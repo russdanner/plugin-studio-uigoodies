@@ -209,6 +209,10 @@ export type BlobStoreDeletedResponse = {
   bucket?: string;
   prefix?: string;
   deletedCount?: number;
+  totalDeletedFound?: number;
+  truncated?: boolean;
+  scanComplete?: boolean;
+  keyword?: string;
   entries: BlobDeletedEntry[];
 };
 
@@ -239,10 +243,12 @@ export type FilterFileResult = {
   success?: boolean;
   error?: string;
   inStudio?: boolean;
-  mode?: 'cli' | string;
+  mode?: 'cli' | 'filter-repo' | 'filter-branch' | string;
   path?: string;
   repoPath?: string;
   headCommitId?: string;
+  rootCommitId?: string;
+  reingestFromCommitId?: string;
   lastProcessedCommitId?: string;
   message?: string;
   hint?: string;
@@ -308,6 +314,7 @@ export type GitLogResponse = {
   headCommitId: string;
   lastProcessedCommitId?: string;
   unprocessedCount?: number;
+  path?: string;
   commits: GitCommit[];
   skip: number;
   limit: number;
@@ -633,6 +640,7 @@ export function fetchGitLog(
     since?: number;
     until?: number;
     order?: GitLogOrder;
+    path?: string;
   }
 ) {
   const order = opts.order === 'asc' ? 'asc' : 'desc';
@@ -651,12 +659,16 @@ export function fetchGitLog(
   if (opts.until) {
     q += '&until=' + opts.until;
   }
+  if (opts.path?.trim()) {
+    q += '&path=' + encodeURIComponent(opts.path.trim());
+  }
   return pluginGet<GitLogResponse>(siteId, pluginUrl('dev-content-ops-git', siteId, q)).pipe(
     map((data) => ({
       ...data,
       branch: apiText(data.branch),
       headCommitId: apiText(data.headCommitId),
       lastProcessedCommitId: data.lastProcessedCommitId ? apiText(data.lastProcessedCommitId) : data.lastProcessedCommitId,
+      path: data.path ? apiText(data.path) : data.path,
       commits: (data.commits ?? []).map(normalizeCommit)
     }))
   );
@@ -1386,15 +1398,19 @@ export function fetchBlobStoreDeleted(
   siteId: string,
   storeId: string,
   target: 'preview' | 'staging' | 'live' = 'preview',
-  limit = 200
+  limit = 500,
+  keyword = ''
 ) {
-  const q =
+  const params =
     'action=blobStoreDeleted&storeId=' +
     encodeURIComponent(storeId) +
     '&target=' +
     encodeURIComponent(target) +
     '&limit=' +
     limit;
+  const q = keyword.trim()
+    ? params + '&q=' + encodeURIComponent(keyword.trim())
+    : params;
   return pluginGet<BlobStoreDeletedResponse>(siteId, pluginUrl('dev-content-ops-git', siteId, q)).pipe(
     map((data) =>
       assertSiteScope(siteId, {
@@ -1403,6 +1419,10 @@ export function fetchBlobStoreDeleted(
         publishingTarget: apiText(data.publishingTarget) || target,
         bucket: data.bucket ? apiText(data.bucket) : undefined,
         prefix: data.prefix ? apiText(data.prefix) : undefined,
+        totalDeletedFound: data.totalDeletedFound,
+        truncated: data.truncated,
+        scanComplete: data.scanComplete,
+        keyword: data.keyword ? apiText(data.keyword) : undefined,
         entries: (data.entries ?? []).map((entry) => ({
           path: apiText(entry.path),
           objectKey: entry.objectKey ? apiText(entry.objectKey) : undefined,

@@ -421,6 +421,55 @@ final class DevContentOpsSupport {
         }
     }
 
+    /**
+     * True when the commit changes any path containing {@code pathQuery}
+     * (case-insensitive substring). Supports extensions (.mp4), folder/file
+     * fragments (a-custom-story), and full paths.
+     */
+    static boolean commitTouchesPathQuery(Repository repo, RevWalk walk, RevCommit commit, String pathQuery) {
+        String q = jsonSafeText(pathQuery ?: '').trim().toLowerCase()
+        if (!q) {
+            return true
+        }
+        if (q.startsWith('/')) {
+            q = q.substring(1)
+        }
+        try {
+            if (commit.getParentCount() == 0) {
+                TreeWalk tw = new TreeWalk(repo)
+                try {
+                    tw.addTree(commit.getTree())
+                    tw.setRecursive(true)
+                    while (tw.next()) {
+                        String p = tw.getPathString()
+                        if (p && p.toLowerCase().contains(q)) {
+                            return true
+                        }
+                    }
+                } finally {
+                    tw.close()
+                }
+                return false
+            }
+            RevCommit parent = walk.parseCommit(commit.getParent(0))
+            Git git = Git.wrap(repo)
+            List<DiffEntry> entries = git.diff()
+                .setOldTree(treeParser(repo, walk, parent))
+                .setNewTree(treeParser(repo, walk, commit))
+                .call()
+            for (DiffEntry entry : entries) {
+                String oldP = (entry.getOldPath() ?: '').toLowerCase()
+                String newP = (entry.getNewPath() ?: '').toLowerCase()
+                if (oldP.contains(q) || newP.contains(q)) {
+                    return true
+                }
+            }
+            return false
+        } catch (Exception ignored) {
+            return false
+        }
+    }
+
     static Map fetchGitLog(
         Repository repo,
         Object sitesSvc,
@@ -432,7 +481,8 @@ final class DevContentOpsSupport {
         Long sinceEpoch,
         Long untilEpoch,
         String order,
-        ContentRepository contentRepo = null
+        ContentRepository contentRepo = null,
+        String pathFilter = null
     ) {
         def branchRef = resolveBranchRef(repo, branch)
         ObjectId startId = repo.resolve(branchRef)
@@ -443,6 +493,8 @@ final class DevContentOpsSupport {
         def processedState = resolveProcessedState(contentRepo, sitesSvc, siteId, startId.name)
         String lastProcessedCommitId = processedState.lastProcessedCommitId as String
         Set<String> unprocessedCommitIds = processedState.unprocessedCommitIds as Set<String>
+        String normalizedPathFilter = jsonSafeText(pathFilter ?: '').trim()
+        boolean hasPathQuery = normalizedPathFilter.length() > 0
 
         boolean ascending = jsonSafeText(order ?: 'desc').toLowerCase() == 'asc'
         List<Map> commits = []
@@ -464,6 +516,9 @@ final class DevContentOpsSupport {
             if (ascending) {
                 List<RevCommit> matched = []
                 for (RevCommit commit : walk) {
+                    if (hasPathQuery && !commitTouchesPathQuery(repo, walk, commit, normalizedPathFilter)) {
+                        continue
+                    }
                     matched.add(commit)
                 }
                 matched.sort { RevCommit a, RevCommit b ->
@@ -487,6 +542,9 @@ final class DevContentOpsSupport {
             } else {
                 int seen = 0
                 for (RevCommit commit : walk) {
+                    if (hasPathQuery && !commitTouchesPathQuery(repo, walk, commit, normalizedPathFilter)) {
+                        continue
+                    }
                     if (seen < skip) {
                         seen++
                         continue
@@ -508,6 +566,7 @@ final class DevContentOpsSupport {
                 headCommitId: start.getName(),
                 lastProcessedCommitId: jsonSafeText(lastProcessedCommitId ?: ''),
                 unprocessedCount: unprocessedCommitIds ? unprocessedCommitIds.size() : 0,
+                path: jsonSafeText(normalizedPathFilter),
                 commits: commits,
                 skip: skip,
                 limit: limit,

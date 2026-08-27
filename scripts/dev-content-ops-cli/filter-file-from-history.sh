@@ -3,6 +3,10 @@
 # Remove a repository-relative path from entire git history for a CrafterCMS site sandbox.
 # Uses git-filter-repo when available, otherwise git filter-branch.
 #
+# Prefer the DevContentOps UI "Remove file from history" action (plugin 1.0.80+), which
+# runs the same rewrite on the Studio server and resets the processed commit for re-ingest.
+# Keep this script for emergency/offline use when Studio cannot run the operation.
+#
 # Usage:
 #   ./filter-file-from-history.sh <siteId> <repo-relative-path> [crafter-data-dir]
 #

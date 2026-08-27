@@ -39,7 +39,8 @@ All plugin REST calls pass the selected site as `?siteId=` on the URL and `siteI
 - Set Studio **last processed commit** (`sitesService.updateLastCommitId`) and run repository sync via Studio's `syncFromRepoTask` bean (same path as `SyncFromRepoEvent`)
 - Revert working tree to commit; reset HEAD (Studio cleanup + hard reset + processed commit sync)
 - Trim History — garbage collection on the sandbox repo; resets processed commit when requested
-- **Remove file from history** — returns a **host CLI** plan (`git filter-repo`); filter-repo cannot run inside the Groovy sandbox. Run the suggested command or `scripts/dev-content-ops-cli/filter-file-from-history.sh` on the Studio host, then reset processed commit and sync.
+- **Remove file from history** — runs `git filter-repo` (or `filter-branch` fallback) on the Studio server, then clears `processed_commits`, sets `last_commit_id` to the rewritten history **root**, and triggers sync
+- **History rewrite acknowledgment** — Remove file from history, Reset HEAD, and Trim History require a checkbox confirming that history will be rewritten/discarded, commit IDs are affected, and other workflows (clones, remotes, patches, publish compare, Studio sync) will be impacted
 
 ## Branches & tags features
 
@@ -91,7 +92,14 @@ Manual merge under **`//reference[@id='craftercms.siteTools']/tools`**:
 }
 ```
 
-On success, the API updates `lastProcessedCommitId` to the new HEAD and publishes `SyncFromRepoEvent`. **Reset HEAD** and **trim history** do the same for the target commit.
+On success, the API:
+1. Rewrites sandbox history (removes the path from all commits)
+2. Reloads Studio's JGit sandbox repository cache
+3. Clears `processed_commits` for the site
+4. Sets `last_commit_id` to the rewritten history **root** (not HEAD), so `getCommitIdsBetween(root, HEAD)` re-ingests all new descendant commit ids
+5. Triggers `SyncFromRepoEvent` / `syncFromRepoTask`
+
+**Reset HEAD** and **trim history** set the processed pointer to their target commit and sync.
 
 ### `optimizeRepo` POST body
 

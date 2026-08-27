@@ -17,6 +17,7 @@ import {
   Divider,
   FormControl,
   IconButton,
+  InputAdornment,
   InputLabel,
   List,
   ListItemButton,
@@ -37,6 +38,7 @@ import RestoreRoundedIcon from '@mui/icons-material/RestoreRounded';
 import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 import KeyboardArrowRightRoundedIcon from '@mui/icons-material/KeyboardArrowRightRounded';
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import { fetchLegacySite } from '@craftercms/studio-ui/services/sites';
 import { showSystemNotification } from '@craftercms/studio-ui/state/actions/system';
 import { firstValueFrom } from 'rxjs';
@@ -44,6 +46,7 @@ import { take } from 'rxjs/operators';
 import { CommitGraphMarker } from './GitGraph';
 import { CommitFileList } from './CommitFileList';
 import { DiffViewer } from './DiffViewer';
+import HistoryRewriteConfirmDialog from './HistoryRewriteConfirmDialog';
 import { PatchBasketPanel, selectionKey } from './PatchBasketPanel';
 import {
   buildPatchFromSelection,
@@ -102,6 +105,8 @@ export function GitLogTab({ siteId, sites = [] }: Props) {
   const [lastProcessedCommitId, setLastProcessedCommitId] = useState('');
   const [sinceDate, setSinceDate] = useState('');
   const [untilDate, setUntilDate] = useState('');
+  const [pathFilterInput, setPathFilterInput] = useState('');
+  const [pathFilter, setPathFilter] = useState('');
   const [logOrder, setLogOrder] = useState<GitLogOrder>('desc');
   const [fileContent, setFileContent] = useState<{ path: string; content: string } | null>(null);
   const [diffFrom, setDiffFrom] = useState('');
@@ -122,6 +127,9 @@ export function GitLogTab({ siteId, sites = [] }: Props) {
     title: string;
     message: string;
     commit?: Pick<GitCommit, 'id' | 'shortId' | 'subject'>;
+    /** When true, require explicit history-rewrite acknowledgment before Confirm. */
+    historyRewrite?: boolean;
+    confirmLabel?: string;
     action: () => void;
   } | null>(null);
   const [apiError, setApiError] = useState<string | null>(null);
@@ -213,7 +221,15 @@ export function GitLogTab({ siteId, sites = [] }: Props) {
         const since = parseEpoch(sinceDate);
         const until = parseEpoch(untilDate);
         const data = await firstValueFrom(
-          fetchGitLog(siteId, { branch, skip, limit: LOG_LIMIT, since, until, order: logOrder })
+          fetchGitLog(siteId, {
+            branch,
+            skip,
+            limit: LOG_LIMIT,
+            since,
+            until,
+            order: logOrder,
+            path: pathFilter || undefined
+          })
         );
         if (reset) {
           setCommits(data.commits ?? []);
@@ -236,8 +252,15 @@ export function GitLogTab({ siteId, sites = [] }: Props) {
         setLoadingMore(false);
       }
     },
-    [siteId, branch, nextSkip, sinceDate, untilDate, logOrder]
+    [siteId, branch, nextSkip, sinceDate, untilDate, logOrder, pathFilter]
   );
+
+  useEffect(() => {
+    const handle = window.setTimeout(() => {
+      setPathFilter(pathFilterInput.trim());
+    }, 400);
+    return () => window.clearTimeout(handle);
+  }, [pathFilterInput]);
 
   useEffect(() => {
     let cancelled = false;
@@ -270,7 +293,7 @@ export function GitLogTab({ siteId, sites = [] }: Props) {
       loadLog(true, 0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- reload when filters change
-  }, [branch, sinceDate, untilDate, logOrder]);
+  }, [branch, sinceDate, untilDate, logOrder, pathFilter]);
 
   useEffect(() => {
     nextSkipRef.current = nextSkip;
@@ -516,7 +539,7 @@ export function GitLogTab({ siteId, sites = [] }: Props) {
     const path = file.path.startsWith('/') ? file.path.slice(1) : file.path;
     destructiveAction(
       'Remove file from history',
-      `Remove "${path}" from all history? Commit IDs will change.`,
+      `Remove "${path}" from all git history on the Studio server? The entire history will be rewritten (every commit ID changes), then Studio will reset the processed pointer and re-ingest the new history.`,
       async () => {
         try {
           const result = await firstValueFrom(
@@ -525,23 +548,25 @@ export function GitLogTab({ siteId, sites = [] }: Props) {
               path
             })
           );
-          if (result.error) {
+          if (result.error && result.success != true) {
             notify(apiText(result.error), 'error');
             setFilterFileResult(result);
             return;
           }
           setFilterFileResult(result);
           if (result.processedCommitUpdate?.error) {
-            notify(`History rewritten; sync failed: ${apiText(result.processedCommitUpdate.error)}`, 'error');
+            notify(`History rewritten; re-ingest sync failed: ${apiText(result.processedCommitUpdate.error)}`, 'error');
           } else {
-            notify(apiText(result.message) || 'History rewritten and sync triggered', result.warning ? 'error' : 'success');
+            notify(apiText(result.message) || 'History rewritten; re-ingest sync triggered', 'success');
           }
           loadStatus();
           loadLog(true);
         } catch (e) {
           notify((e as Error).message || 'Failed to remove file from history', 'error');
         }
-      }
+      },
+      commit,
+      { historyRewrite: true, confirmLabel: 'Rewrite history' }
     );
   };
 
@@ -554,6 +579,9 @@ export function GitLogTab({ siteId, sites = [] }: Props) {
       filterFileResult.warning ? apiText(filterFileResult.warning) : '',
       filterFileResult.message ? apiText(filterFileResult.message) : '',
       filterFileResult.headCommitId ? `New HEAD: ${filterFileResult.headCommitId}` : '',
+      filterFileResult.reingestFromCommitId
+        ? `Re-ingest baseline: ${filterFileResult.reingestFromCommitId}`
+        : '',
       filterFileResult.lastProcessedCommitId
         ? `Previous processed: ${filterFileResult.lastProcessedCommitId}`
         : ''
@@ -578,12 +606,15 @@ export function GitLogTab({ siteId, sites = [] }: Props) {
     title: string,
     message: string,
     action: () => Promise<void>,
-    commit?: Pick<GitCommit, 'id' | 'shortId' | 'subject'>
+    commit?: Pick<GitCommit, 'id' | 'shortId' | 'subject'>,
+    options?: { historyRewrite?: boolean; confirmLabel?: string }
   ) => {
     setConfirmDialog({
       title,
       message,
       commit,
+      historyRewrite: options?.historyRewrite,
+      confirmLabel: options?.confirmLabel,
       action: () => {
         action()
           .then(() => setConfirmDialog(null))
@@ -676,6 +707,31 @@ export function GitLogTab({ siteId, sites = [] }: Props) {
               onChange={(e) => setUntilDate(e.target.value)}
               InputLabelProps={{ shrink: true }}
               sx={{ width: 188 }}
+            />
+            <TextField
+              size="small"
+              label="Path / filename"
+              placeholder=".mp4, a-custom-story, or site/website/…"
+              value={pathFilterInput}
+              onChange={(e) => setPathFilterInput(e.target.value)}
+              sx={{ minWidth: 220, flex: '1 1 220px' }}
+              InputProps={{
+                endAdornment: pathFilterInput ? (
+                  <InputAdornment position="end">
+                    <IconButton
+                      size="small"
+                      aria-label="Clear path filter"
+                      onClick={() => {
+                        setPathFilterInput('');
+                        setPathFilter('');
+                      }}
+                      edge="end"
+                    >
+                      <CloseRoundedIcon fontSize="small" />
+                    </IconButton>
+                  </InputAdornment>
+                ) : undefined
+              }}
             />
             <Divider flexItem orientation="vertical" sx={{ alignSelf: 'stretch', my: 0.5 }} />
             <TextField
@@ -988,7 +1044,7 @@ export function GitLogTab({ siteId, sites = [] }: Props) {
                     onClick={() =>
                       destructiveAction(
                         'Reset HEAD',
-                        'Reset HEAD to this commit?',
+                        'Reset HEAD to this commit? History after this point will be discarded from the branch tip. Commit IDs before this point stay the same, but any work based on the abandoned tip will diverge.',
                         async () => {
                           const result = await firstValueFrom(
                             postDevContentOpsAction<{ processedCommitUpdate?: ProcessedCommitUpdate }>(siteId, {
@@ -1004,7 +1060,8 @@ export function GitLogTab({ siteId, sites = [] }: Props) {
                           loadStatus();
                           loadLog(true);
                         },
-                        selected
+                        selected,
+                        { historyRewrite: true, confirmLabel: 'Reset HEAD' }
                       )
                     }
                   >
@@ -1017,7 +1074,7 @@ export function GitLogTab({ siteId, sites = [] }: Props) {
                     onClick={() =>
                       destructiveAction(
                         'Trim history',
-                        'Discard history before this commit?',
+                        'Trim/discard history relative to this commit? This is a destructive history operation and can invalidate commit IDs and disrupt other workflows that depend on the current history.',
                         async () => {
                           const result = await firstValueFrom(
                             postDevContentOpsAction<{ processedCommitUpdate?: ProcessedCommitUpdate }>(siteId, {
@@ -1033,7 +1090,8 @@ export function GitLogTab({ siteId, sites = [] }: Props) {
                           loadStatus();
                           loadLog(true);
                         },
-                        selected
+                        selected,
+                        { historyRewrite: true, confirmLabel: 'Trim history' }
                       )
                     }
                   >
@@ -1091,7 +1149,7 @@ export function GitLogTab({ siteId, sites = [] }: Props) {
           {filterFileResult?.success ? 'File removed from history' : 'Remove file from history'}
         </DialogTitle>
         <DialogContent>
-          {filterFileResult?.error && (
+          {filterFileResult?.error && filterFileResult?.success != true && (
             <Alert severity="error" sx={{ mb: 2 }}>
               {apiText(filterFileResult.error)}
             </Alert>
@@ -1108,7 +1166,7 @@ export function GitLogTab({ siteId, sites = [] }: Props) {
           )}
           {filterFileResult?.processedCommitUpdate?.error && (
             <Alert severity="warning" sx={{ mb: 2 }}>
-              Sync failed: {apiText(filterFileResult.processedCommitUpdate.error)}
+              Re-ingest sync failed: {apiText(filterFileResult.processedCommitUpdate.error)}
             </Alert>
           )}
           {filterFileResult?.headCommitId && (
@@ -1116,6 +1174,18 @@ export function GitLogTab({ siteId, sites = [] }: Props) {
               <Typography variant="caption" color="text.secondary" fontWeight={600}>New HEAD commit</Typography>
               <Paper variant="outlined" sx={{ ...codeBlockSx, mb: 1.5 }}>
                 {apiText(filterFileResult.headCommitId)}
+              </Paper>
+            </>
+          )}
+          {(filterFileResult?.reingestFromCommitId || filterFileResult?.processedCommitUpdate?.commitId) && (
+            <>
+              <Typography variant="caption" color="text.secondary" fontWeight={600}>
+                Re-ingest baseline (last processed)
+              </Typography>
+              <Paper variant="outlined" sx={{ ...codeBlockSx, mb: 1.5 }}>
+                {apiText(
+                  filterFileResult.reingestFromCommitId || filterFileResult.processedCommitUpdate?.commitId || ''
+                )}
               </Paper>
             </>
           )}
@@ -1134,9 +1204,13 @@ export function GitLogTab({ siteId, sites = [] }: Props) {
             <Button
               color="primary"
               onClick={() => {
-                const head = apiText(filterFileResult.headCommitId);
+                const baseline = apiText(
+                  filterFileResult.reingestFromCommitId ||
+                    filterFileResult.processedCommitUpdate?.commitId ||
+                    filterFileResult.headCommitId
+                );
                 setFilterFileResult(null);
-                onSetProcessedCommit(head);
+                onSetProcessedCommit(baseline);
               }}
             >
               Retry sync
@@ -1146,29 +1220,43 @@ export function GitLogTab({ siteId, sites = [] }: Props) {
         </DialogActions>
       </Dialog>
 
-      <Dialog open={Boolean(confirmDialog)} onClose={() => setConfirmDialog(null)} maxWidth="sm" fullWidth>
-        <DialogTitle>{confirmDialog?.title}</DialogTitle>
-        <DialogContent>
-          <Typography variant="body2">{confirmDialog?.message}</Typography>
-          {confirmDialog?.commit && (
-            <Paper variant="outlined" sx={{ ...codeBlockSx, mt: 2 }}>
-              <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 0.75, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.6 }}>
-                Commit
-              </Typography>
-              <Typography variant="body2" sx={{ ...monoSx, wordBreak: 'break-all' }}>
-                {(confirmDialog.commit.shortId || confirmDialog.commit.id.slice(0, 8)) + ' · ' + confirmDialog.commit.id}
-              </Typography>
-              <Typography variant="body2" sx={{ mt: 1, fontWeight: 500 }}>
-                {confirmDialog.commit.subject || '(no commit message)'}
-              </Typography>
-            </Paper>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setConfirmDialog(null)}>Cancel</Button>
-          <Button color="error" onClick={() => confirmDialog?.action()}>Confirm</Button>
-        </DialogActions>
-      </Dialog>
+      {confirmDialog?.historyRewrite ? (
+        <HistoryRewriteConfirmDialog
+          open
+          title={confirmDialog.title}
+          message={confirmDialog.message}
+          commit={confirmDialog.commit}
+          confirmLabel={confirmDialog.confirmLabel || 'Rewrite history'}
+          codeBlockSx={codeBlockSx}
+          monoSx={monoSx}
+          onCancel={() => setConfirmDialog(null)}
+          onConfirm={() => confirmDialog.action()}
+        />
+      ) : (
+        <Dialog open={Boolean(confirmDialog)} onClose={() => setConfirmDialog(null)} maxWidth="sm" fullWidth>
+          <DialogTitle>{confirmDialog?.title}</DialogTitle>
+          <DialogContent>
+            <Typography variant="body2">{confirmDialog?.message}</Typography>
+            {confirmDialog?.commit && (
+              <Paper variant="outlined" sx={{ ...codeBlockSx, mt: 2 }}>
+                <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 0.75, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.6 }}>
+                  Commit
+                </Typography>
+                <Typography variant="body2" sx={{ ...monoSx, wordBreak: 'break-all' }}>
+                  {(confirmDialog.commit.shortId || confirmDialog.commit.id.slice(0, 8)) + ' · ' + confirmDialog.commit.id}
+                </Typography>
+                <Typography variant="body2" sx={{ mt: 1, fontWeight: 500 }}>
+                  {confirmDialog.commit.subject || '(no commit message)'}
+                </Typography>
+              </Paper>
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setConfirmDialog(null)}>Cancel</Button>
+            <Button color="error" onClick={() => confirmDialog?.action()}>Confirm</Button>
+          </DialogActions>
+        </Dialog>
+      )}
     </TabShell>
   );
 }

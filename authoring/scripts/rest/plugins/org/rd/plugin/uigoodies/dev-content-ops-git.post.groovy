@@ -107,13 +107,9 @@ try {
                 response.status = 400
                 return DevContentOpsSupport.errorMap('path is required')
             }
-            def filterResult = DevContentOpsSupport.filterFileFromHistory(helper, applicationContext, siteId, path, [:])
-            if (filterResult.success && filterResult.headCommitId && sitesSvc) {
-                filterResult.processedCommitUpdate = DevContentOpsSupport.setProcessedCommitAndSync(
-                    sitesSvc, applicationContext, siteId, filterResult.headCommitId as String, 500
-                )
-            }
-            return filterResult
+            // filterFileFromHistory runs filter-repo, resets processed commit for full
+            // re-ingest (history root), clears processed_commits, and triggers sync.
+            return DevContentOpsSupport.filterFileFromHistory(helper, applicationContext, siteId, path, [:])
 
         case 'trimHistory':
             def keepCommitId = DevContentOpsSupport.jsonSafeText(payload.keepCommitId ?: '')

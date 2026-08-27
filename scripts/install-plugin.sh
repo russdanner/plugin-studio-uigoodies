@@ -18,10 +18,11 @@ if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
   echo "  Builds uigoodies-components, then POST /studio/api/2/marketplace/copy." >&2
   echo "  Token: CRAFTER_STUDIO_TOKEN env or scripts/.studio-token (gitignored)." >&2
   echo "" >&2
-  echo "  SKIP_YARN_DIST=1       Skip UI build (bundle must already exist)." >&2
-  echo "  SKIP_SCRIPT_RELOAD=1   Skip Groovy script reload after copy." >&2
-  echo "  SKIP_WHITELIST=1       Do not merge sandbox whitelist fragment (default: skip)." >&2
-  echo "  SKIP_UI_XML=1          Do not merge DevContentOps / Translation into config/studio/ui.xml." >&2
+  echo "  SKIP_YARN_DIST=1              Skip UI build (bundle must already exist)." >&2
+  echo "  SKIP_SCRIPT_RELOAD=1          Skip Groovy script reload after copy." >&2
+  echo "  SKIP_WHITELIST=1              Do not merge sandbox whitelist fragment (default: skip)." >&2
+  echo "  SKIP_UI_XML=1                 Do not merge DevContentOps / Translation into config/studio/ui.xml." >&2
+  echo "  INSTALL_LINK_CHECK_TOOLBAR=1  Opt in: wire Link check + WCAG preview toolbar widgets." >&2
   echo "" >&2
   echo "IMPORTANT: marketplace/copy reads 'path' from the Studio server's filesystem." >&2
   echo "  Run this script ON the Studio host (or set path to a clone on that host)." >&2
@@ -138,21 +139,17 @@ echo ""
 echo "marketplace/copy finished."
 
 sync_git_cli_runner() {
-  # UigoodiesGitCliRunner was removed; delete stale copies from older installs.
-  local stale_plugin="${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox/config/studio/scripts/classes/plugins/org/rd/plugin/uigoodies/UigoodiesGitCliRunner.groovy"
+  # Remove misplaced copies under Studio's package path only; keep the plugin class.
   local stale_studio="${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox/config/studio/scripts/classes/org/craftercms/studio/impl/v2/utils/git/UigoodiesGitCliRunner.groovy"
-  for stale in "${stale_plugin}" "${stale_studio}"; do
-    if [[ ! -f "${stale}" ]]; then
-      continue
-    fi
+  if [[ -f "${stale_studio}" ]]; then
     if git -C "${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-      local rel="${stale#${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox/}"
-      git -C "${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox" rm -f "${rel}" 2>/dev/null || rm -f "${stale}"
+      local rel="${stale_studio#${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox/}"
+      git -C "${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox" rm -f "${rel}" 2>/dev/null || rm -f "${stale_studio}"
     else
-      rm -f "${stale}"
+      rm -f "${stale_studio}"
     fi
-    echo "Removed stale UigoodiesGitCliRunner: ${stale}"
-  done
+    echo "Removed misplaced UigoodiesGitCliRunner: ${stale_studio}"
+  fi
 }
 
 sync_git_cli_runner
@@ -432,7 +429,7 @@ elif [[ "${SKIP_UI_XML:-}" != "1" && ! -f "${SITE_UI_XML}" ]]; then
   echo "Note: site ui.xml not found — merge Translation toolbar manually (see docs/widgets/translation-tools.md)."
 fi
 
-if [[ "${SKIP_UI_XML:-}" != "1" && -f "${SITE_UI_XML}" && -f "${UI_LINK_CHECK_TOOLBAR_FRAGMENT}" ]]; then
+if [[ "${INSTALL_LINK_CHECK_TOOLBAR:-}" == "1" && "${SKIP_UI_XML:-}" != "1" && -f "${SITE_UI_XML}" && -f "${UI_LINK_CHECK_TOOLBAR_FRAGMENT}" ]]; then
   echo "Patching link-check / WCAG toolbar widgets in config/studio/ui.xml..."
   python3 - "${SITE_UI_XML}" "${UI_LINK_CHECK_TOOLBAR_FRAGMENT}" "${LINK_CHECK_TOOLBAR_WIDGET_ID}" "${LINK_CHECK_A11Y_WIDGET_ID}" <<'PY'
 import re

@@ -94,9 +94,10 @@ try {
                 branchName = 'master'
             }
             def order = DevContentOpsSupport.jsonSafeText(params.order ?: 'desc')
+            def pathFilter = DevContentOpsSupport.jsonSafeText(params.path ?: '')
             def logRepo = DevContentOpsSupport.openSandboxRepo(helper, siteId)
             return DevContentOpsSupport.fetchGitLog(
-                logRepo, sitesSvc, processedDao, siteId, branchName, skip, limit, since, until, order, contentRepo
+                logRepo, sitesSvc, processedDao, siteId, branchName, skip, limit, since, until, order, contentRepo, pathFilter
             )
 
         case 'commit':
@@ -292,6 +293,7 @@ try {
             def deletedStoreId = DevContentOpsSupport.jsonSafeText(params.storeId ?: '')
             def deletedTarget = DevContentOpsSupport.jsonSafeText(params.target ?: 'preview')
             def deletedLimit = DevContentOpsSupport.toLong(params.limit, 200L) as int
+            def deletedKeyword = DevContentOpsSupport.jsonSafeText(params.q ?: params.keyword ?: '')
             if (!deletedStoreId) {
                 response.status = 400
                 return DevContentOpsSupport.errorMap('storeId is required')
@@ -299,7 +301,7 @@ try {
             return DevContentOpsSupport.withSiteId(
                 siteId,
                 DevContentOpsBlobStoreSupport.listDeletedBlobs(
-                    applicationContext, contentRepo, siteId, deletedStoreId, deletedTarget, deletedLimit
+                    applicationContext, contentRepo, siteId, deletedStoreId, deletedTarget, deletedLimit, deletedKeyword
                 ) as Map
             )
 

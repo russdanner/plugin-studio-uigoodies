@@ -6,7 +6,7 @@ const Button = craftercms.libs.MaterialUI.Button && Object.prototype.hasOwnPrope
 const SystemIcon = craftercms.components.SystemIcon && Object.prototype.hasOwnProperty.call(craftercms.components.SystemIcon, 'default') ? craftercms.components.SystemIcon['default'] : craftercms.components.SystemIcon;
 const { isItemLockedForMe } = craftercms.utils.content;
 const React = craftercms.libs.React;
-const { useState, useRef, useEffect, useMemo, useCallback, createContext, useSyncExternalStore, useId, useImperativeHandle, useLayoutEffect, useContext, forwardRef } = craftercms.libs.React;
+const { useState, useRef, useEffect, useMemo, useCallback, createContext, useSyncExternalStore, useId, useImperativeHandle, useLayoutEffect, useContext, forwardRef, createElement } = craftercms.libs.React;
 const React__default = craftercms.libs.React && Object.prototype.hasOwnProperty.call(craftercms.libs.React, 'default') ? craftercms.libs.React['default'] : craftercms.libs.React;
 const { SystemIcon: SystemIcon$1, WidgetsGrid, DialogBody, DialogFooter: DialogFooter$1, DialogHeader, BasePathSelector } = craftercms.components;
 const ExpandMore = craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreOutlined') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreOutlined'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreOutlined')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreOutlined');
@@ -105,6 +105,7 @@ const ContentPasteRoundedIcon = craftercms.utils.constants.components.get('@mui/
 const CloseRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/CloseRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/CloseRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/CloseRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/CloseRounded');
 const FolderRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/FolderRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/FolderRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/FolderRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/FolderRounded');
 const ImageRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/ImageRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ImageRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ImageRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ImageRounded');
+const { search } = craftercms.services.search;
 const AccountTreeRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/AccountTreeRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/AccountTreeRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/AccountTreeRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/AccountTreeRounded');
 const CompareArrowsRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/CompareArrowsRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/CompareArrowsRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/CompareArrowsRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/CompareArrowsRounded');
 const HistoryRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/HistoryRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/HistoryRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/HistoryRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/HistoryRounded');
@@ -45606,9 +45607,26 @@ function ImageStudioWelcome(_a) {
                     } })] }) }));
 }
 
+var IMAGE_MIME_TYPES = [
+    'image/png',
+    'image/jpeg',
+    'image/gif',
+    'image/svg+xml',
+    'image/webp',
+    'image/bmp',
+    'image/x-icon',
+    'image/vnd.microsoft.icon'
+];
+var IMAGE_EXT_RE = /\.(png|jpe?g|gif|svg|webp|bmp|ico)$/i;
 function isImageAsset(item) {
     var _a;
-    return item.systemType === 'asset' && ((_a = item.mimeType) === null || _a === void 0 ? void 0 : _a.startsWith('image/'));
+    if ((_a = item.mimeType) === null || _a === void 0 ? void 0 : _a.startsWith('image/')) {
+        return true;
+    }
+    if (item.systemType === 'asset' && IMAGE_EXT_RE.test(item.path || '')) {
+        return true;
+    }
+    return IMAGE_EXT_RE.test(item.path || '');
 }
 function pathSegments(path) {
     var parts = path.replace(/\/$/, '').split('/').filter(Boolean);
@@ -45621,14 +45639,87 @@ function pathSegments(path) {
     }
     return segments;
 }
+function itemName(item) {
+    if ('label' in item && item.label) {
+        return item.label;
+    }
+    if ('name' in item && item.name) {
+        return item.name;
+    }
+    return item.path.split('/').pop() || item.path;
+}
+function matchesNameQuery(item, query) {
+    var q = query.trim().toLowerCase();
+    if (!q) {
+        return true;
+    }
+    var name = itemName(item).toLowerCase();
+    var path = (item.path || '').toLowerCase();
+    return name.includes(q) || path.includes(q);
+}
+function escapeRegex(value) {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+/** OpenSearch path filter: everything under the folder (recursive). */
+function recursivePathFilter(folderPath) {
+    var normalized = folderPath.replace(/\/+$/, '') || '/';
+    return "".concat(escapeRegex(normalized), "/.*");
+}
+function previewSrc(item, guestOrigin) {
+    if (item.previewUrl) {
+        return item.previewUrl;
+    }
+    if (guestOrigin && item.path) {
+        return "".concat(guestOrigin.replace(/\/$/, '')).concat(item.path.startsWith('/') ? item.path : "/".concat(item.path));
+    }
+    return item.path || undefined;
+}
+function searchItemToBrowseImage(item) {
+    return {
+        path: item.path,
+        name: item.name,
+        label: item.name,
+        previewUrl: item.previewUrl,
+        mimeType: item.mimeType
+    };
+}
+function ImageThumb(_a) {
+    var item = _a.item, guestOrigin = _a.guestOrigin;
+    var _b = useState(false), failed = _b[0], setFailed = _b[1];
+    var src = previewSrc(item, guestOrigin);
+    if (!src || failed) {
+        return (jsx(Box$1, { sx: {
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                bgcolor: 'action.selected'
+            }, children: jsx(ImageRoundedIcon, { color: "primary" }) }));
+    }
+    return (jsx(Box$1, { component: "img", src: src, alt: itemName(item), loading: "lazy", onError: function () { return setFailed(true); }, sx: {
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            display: 'block'
+        } }));
+}
 function ImageRepoBrowserDialog(_a) {
     var _this = this;
-    var open = _a.open, onClose = _a.onClose, defaultPath = _a.defaultPath, onImageSelected = _a.onImageSelected, onError = _a.onError, loadRepoImage = _a.loadRepoImage;
+    var open = _a.open, onClose = _a.onClose, defaultPath = _a.defaultPath, guestOrigin = _a.guestOrigin, onImageSelected = _a.onImageSelected, onError = _a.onError, loadRepoImage = _a.loadRepoImage;
     var siteId = useActiveSiteId();
     var _b = useState(defaultPath), browsePath = _b[0], setBrowsePath = _b[1];
-    var _c = useState([]), items = _c[0], setItems = _c[1];
-    var _d = useState(false), loading = _d[0], setLoading = _d[1];
-    var _e = useState(false), loadingImage = _e[0], setLoadingImage = _e[1];
+    var _c = useState(''), nameQuery = _c[0], setNameQuery = _c[1];
+    var _d = useState(''), debouncedQuery = _d[0], setDebouncedQuery = _d[1];
+    var _e = useState([]), items = _e[0], setItems = _e[1];
+    var _f = useState(null), searchImages = _f[0], setSearchImages = _f[1];
+    var _g = useState(false), loading = _g[0], setLoading = _g[1];
+    var _h = useState(false), searching = _h[0], setSearching = _h[1];
+    var _j = useState(false), loadingImage = _j[0], setLoadingImage = _j[1];
+    var onErrorRef = useRef(onError);
+    onErrorRef.current = onError;
+    var searchSubRef = useRef(null);
+    var wasOpenRef = useRef(false);
     var loadFolder = useCallback(function (path) { return __awaiter(_this, void 0, void 0, function () {
         var response, list, i, item, e_1;
         return __generator(this, function (_a) {
@@ -45658,7 +45749,7 @@ function ImageRepoBrowserDialog(_a) {
                     return [3 /*break*/, 5];
                 case 3:
                     e_1 = _a.sent();
-                    onError(e_1.message);
+                    onErrorRef.current(e_1.message);
                     return [3 /*break*/, 5];
                 case 4:
                     setLoading(false);
@@ -45666,15 +45757,80 @@ function ImageRepoBrowserDialog(_a) {
                 case 5: return [2 /*return*/];
             }
         });
-    }); }, [siteId, onError]);
+    }); }, [siteId]);
+    // Reset only when the dialog opens (not when loadFolder identity changes).
     useEffect(function () {
-        if (open) {
+        if (open && !wasOpenRef.current) {
             setBrowsePath(defaultPath);
+            setNameQuery('');
+            setDebouncedQuery('');
+            setSearchImages(null);
             loadFolder(defaultPath);
         }
+        wasOpenRef.current = open;
     }, [open, defaultPath, loadFolder]);
-    var folders = useMemo(function () { return items.filter(function (item) { return item.systemType === 'folder'; }); }, [items]);
-    var images = useMemo(function () { return items.filter(isImageAsset); }, [items]);
+    useEffect(function () {
+        var handle = window.setTimeout(function () { return setDebouncedQuery(nameQuery.trim()); }, 350);
+        return function () { return window.clearTimeout(handle); };
+    }, [nameQuery]);
+    // Recursive site search when the user types a name (scoped under the current browse folder).
+    useEffect(function () {
+        var _a;
+        (_a = searchSubRef.current) === null || _a === void 0 ? void 0 : _a.unsubscribe();
+        searchSubRef.current = null;
+        if (!open || !siteId || !debouncedQuery) {
+            setSearchImages(null);
+            setSearching(false);
+            return;
+        }
+        setSearching(true);
+        var sub = search(siteId, {
+            keywords: debouncedQuery,
+            path: recursivePathFilter(browsePath),
+            offset: 0,
+            limit: 60,
+            sortBy: '_score',
+            sortOrder: 'desc',
+            filters: {
+                'mime-type': IMAGE_MIME_TYPES
+            }
+        }).subscribe({
+            next: function (result) {
+                var _a;
+                var found = ((_a = result === null || result === void 0 ? void 0 : result.items) !== null && _a !== void 0 ? _a : [])
+                    .filter(function (item) { var _a; return (item === null || item === void 0 ? void 0 : item.path) && (((_a = item.mimeType) === null || _a === void 0 ? void 0 : _a.startsWith('image/')) || IMAGE_EXT_RE.test(item.path)); })
+                    .map(searchItemToBrowseImage);
+                setSearchImages(found);
+                setSearching(false);
+            },
+            error: function (e) {
+                setSearchImages([]);
+                setSearching(false);
+                onErrorRef.current((e === null || e === void 0 ? void 0 : e.message) || 'Image search failed');
+            }
+        });
+        searchSubRef.current = sub;
+        return function () {
+            sub.unsubscribe();
+        };
+    }, [open, siteId, debouncedQuery, browsePath]);
+    var isSearching = Boolean(debouncedQuery);
+    var folders = useMemo(function () {
+        return isSearching
+            ? []
+            : items.filter(function (item) { return item.systemType === 'folder' && matchesNameQuery(item, nameQuery); });
+    }, [items, nameQuery, isSearching]);
+    var folderImages = useMemo(function () {
+        return items
+            .filter(function (item) { return isImageAsset(item) && matchesNameQuery(item, nameQuery); })
+            .map(function (item) { return ({
+            path: item.path,
+            label: item.label,
+            previewUrl: item.previewUrl,
+            mimeType: item.mimeType
+        }); });
+    }, [items, nameQuery]);
+    var images = isSearching ? searchImages !== null && searchImages !== void 0 ? searchImages : [] : folderImages;
     var crumbs = useMemo(function () { return pathSegments(browsePath); }, [browsePath]);
     var openRepoImage = function (path, name) { return __awaiter(_this, void 0, void 0, function () {
         var dataUrl, e_2;
@@ -45702,15 +45858,26 @@ function ImageRepoBrowserDialog(_a) {
             }
         });
     }); };
-    return (jsxs(Dialog, { open: open, onClose: onClose, maxWidth: "sm", fullWidth: true, children: [jsxs(DialogTitle, { sx: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', pb: 1 }, children: [jsx(Typography, { variant: "h6", component: "span", children: "Browse images" }), jsx(IconButton$1, { size: "small", onClick: onClose, "aria-label": "Close", children: jsx(CloseRoundedIcon, {}) })] }), jsxs(DialogContent, { sx: { pt: 0 }, children: [jsx(Breadcrumbs, { sx: { mb: 1.5, flexWrap: 'wrap' }, children: crumbs.map(function (segment, index) {
+    return (jsxs(Dialog, { open: open, onClose: onClose, maxWidth: "md", fullWidth: true, children: [jsxs(DialogTitle, { sx: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', pb: 1 }, children: [jsx(Typography, { variant: "h6", component: "span", children: "Browse images" }), jsx(IconButton$1, { size: "small", onClick: onClose, "aria-label": "Close", children: jsx(CloseRoundedIcon, {}) })] }), jsxs(DialogContent, { sx: { pt: 0 }, children: [jsx(Breadcrumbs, { sx: { mb: 1.5, flexWrap: 'wrap' }, children: crumbs.map(function (segment, index) {
                             var label = segment.split('/').pop() || '/';
                             var isLast = index === crumbs.length - 1;
-                            return isLast ? (jsx(Typography, { variant: "body2", color: "text.primary", children: label }, segment)) : (jsx(Link, { component: "button", variant: "body2", underline: "hover", onClick: function () { return loadFolder(segment); }, children: label }, segment));
+                            return isLast ? (jsx(Typography, { variant: "body2", color: "text.primary", children: label }, segment)) : (jsx(Link, { component: "button", variant: "body2", underline: "hover", onClick: function () {
+                                    setNameQuery('');
+                                    setDebouncedQuery('');
+                                    loadFolder(segment);
+                                }, children: label }, segment));
                         }) }), jsx(TextField$1, { size: "small", fullWidth: true, label: "Folder path", value: browsePath, onChange: function (e) { return setBrowsePath(e.target.value); }, onKeyDown: function (e) {
                             if (e.key === 'Enter') {
+                                setNameQuery('');
+                                setDebouncedQuery('');
                                 loadFolder(browsePath);
                             }
-                        }, sx: { mb: 1.5 } }), jsxs(Box$1, { sx: { position: 'relative', minHeight: 280, maxHeight: 360, overflow: 'auto', borderRadius: 1, bgcolor: 'action.hover' }, children: [(loading || loadingImage) && (jsx(Box$1, { sx: {
+                        }, sx: { mb: 1.5 } }), jsx(TextField$1, { size: "small", fullWidth: true, label: "Search by name", placeholder: "Find images under this folder by filename\u2026", value: nameQuery, onChange: function (e) { return setNameQuery(e.target.value); }, sx: { mb: 1.5 }, InputProps: {
+                            startAdornment: (jsx(InputAdornment, { position: "start", children: jsx(SearchRoundedIcon, { fontSize: "small", color: "action" }) })),
+                            endAdornment: nameQuery ? (jsx(InputAdornment, { position: "end", children: jsx(IconButton$1, { size: "small", "aria-label": "Clear name search", onClick: function () { return setNameQuery(''); }, edge: "end", children: jsx(CloseRoundedIcon, { fontSize: "small" }) }) })) : undefined
+                        }, helperText: isSearching
+                            ? "Searching under ".concat(browsePath, "\u2026")
+                            : 'Leave empty to browse this folder. Type a name to search nested folders.' }), jsxs(Box$1, { sx: { position: 'relative', minHeight: 320, maxHeight: 440, overflow: 'auto', borderRadius: 1, bgcolor: 'action.hover', p: 1 }, children: [(loading || searching || loadingImage) && (jsx(Box$1, { sx: {
                                     position: 'absolute',
                                     inset: 0,
                                     display: 'flex',
@@ -45718,9 +45885,30 @@ function ImageRepoBrowserDialog(_a) {
                                     justifyContent: 'center',
                                     bgcolor: 'rgba(255,255,255,0.6)',
                                     zIndex: 1
-                                }, children: jsx(CircularProgress, { size: 28 }) })), jsxs(List, { dense: true, disablePadding: true, children: [folders.map(function (folder) { return (jsxs(ListItemButton, { onClick: function () { return loadFolder(folder.path); }, children: [jsx(ListItemIcon, { sx: { minWidth: 36 }, children: jsx(FolderRoundedIcon, { fontSize: "small", color: "action" }) }), jsx(ListItemText, { primary: folder.label || folder.path.split('/').pop() })] }, folder.path)); }), images.map(function (image) { return (jsxs(ListItemButton, { onClick: function () {
-                                            return openRepoImage(image.path, image.label || image.path.split('/').pop() || image.path);
-                                        }, children: [jsx(ListItemIcon, { sx: { minWidth: 36 }, children: jsx(ImageRoundedIcon, { fontSize: "small", color: "primary" }) }), jsx(ListItemText, { primary: image.label || image.path.split('/').pop(), secondary: image.path, secondaryTypographyProps: { noWrap: true } })] }, image.path)); }), !loading && !folders.length && !images.length && (jsx(Box$1, { sx: { p: 3, textAlign: 'center' }, children: jsx(Typography, { variant: "body2", color: "text.secondary", children: "No images in this folder." }) }))] })] })] })] }));
+                                }, children: jsx(CircularProgress, { size: 28 }) })), folders.length > 0 && (jsx(List, { dense: true, disablePadding: true, sx: { mb: images.length ? 1 : 0 }, children: folders.map(function (folder) { return (jsxs(ListItemButton, { onClick: function () { return loadFolder(folder.path); }, sx: { borderRadius: 1 }, children: [jsx(ListItemIcon, { sx: { minWidth: 36 }, children: jsx(FolderRoundedIcon, { fontSize: "small", color: "action" }) }), jsx(ListItemText, { primary: itemName(folder) })] }, folder.path)); }) })), images.length > 0 && (jsx(Box$1, { sx: {
+                                    display: 'grid',
+                                    gridTemplateColumns: 'repeat(auto-fill, minmax(128px, 1fr))',
+                                    gap: 1
+                                }, children: images.map(function (image) {
+                                    var name = itemName(image);
+                                    return (jsxs(Box$1, { component: "button", type: "button", onClick: function () { return openRepoImage(image.path, name); }, title: image.path, sx: {
+                                            appearance: 'none',
+                                            border: 1,
+                                            borderColor: 'divider',
+                                            borderRadius: 1,
+                                            p: 0,
+                                            m: 0,
+                                            bgcolor: 'background.paper',
+                                            cursor: 'pointer',
+                                            overflow: 'hidden',
+                                            textAlign: 'left',
+                                            transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+                                            '&:hover': {
+                                                borderColor: 'primary.main',
+                                                boxShadow: 1
+                                            }
+                                        }, children: [jsx(Box$1, { sx: { width: '100%', aspectRatio: '1 / 1', bgcolor: 'action.hover' }, children: jsx(ImageThumb, { item: image, guestOrigin: guestOrigin }) }), jsxs(Box$1, { sx: { px: 1, py: 0.75 }, children: [jsx(Typography, { variant: "caption", noWrap: true, display: "block", fontWeight: 600, children: name }), jsx(Typography, { variant: "caption", color: "text.secondary", noWrap: true, display: "block", children: image.path })] })] }, image.path));
+                                }) })), !loading && !searching && !folders.length && !images.length && (jsx(Box$1, { sx: { p: 3, textAlign: 'center' }, children: jsx(Typography, { variant: "body2", color: "text.secondary", children: isSearching ? 'No matching images found.' : 'No images in this folder.' }) }))] })] })] }));
 }
 
 var TOOL_OPTIONS = [
@@ -46067,7 +46255,7 @@ function ImageStudio(_a) {
                                                     color: 'primary.main'
                                                 }
                                             }
-                                        }, children: TOOL_OPTIONS.map(function (opt) { return (jsxs(ToggleButton, { value: opt.value, children: [opt.icon, opt.label] }, opt.value)); }) })] }))] }), jsxs(Box$1, { sx: { flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }, children: [mainTab === 'requirements' && (jsx(Box$1, { sx: { flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', p: 1.5, overflow: 'hidden' }, children: jsx(ImageSizeRequirementsPanel, { active: mainTab === 'requirements', appliedFieldId: appliedFieldId, onApplyConstraints: handleApplyConstraints, currentWidth: previewDimensions === null || previewDimensions === void 0 ? void 0 : previewDimensions.width, currentHeight: previewDimensions === null || previewDimensions === void 0 ? void 0 : previewDimensions.height }) })), mainTab === 'studio' && !loaded && (jsx(ImageStudioWelcome, { onFile: handleLocalFile, onBrowseRequest: function () { return setBrowseOpen(true); } })), mainTab === 'studio' && loaded && (jsx(Box$1, { sx: { flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', px: 1.5, py: 1 }, children: jsx(ImageStudioEditor, { imageSrc: loaded.dataUrl, tool: tool, adjustments: adjustments, onAdjustmentsChange: handleAdjustmentsChange, focal: focal, onFocalChange: setFocal, croppedAreaPixels: croppedAreaPixels, onCroppedAreaPixelsChange: setCroppedAreaPixels, aspect: aspect, onAspectChange: setAspect, outputWidth: outputWidth, outputHeight: outputHeight, onOutputWidthChange: setOutputWidth, onOutputHeightChange: setOutputHeight, lockOutputAspect: lockOutputAspect, onLockOutputAspectChange: setLockOutputAspect, outputBackground: outputBackground, onOutputBackgroundChange: setOutputBackground, onReset: resetEdits, filterPresetId: filterPresetId, onSelectFilterPreset: handleSelectFilterPreset, onTintChange: handleTintChange, drawState: drawState, onDrawStateChange: setDrawState, drawTool: drawTool, onDrawToolChange: setDrawTool, brushColor: brushColor, onBrushColorChange: setBrushColor, brushSize: brushSize, onBrushSizeChange: setBrushSize, textFontFamily: textFontFamily, onTextFontFamilyChange: setTextFontFamily, textFontSize: textFontSize, onTextFontSizeChange: setTextFontSize, canvasView: canvasView, onCanvasViewChange: setCanvasView, onApplyCrop: handleApplyCrop, applyingCrop: applyingCrop }) }))] })] }), jsx(Divider, {}), jsx(DialogFooter$1, { sx: { px: 2.5, py: 1.5, bgcolor: 'background.paper' }, children: jsxs(Stack$1, { direction: "row", alignItems: "center", justifyContent: "space-between", width: "100%", children: [loaded && previewDimensions ? (jsx(Chip, { size: "small", variant: "outlined", label: "".concat(previewDimensions.width, " \u00D7 ").concat(previewDimensions.height, "px"), sx: { fontWeight: 500 } })) : (jsx(Box$1, {})), jsx(MyLoadingButton, { variant: "contained", startIcon: jsx(SaveRoundedIcon, {}), disabled: !loaded, loading: saving, onClick: function () { return loaded && setSaveOpen(true); }, children: "Save image" })] }) }), jsx(ImageRepoBrowserDialog, { open: browseOpen, onClose: function () { return setBrowseOpen(false); }, defaultPath: defaultPath, onImageSelected: handleImageSelected, onError: handleError, loadRepoImage: loadRepoImage }), jsx(ImageStudioSaveDialog, { open: saveOpen, onClose: function () { return setSaveOpen(false); }, onSave: handleSave, saving: saving, defaultFolder: (loaded === null || loaded === void 0 ? void 0 : loaded.sourcePath) ? loaded.sourcePath.substring(0, loaded.sourcePath.lastIndexOf('/')) : defaultPath, sourcePath: loaded === null || loaded === void 0 ? void 0 : loaded.sourcePath, suggestedName: suggestedSaveName })] }));
+                                        }, children: TOOL_OPTIONS.map(function (opt) { return (jsxs(ToggleButton, { value: opt.value, children: [opt.icon, opt.label] }, opt.value)); }) })] }))] }), jsxs(Box$1, { sx: { flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }, children: [mainTab === 'requirements' && (jsx(Box$1, { sx: { flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', p: 1.5, overflow: 'hidden' }, children: jsx(ImageSizeRequirementsPanel, { active: mainTab === 'requirements', appliedFieldId: appliedFieldId, onApplyConstraints: handleApplyConstraints, currentWidth: previewDimensions === null || previewDimensions === void 0 ? void 0 : previewDimensions.width, currentHeight: previewDimensions === null || previewDimensions === void 0 ? void 0 : previewDimensions.height }) })), mainTab === 'studio' && !loaded && (jsx(ImageStudioWelcome, { onFile: handleLocalFile, onBrowseRequest: function () { return setBrowseOpen(true); } })), mainTab === 'studio' && loaded && (jsx(Box$1, { sx: { flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', px: 1.5, py: 1 }, children: jsx(ImageStudioEditor, { imageSrc: loaded.dataUrl, tool: tool, adjustments: adjustments, onAdjustmentsChange: handleAdjustmentsChange, focal: focal, onFocalChange: setFocal, croppedAreaPixels: croppedAreaPixels, onCroppedAreaPixelsChange: setCroppedAreaPixels, aspect: aspect, onAspectChange: setAspect, outputWidth: outputWidth, outputHeight: outputHeight, onOutputWidthChange: setOutputWidth, onOutputHeightChange: setOutputHeight, lockOutputAspect: lockOutputAspect, onLockOutputAspectChange: setLockOutputAspect, outputBackground: outputBackground, onOutputBackgroundChange: setOutputBackground, onReset: resetEdits, filterPresetId: filterPresetId, onSelectFilterPreset: handleSelectFilterPreset, onTintChange: handleTintChange, drawState: drawState, onDrawStateChange: setDrawState, drawTool: drawTool, onDrawToolChange: setDrawTool, brushColor: brushColor, onBrushColorChange: setBrushColor, brushSize: brushSize, onBrushSizeChange: setBrushSize, textFontFamily: textFontFamily, onTextFontFamilyChange: setTextFontFamily, textFontSize: textFontSize, onTextFontSizeChange: setTextFontSize, canvasView: canvasView, onCanvasViewChange: setCanvasView, onApplyCrop: handleApplyCrop, applyingCrop: applyingCrop }) }))] })] }), jsx(Divider, {}), jsx(DialogFooter$1, { sx: { px: 2.5, py: 1.5, bgcolor: 'background.paper' }, children: jsxs(Stack$1, { direction: "row", alignItems: "center", justifyContent: "space-between", width: "100%", children: [loaded && previewDimensions ? (jsx(Chip, { size: "small", variant: "outlined", label: "".concat(previewDimensions.width, " \u00D7 ").concat(previewDimensions.height, "px"), sx: { fontWeight: 500 } })) : (jsx(Box$1, {})), jsx(MyLoadingButton, { variant: "contained", startIcon: jsx(SaveRoundedIcon, {}), disabled: !loaded, loading: saving, onClick: function () { return loaded && setSaveOpen(true); }, children: "Save image" })] }) }), jsx(ImageRepoBrowserDialog, { open: browseOpen, onClose: function () { return setBrowseOpen(false); }, defaultPath: defaultPath, guestOrigin: guestOrigin, onImageSelected: handleImageSelected, onError: handleError, loadRepoImage: loadRepoImage }), jsx(ImageStudioSaveDialog, { open: saveOpen, onClose: function () { return setSaveOpen(false); }, onSave: handleSave, saving: saving, defaultFolder: (loaded === null || loaded === void 0 ? void 0 : loaded.sourcePath) ? loaded.sourcePath.substring(0, loaded.sourcePath.lastIndexOf('/')) : defaultPath, sourcePath: loaded === null || loaded === void 0 ? void 0 : loaded.sourcePath, suggestedName: suggestedSaveName })] }));
 }
 function mimeTypeForPath(path) {
     var _a;
@@ -46303,6 +46491,7 @@ function postWorkTreeResetHard(siteId) {
     });
 }
 function fetchGitLog(siteId, opts) {
+    var _a;
     var order = opts.order === 'asc' ? 'asc' : 'desc';
     var q = 'action=log&branch=' +
         encodeURIComponent(opts.branch) +
@@ -46318,9 +46507,12 @@ function fetchGitLog(siteId, opts) {
     if (opts.until) {
         q += '&until=' + opts.until;
     }
+    if ((_a = opts.path) === null || _a === void 0 ? void 0 : _a.trim()) {
+        q += '&path=' + encodeURIComponent(opts.path.trim());
+    }
     return pluginGet(siteId, pluginUrl('dev-content-ops-git', siteId, q)).pipe(map(function (data) {
         var _a;
-        return (__assign(__assign({}, data), { branch: apiText(data.branch), headCommitId: apiText(data.headCommitId), lastProcessedCommitId: data.lastProcessedCommitId ? apiText(data.lastProcessedCommitId) : data.lastProcessedCommitId, commits: ((_a = data.commits) !== null && _a !== void 0 ? _a : []).map(normalizeCommit) }));
+        return (__assign(__assign({}, data), { branch: apiText(data.branch), headCommitId: apiText(data.headCommitId), lastProcessedCommitId: data.lastProcessedCommitId ? apiText(data.lastProcessedCommitId) : data.lastProcessedCommitId, path: data.path ? apiText(data.path) : data.path, commits: ((_a = data.commits) !== null && _a !== void 0 ? _a : []).map(normalizeCommit) }));
     }));
 }
 function fetchGitCommitDetail(siteId, commitId) {
@@ -46660,18 +46852,21 @@ function fetchBlobStoreVersions(siteId, storeId, path, target) {
             }); }) }));
     }));
 }
-function fetchBlobStoreDeleted(siteId, storeId, target, limit) {
+function fetchBlobStoreDeleted(siteId, storeId, target, limit, keyword) {
     if (target === void 0) { target = 'preview'; }
-    if (limit === void 0) { limit = 200; }
-    var q = 'action=blobStoreDeleted&storeId=' +
+    if (keyword === void 0) { keyword = ''; }
+    var params = 'action=blobStoreDeleted&storeId=' +
         encodeURIComponent(storeId) +
         '&target=' +
         encodeURIComponent(target) +
         '&limit=' +
         limit;
+    var q = keyword.trim()
+        ? params + '&q=' + encodeURIComponent(keyword.trim())
+        : params;
     return pluginGet(siteId, pluginUrl('dev-content-ops-git', siteId, q)).pipe(map(function (data) {
         var _a;
-        return assertSiteScope(siteId, __assign(__assign({}, data), { storeId: apiText(data.storeId) || storeId, publishingTarget: apiText(data.publishingTarget) || target, bucket: data.bucket ? apiText(data.bucket) : undefined, prefix: data.prefix ? apiText(data.prefix) : undefined, entries: ((_a = data.entries) !== null && _a !== void 0 ? _a : []).map(function (entry) { return ({
+        return assertSiteScope(siteId, __assign(__assign({}, data), { storeId: apiText(data.storeId) || storeId, publishingTarget: apiText(data.publishingTarget) || target, bucket: data.bucket ? apiText(data.bucket) : undefined, prefix: data.prefix ? apiText(data.prefix) : undefined, totalDeletedFound: data.totalDeletedFound, truncated: data.truncated, scanComplete: data.scanComplete, keyword: data.keyword ? apiText(data.keyword) : undefined, entries: ((_a = data.entries) !== null && _a !== void 0 ? _a : []).map(function (entry) { return ({
                 path: apiText(entry.path),
                 objectKey: entry.objectKey ? apiText(entry.objectKey) : undefined,
                 versionId: apiText(entry.versionId),
@@ -47204,38 +47399,61 @@ function PaperFallback(_a) {
         }, children: children }));
 }
 
+var HISTORY_REWRITE_ACK_LABEL = 'I understand that git history will be rewritten from this point, commit IDs will change, and this will impact other workflows (clones, remotes, patches, publish compare, and Studio sync).';
+var HISTORY_REWRITE_IMPACTS = [
+    'Commit IDs change for rewritten history; old SHAs become invalid.',
+    'Other clones, remotes, and open work based on previous SHAs will diverge.',
+    'Patches, publish compare, and Studio processed-commit sync are affected until re-ingest completes.'
+];
+/**
+ * Confirm dialog for operations that rewrite or discard git history.
+ * Requires an explicit checkbox acknowledgment before Confirm is enabled.
+ */
+function HistoryRewriteConfirmDialog(_a) {
+    var open = _a.open, title = _a.title, message = _a.message, commit = _a.commit, _b = _a.confirmLabel, confirmLabel = _b === void 0 ? 'Rewrite history' : _b, _c = _a.ackLabel, ackLabel = _c === void 0 ? HISTORY_REWRITE_ACK_LABEL : _c, _d = _a.impacts, impacts = _d === void 0 ? HISTORY_REWRITE_IMPACTS : _d, _e = _a.busy, busy = _e === void 0 ? false : _e, onCancel = _a.onCancel, onConfirm = _a.onConfirm, codeBlockSx = _a.codeBlockSx, monoSx = _a.monoSx;
+    var _f = useState(false), acked = _f[0], setAcked = _f[1];
+    useEffect(function () {
+        if (open) {
+            setAcked(false);
+        }
+    }, [open, title, message]);
+    return (jsxs(Dialog, { open: open, onClose: function () { return !busy && onCancel(); }, maxWidth: "sm", fullWidth: true, children: [jsx(DialogTitle, { children: title }), jsx(DialogContent, { children: jsxs(Stack$1, { spacing: 2, sx: { mt: 0.5 }, children: [jsx(Alert, { severity: "error", icon: jsx(WarningAmberRoundedIcon, {}), children: message }), impacts.length > 0 && (jsxs(Box$1, { children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, sx: { mb: 0.75 }, children: "Impact on other workflows" }), jsx(Box$1, { component: "ul", sx: { m: 0, pl: 2.25 }, children: impacts.map(function (item) { return (jsx(Typography, { component: "li", variant: "body2", color: "text.secondary", sx: { mb: 0.5 }, children: item }, item)); }) })] })), commit && (jsxs(Paper, { variant: "outlined", sx: codeBlockSx, children: [jsx(Typography, { variant: "caption", color: "text.secondary", display: "block", sx: { mb: 0.75, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.6 }, children: "Commit" }), jsx(Typography, { variant: "body2", sx: __assign(__assign({}, monoSx), { wordBreak: 'break-all' }), children: (commit.shortId || commit.id.slice(0, 8)) + ' · ' + commit.id }), jsx(Typography, { variant: "body2", sx: { mt: 1, fontWeight: 500 }, children: commit.subject || '(no commit message)' })] })), jsx(FormControlLabel, { control: jsx(Checkbox, { checked: acked, onChange: function (e) { return setAcked(e.target.checked); }, disabled: busy, color: "error" }), label: ackLabel, sx: { alignItems: 'flex-start', mr: 0, '& .MuiFormControlLabel-label': { typography: 'body2' } } })] }) }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: onCancel, disabled: busy, children: "Cancel" }), jsx(Button$1, { color: "error", variant: "contained", disabled: !acked || busy, onClick: onConfirm, children: confirmLabel })] })] }));
+}
+
 var LOG_LIMIT = 50;
 function GitLogTab(_a) {
     var _this = this;
-    var _b, _c;
-    var siteId = _a.siteId, _d = _a.sites, sites = _d === void 0 ? [] : _d;
+    var _b, _c, _d, _e;
+    var siteId = _a.siteId, _f = _a.sites, sites = _f === void 0 ? [] : _f;
     var dispatch = useDispatch();
-    var _e = useState(null), status = _e[0], setStatus = _e[1];
-    var _f = useState(''), branch = _f[0], setBranch = _f[1];
-    var _g = useState([]), commits = _g[0], setCommits = _g[1];
-    var _h = useState(null), selected = _h[0], setSelected = _h[1];
-    var _j = useState({}), expanded = _j[0], setExpanded = _j[1];
-    var _k = useState(false), loading = _k[0], setLoading = _k[1];
-    var _l = useState(false), loadingMore = _l[0], setLoadingMore = _l[1];
-    var _m = useState(false), hasMore = _m[0], setHasMore = _m[1];
-    var _o = useState(0), nextSkip = _o[0], setNextSkip = _o[1];
-    var _p = useState(''), lastProcessedCommitId = _p[0], setLastProcessedCommitId = _p[1];
-    var _q = useState(''), sinceDate = _q[0], setSinceDate = _q[1];
-    var _r = useState(''), untilDate = _r[0], setUntilDate = _r[1];
-    var _s = useState('desc'), logOrder = _s[0], setLogOrder = _s[1];
-    var _t = useState(null), fileContent = _t[0], setFileContent = _t[1];
-    var _u = useState(''), diffFrom = _u[0], setDiffFrom = _u[1];
-    var _v = useState(''), diffTo = _v[0], setDiffTo = _v[1];
-    var _w = useState(null), diffView = _w[0], setDiffView = _w[1];
-    var _x = useState([]), patchSelections = _x[0], setPatchSelections = _x[1];
-    var _y = useState(''), patchPreview = _y[0], setPatchPreview = _y[1];
-    var _z = useState(''), patchText = _z[0], setPatchText = _z[1];
-    var _0 = useState(siteId), patchApplyTargetSiteId = _0[0], setPatchApplyTargetSiteId = _0[1];
-    var _1 = useState(false), buildingPatch = _1[0], setBuildingPatch = _1[1];
-    var _2 = useState(false), diffDialogOpen = _2[0], setDiffDialogOpen = _2[1];
-    var _3 = useState(null), confirmDialog = _3[0], setConfirmDialog = _3[1];
-    var _4 = useState(null), apiError = _4[0], setApiError = _4[1];
-    var _5 = useState(null), filterFileResult = _5[0], setFilterFileResult = _5[1];
+    var _g = useState(null), status = _g[0], setStatus = _g[1];
+    var _h = useState(''), branch = _h[0], setBranch = _h[1];
+    var _j = useState([]), commits = _j[0], setCommits = _j[1];
+    var _k = useState(null), selected = _k[0], setSelected = _k[1];
+    var _l = useState({}), expanded = _l[0], setExpanded = _l[1];
+    var _m = useState(false), loading = _m[0], setLoading = _m[1];
+    var _o = useState(false), loadingMore = _o[0], setLoadingMore = _o[1];
+    var _p = useState(false), hasMore = _p[0], setHasMore = _p[1];
+    var _q = useState(0), nextSkip = _q[0], setNextSkip = _q[1];
+    var _r = useState(''), lastProcessedCommitId = _r[0], setLastProcessedCommitId = _r[1];
+    var _s = useState(''), sinceDate = _s[0], setSinceDate = _s[1];
+    var _t = useState(''), untilDate = _t[0], setUntilDate = _t[1];
+    var _u = useState(''), pathFilterInput = _u[0], setPathFilterInput = _u[1];
+    var _v = useState(''), pathFilter = _v[0], setPathFilter = _v[1];
+    var _w = useState('desc'), logOrder = _w[0], setLogOrder = _w[1];
+    var _x = useState(null), fileContent = _x[0], setFileContent = _x[1];
+    var _y = useState(''), diffFrom = _y[0], setDiffFrom = _y[1];
+    var _z = useState(''), diffTo = _z[0], setDiffTo = _z[1];
+    var _0 = useState(null), diffView = _0[0], setDiffView = _0[1];
+    var _1 = useState([]), patchSelections = _1[0], setPatchSelections = _1[1];
+    var _2 = useState(''), patchPreview = _2[0], setPatchPreview = _2[1];
+    var _3 = useState(''), patchText = _3[0], setPatchText = _3[1];
+    var _4 = useState(siteId), patchApplyTargetSiteId = _4[0], setPatchApplyTargetSiteId = _4[1];
+    var _5 = useState(false), buildingPatch = _5[0], setBuildingPatch = _5[1];
+    var _6 = useState(false), diffDialogOpen = _6[0], setDiffDialogOpen = _6[1];
+    var _7 = useState(null), confirmDialog = _7[0], setConfirmDialog = _7[1];
+    var _8 = useState(null), apiError = _8[0], setApiError = _8[1];
+    var _9 = useState(null), filterFileResult = _9[0], setFilterFileResult = _9[1];
     var listRef = useRef(null);
     var loadMoreRef = useRef(null);
     var loadingMoreRef = useRef(false);
@@ -47334,7 +47552,15 @@ function GitLogTab(_a) {
                         setApiError(null);
                         since = parseEpoch(sinceDate);
                         until = parseEpoch(untilDate);
-                        return [4 /*yield*/, firstValueFrom(fetchGitLog(siteId, { branch: branch, skip: skip, limit: LOG_LIMIT, since: since, until: until, order: logOrder }))];
+                        return [4 /*yield*/, firstValueFrom(fetchGitLog(siteId, {
+                                branch: branch,
+                                skip: skip,
+                                limit: LOG_LIMIT,
+                                since: since,
+                                until: until,
+                                order: logOrder,
+                                path: pathFilter || undefined
+                            }))];
                     case 2:
                         data_1 = _c.sent();
                         if (reset) {
@@ -47366,7 +47592,13 @@ function GitLogTab(_a) {
                 }
             });
         });
-    }, [siteId, branch, nextSkip, sinceDate, untilDate, logOrder]);
+    }, [siteId, branch, nextSkip, sinceDate, untilDate, logOrder, pathFilter]);
+    useEffect(function () {
+        var handle = window.setTimeout(function () {
+            setPathFilter(pathFilterInput.trim());
+        }, 400);
+        return function () { return window.clearTimeout(handle); };
+    }, [pathFilterInput]);
     useEffect(function () {
         var cancelled = false;
         firstValueFrom(fetchLegacySite(siteId).pipe(take(1)))
@@ -47395,7 +47627,7 @@ function GitLogTab(_a) {
             loadLog(true, 0);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps -- reload when filters change
-    }, [branch, sinceDate, untilDate, logOrder]);
+    }, [branch, sinceDate, untilDate, logOrder, pathFilter]);
     useEffect(function () {
         nextSkipRef.current = nextSkip;
     }, [nextSkip]);
@@ -47730,7 +47962,7 @@ function GitLogTab(_a) {
     }); };
     var onRemoveFileFromHistory = function (commit, file) {
         var path = file.path.startsWith('/') ? file.path.slice(1) : file.path;
-        destructiveAction('Remove file from history', "Remove \"".concat(path, "\" from all history? Commit IDs will change."), function () { return __awaiter(_this, void 0, void 0, function () {
+        destructiveAction('Remove file from history', "Remove \"".concat(path, "\" from all git history on the Studio server? The entire history will be rewritten (every commit ID changes), then Studio will reset the processed pointer and re-ingest the new history."), function () { return __awaiter(_this, void 0, void 0, function () {
             var result, e_10;
             var _a;
             return __generator(this, function (_b) {
@@ -47743,17 +47975,17 @@ function GitLogTab(_a) {
                             }))];
                     case 1:
                         result = _b.sent();
-                        if (result.error) {
+                        if (result.error && result.success != true) {
                             notify(apiText(result.error), 'error');
                             setFilterFileResult(result);
                             return [2 /*return*/];
                         }
                         setFilterFileResult(result);
                         if ((_a = result.processedCommitUpdate) === null || _a === void 0 ? void 0 : _a.error) {
-                            notify("History rewritten; sync failed: ".concat(apiText(result.processedCommitUpdate.error)), 'error');
+                            notify("History rewritten; re-ingest sync failed: ".concat(apiText(result.processedCommitUpdate.error)), 'error');
                         }
                         else {
-                            notify(apiText(result.message) || 'History rewritten and sync triggered', result.warning ? 'error' : 'success');
+                            notify(apiText(result.message) || 'History rewritten; re-ingest sync triggered', 'success');
                         }
                         loadStatus();
                         loadLog(true);
@@ -47765,7 +47997,7 @@ function GitLogTab(_a) {
                     case 3: return [2 /*return*/];
                 }
             });
-        }); });
+        }); }, commit, { historyRewrite: true, confirmLabel: 'Rewrite history' });
     };
     var copyFilterFileDetails = function () {
         var _a;
@@ -47777,6 +48009,9 @@ function GitLogTab(_a) {
             filterFileResult.warning ? apiText(filterFileResult.warning) : '',
             filterFileResult.message ? apiText(filterFileResult.message) : '',
             filterFileResult.headCommitId ? "New HEAD: ".concat(filterFileResult.headCommitId) : '',
+            filterFileResult.reingestFromCommitId
+                ? "Re-ingest baseline: ".concat(filterFileResult.reingestFromCommitId)
+                : '',
             filterFileResult.lastProcessedCommitId
                 ? "Previous processed: ".concat(filterFileResult.lastProcessedCommitId)
                 : ''
@@ -47792,11 +48027,13 @@ function GitLogTab(_a) {
             subject: commit.subject
         });
     };
-    var destructiveAction = function (title, message, action, commit) {
+    var destructiveAction = function (title, message, action, commit, options) {
         setConfirmDialog({
             title: title,
             message: message,
             commit: commit,
+            historyRewrite: options === null || options === void 0 ? void 0 : options.historyRewrite,
+            confirmLabel: options === null || options === void 0 ? void 0 : options.confirmLabel,
             action: function () {
                 action()
                     .then(function () { return setConfirmDialog(null); })
@@ -47806,7 +48043,12 @@ function GitLogTab(_a) {
     };
     return (jsxs(TabShell, { children: [apiError && (jsx(Alert, { severity: "error", onClose: function () { return setApiError(null); }, sx: { flexShrink: 0 }, children: apiError })), jsxs(TabToolbar, { children: [jsxs(Stack$1, { direction: "row", spacing: 1.5, flexWrap: "wrap", useFlexGap: true, alignItems: "center", justifyContent: "space-between", children: [jsxs(Stack$1, { direction: "row", spacing: 1, flexWrap: "wrap", useFlexGap: true, alignItems: "center", children: [jsxs(FormControl, { size: "small", sx: { minWidth: 132 }, children: [jsx(InputLabel, { children: "Branch" }), jsx(Select, { label: "Branch", value: branch, onChange: function (e) { return setBranch(e.target.value); }, children: branchOptions.map(function (b) { return (jsx(MenuItem$1, { value: b, children: b }, b)); }) })] }), jsx(Tooltip, { title: (status === null || status === void 0 ? void 0 : status.sandboxBranch) && branch !== status.sandboxBranch
                                             ? "Sandbox branch is ".concat(status.sandboxBranch)
-                                            : undefined, disableHoverListener: !((status === null || status === void 0 ? void 0 : status.sandboxBranch) && branch !== status.sandboxBranch), children: jsx(Chip, { size: "small", variant: "outlined", color: (status === null || status === void 0 ? void 0 : status.sandboxBranch) && branch !== status.sandboxBranch ? 'warning' : 'default', label: 'Sandbox · ' + ((status === null || status === void 0 ? void 0 : status.sandboxBranch) || '—'), sx: { fontWeight: 600 } }) }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: jsx(RefreshRoundedIcon, {}), onClick: function () { return loadLog(true); }, children: "Refresh" })] }), status && jsx(RepoStatusBar, { status: status })] }), jsx(Divider, {}), jsxs(Stack$1, { direction: "row", spacing: 1.5, flexWrap: "wrap", useFlexGap: true, alignItems: "center", children: [jsxs(FormControl, { size: "small", sx: { minWidth: 140 }, children: [jsx(InputLabel, { children: "Order" }), jsxs(Select, { label: "Order", value: logOrder, onChange: function (e) { return setLogOrder(e.target.value); }, children: [jsx(MenuItem$1, { value: "desc", children: "Newest first" }), jsx(MenuItem$1, { value: "asc", children: "Oldest first" })] })] }), jsx(TextField$1, { size: "small", label: "Since", type: "datetime-local", value: sinceDate, onChange: function (e) { return setSinceDate(e.target.value); }, InputLabelProps: { shrink: true }, sx: { width: 188 } }), jsx(TextField$1, { size: "small", label: "Until", type: "datetime-local", value: untilDate, onChange: function (e) { return setUntilDate(e.target.value); }, InputLabelProps: { shrink: true }, sx: { width: 188 } }), jsx(Divider, { flexItem: true, orientation: "vertical", sx: { alignSelf: 'stretch', my: 0.5 } }), jsx(TextField$1, { size: "small", label: "Diff from", placeholder: "commit or branch", value: diffFrom, onChange: function (e) { return setDiffFrom(e.target.value); }, sx: { width: 132 } }), jsx(TextField$1, { size: "small", label: "Diff to", placeholder: "commit or branch", value: diffTo, onChange: function (e) { return setDiffTo(e.target.value); }, sx: { width: 132 } }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: jsx(CompareArrowsRoundedIcon, {}), onClick: onDiffRefs, children: "Diff refs" })] })] }), jsxs(Box$1, { sx: {
+                                            : undefined, disableHoverListener: !((status === null || status === void 0 ? void 0 : status.sandboxBranch) && branch !== status.sandboxBranch), children: jsx(Chip, { size: "small", variant: "outlined", color: (status === null || status === void 0 ? void 0 : status.sandboxBranch) && branch !== status.sandboxBranch ? 'warning' : 'default', label: 'Sandbox · ' + ((status === null || status === void 0 ? void 0 : status.sandboxBranch) || '—'), sx: { fontWeight: 600 } }) }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: jsx(RefreshRoundedIcon, {}), onClick: function () { return loadLog(true); }, children: "Refresh" })] }), status && jsx(RepoStatusBar, { status: status })] }), jsx(Divider, {}), jsxs(Stack$1, { direction: "row", spacing: 1.5, flexWrap: "wrap", useFlexGap: true, alignItems: "center", children: [jsxs(FormControl, { size: "small", sx: { minWidth: 140 }, children: [jsx(InputLabel, { children: "Order" }), jsxs(Select, { label: "Order", value: logOrder, onChange: function (e) { return setLogOrder(e.target.value); }, children: [jsx(MenuItem$1, { value: "desc", children: "Newest first" }), jsx(MenuItem$1, { value: "asc", children: "Oldest first" })] })] }), jsx(TextField$1, { size: "small", label: "Since", type: "datetime-local", value: sinceDate, onChange: function (e) { return setSinceDate(e.target.value); }, InputLabelProps: { shrink: true }, sx: { width: 188 } }), jsx(TextField$1, { size: "small", label: "Until", type: "datetime-local", value: untilDate, onChange: function (e) { return setUntilDate(e.target.value); }, InputLabelProps: { shrink: true }, sx: { width: 188 } }), jsx(TextField$1, { size: "small", label: "Path / filename", placeholder: ".mp4, a-custom-story, or site/website/\u2026", value: pathFilterInput, onChange: function (e) { return setPathFilterInput(e.target.value); }, sx: { minWidth: 220, flex: '1 1 220px' }, InputProps: {
+                                    endAdornment: pathFilterInput ? (jsx(InputAdornment, { position: "end", children: jsx(IconButton$1, { size: "small", "aria-label": "Clear path filter", onClick: function () {
+                                                setPathFilterInput('');
+                                                setPathFilter('');
+                                            }, edge: "end", children: jsx(CloseRoundedIcon, { fontSize: "small" }) }) })) : undefined
+                                } }), jsx(Divider, { flexItem: true, orientation: "vertical", sx: { alignSelf: 'stretch', my: 0.5 } }), jsx(TextField$1, { size: "small", label: "Diff from", placeholder: "commit or branch", value: diffFrom, onChange: function (e) { return setDiffFrom(e.target.value); }, sx: { width: 132 } }), jsx(TextField$1, { size: "small", label: "Diff to", placeholder: "commit or branch", value: diffTo, onChange: function (e) { return setDiffTo(e.target.value); }, sx: { width: 132 } }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: jsx(CompareArrowsRoundedIcon, {}), onClick: onDiffRefs, children: "Diff refs" })] })] }), jsxs(Box$1, { sx: {
                     display: 'flex',
                     flexDirection: { xs: 'column', lg: 'row' },
                     gap: 2,
@@ -47876,7 +48118,7 @@ function GitLogTab(_a) {
                                                                             });
                                                                         }); });
                                                                     }, children: "Revert to commit" })] })] }), fileContent && (jsxs(Box$1, { children: [jsx(SectionLabel, { children: "File preview" }), jsx(Typography, { variant: "caption", color: "text.secondary", display: "block", sx: { mt: 0.75, mb: 0.5, wordBreak: 'break-all' }, children: fileContent.path }), jsx(Paper, { variant: "outlined", sx: __assign(__assign({}, codeBlockSx), { maxHeight: 220, overflow: 'auto', fontSize: 11 }), children: jsx("pre", { style: { margin: 0, whiteSpace: 'pre-wrap' }, children: fileContent.content }) })] })), jsxs(DangerZone, { children: [jsx(Button$1, { size: "small", variant: "outlined", color: "error", startIcon: jsx(WarningAmberRoundedIcon, {}), onClick: function () {
-                                                                return destructiveAction('Reset HEAD', 'Reset HEAD to this commit?', function () { return __awaiter(_this, void 0, void 0, function () {
+                                                                return destructiveAction('Reset HEAD', 'Reset HEAD to this commit? History after this point will be discarded from the branch tip. Commit IDs before this point stay the same, but any work based on the abandoned tip will diverge.', function () { return __awaiter(_this, void 0, void 0, function () {
                                                                     var result;
                                                                     return __generator(this, function (_a) {
                                                                         switch (_a.label) {
@@ -47892,9 +48134,9 @@ function GitLogTab(_a) {
                                                                                 return [2 /*return*/];
                                                                         }
                                                                     });
-                                                                }); }, selected);
+                                                                }); }, selected, { historyRewrite: true, confirmLabel: 'Reset HEAD' });
                                                             }, children: "Reset HEAD" }), jsx(Button$1, { size: "small", color: "error", variant: "outlined", onClick: function () {
-                                                                return destructiveAction('Trim history', 'Discard history before this commit?', function () { return __awaiter(_this, void 0, void 0, function () {
+                                                                return destructiveAction('Trim history', 'Trim/discard history relative to this commit? This is a destructive history operation and can invalidate commit IDs and disrupt other workflows that depend on the current history.', function () { return __awaiter(_this, void 0, void 0, function () {
                                                                     var result;
                                                                     return __generator(this, function (_a) {
                                                                         switch (_a.label) {
@@ -47910,12 +48152,15 @@ function GitLogTab(_a) {
                                                                                 return [2 /*return*/];
                                                                         }
                                                                     });
-                                                                }); }, selected);
-                                                            }, children: "Trim History" })] })] })) })] }), jsx(PatchBasketPanel, { selections: patchSelections, onRemove: removeFromPatch, onClear: clearPatchBasket, onBuildPatch: onBuildPatchBasket, onApplyPatch: onApplyPatch, onDownloadPatch: onDownloadPatch, building: buildingPatch, patchPreview: patchPreview, sourceSiteId: siteId, sites: sites, applyTargetSiteId: patchApplyTargetSiteId, onApplyTargetSiteChange: setPatchApplyTargetSiteId })] })] }), jsxs(Dialog, { open: diffDialogOpen, onClose: function () { return setDiffDialogOpen(false); }, maxWidth: "lg", fullWidth: true, PaperProps: { sx: { minHeight: 520, borderRadius: 2 } }, children: [jsx(DialogTitle, { sx: { pb: 1 }, children: "Diff viewer" }), jsx(DialogContent, { sx: { display: 'flex', flexDirection: 'column', minHeight: 400 }, children: diffView && (jsx(DiffViewer, { title: diffView.title, fileDiffs: diffView.fileDiffs, activePath: diffView.activePath, fallbackText: diffView.fallbackText, onActivePathChange: function (path) { return setDiffView(function (prev) { return (prev ? __assign(__assign({}, prev), { activePath: path }) : prev); }); } })) }), jsx(DialogActions, { children: jsx(Button$1, { onClick: function () { return setDiffDialogOpen(false); }, children: "Close" }) })] }), jsxs(Dialog, { open: Boolean(filterFileResult), onClose: function () { return setFilterFileResult(null); }, maxWidth: "sm", fullWidth: true, children: [jsx(DialogTitle, { children: (filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.success) ? 'File removed from history' : 'Remove file from history' }), jsxs(DialogContent, { children: [(filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.error) && (jsx(Alert, { severity: "error", sx: { mb: 2 }, children: apiText(filterFileResult.error) })), (filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.warning) && (jsx(Alert, { severity: "warning", sx: { mb: 2 }, children: apiText(filterFileResult.warning) })), (filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.message) && (jsx(Typography, { variant: "body2", sx: { mb: 2 }, children: apiText(filterFileResult.message) })), ((_b = filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.processedCommitUpdate) === null || _b === void 0 ? void 0 : _b.error) && (jsxs(Alert, { severity: "warning", sx: { mb: 2 }, children: ["Sync failed: ", apiText(filterFileResult.processedCommitUpdate.error)] })), (filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.headCommitId) && (jsxs(Fragment, { children: [jsx(Typography, { variant: "caption", color: "text.secondary", fontWeight: 600, children: "New HEAD commit" }), jsx(Paper, { variant: "outlined", sx: __assign(__assign({}, codeBlockSx), { mb: 1.5 }), children: apiText(filterFileResult.headCommitId) })] })), (filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.lastProcessedCommitId) && (jsxs(Fragment, { children: [jsx(Typography, { variant: "caption", color: "text.secondary", fontWeight: 600, children: "Previous processed commit" }), jsx(Paper, { variant: "outlined", sx: __assign(__assign({}, codeBlockSx), { mb: 1.5 }), children: apiText(filterFileResult.lastProcessedCommitId) })] }))] }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: copyFilterFileDetails, children: "Copy" }), ((_c = filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.processedCommitUpdate) === null || _c === void 0 ? void 0 : _c.error) && filterFileResult.headCommitId && (jsx(Button$1, { color: "primary", onClick: function () {
-                                    var head = apiText(filterFileResult.headCommitId);
+                                                                }); }, selected, { historyRewrite: true, confirmLabel: 'Trim history' });
+                                                            }, children: "Trim History" })] })] })) })] }), jsx(PatchBasketPanel, { selections: patchSelections, onRemove: removeFromPatch, onClear: clearPatchBasket, onBuildPatch: onBuildPatchBasket, onApplyPatch: onApplyPatch, onDownloadPatch: onDownloadPatch, building: buildingPatch, patchPreview: patchPreview, sourceSiteId: siteId, sites: sites, applyTargetSiteId: patchApplyTargetSiteId, onApplyTargetSiteChange: setPatchApplyTargetSiteId })] })] }), jsxs(Dialog, { open: diffDialogOpen, onClose: function () { return setDiffDialogOpen(false); }, maxWidth: "lg", fullWidth: true, PaperProps: { sx: { minHeight: 520, borderRadius: 2 } }, children: [jsx(DialogTitle, { sx: { pb: 1 }, children: "Diff viewer" }), jsx(DialogContent, { sx: { display: 'flex', flexDirection: 'column', minHeight: 400 }, children: diffView && (jsx(DiffViewer, { title: diffView.title, fileDiffs: diffView.fileDiffs, activePath: diffView.activePath, fallbackText: diffView.fallbackText, onActivePathChange: function (path) { return setDiffView(function (prev) { return (prev ? __assign(__assign({}, prev), { activePath: path }) : prev); }); } })) }), jsx(DialogActions, { children: jsx(Button$1, { onClick: function () { return setDiffDialogOpen(false); }, children: "Close" }) })] }), jsxs(Dialog, { open: Boolean(filterFileResult), onClose: function () { return setFilterFileResult(null); }, maxWidth: "sm", fullWidth: true, children: [jsx(DialogTitle, { children: (filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.success) ? 'File removed from history' : 'Remove file from history' }), jsxs(DialogContent, { children: [(filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.error) && (filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.success) != true && (jsx(Alert, { severity: "error", sx: { mb: 2 }, children: apiText(filterFileResult.error) })), (filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.warning) && (jsx(Alert, { severity: "warning", sx: { mb: 2 }, children: apiText(filterFileResult.warning) })), (filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.message) && (jsx(Typography, { variant: "body2", sx: { mb: 2 }, children: apiText(filterFileResult.message) })), ((_b = filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.processedCommitUpdate) === null || _b === void 0 ? void 0 : _b.error) && (jsxs(Alert, { severity: "warning", sx: { mb: 2 }, children: ["Re-ingest sync failed: ", apiText(filterFileResult.processedCommitUpdate.error)] })), (filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.headCommitId) && (jsxs(Fragment, { children: [jsx(Typography, { variant: "caption", color: "text.secondary", fontWeight: 600, children: "New HEAD commit" }), jsx(Paper, { variant: "outlined", sx: __assign(__assign({}, codeBlockSx), { mb: 1.5 }), children: apiText(filterFileResult.headCommitId) })] })), ((filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.reingestFromCommitId) || ((_c = filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.processedCommitUpdate) === null || _c === void 0 ? void 0 : _c.commitId)) && (jsxs(Fragment, { children: [jsx(Typography, { variant: "caption", color: "text.secondary", fontWeight: 600, children: "Re-ingest baseline (last processed)" }), jsx(Paper, { variant: "outlined", sx: __assign(__assign({}, codeBlockSx), { mb: 1.5 }), children: apiText(filterFileResult.reingestFromCommitId || ((_d = filterFileResult.processedCommitUpdate) === null || _d === void 0 ? void 0 : _d.commitId) || '') })] })), (filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.lastProcessedCommitId) && (jsxs(Fragment, { children: [jsx(Typography, { variant: "caption", color: "text.secondary", fontWeight: 600, children: "Previous processed commit" }), jsx(Paper, { variant: "outlined", sx: __assign(__assign({}, codeBlockSx), { mb: 1.5 }), children: apiText(filterFileResult.lastProcessedCommitId) })] }))] }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: copyFilterFileDetails, children: "Copy" }), ((_e = filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.processedCommitUpdate) === null || _e === void 0 ? void 0 : _e.error) && filterFileResult.headCommitId && (jsx(Button$1, { color: "primary", onClick: function () {
+                                    var _a;
+                                    var baseline = apiText(filterFileResult.reingestFromCommitId ||
+                                        ((_a = filterFileResult.processedCommitUpdate) === null || _a === void 0 ? void 0 : _a.commitId) ||
+                                        filterFileResult.headCommitId);
                                     setFilterFileResult(null);
-                                    onSetProcessedCommit(head);
-                                }, children: "Retry sync" })), jsx(Button$1, { onClick: function () { return setFilterFileResult(null); }, children: "Close" })] })] }), jsxs(Dialog, { open: Boolean(confirmDialog), onClose: function () { return setConfirmDialog(null); }, maxWidth: "sm", fullWidth: true, children: [jsx(DialogTitle, { children: confirmDialog === null || confirmDialog === void 0 ? void 0 : confirmDialog.title }), jsxs(DialogContent, { children: [jsx(Typography, { variant: "body2", children: confirmDialog === null || confirmDialog === void 0 ? void 0 : confirmDialog.message }), (confirmDialog === null || confirmDialog === void 0 ? void 0 : confirmDialog.commit) && (jsxs(Paper, { variant: "outlined", sx: __assign(__assign({}, codeBlockSx), { mt: 2 }), children: [jsx(Typography, { variant: "caption", color: "text.secondary", display: "block", sx: { mb: 0.75, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.6 }, children: "Commit" }), jsx(Typography, { variant: "body2", sx: __assign(__assign({}, monoSx), { wordBreak: 'break-all' }), children: (confirmDialog.commit.shortId || confirmDialog.commit.id.slice(0, 8)) + ' · ' + confirmDialog.commit.id }), jsx(Typography, { variant: "body2", sx: { mt: 1, fontWeight: 500 }, children: confirmDialog.commit.subject || '(no commit message)' })] }))] }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: function () { return setConfirmDialog(null); }, children: "Cancel" }), jsx(Button$1, { color: "error", onClick: function () { return confirmDialog === null || confirmDialog === void 0 ? void 0 : confirmDialog.action(); }, children: "Confirm" })] })] })] }));
+                                    onSetProcessedCommit(baseline);
+                                }, children: "Retry sync" })), jsx(Button$1, { onClick: function () { return setFilterFileResult(null); }, children: "Close" })] })] }), (confirmDialog === null || confirmDialog === void 0 ? void 0 : confirmDialog.historyRewrite) ? (jsx(HistoryRewriteConfirmDialog, { open: true, title: confirmDialog.title, message: confirmDialog.message, commit: confirmDialog.commit, confirmLabel: confirmDialog.confirmLabel || 'Rewrite history', codeBlockSx: codeBlockSx, monoSx: monoSx, onCancel: function () { return setConfirmDialog(null); }, onConfirm: function () { return confirmDialog.action(); } })) : (jsxs(Dialog, { open: Boolean(confirmDialog), onClose: function () { return setConfirmDialog(null); }, maxWidth: "sm", fullWidth: true, children: [jsx(DialogTitle, { children: confirmDialog === null || confirmDialog === void 0 ? void 0 : confirmDialog.title }), jsxs(DialogContent, { children: [jsx(Typography, { variant: "body2", children: confirmDialog === null || confirmDialog === void 0 ? void 0 : confirmDialog.message }), (confirmDialog === null || confirmDialog === void 0 ? void 0 : confirmDialog.commit) && (jsxs(Paper, { variant: "outlined", sx: __assign(__assign({}, codeBlockSx), { mt: 2 }), children: [jsx(Typography, { variant: "caption", color: "text.secondary", display: "block", sx: { mb: 0.75, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.6 }, children: "Commit" }), jsx(Typography, { variant: "body2", sx: __assign(__assign({}, monoSx), { wordBreak: 'break-all' }), children: (confirmDialog.commit.shortId || confirmDialog.commit.id.slice(0, 8)) + ' · ' + confirmDialog.commit.id }), jsx(Typography, { variant: "body2", sx: { mt: 1, fontWeight: 500 }, children: confirmDialog.commit.subject || '(no commit message)' })] }))] }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: function () { return setConfirmDialog(null); }, children: "Cancel" }), jsx(Button$1, { color: "error", onClick: function () { return confirmDialog === null || confirmDialog === void 0 ? void 0 : confirmDialog.action(); }, children: "Confirm" })] })] }))] }));
 }
 
 /*
@@ -50828,25 +51073,61 @@ function DeletedBlobsPanel(_a) {
     var _c = useState(false), loading = _c[0], setLoading = _c[1];
     var _d = useState(null), restoringId = _d[0], setRestoringId = _d[1];
     var _e = useState([]), entries = _e[0], setEntries = _e[1];
-    var _f = useState(null), error = _f[0], setError = _f[1];
-    var _g = useState(null), notice = _g[0], setNotice = _g[1];
-    var loadDeleted = useCallback(function () {
+    var _f = useState(''), keyword = _f[0], setKeyword = _f[1];
+    var _g = useState(''), appliedKeyword = _g[0], setAppliedKeyword = _g[1];
+    var _h = useState({}), listMeta = _h[0], setListMeta = _h[1];
+    var _j = useState(null), error = _j[0], setError = _j[1];
+    var _k = useState(null), notice = _k[0], setNotice = _k[1];
+    var loadDeleted = useCallback(function (searchKeyword) {
+        if (!store.versioningSupported) {
+            return;
+        }
+        var q = (searchKeyword !== null && searchKeyword !== void 0 ? searchKeyword : appliedKeyword).trim();
+        setLoading(true);
+        setError(null);
+        firstValueFrom(fetchBlobStoreDeleted(siteId, store.id, target, 500, q))
+            .then(function (data) {
+            var _a, _b, _c, _d;
+            setEntries((_a = data.entries) !== null && _a !== void 0 ? _a : []);
+            setListMeta({
+                totalDeletedFound: (_d = (_b = data.totalDeletedFound) !== null && _b !== void 0 ? _b : (_c = data.entries) === null || _c === void 0 ? void 0 : _c.length) !== null && _d !== void 0 ? _d : 0,
+                truncated: data.truncated,
+                scanComplete: data.scanComplete
+            });
+            setAppliedKeyword(q);
+        })
+            .catch(function (err) {
+            setEntries([]);
+            setListMeta({});
+            setError(err.message);
+        })
+            .finally(function () { return setLoading(false); });
+    }, [appliedKeyword, siteId, store.id, store.versioningSupported, target]);
+    useEffect(function () {
+        setKeyword('');
+        setAppliedKeyword('');
         if (!store.versioningSupported) {
             return;
         }
         setLoading(true);
         setError(null);
-        firstValueFrom(fetchBlobStoreDeleted(siteId, store.id, target))
-            .then(function (data) { var _a; return setEntries((_a = data.entries) !== null && _a !== void 0 ? _a : []); })
+        firstValueFrom(fetchBlobStoreDeleted(siteId, store.id, target, 500, ''))
+            .then(function (data) {
+            var _a, _b, _c, _d;
+            setEntries((_a = data.entries) !== null && _a !== void 0 ? _a : []);
+            setListMeta({
+                totalDeletedFound: (_d = (_b = data.totalDeletedFound) !== null && _b !== void 0 ? _b : (_c = data.entries) === null || _c === void 0 ? void 0 : _c.length) !== null && _d !== void 0 ? _d : 0,
+                truncated: data.truncated,
+                scanComplete: data.scanComplete
+            });
+        })
             .catch(function (err) {
             setEntries([]);
+            setListMeta({});
             setError(err.message);
         })
             .finally(function () { return setLoading(false); });
     }, [siteId, store.id, store.versioningSupported, target]);
-    useEffect(function () {
-        loadDeleted();
-    }, [loadDeleted]);
     var undelete = function (entry) { return __awaiter(_this, void 0, void 0, function () {
         var result, err_2;
         return __generator(this, function (_a) {
@@ -50891,14 +51172,26 @@ function DeletedBlobsPanel(_a) {
     if (!store.versioningSupported) {
         return null;
     }
-    return (jsxs(Box$1, { sx: { mt: 2 }, children: [jsx(SectionLabel, { children: "Deleted in storage" }), jsx(Typography, { variant: "caption", color: "text.secondary", sx: { display: 'block', mb: 1 }, children: "Objects removed from blob storage (S3 delete markers). Restore brings back the latest non-deleted version." }), jsxs(Stack$1, { direction: { xs: 'column', sm: 'row' }, spacing: 1, alignItems: { sm: 'center' }, sx: { mb: 1 }, children: [jsxs(FormControl, { size: "small", sx: { minWidth: 160 }, children: [jsx(InputLabel, { id: "deleted-target-".concat(store.id), children: "Environment" }), jsx(Select, { labelId: "deleted-target-".concat(store.id), label: "Environment", value: target, onChange: function (e) { return setTarget(e.target.value); }, children: targetOptions.map(function (option) { return (jsx(MenuItem$1, { value: option, children: option }, option)); }) })] }), jsx(Button$1, { size: "small", startIcon: jsx(RefreshRoundedIcon, {}), onClick: loadDeleted, disabled: loading, children: "Refresh deleted" })] }), notice && (jsx(Alert, { severity: "success", sx: { mb: 1 }, onClose: function () { return setNotice(null); }, children: notice })), error && (jsx(Alert, { severity: "error", sx: { mb: 1 }, onClose: function () { return setError(null); }, children: error })), jsx(Box$1, { sx: {
+    return (jsxs(Box$1, { sx: { mt: 2 }, children: [jsx(SectionLabel, { children: "Deleted in storage" }), jsx(Typography, { variant: "caption", color: "text.secondary", sx: { display: 'block', mb: 1 }, children: "Lists objects whose current S3 version is a delete marker (currently removed in this environment). Version history may also show older delete markers from past delete/restore cycles \u2014 those are not listed here unless the object is deleted again." }), jsxs(Stack$1, { direction: { xs: 'column', sm: 'row' }, spacing: 1, alignItems: { sm: 'center' }, sx: { mb: 1 }, children: [jsxs(FormControl, { size: "small", sx: { minWidth: 160 }, children: [jsx(InputLabel, { id: "deleted-target-".concat(store.id), children: "Environment" }), jsx(Select, { labelId: "deleted-target-".concat(store.id), label: "Environment", value: target, onChange: function (e) { return setTarget(e.target.value); }, children: targetOptions.map(function (option) { return (jsx(MenuItem$1, { value: option, children: option }, option)); }) })] }), jsx(Button$1, { size: "small", startIcon: jsx(RefreshRoundedIcon, {}), onClick: function () { return loadDeleted(keyword); }, disabled: loading, children: "Refresh deleted" }), jsx(TextField$1, { size: "small", label: "Search path", placeholder: "Search path\u2026", value: keyword, onChange: function (e) { return setKeyword(e.target.value); }, onKeyDown: function (e) {
+                            if (e.key === 'Enter') {
+                                loadDeleted(keyword);
+                            }
+                        }, sx: { minWidth: 220, flex: '1 1 180px', maxWidth: 360 }, inputProps: { 'aria-label': 'Search deleted blobs by path' } }), jsx(Button$1, { size: "small", variant: "outlined", onClick: function () { return loadDeleted(keyword); }, disabled: loading, children: "Search" }), entries.length > 0 && (jsx(Typography, { variant: "caption", color: "text.secondary", sx: { whiteSpace: 'nowrap' }, children: listMeta.totalDeletedFound != null && listMeta.totalDeletedFound > entries.length
+                            ? "Showing ".concat(entries.length, " of ").concat(listMeta.totalDeletedFound, " deleted")
+                            : appliedKeyword
+                                ? "".concat(entries.length, " match")
+                                : "".concat(entries.length, " deleted") }))] }), listMeta.truncated && (jsx(Alert, { severity: "info", sx: { mb: 1 }, children: listMeta.scanComplete === false
+                    ? 'Scan stopped early on a large bucket. Use Search with a path fragment to find a specific deleted object.'
+                    : "More than ".concat(entries.length, " currently deleted objects match this store. Refine Search or increase the limit.") })), notice && (jsx(Alert, { severity: "success", sx: { mb: 1 }, onClose: function () { return setNotice(null); }, children: notice })), error && (jsx(Alert, { severity: "error", sx: { mb: 1 }, onClose: function () { return setError(null); }, children: error })), jsx(Box$1, { sx: {
                     border: 1,
                     borderColor: 'divider',
                     borderRadius: 1,
                     maxHeight: 240,
                     overflow: 'auto',
                     bgcolor: function (t) { return alpha(t.palette.text.primary, 0.02); }
-                }, children: loading ? (jsxs(Box$1, { sx: { p: 2, display: 'flex', alignItems: 'center', gap: 1 }, children: [jsx(CircularProgress, { size: 18 }), jsx(Typography, { variant: "body2", color: "text.secondary", children: "Loading deleted objects\u2026" })] })) : entries.length === 0 ? (jsx(Typography, { variant: "body2", color: "text.secondary", sx: { p: 2 }, children: "No deleted blobs found under this store path." })) : (jsxs(Table, { size: "small", stickyHeader: true, children: [jsx(TableHead, { children: jsxs(TableRow, { children: [jsx(TableCell, { children: "Path" }), jsx(TableCell, { children: "Deleted" }), jsx(TableCell, { align: "right", children: "Actions" })] }) }), jsx(TableBody, { children: entries.map(function (entry) { return (jsxs(TableRow, { hover: true, children: [jsx(TableCell, { sx: __assign(__assign({}, monoSx), { maxWidth: 360 }), title: entry.path, children: entry.path }), jsx(TableCell, { children: formatVersionDate(entry.lastModified) }), jsx(TableCell, { align: "right", children: jsxs(Stack$1, { direction: "row", spacing: 0.5, justifyContent: "flex-end", children: [jsx(Button$1, { size: "small", onClick: function () { return onOpenHistory(entry.path); }, children: "History" }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: restoringId === entry.versionId ? jsx(CircularProgress, { size: 14 }) : jsx(RestoreRoundedIcon, {}), disabled: Boolean(store.readOnly) || restoringId !== null, onClick: function () { return undelete(entry); }, children: "Restore" })] }) })] }, "".concat(entry.path, "-").concat(entry.versionId))); }) })] })) })] }));
+                }, children: loading ? (jsxs(Box$1, { sx: { p: 2, display: 'flex', alignItems: 'center', gap: 1 }, children: [jsx(CircularProgress, { size: 18 }), jsx(Typography, { variant: "body2", color: "text.secondary", children: "Loading deleted objects\u2026" })] })) : entries.length === 0 ? (jsx(Typography, { variant: "body2", color: "text.secondary", sx: { p: 2 }, children: appliedKeyword
+                        ? "No currently deleted blobs match \"".concat(appliedKeyword, "\" in ").concat(target, ".")
+                        : "No currently deleted blobs found under this store path in ".concat(target, ".") })) : (jsxs(Table, { size: "small", stickyHeader: true, children: [jsx(TableHead, { children: jsxs(TableRow, { children: [jsx(TableCell, { children: "Path" }), jsx(TableCell, { children: "Deleted" }), jsx(TableCell, { align: "right", children: "Actions" })] }) }), jsx(TableBody, { children: entries.map(function (entry) { return (jsxs(TableRow, { hover: true, children: [jsx(TableCell, { sx: __assign(__assign({}, monoSx), { maxWidth: 360 }), title: entry.path, children: entry.path }), jsx(TableCell, { children: formatVersionDate(entry.lastModified) }), jsx(TableCell, { align: "right", children: jsxs(Stack$1, { direction: "row", spacing: 0.5, justifyContent: "flex-end", children: [jsx(Button$1, { size: "small", onClick: function () { return onOpenHistory(entry.path); }, children: "History" }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: restoringId === entry.versionId ? jsx(CircularProgress, { size: 14 }) : jsx(RestoreRoundedIcon, {}), disabled: Boolean(store.readOnly) || restoringId !== null, onClick: function () { return undelete(entry); }, children: "Restore" })] }) })] }, "".concat(entry.path, "-").concat(entry.versionId))); }) })] })) })] }));
 }
 function BlobStoreSection(_a) {
     var _this = this;
@@ -51477,58 +51770,467 @@ var HttpUtils = {
 
 /**
  * Multi–locale folder layout under paths like /site/website and /site/components.
- * Adjust for your site (folder names must match repo locale roots).
+ * Folder names must match repo locale roots (or aliases below).
+ *
+ * Catalog: full ISO 639-1 languages, common BCP-47 regional tags, ISO 3166-1 country/market
+ * folder codes, and CMS aliases (us, uk, br, shared, …).
  */
-var MULTI_LOCALE_BASE_LOCALE = 'en';
-/** Locales to show in translation mode (order = UI order). Must match folder names under the root. */
-var MULTI_LOCALE_CODES = ['en', 'es', 'ja', 'zh'];
-var LOCALE_META = {
-    en: { label: 'English', flag: '🇺🇸' },
-    es: { label: 'Spanish', flag: '🇪🇸' },
-    ja: { label: 'Japanese', flag: '🇯🇵' },
-    zh: { label: 'Chinese', flag: '🇨🇳' },
-    de: { label: 'German', flag: '🇩🇪' },
-    ar: { label: 'Arabic', flag: '🇸🇦' }
-};
 /**
- * Fallback map for locale flags. Supports 2-char and common 5-char codes.
- * Users should not need to configure flags in site-config.xml.
+ * Canonical locale catalog: key = folder / config code (lowercase, hyphen).
+ *
+ * Includes:
+ * - ISO 639-1 language codes
+ * - Common BCP-47 regional tags (en-us, pt-br, zh-cn, …)
+ * - ISO 3166-1 alpha-2 country/market folder codes (when not already a language code)
+ * - CMS aliases (us, uk, br, jp, dk, se, shared, …)
+ *
+ * CMS alias precedence (intentional overrides of rare ISO language codes):
+ * - `uk` = English (UK); use `ua` / `uk-ua` for Ukrainian
+ * - `br` = Portuguese (Brazil); Breton is not exposed as a folder alias
+ * - `ae` / `sa` / `tw` prefer market Arabic/Chinese labels over rare ISO language uses
  */
-var LOCALE_FLAG_BY_CODE = {
-    en: '🇺🇸',
-    'en-us': '🇺🇸',
-    'en-gb': '🇬🇧',
-    es: '🇪🇸',
-    'es-es': '🇪🇸',
-    de: '🇩🇪',
-    'de-de': '🇩🇪',
-    zh: '🇨🇳',
-    cn: '🇨🇳',
-    'zh-cn': '🇨🇳',
-    'zh-tw': '🇹🇼',
-    ja: '🇯🇵',
-    'ja-jp': '🇯🇵',
-    fr: '🇫🇷',
-    'fr-fr': '🇫🇷',
-    it: '🇮🇹',
-    'it-it': '🇮🇹',
-    pt: '🇵🇹',
-    'pt-pt': '🇵🇹',
-    'pt-br': '🇧🇷',
-    ko: '🇰🇷',
-    'ko-kr': '🇰🇷',
-    /** Arabic (language code); flag is Saudi Arabia — common default for `ar` in path folders. */
-    ar: '🇸🇦',
-    'ar-sa': '🇸🇦',
-    'ar-ae': '🇦🇪',
-    'ar-eg': '🇪🇬'
+var LOCALE_CATALOG = {
+    'aa': { label: 'Afar', flag: '🇪🇹' },
+    'ab': { label: 'Abkhaz', flag: '🇬🇪' },
+    'ad': { label: 'Andorra', flag: '🇦🇩' },
+    'ae': { label: 'Arabic (UAE)', flag: '🇦🇪' },
+    'af': { label: 'Afrikaans', flag: '🇿🇦' },
+    'ag': { label: 'Antigua and Barbuda', flag: '🇦🇬' },
+    'ai': { label: 'Anguilla', flag: '🇦🇮' },
+    'ak': { label: 'Akan', flag: '🇬🇭' },
+    'al': { label: 'Albania', flag: '🇦🇱' },
+    'am': { label: 'Amharic', flag: '🇪🇹' },
+    'an': { label: 'Aragonese', flag: '🇪🇸' },
+    'ao': { label: 'Angola', flag: '🇦🇴' },
+    'aq': { label: 'Antarctica', flag: '🇦🇶' },
+    'ar': { label: 'Arabic', flag: '🇸🇦' },
+    'ar-ae': { label: 'Arabic (UAE)', flag: '🇦🇪' },
+    'ar-bh': { label: 'Arabic (Bahrain)', flag: '🇧🇭' },
+    'ar-dz': { label: 'Arabic (Algeria)', flag: '🇩🇿' },
+    'ar-eg': { label: 'Arabic (Egypt)', flag: '🇪🇬' },
+    'ar-iq': { label: 'Arabic (Iraq)', flag: '🇮🇶' },
+    'ar-jo': { label: 'Arabic (Jordan)', flag: '🇯🇴' },
+    'ar-kw': { label: 'Arabic (Kuwait)', flag: '🇰🇼' },
+    'ar-lb': { label: 'Arabic (Lebanon)', flag: '🇱🇧' },
+    'ar-ly': { label: 'Arabic (Libya)', flag: '🇱🇾' },
+    'ar-ma': { label: 'Arabic (Morocco)', flag: '🇲🇦' },
+    'ar-om': { label: 'Arabic (Oman)', flag: '🇴🇲' },
+    'ar-qa': { label: 'Arabic (Qatar)', flag: '🇶🇦' },
+    'ar-sa': { label: 'Arabic (Saudi Arabia)', flag: '🇸🇦' },
+    'ar-sy': { label: 'Arabic (Syria)', flag: '🇸🇾' },
+    'ar-tn': { label: 'Arabic (Tunisia)', flag: '🇹🇳' },
+    'ar-ye': { label: 'Arabic (Yemen)', flag: '🇾🇪' },
+    'as': { label: 'Assamese', flag: '🇮🇳' },
+    'at': { label: 'Austria', flag: '🇦🇹' },
+    'au': { label: 'English (Australia)', flag: '🇦🇺' },
+    'av': { label: 'Avaric', flag: '🇷🇺' },
+    'aw': { label: 'Aruba', flag: '🇦🇼' },
+    'ax': { label: 'Åland Islands', flag: '🇦🇽' },
+    'ay': { label: 'Aymara', flag: '🇧🇴' },
+    'az': { label: 'Azerbaijani', flag: '🇦🇿' },
+    'ba': { label: 'Bashkir', flag: '🇷🇺' },
+    'bb': { label: 'Barbados', flag: '🇧🇧' },
+    'bd': { label: 'Bangladesh', flag: '🇧🇩' },
+    'be': { label: 'Belarusian', flag: '🇧🇾' },
+    'bf': { label: 'Burkina Faso', flag: '🇧🇫' },
+    'bg': { label: 'Bulgarian', flag: '🇧🇬' },
+    'bh': { label: 'Bihari', flag: '🇮🇳' },
+    'bi': { label: 'Bislama', flag: '🇻🇺' },
+    'bj': { label: 'Benin', flag: '🇧🇯' },
+    'bl': { label: 'Saint Barthélemy', flag: '🇧🇱' },
+    'bm': { label: 'Bambara', flag: '🇲🇱' },
+    'bn': { label: 'Bengali', flag: '🇧🇩' },
+    'bn-bd': { label: 'Bengali (Bangladesh)', flag: '🇧🇩' },
+    'bn-in': { label: 'Bengali (India)', flag: '🇮🇳' },
+    'bo': { label: 'Tibetan Standard', flag: '🇨🇳' },
+    'bq': { label: 'Bonaire, Sint Eustatius and Saba', flag: '🇧🇶' },
+    'br': { label: 'Portuguese (Brazil)', flag: '🇧🇷' },
+    'bs': { label: 'Bosnian', flag: '🇧🇦' },
+    'bt': { label: 'Bhutan', flag: '🇧🇹' },
+    'bv': { label: 'Bouvet Island', flag: '🇧🇻' },
+    'bw': { label: 'Botswana', flag: '🇧🇼' },
+    'by': { label: 'Belarus', flag: '🇧🇾' },
+    'bz': { label: 'Belize', flag: '🇧🇿' },
+    'ca': { label: 'Catalan', flag: '🇦🇩' },
+    'cc': { label: 'Cocos (Keeling) Islands', flag: '🇨🇨' },
+    'cd': { label: 'Congo, Democratic Republic of the', flag: '🇨🇩' },
+    'ce': { label: 'Chechen', flag: '🇷🇺' },
+    'cf': { label: 'Central African Republic', flag: '🇨🇫' },
+    'cg': { label: 'Congo', flag: '🇨🇬' },
+    'ch': { label: 'Chamorro', flag: '🇬🇺' },
+    'ci': { label: 'Côte d\'Ivoire', flag: '🇨🇮' },
+    'ck': { label: 'Cook Islands', flag: '🇨🇰' },
+    'cl': { label: 'Chile', flag: '🇨🇱' },
+    'cm': { label: 'Cameroon', flag: '🇨🇲' },
+    'cn': { label: 'Chinese', flag: '🇨🇳' },
+    'co': { label: 'Corsican', flag: '🇫🇷' },
+    'common': { label: 'Common', flag: '🌐' },
+    'cr': { label: 'Cree', flag: '🇨🇦' },
+    'cs': { label: 'Czech', flag: '🇨🇿' },
+    'cu': { label: 'Old Church Slavonic', flag: '🇷🇺' },
+    'cv': { label: 'Chuvash', flag: '🇷🇺' },
+    'cw': { label: 'Curaçao', flag: '🇨🇼' },
+    'cx': { label: 'Christmas Island', flag: '🇨🇽' },
+    'cy': { label: 'Welsh', flag: '🇬🇧' },
+    'cz': { label: 'Czechia', flag: '🇨🇿' },
+    'da': { label: 'Danish', flag: '🇩🇰' },
+    'de': { label: 'German', flag: '🇩🇪' },
+    'de-at': { label: 'German (Austria)', flag: '🇦🇹' },
+    'de-ch': { label: 'German (Switzerland)', flag: '🇨🇭' },
+    'de-de': { label: 'German (Germany)', flag: '🇩🇪' },
+    'de-li': { label: 'German (Liechtenstein)', flag: '🇱🇮' },
+    'de-lu': { label: 'German (Luxembourg)', flag: '🇱🇺' },
+    'dj': { label: 'Djibouti', flag: '🇩🇯' },
+    'dk': { label: 'Danish', flag: '🇩🇰' },
+    'dm': { label: 'Dominica', flag: '🇩🇲' },
+    'do': { label: 'Dominican Republic', flag: '🇩🇴' },
+    'dv': { label: 'Divehi', flag: '🇲🇻' },
+    'dz': { label: 'Dzongkha', flag: '🇧🇹' },
+    'ec': { label: 'Ecuador', flag: '🇪🇨' },
+    'ee': { label: 'Ewe', flag: '🇬🇭' },
+    'eg': { label: 'Egypt', flag: '🇪🇬' },
+    'eh': { label: 'Western Sahara', flag: '🇪🇭' },
+    'el': { label: 'Greek (modern)', flag: '🇬🇷' },
+    'en': { label: 'English', flag: '🇺🇸' },
+    'en-au': { label: 'English (Australia)', flag: '🇦🇺' },
+    'en-bz': { label: 'English (Belize)', flag: '🇧🇿' },
+    'en-ca': { label: 'English (Canada)', flag: '🇨🇦' },
+    'en-gb': { label: 'English (UK)', flag: '🇬🇧' },
+    'en-hk': { label: 'English (Hong Kong)', flag: '🇭🇰' },
+    'en-ie': { label: 'English (Ireland)', flag: '🇮🇪' },
+    'en-in': { label: 'English (India)', flag: '🇮🇳' },
+    'en-jm': { label: 'English (Jamaica)', flag: '🇯🇲' },
+    'en-my': { label: 'English (Malaysia)', flag: '🇲🇾' },
+    'en-nz': { label: 'English (New Zealand)', flag: '🇳🇿' },
+    'en-ph': { label: 'English (Philippines)', flag: '🇵🇭' },
+    'en-sg': { label: 'English (Singapore)', flag: '🇸🇬' },
+    'en-tt': { label: 'English (Trinidad & Tobago)', flag: '🇹🇹' },
+    'en-us': { label: 'English (US)', flag: '🇺🇸' },
+    'en-za': { label: 'English (South Africa)', flag: '🇿🇦' },
+    'en-zw': { label: 'English (Zimbabwe)', flag: '🇿🇼' },
+    'eo': { label: 'Esperanto', flag: '🌐' },
+    'er': { label: 'Eritrea', flag: '🇪🇷' },
+    'es': { label: 'Spanish', flag: '🇪🇸' },
+    'es-ar': { label: 'Spanish (Argentina)', flag: '🇦🇷' },
+    'es-bo': { label: 'Spanish (Bolivia)', flag: '🇧🇴' },
+    'es-cl': { label: 'Spanish (Chile)', flag: '🇨🇱' },
+    'es-co': { label: 'Spanish (Colombia)', flag: '🇨🇴' },
+    'es-cr': { label: 'Spanish (Costa Rica)', flag: '🇨🇷' },
+    'es-do': { label: 'Spanish (Dominican Republic)', flag: '🇩🇴' },
+    'es-ec': { label: 'Spanish (Ecuador)', flag: '🇪🇨' },
+    'es-es': { label: 'Spanish (Spain)', flag: '🇪🇸' },
+    'es-gt': { label: 'Spanish (Guatemala)', flag: '🇬🇹' },
+    'es-hn': { label: 'Spanish (Honduras)', flag: '🇭🇳' },
+    'es-mx': { label: 'Spanish (Mexico)', flag: '🇲🇽' },
+    'es-ni': { label: 'Spanish (Nicaragua)', flag: '🇳🇮' },
+    'es-pa': { label: 'Spanish (Panama)', flag: '🇵🇦' },
+    'es-pe': { label: 'Spanish (Peru)', flag: '🇵🇪' },
+    'es-pr': { label: 'Spanish (Puerto Rico)', flag: '🇵🇷' },
+    'es-py': { label: 'Spanish (Paraguay)', flag: '🇵🇾' },
+    'es-sv': { label: 'Spanish (El Salvador)', flag: '🇸🇻' },
+    'es-uy': { label: 'Spanish (Uruguay)', flag: '🇺🇾' },
+    'es-ve': { label: 'Spanish (Venezuela)', flag: '🇻🇪' },
+    'et': { label: 'Estonian', flag: '🇪🇪' },
+    'eu': { label: 'Basque', flag: '🇪🇸' },
+    'fa': { label: 'Persian (Farsi)', flag: '🇮🇷' },
+    'ff': { label: 'Fula', flag: '🇸🇳' },
+    'fi': { label: 'Finnish', flag: '🇫🇮' },
+    'fj': { label: 'Fijian', flag: '🇫🇯' },
+    'fk': { label: 'Falkland Islands (Malvinas)', flag: '🇫🇰' },
+    'fm': { label: 'Micronesia, Federated States of', flag: '🇫🇲' },
+    'fo': { label: 'Faroese', flag: '🇫🇴' },
+    'fr': { label: 'French', flag: '🇫🇷' },
+    'fr-be': { label: 'French (Belgium)', flag: '🇧🇪' },
+    'fr-ca': { label: 'French (Canada)', flag: '🇨🇦' },
+    'fr-ch': { label: 'French (Switzerland)', flag: '🇨🇭' },
+    'fr-fr': { label: 'French (France)', flag: '🇫🇷' },
+    'fr-lu': { label: 'French (Luxembourg)', flag: '🇱🇺' },
+    'fr-mc': { label: 'French (Monaco)', flag: '🇲🇨' },
+    'fy': { label: 'Western Frisian', flag: '🇳🇱' },
+    'ga': { label: 'Irish', flag: '🇮🇪' },
+    'gb': { label: 'English (UK)', flag: '🇬🇧' },
+    'gd': { label: 'Scottish Gaelic', flag: '🇬🇧' },
+    'ge': { label: 'Georgia', flag: '🇬🇪' },
+    'gf': { label: 'French Guiana', flag: '🇬🇫' },
+    'gg': { label: 'Guernsey', flag: '🇬🇬' },
+    'gh': { label: 'Ghana', flag: '🇬🇭' },
+    'gi': { label: 'Gibraltar', flag: '🇬🇮' },
+    'gl': { label: 'Galician', flag: '🇪🇸' },
+    'global': { label: 'Global', flag: '🌐' },
+    'gm': { label: 'Gambia', flag: '🇬🇲' },
+    'gn': { label: 'Guaraní', flag: '🇵🇾' },
+    'gp': { label: 'Guadeloupe', flag: '🇬🇵' },
+    'gq': { label: 'Equatorial Guinea', flag: '🇬🇶' },
+    'gr': { label: 'Greece', flag: '🇬🇷' },
+    'gs': { label: 'South Georgia and the South Sandwich Islands', flag: '🇬🇸' },
+    'gt': { label: 'Guatemala', flag: '🇬🇹' },
+    'gu': { label: 'Gujarati', flag: '🇮🇳' },
+    'gv': { label: 'Manx', flag: '🇮🇲' },
+    'gw': { label: 'Guinea-Bissau', flag: '🇬🇼' },
+    'gy': { label: 'Guyana', flag: '🇬🇾' },
+    'ha': { label: 'Hausa', flag: '🇳🇬' },
+    'he': { label: 'Hebrew (modern)', flag: '🇮🇱' },
+    'hi': { label: 'Hindi', flag: '🇮🇳' },
+    'hk': { label: 'Chinese (Hong Kong)', flag: '🇭🇰' },
+    'hm': { label: 'Heard Island and McDonald Islands', flag: '🇭🇲' },
+    'hn': { label: 'Honduras', flag: '🇭🇳' },
+    'ho': { label: 'Hiri Motu', flag: '🇵🇬' },
+    'hr': { label: 'Croatian', flag: '🇭🇷' },
+    'ht': { label: 'Haitian', flag: '🇭🇹' },
+    'hu': { label: 'Hungarian', flag: '🇭🇺' },
+    'hy': { label: 'Armenian', flag: '🇦🇲' },
+    'hz': { label: 'Herero', flag: '🇳🇦' },
+    'ia': { label: 'Interlingua', flag: '🌐' },
+    'id': { label: 'Indonesian', flag: '🇮🇩' },
+    'ie': { label: 'Interlingue', flag: '🌐' },
+    'ig': { label: 'Igbo', flag: '🇳🇬' },
+    'ii': { label: 'Nuosu', flag: '🇨🇳' },
+    'ik': { label: 'Inupiaq', flag: '🇺🇸' },
+    'il': { label: 'Israel', flag: '🇮🇱' },
+    'im': { label: 'Isle of Man', flag: '🇮🇲' },
+    'in': { label: 'India', flag: '🇮🇳' },
+    'io': { label: 'Ido', flag: '🌐' },
+    'iq': { label: 'Iraq', flag: '🇮🇶' },
+    'ir': { label: 'Iran, Islamic Republic of', flag: '🇮🇷' },
+    'is': { label: 'Icelandic', flag: '🇮🇸' },
+    'it': { label: 'Italian', flag: '🇮🇹' },
+    'it-ch': { label: 'Italian (Switzerland)', flag: '🇨🇭' },
+    'it-it': { label: 'Italian (Italy)', flag: '🇮🇹' },
+    'iu': { label: 'Inuktitut', flag: '🇨🇦' },
+    'ja': { label: 'Japanese', flag: '🇯🇵' },
+    'ja-jp': { label: 'Japanese (Japan)', flag: '🇯🇵' },
+    'je': { label: 'Jersey', flag: '🇯🇪' },
+    'jm': { label: 'Jamaica', flag: '🇯🇲' },
+    'jo': { label: 'Jordan', flag: '🇯🇴' },
+    'jp': { label: 'Japanese', flag: '🇯🇵' },
+    'jv': { label: 'Javanese', flag: '🇮🇩' },
+    'ka': { label: 'Georgian', flag: '🇬🇪' },
+    'ke': { label: 'Kenya', flag: '🇰🇪' },
+    'kg': { label: 'Kongo', flag: '🇨🇩' },
+    'kh': { label: 'Cambodia', flag: '🇰🇭' },
+    'ki': { label: 'Kikuyu', flag: '🇰🇪' },
+    'kj': { label: 'Kwanyama', flag: '🇳🇦' },
+    'kk': { label: 'Kazakh', flag: '🇰🇿' },
+    'kl': { label: 'Kalaallisut', flag: '🇬🇱' },
+    'km': { label: 'Khmer', flag: '🇰🇭' },
+    'kn': { label: 'Kannada', flag: '🇮🇳' },
+    'ko': { label: 'Korean', flag: '🇰🇷' },
+    'ko-kr': { label: 'Korean (Korea)', flag: '🇰🇷' },
+    'kp': { label: 'Korea, Democratic People\'s Republic of', flag: '🇰🇵' },
+    'kr': { label: 'Korean', flag: '🇰🇷' },
+    'ks': { label: 'Kashmiri', flag: '🇮🇳' },
+    'ku': { label: 'Kurdish', flag: '🇮🇶' },
+    'kv': { label: 'Komi', flag: '🇷🇺' },
+    'kw': { label: 'Cornish', flag: '🇬🇧' },
+    'ky': { label: 'Kyrgyz', flag: '🇰🇬' },
+    'kz': { label: 'Kazakhstan', flag: '🇰🇿' },
+    'la': { label: 'Latin', flag: '🇻🇦' },
+    'lb': { label: 'Luxembourgish', flag: '🇱🇺' },
+    'lc': { label: 'Saint Lucia', flag: '🇱🇨' },
+    'lg': { label: 'Ganda', flag: '🇺🇬' },
+    'li': { label: 'Limburgish', flag: '🇳🇱' },
+    'lk': { label: 'Sri Lanka', flag: '🇱🇰' },
+    'ln': { label: 'Lingala', flag: '🇨🇩' },
+    'lo': { label: 'Lao', flag: '🇱🇦' },
+    'lr': { label: 'Liberia', flag: '🇱🇷' },
+    'ls': { label: 'Lesotho', flag: '🇱🇸' },
+    'lt': { label: 'Lithuanian', flag: '🇱🇹' },
+    'lu': { label: 'Luba-Katanga', flag: '🇨🇩' },
+    'lv': { label: 'Latvian', flag: '🇱🇻' },
+    'ly': { label: 'Libya', flag: '🇱🇾' },
+    'ma': { label: 'Morocco', flag: '🇲🇦' },
+    'mc': { label: 'Monaco', flag: '🇲🇨' },
+    'md': { label: 'Moldova, Republic of', flag: '🇲🇩' },
+    'me': { label: 'Montenegro', flag: '🇲🇪' },
+    'mf': { label: 'Saint Martin (French part)', flag: '🇲🇫' },
+    'mg': { label: 'Malagasy', flag: '🇲🇬' },
+    'mh': { label: 'Marshallese', flag: '🇲🇭' },
+    'mi': { label: 'Māori', flag: '🇳🇿' },
+    'mk': { label: 'Macedonian', flag: '🇲🇰' },
+    'ml': { label: 'Malayalam', flag: '🇮🇳' },
+    'mm': { label: 'Myanmar', flag: '🇲🇲' },
+    'mn': { label: 'Mongolian', flag: '🇲🇳' },
+    'mo': { label: 'Macao', flag: '🇲🇴' },
+    'mp': { label: 'Northern Mariana Islands', flag: '🇲🇵' },
+    'mq': { label: 'Martinique', flag: '🇲🇶' },
+    'mr': { label: 'Marathi (Marāṭhī)', flag: '🇮🇳' },
+    'ms': { label: 'Malay', flag: '🇲🇾' },
+    'mt': { label: 'Maltese', flag: '🇲🇹' },
+    'mu': { label: 'Mauritius', flag: '🇲🇺' },
+    'mv': { label: 'Maldives', flag: '🇲🇻' },
+    'mw': { label: 'Malawi', flag: '🇲🇼' },
+    'mx': { label: 'Spanish (Mexico)', flag: '🇲🇽' },
+    'my': { label: 'Burmese', flag: '🇲🇲' },
+    'mz': { label: 'Mozambique', flag: '🇲🇿' },
+    'na': { label: 'Nauruan', flag: '🇳🇷' },
+    'nb': { label: 'Norwegian Bokmål', flag: '🇳🇴' },
+    'nb-no': { label: 'Norwegian Bokmål (Norway)', flag: '🇳🇴' },
+    'nc': { label: 'New Caledonia', flag: '🇳🇨' },
+    'nd': { label: 'Northern Ndebele', flag: '🇿🇼' },
+    'ne': { label: 'Nepali', flag: '🇳🇵' },
+    'nf': { label: 'Norfolk Island', flag: '🇳🇫' },
+    'ng': { label: 'Ndonga', flag: '🇳🇦' },
+    'ni': { label: 'Nicaragua', flag: '🇳🇮' },
+    'nl': { label: 'Dutch', flag: '🇳🇱' },
+    'nl-be': { label: 'Dutch (Belgium)', flag: '🇧🇪' },
+    'nl-nl': { label: 'Dutch (Netherlands)', flag: '🇳🇱' },
+    'nn': { label: 'Norwegian Nynorsk', flag: '🇳🇴' },
+    'nn-no': { label: 'Norwegian Nynorsk (Norway)', flag: '🇳🇴' },
+    'no': { label: 'Norwegian', flag: '🇳🇴' },
+    'np': { label: 'Nepal', flag: '🇳🇵' },
+    'nr': { label: 'Southern Ndebele', flag: '🇿🇦' },
+    'nu': { label: 'Niue', flag: '🇳🇺' },
+    'nv': { label: 'Navajo', flag: '🇺🇸' },
+    'ny': { label: 'Chichewa', flag: '🇲🇼' },
+    'nz': { label: 'New Zealand', flag: '🇳🇿' },
+    'oc': { label: 'Occitan', flag: '🇫🇷' },
+    'oj': { label: 'Ojibwe', flag: '🇨🇦' },
+    'om': { label: 'Oromo', flag: '🇪🇹' },
+    'or': { label: 'Oriya', flag: '🇮🇳' },
+    'os': { label: 'Ossetian', flag: '🇬🇪' },
+    'pa': { label: '(Eastern) Punjabi', flag: '🇮🇳' },
+    'pe': { label: 'Peru', flag: '🇵🇪' },
+    'pf': { label: 'French Polynesia', flag: '🇵🇫' },
+    'pg': { label: 'Papua New Guinea', flag: '🇵🇬' },
+    'ph': { label: 'Philippines', flag: '🇵🇭' },
+    'pi': { label: 'Pāli', flag: '🇮🇳' },
+    'pk': { label: 'Pakistan', flag: '🇵🇰' },
+    'pl': { label: 'Polish', flag: '🇵🇱' },
+    'pm': { label: 'Saint Pierre and Miquelon', flag: '🇵🇲' },
+    'pn': { label: 'Pitcairn', flag: '🇵🇳' },
+    'pr': { label: 'Puerto Rico', flag: '🇵🇷' },
+    'ps': { label: 'Pashto', flag: '🇦🇫' },
+    'pt': { label: 'Portuguese', flag: '🇵🇹' },
+    'pt-ao': { label: 'Portuguese (Angola)', flag: '🇦🇴' },
+    'pt-br': { label: 'Portuguese (Brazil)', flag: '🇧🇷' },
+    'pt-pt': { label: 'Portuguese (Portugal)', flag: '🇵🇹' },
+    'pw': { label: 'Palau', flag: '🇵🇼' },
+    'py': { label: 'Paraguay', flag: '🇵🇾' },
+    'qa': { label: 'Qatar', flag: '🇶🇦' },
+    'qu': { label: 'Quechua', flag: '🇵🇪' },
+    're': { label: 'Réunion', flag: '🇷🇪' },
+    'rm': { label: 'Romansh', flag: '🇨🇭' },
+    'rn': { label: 'Kirundi', flag: '🇧🇮' },
+    'ro': { label: 'Romanian', flag: '🇷🇴' },
+    'rs': { label: 'Serbia', flag: '🇷🇸' },
+    'ru': { label: 'Russian', flag: '🇷🇺' },
+    'ru-ru': { label: 'Russian (Russia)', flag: '🇷🇺' },
+    'rw': { label: 'Kinyarwanda', flag: '🇷🇼' },
+    'sa': { label: 'Arabic (Saudi Arabia)', flag: '🇸🇦' },
+    'sb': { label: 'Solomon Islands', flag: '🇸🇧' },
+    'sc': { label: 'Sardinian', flag: '🇮🇹' },
+    'sd': { label: 'Sindhi', flag: '🇵🇰' },
+    'se': { label: 'Swedish', flag: '🇸🇪' },
+    'sg': { label: 'Sango', flag: '🇨🇫' },
+    'sh': { label: 'Saint Helena, Ascension and Tristan da Cunha', flag: '🇸🇭' },
+    'shared': { label: 'Shared', flag: '🌐' },
+    'si': { label: 'Sinhalese', flag: '🇱🇰' },
+    'sj': { label: 'Svalbard and Jan Mayen', flag: '🇸🇯' },
+    'sk': { label: 'Slovak', flag: '🇸🇰' },
+    'sl': { label: 'Slovene', flag: '🇸🇮' },
+    'sm': { label: 'Samoan', flag: '🇼🇸' },
+    'sn': { label: 'Shona', flag: '🇿🇼' },
+    'so': { label: 'Somali', flag: '🇸🇴' },
+    'sq': { label: 'Albanian', flag: '🇦🇱' },
+    'sr': { label: 'Serbian', flag: '🇷🇸' },
+    'ss': { label: 'Swati', flag: '🇸🇿' },
+    'st': { label: 'Southern Sotho', flag: '🇱🇸' },
+    'su': { label: 'Sundanese', flag: '🇮🇩' },
+    'sv': { label: 'Swedish', flag: '🇸🇪' },
+    'sv-fi': { label: 'Swedish (Finland)', flag: '🇫🇮' },
+    'sv-se': { label: 'Swedish (Sweden)', flag: '🇸🇪' },
+    'sw': { label: 'Swahili', flag: '🇹🇿' },
+    'sx': { label: 'Sint Maarten (Dutch part)', flag: '🇸🇽' },
+    'sy': { label: 'Syrian Arab Republic', flag: '🇸🇾' },
+    'sz': { label: 'Eswatini', flag: '🇸🇿' },
+    'ta': { label: 'Tamil', flag: '🇮🇳' },
+    'tc': { label: 'Turks and Caicos Islands', flag: '🇹🇨' },
+    'td': { label: 'Chad', flag: '🇹🇩' },
+    'te': { label: 'Telugu', flag: '🇮🇳' },
+    'tf': { label: 'French Southern Territories', flag: '🇹🇫' },
+    'tg': { label: 'Tajik', flag: '🇹🇯' },
+    'th': { label: 'Thai', flag: '🇹🇭' },
+    'ti': { label: 'Tigrinya', flag: '🇪🇷' },
+    'tj': { label: 'Tajikistan', flag: '🇹🇯' },
+    'tk': { label: 'Turkmen', flag: '🇹🇲' },
+    'tl': { label: 'Tagalog', flag: '🇵🇭' },
+    'tm': { label: 'Turkmenistan', flag: '🇹🇲' },
+    'tn': { label: 'Tswana', flag: '🇧🇼' },
+    'to': { label: 'Tonga (Tonga Islands)', flag: '🇹🇴' },
+    'tr': { label: 'Turkish', flag: '🇹🇷' },
+    'ts': { label: 'Tsonga', flag: '🇿🇦' },
+    'tt': { label: 'Tatar', flag: '🇷🇺' },
+    'tv': { label: 'Tuvalu', flag: '🇹🇻' },
+    'tw': { label: 'Chinese (Traditional)', flag: '🇹🇼' },
+    'ty': { label: 'Tahitian', flag: '🇵🇫' },
+    'tz': { label: 'Tanzania, United Republic of', flag: '🇹🇿' },
+    'ua': { label: 'Ukrainian', flag: '🇺🇦' },
+    'ug': { label: 'Uyghur', flag: '🇨🇳' },
+    'uk': { label: 'English (UK)', flag: '🇬🇧' },
+    'uk-ua': { label: 'Ukrainian (Ukraine)', flag: '🇺🇦' },
+    'um': { label: 'United States Minor Outlying Islands', flag: '🇺🇲' },
+    'ur': { label: 'Urdu', flag: '🇵🇰' },
+    'us': { label: 'English (US)', flag: '🇺🇸' },
+    'uy': { label: 'Uruguay', flag: '🇺🇾' },
+    'uz': { label: 'Uzbek', flag: '🇺🇿' },
+    'va': { label: 'Holy See', flag: '🇻🇦' },
+    'vc': { label: 'Saint Vincent and the Grenadines', flag: '🇻🇨' },
+    've': { label: 'Venda', flag: '🇿🇦' },
+    'vg': { label: 'Virgin Islands (British)', flag: '🇻🇬' },
+    'vi': { label: 'Vietnamese', flag: '🇻🇳' },
+    'vn': { label: 'Viet Nam', flag: '🇻🇳' },
+    'vo': { label: 'Volapük', flag: '🌐' },
+    'vu': { label: 'Vanuatu', flag: '🇻🇺' },
+    'wa': { label: 'Walloon', flag: '🇧🇪' },
+    'wf': { label: 'Wallis and Futuna', flag: '🇼🇫' },
+    'wo': { label: 'Wolof', flag: '🇸🇳' },
+    'ws': { label: 'Samoa', flag: '🇼🇸' },
+    'xh': { label: 'Xhosa', flag: '🇿🇦' },
+    'ye': { label: 'Yemen', flag: '🇾🇪' },
+    'yi': { label: 'Yiddish', flag: '🇮🇱' },
+    'yo': { label: 'Yoruba', flag: '🇳🇬' },
+    'yt': { label: 'Mayotte', flag: '🇾🇹' },
+    'za': { label: 'Zhuang', flag: '🇨🇳' },
+    'zh': { label: 'Chinese', flag: '🇨🇳' },
+    'zh-cn': { label: 'Chinese (Simplified)', flag: '🇨🇳' },
+    'zh-hk': { label: 'Chinese (Hong Kong)', flag: '🇭🇰' },
+    'zh-mo': { label: 'Chinese (Macau)', flag: '🇲🇴' },
+    'zh-sg': { label: 'Chinese (Singapore)', flag: '🇸🇬' },
+    'zh-tw': { label: 'Chinese (Traditional)', flag: '🇹🇼' },
+    'zm': { label: 'Zambia', flag: '🇿🇲' },
+    'zu': { label: 'Zulu', flag: '🇿🇦' },
+    'zw': { label: 'Zimbabwe', flag: '🇿🇼' }
 };
-function getFlagForLocale(localeCode) {
+/** @deprecated Prefer LOCALE_CATALOG — kept for existing imports. */
+var LOCALE_META = LOCALE_CATALOG;
+/** @deprecated Prefer getFlagForLocale / LOCALE_CATALOG. */
+Object.fromEntries(Object.entries(LOCALE_CATALOG).map(function (_a) {
+    var code = _a[0], meta = _a[1];
+    return [code, meta.flag];
+}));
+/**
+ * Codes used when detecting locale folders without a site translation-config.xml.
+ * Includes ISO codes and common CMS aliases.
+ */
+var MULTI_LOCALE_CODES = Object.keys(LOCALE_CATALOG).sort(function (a, b) {
+    return a.localeCompare(b);
+});
+function getLocaleMeta(localeCode) {
     var _a, _b;
-    var k = String(localeCode || '').toLowerCase();
-    if (!k)
-        return '🌐';
-    return (_b = (_a = LOCALE_FLAG_BY_CODE[k]) !== null && _a !== void 0 ? _a : LOCALE_FLAG_BY_CODE[k.slice(0, 2)]) !== null && _b !== void 0 ? _b : '🌐';
+    var k = String(localeCode || '')
+        .trim()
+        .toLowerCase()
+        .replace(/_/g, '-');
+    if (!k) {
+        return { label: '', flag: '🌐' };
+    }
+    return ((_b = (_a = LOCALE_CATALOG[k]) !== null && _a !== void 0 ? _a : LOCALE_CATALOG[k.slice(0, 2)]) !== null && _b !== void 0 ? _b : {
+        label: k,
+        flag: '🌐'
+    });
+}
+function getFlagForLocale(localeCode) {
+    return getLocaleMeta(localeCode).flag || '🌐';
 }
 /** Avoid redundant `setTranslationConfig` when API returns a new object with the same locale list (prevents load/effect loops). */
 function translationConfigsEqual(a, b) {
@@ -52259,14 +52961,17 @@ function detectLocaleFolderNames(childPaths, rootDir, allowedLocaleCodes) {
     }
     return Array.from(new Set(names));
 }
-/** At least two configured locale folders on disk, including the site default locale (from config or `en`). */
+/** At least two locale folders on disk. When {@code baseLocale} is set, it must be among them. */
 function isMultiLocaleLayout(localeFolders, baseLocale) {
     if (localeFolders.length < 2) {
         return false;
     }
-    var base = (baseLocale || MULTI_LOCALE_BASE_LOCALE).toLowerCase();
-    var lower = localeFolders.map(function (s) { return s.toLowerCase(); });
-    return lower.includes(base);
+    if (!baseLocale || !String(baseLocale).trim()) {
+        return true;
+    }
+    var base = String(baseLocale).trim().toLowerCase().replace(/_/g, '-');
+    var lower = localeFolders.map(function (s) { return s.toLowerCase().replace(/_/g, '-'); });
+    return lower.some(function (seg) { return localeSegmentsCompatible(seg, base); });
 }
 /**
  * Full repo path for the same relative path in another locale folder.
@@ -52366,13 +53071,15 @@ function resolveLocaleFoldersOnSite(authoringBase, siteId, rootDir, configuredLo
                     primary = [];
                     _loop_2 = function (code) {
                         var match = detected.find(function (d) { return localeSegmentsCompatible(d, code); });
-                        primary.push(match !== null && match !== void 0 ? match : code);
+                        if (match && !primary.some(function (p) { return p.toLowerCase() === match.toLowerCase(); })) {
+                            primary.push(match);
+                        }
                     };
                     for (_a = 0, configured_2 = configured; _a < configured_2.length; _a++) {
                         code = configured_2[_a];
                         _loop_2(code);
                     }
-                    extra = detected.filter(function (d) { return !configured.some(function (c) { return localeSegmentsCompatible(d, c); }); });
+                    extra = detected.filter(function (d) { return !primary.some(function (p) { return localeSegmentsCompatible(d, p); }); });
                     return [2 /*return*/, __spreadArray(__spreadArray([], primary, true), extra, true)];
             }
         });
@@ -52660,6 +53367,70 @@ function TranslationDialog(props) {
 var TRANSLATION_CONFIG_PATH = '/translation-config.xml';
 var TRANSLATION_CONFIG_MODULE = 'studio';
 var UIGOODIES_PLUGIN_ID = 'org.rd.plugin.uigoodies';
+var DEFAULT_TRANSLATION_SECTION_TITLE = 'Translation';
+/** Legacy / Smart Copy section title reused when present so Fix does not rename it. */
+var DEFAULT_PREFERRED_EXISTING_SECTION_TITLES = [
+    'Alternative Locale Properties'
+];
+function resolveTranslationFormSectionOptions(options) {
+    var _a;
+    var createTitle = String((_a = options === null || options === void 0 ? void 0 : options.sectionTitle) !== null && _a !== void 0 ? _a : DEFAULT_TRANSLATION_SECTION_TITLE).trim() ||
+        DEFAULT_TRANSLATION_SECTION_TITLE;
+    var preferRaw = (options === null || options === void 0 ? void 0 : options.preferExistingSectionTitles) !== undefined
+        ? options.preferExistingSectionTitles
+        : __spreadArray([], DEFAULT_PREFERRED_EXISTING_SECTION_TITLES, true);
+    var preferExisting = [];
+    var seenPrefer = new Set();
+    for (var _i = 0, preferRaw_1 = preferRaw; _i < preferRaw_1.length; _i++) {
+        var raw = preferRaw_1[_i];
+        var title = String(raw || '').trim();
+        if (!title) {
+            continue;
+        }
+        var key = title.toLowerCase();
+        if (seenPrefer.has(key) || key === createTitle.toLowerCase()) {
+            continue;
+        }
+        seenPrefer.add(key);
+        preferExisting.push(title);
+    }
+    var acceptedLower = new Set(__spreadArray([
+        createTitle.toLowerCase()
+    ], preferExisting.map(function (t) { return t.toLowerCase(); }), true));
+    return { createTitle: createTitle, preferExisting: preferExisting, acceptedLower: acceptedLower };
+}
+function sectionTitleText(section) {
+    var _a;
+    return (((_a = section.querySelector(':scope > title')) === null || _a === void 0 ? void 0 : _a.textContent) || '').trim();
+}
+function isAcceptedTranslationSectionTitle(title, resolved) {
+    return resolved.acceptedLower.has(title.trim().toLowerCase());
+}
+/**
+ * Pick the section title to keep/create: first preferred title that already exists on the form,
+ * else an existing createTitle section, else createTitle for a new section.
+ */
+function resolveTargetTranslationSectionTitle(doc, options) {
+    var resolved = resolveTranslationFormSectionOptions(options);
+    var sections = doc.querySelector('form > sections');
+    if (!sections) {
+        return resolved.createTitle;
+    }
+    var titles = Array.from(sections.querySelectorAll(':scope > section')).map(sectionTitleText);
+    var _loop_1 = function (preferred) {
+        if (titles.some(function (t) { return t.toLowerCase() === preferred.toLowerCase(); })) {
+            return { value: preferred };
+        }
+    };
+    for (var _i = 0, _a = resolved.preferExisting; _i < _a.length; _i++) {
+        var preferred = _a[_i];
+        var state_1 = _loop_1(preferred);
+        if (typeof state_1 === "object")
+            return state_1.value;
+    }
+    var createMatch = titles.find(function (t) { return t.toLowerCase() === resolved.createTitle.toLowerCase(); });
+    return createMatch || resolved.createTitle;
+}
 /** Human-readable labels for each required piece of the Translation form definition. */
 var TRANSLATION_FORM_REQUIREMENTS = [
     { id: 'translation-section', label: 'Translation section' },
@@ -52684,6 +53455,7 @@ function lookupMeta(code) {
     if (fromMeta) {
         return { label: fromMeta.label, flag: fromMeta.flag };
     }
+    // Unknown custom folder names (e.g. site-specific aliases) still appear with a globe.
     return { label: k, flag: '🌐' };
 }
 function contentTypeFormPath(contentTypeId) {
@@ -52822,21 +53594,38 @@ var CANONICAL_FIELD_ORDER = __spreadArray([], TRANSLATION_FIELD_IDS, true);
 function allFormFields(doc) {
     return Array.from(doc.querySelectorAll('form field')).filter(function (field) { return field.querySelector(':scope > id'); });
 }
-function allTranslationSections(doc) {
+function allTranslationSections(doc, resolved) {
+    if (resolved === void 0) { resolved = resolveTranslationFormSectionOptions(); }
     var sections = doc.querySelector('form > sections');
     if (!sections) {
         return [];
     }
     return Array.from(sections.querySelectorAll(':scope > section')).filter(function (section) {
-        var _a;
-        var title = (((_a = section.querySelector(':scope > title')) === null || _a === void 0 ? void 0 : _a.textContent) || '').trim().toLowerCase();
-        return title === 'translation';
+        return isAcceptedTranslationSectionTitle(sectionTitleText(section), resolved);
     });
 }
-function findTranslationSection(doc) {
+function findTranslationSection(doc, resolved) {
     var _a;
-    var matches = allTranslationSections(doc);
-    return (_a = matches[0]) !== null && _a !== void 0 ? _a : null;
+    if (resolved === void 0) { resolved = resolveTranslationFormSectionOptions(); }
+    var matches = allTranslationSections(doc, resolved);
+    if (matches.length === 0) {
+        return null;
+    }
+    var _loop_2 = function (preferred) {
+        var hit = matches.find(function (s) { return sectionTitleText(s).toLowerCase() === preferred.toLowerCase(); });
+        if (hit) {
+            return { value: hit };
+        }
+    };
+    // Prefer preferred-existing title order, then createTitle.
+    for (var _i = 0, _b = resolved.preferExisting; _i < _b.length; _i++) {
+        var preferred = _b[_i];
+        var state_2 = _loop_2(preferred);
+        if (typeof state_2 === "object")
+            return state_2.value;
+    }
+    var createHit = matches.find(function (s) { return sectionTitleText(s).toLowerCase() === resolved.createTitle.toLowerCase(); });
+    return (_a = createHit !== null && createHit !== void 0 ? createHit : matches[0]) !== null && _a !== void 0 ? _a : null;
 }
 function translationSectionFieldElements(section) {
     if (!section) {
@@ -52877,8 +53666,8 @@ function isTranslationSectionLast(doc, section) {
     }
     return allSections[allSections.length - 1] === section;
 }
-function analyzeFormDefinition(xml) {
-    var _a;
+function analyzeFormDefinition(xml, options) {
+    var resolved = resolveTranslationFormSectionOptions(options);
     var doc = new DOMParser().parseFromString(String(xml || ''), 'application/xml');
     if (doc.querySelector('parsererror')) {
         return {
@@ -52893,9 +53682,10 @@ function analyzeFormDefinition(xml) {
             missing: ['Invalid form-definition XML']
         };
     }
-    var translationSections = allTranslationSections(doc);
-    var translationSection = (_a = translationSections[0]) !== null && _a !== void 0 ? _a : null;
+    var translationSections = allTranslationSections(doc, resolved);
+    var translationSection = findTranslationSection(doc, resolved);
     var hasTranslationSection = translationSection !== null;
+    var foundSectionTitle = translationSection ? sectionTitleText(translationSection) : undefined;
     var sectionFields = translationSectionFieldElements(translationSection);
     var localeCodeField = fieldById(sectionFields, 'localeCode_s');
     var sourceLocaleCodeField = fieldById(sectionFields, 'sourceLocaleCode_s');
@@ -52908,17 +53698,18 @@ function analyzeFormDefinition(xml) {
     var hasTranslationsField = Boolean(translationsField);
     var hasTranslationVersions = isCanonicalTranslationsField(translationsField);
     var missing = [];
+    var sectionLabel = foundSectionTitle || resolved.createTitle;
     if (!hasTranslationSection) {
-        missing.push('Translation section');
+        missing.push("Form section \"".concat(resolved.createTitle, "\" (or preferred existing)"));
     }
     if (translationSections.length > 1) {
-        missing.push("Multiple Translation sections (".concat(translationSections.length, ")"));
+        missing.push("Multiple locale/translation sections (".concat(translationSections.length, ")"));
     }
     if (translationSection && !isTranslationSectionLast(doc, translationSection)) {
-        missing.push('Translation section must be last');
+        missing.push("Section \"".concat(sectionLabel, "\" must be last"));
     }
     if (translationSection && !isTranslationSectionCollapsed(translationSection)) {
-        missing.push('Translation section must default closed');
+        missing.push("Section \"".concat(sectionLabel, "\" must default closed"));
     }
     TRANSLATION_FIELD_IDS.forEach(function (id) {
         var matches = fieldsById(doc, id);
@@ -52927,7 +53718,7 @@ function analyzeFormDefinition(xml) {
         }
         var outsideSection = matches.filter(function (field) { return !translationSection || !translationSection.contains(field); });
         if (outsideSection.length > 0) {
-            missing.push("".concat(id, " outside Translation section"));
+            missing.push("".concat(id, " outside section \"").concat(sectionLabel, "\""));
         }
     });
     if (!localeCodeField) {
@@ -52954,17 +53745,19 @@ function analyzeFormDefinition(xml) {
     else if (!hasTranslationVersions) {
         missing.push('translations (must use translation-versions control)');
     }
-    if (translationSection && sectionFields.length === CANONICAL_FIELD_ORDER.length) {
-        var orderedIds = sectionFields.map(function (field) { return fieldId(field); });
-        if (orderedIds.join(',') !== CANONICAL_FIELD_ORDER.join(',')) {
+    var translationFieldIdsInSection = sectionFields
+        .map(function (field) { return fieldId(field); })
+        .filter(function (id) { return TRANSLATION_FIELD_IDS.includes(id); });
+    if (translationSection && translationFieldIdsInSection.length === CANONICAL_FIELD_ORDER.length) {
+        if (translationFieldIdsInSection.join(',') !== CANONICAL_FIELD_ORDER.join(',')) {
             missing.push('Translation fields must be ordered: translations, localeSourceId_s, localeCode_s, sourceLocaleCode_s');
         }
     }
-    else if (translationSection && sectionFields.length > 0) {
-        missing.push('Translation section must contain exactly 4 fields');
+    else if (translationSection && translationFieldIdsInSection.length === 0) {
+        missing.push("Section \"".concat(sectionLabel, "\" has no translation fields"));
     }
-    else if (translationSection && sectionFields.length === 0) {
-        missing.push('Translation section is empty');
+    else if (translationSection && translationFieldIdsInSection.length !== CANONICAL_FIELD_ORDER.length) {
+        missing.push("Section \"".concat(sectionLabel, "\" must contain all 4 translation fields (found ").concat(translationFieldIdsInSection.length, ")"));
     }
     return {
         hasTranslationSection: hasTranslationSection,
@@ -52974,6 +53767,7 @@ function analyzeFormDefinition(xml) {
         hasCustomLocaleControl: hasCustomLocaleControl,
         hasTranslationVersions: hasTranslationVersions,
         hasTranslationsField: hasTranslationsField,
+        sectionTitle: foundSectionTitle,
         complete: missing.length === 0,
         missing: missing
     };
@@ -52987,15 +53781,6 @@ function parseFieldFragment(fragment) {
         throw new Error('Unable to build translation field fragment.');
     }
     return doc.documentElement.firstElementChild;
-}
-function removeTranslationSections(doc) {
-    var removed = 0;
-    allTranslationSections(doc).forEach(function (section) {
-        var _a;
-        (_a = section.parentNode) === null || _a === void 0 ? void 0 : _a.removeChild(section);
-        removed += 1;
-    });
-    return removed;
 }
 function removeTranslationFieldsEverywhere(doc) {
     var removed = [];
@@ -53086,29 +53871,54 @@ function ensureTranslationSectionCollapsed(doc, section) {
     }
     return false;
 }
-function createTranslationSectionAtBottom(doc) {
+function createTranslationSectionAtBottom(doc, sectionTitle) {
     var sections = doc.querySelector('form > sections');
     if (!sections) {
         throw new Error('form-definition.xml has no <sections> element.');
     }
     var section = doc.createElement('section');
     var title = doc.createElement('title');
-    title.textContent = 'Translation';
+    title.textContent = sectionTitle;
     var description = doc.createElement('description');
     var defaultOpen = doc.createElement('defaultOpen');
     defaultOpen.textContent = 'false';
     var fields = doc.createElement('fields');
     section.append(title, description, defaultOpen, fields);
     sections.appendChild(section);
+    return section;
+}
+function ensureSectionFieldsContainer(doc, section) {
+    var fields = section.querySelector(':scope > fields');
+    if (!fields) {
+        fields = doc.createElement('fields');
+        section.appendChild(fields);
+    }
     return fields;
 }
-/** Move Translation section to the bottom and put translation-versions first inside it. */
-function ensureTranslationFormLayout(doc) {
+function moveNonTranslationFields(fromSection, toFields) {
+    var fromFields = fromSection.querySelector(':scope > fields');
+    if (!fromFields) {
+        return 0;
+    }
+    var moved = 0;
+    Array.from(fromFields.querySelectorAll(':scope > field')).forEach(function (field) {
+        var id = fieldId(field);
+        if (TRANSLATION_FIELD_IDS.includes(id)) {
+            return;
+        }
+        toFields.appendChild(field);
+        moved += 1;
+    });
+    return moved;
+}
+/** Move locale/translation section to the bottom and collapse it by default. */
+function ensureTranslationFormLayout(doc, options) {
+    var resolved = resolveTranslationFormSectionOptions(options);
     var sections = doc.querySelector('form > sections');
     if (!sections) {
         return false;
     }
-    var translationSection = findTranslationSection(doc);
+    var translationSection = findTranslationSection(doc, resolved);
     if (!translationSection) {
         return false;
     }
@@ -53121,67 +53931,124 @@ function ensureTranslationFormLayout(doc) {
         changed = true;
     }
     var fields = translationSection.querySelector(':scope > fields');
-    if (fields) {
-        var translationField = Array.from(fields.querySelectorAll(':scope > field')).find(function (field) {
-            return fieldId(field) === 'translations';
-        });
-        var firstField = fields.querySelector(':scope > field');
-        if (translationField && firstField && translationField !== firstField) {
-            fields.insertBefore(translationField, firstField);
-            changed = true;
-        }
+    if (fields && orderTranslationFieldsInSection(fields)) {
+        changed = true;
     }
     return changed;
 }
-function consolidateTranslationForm(doc) {
+function orderTranslationFieldsInSection(fields) {
+    var allFields = Array.from(fields.querySelectorAll(':scope > field'));
+    var byId = new Map();
+    allFields.forEach(function (field) {
+        var id = fieldId(field);
+        if (TRANSLATION_FIELD_IDS.includes(id) && !byId.has(id)) {
+            byId.set(id, field);
+        }
+    });
+    var ordered = CANONICAL_FIELD_ORDER.map(function (id) { return byId.get(id); }).filter(function (f) { return Boolean(f); });
+    if (ordered.length === 0) {
+        return false;
+    }
+    var currentOrder = allFields
+        .map(function (field) { return fieldId(field); })
+        .filter(function (id) { return TRANSLATION_FIELD_IDS.includes(id); });
+    var desiredOrder = ordered.map(function (field) { return fieldId(field); });
+    if (currentOrder.join(',') === desiredOrder.join(',')) {
+        return false;
+    }
+    var insertAt = 0;
+    for (var i = 0; i < allFields.length; i += 1) {
+        if (TRANSLATION_FIELD_IDS.includes(fieldId(allFields[i]))) {
+            break;
+        }
+        insertAt += 1;
+    }
+    var others = allFields.filter(function (field) { return !TRANSLATION_FIELD_IDS.includes(fieldId(field)); });
+    while (fields.firstChild) {
+        fields.removeChild(fields.firstChild);
+    }
+    others.slice(0, insertAt).forEach(function (field) { return fields.appendChild(field); });
+    ordered.forEach(function (field) { return fields.appendChild(field); });
+    others.slice(insertAt).forEach(function (field) { return fields.appendChild(field); });
+    return true;
+}
+function consolidateTranslationForm(doc, options) {
+    var _a;
+    var resolved = resolveTranslationFormSectionOptions(options);
+    var targetTitle = resolveTargetTranslationSectionTitle(doc, options);
     var actions = [];
     var harvested = harvestTranslationFields(doc);
     var movedFromElsewhere = TRANSLATION_FIELD_IDS.filter(function (id) {
-        var _a;
         var field = harvested.get(id);
         if (!field) {
             return false;
         }
         var section = field.closest('section');
-        var title = (((_a = section === null || section === void 0 ? void 0 : section.querySelector(':scope > title')) === null || _a === void 0 ? void 0 : _a.textContent) || '').trim().toLowerCase();
-        return title !== 'translation';
+        var title = section ? sectionTitleText(section) : '';
+        return title.toLowerCase() !== targetTitle.toLowerCase();
     });
     if (movedFromElsewhere.length > 0) {
-        actions.push("Moved translation fields into Translation section: ".concat(movedFromElsewhere.join(', ')));
+        actions.push("Moved translation fields into section \"".concat(targetTitle, "\": ").concat(movedFromElsewhere.join(', ')));
     }
-    var removedSections = removeTranslationSections(doc);
-    if (removedSections > 0) {
-        actions.push(removedSections === 1 ? 'Rebuilt Translation section' : "Rebuilt ".concat(removedSections, " Translation sections"));
+    // Prefer keeping an existing target section (preserves non-translation fields).
+    var targetSection = null;
+    var sectionsEl = doc.querySelector('form > sections');
+    if (sectionsEl) {
+        targetSection =
+            (_a = Array.from(sectionsEl.querySelectorAll(':scope > section')).find(function (section) { return sectionTitleText(section).toLowerCase() === targetTitle.toLowerCase(); })) !== null && _a !== void 0 ? _a : null;
+    }
+    if (!targetSection) {
+        targetSection = createTranslationSectionAtBottom(doc, targetTitle);
+        actions.push("Created section \"".concat(targetTitle, "\""));
+    }
+    var targetFields = ensureSectionFieldsContainer(doc, targetSection);
+    // Merge extras from duplicate accepted sections, then remove those duplicates.
+    var duplicates = allTranslationSections(doc, resolved).filter(function (section) { return section !== targetSection; });
+    var preservedExtras = 0;
+    duplicates.forEach(function (section) {
+        var _a;
+        preservedExtras += moveNonTranslationFields(section, targetFields);
+        (_a = section.parentNode) === null || _a === void 0 ? void 0 : _a.removeChild(section);
+    });
+    if (duplicates.length > 0) {
+        actions.push(duplicates.length === 1
+            ? "Removed duplicate locale/translation section"
+            : "Removed ".concat(duplicates.length, " duplicate locale/translation sections"));
+    }
+    if (preservedExtras > 0) {
+        actions.push("Preserved ".concat(preservedExtras, " non-translation field(s) in \"").concat(targetTitle, "\""));
     }
     var removedFields = removeTranslationFieldsEverywhere(doc);
     if (removedFields.length > 0 && movedFromElsewhere.length === 0) {
         var unique = Array.from(new Set(removedFields));
-        actions.push("Removed stray translation fields: ".concat(unique.join(', ')));
+        actions.push("Normalized translation fields: ".concat(unique.join(', ')));
     }
-    var fieldsContainer = createTranslationSectionAtBottom(doc);
     var added = [];
     CANONICAL_FIELD_ORDER.forEach(function (id) {
         if (!harvested.has(id)) {
             added.push(id);
         }
-        fieldsContainer.appendChild(buildCanonicalTranslationField(doc, id, harvested));
+        targetFields.appendChild(buildCanonicalTranslationField(doc, id, harvested));
     });
     if (added.length > 0) {
         actions.push("Added missing translation fields: ".concat(added.join(', ')));
     }
-    ensureTranslationFormLayout(doc);
+    if (orderTranslationFieldsInSection(targetFields)) {
+        actions.push("Ordered translation fields in \"".concat(targetTitle, "\""));
+    }
+    ensureTranslationFormLayout(doc, options);
     return actions;
 }
-function patchFormDefinitionWithTranslationFields(xml) {
+function patchFormDefinitionWithTranslationFields(xml, options) {
     var originalXml = String(xml || '');
     var doc = new DOMParser().parseFromString(originalXml, 'application/xml');
     if (doc.querySelector('parsererror')) {
         throw new Error('Unable to parse form-definition.xml.');
     }
-    var beforeStatus = analyzeFormDefinition(originalXml);
-    var actions = consolidateTranslationForm(doc);
+    var beforeStatus = analyzeFormDefinition(originalXml, options);
+    var actions = consolidateTranslationForm(doc, options);
     var serialized = new XMLSerializer().serializeToString(doc);
-    var afterStatus = analyzeFormDefinition(serialized);
+    var afterStatus = analyzeFormDefinition(serialized, options);
     var changed = serialized !== originalXml || !beforeStatus.complete;
     return {
         xml: serialized,
@@ -53677,6 +54544,12 @@ function TranslationConfigTools() {
     var _o = useState(false), applyLoading = _o[0], setApplyLoading = _o[1];
     var _p = useState(false), scaffoldOpen = _p[0], setScaffoldOpen = _p[1];
     var _q = useState(false), scaffoldLoading = _q[0], setScaffoldLoading = _q[1];
+    var _r = useState(DEFAULT_TRANSLATION_SECTION_TITLE), sectionTitle = _r[0], setSectionTitle = _r[1];
+    var _s = useState(__spreadArray([], DEFAULT_PREFERRED_EXISTING_SECTION_TITLES, true)), preferExistingTitles = _s[0], setPreferExistingTitles = _s[1];
+    var formSectionOptions = useMemo(function () { return ({
+        sectionTitle: sectionTitle.trim() || DEFAULT_TRANSLATION_SECTION_TITLE,
+        preferExistingSectionTitles: preferExistingTitles
+    }); }, [sectionTitle, preferExistingTitles]);
     var localeSuggestions = useMemo(function () { return suggestedLocaleOptions(); }, []);
     var localePreview = useMemo(function () {
         return configModel.languages
@@ -53741,7 +54614,7 @@ function TranslationConfigTools() {
                 id: type.id,
                 name: type.name || type.id,
                 formPath: formPath,
-                status: analyzeFormDefinition(xml)
+                status: analyzeFormDefinition(xml, formSectionOptions)
             }); }), catchError(function () {
                 return of({
                     id: type.id,
@@ -53778,7 +54651,7 @@ function TranslationConfigTools() {
             }
         });
         return function () { return sub.unsubscribe(); };
-    }, [siteId]);
+    }, [siteId, formSectionOptions]);
     useEffect(function () {
         if (tab === 'content-types' && siteId && typeRows.length === 0 && !typesLoading) {
             scanContentTypes();
@@ -53868,7 +54741,7 @@ function TranslationConfigTools() {
         from(targets)
             .pipe(concatMap(function (row) {
             return fetchConfigurationXML(siteId, row.formPath, TRANSLATION_CONFIG_MODULE).pipe(mergeMap(function (xml) {
-                var patched = patchFormDefinitionWithTranslationFields(xml);
+                var patched = patchFormDefinitionWithTranslationFields(xml, formSectionOptions);
                 if (!patched.changed) {
                     return of({ id: row.id, skipped: true });
                 }
@@ -53967,9 +54840,29 @@ function TranslationConfigTools() {
                                         else {
                                             setSelectedTypeIds(new Set());
                                         }
-                                    } }), label: "Select incomplete" })] }), typesError && jsx(Alert, { severity: "error", children: typesError }), jsxs(Alert, { severity: "info", sx: { mb: 2 }, children: ["Each content type must have exactly one Translation section (last on the form, collapsed by default) containing", ' ', TRANSLATION_FORM_REQUIREMENTS.filter(function (req) { return req.id !== 'translation-section'; })
+                                    } }), label: "Select incomplete" })] }), typesError && jsx(Alert, { severity: "error", children: typesError }), jsxs(Box$1, { sx: {
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 1.5,
+                            p: 1.5,
+                            border: 1,
+                            borderColor: 'divider',
+                            borderRadius: 1,
+                            maxWidth: 720
+                        }, children: [jsx(Typography, { variant: "subtitle2", children: "Form section" }), jsx(TextField$1, { size: "small", label: "Section title when creating new", value: sectionTitle, onChange: function (event) { return setSectionTitle(event.target.value); }, helperText: "Default: ".concat(DEFAULT_TRANSLATION_SECTION_TITLE), sx: { maxWidth: 420 } }), jsx(Autocomplete, { multiple: true, freeSolo: true, size: "small", options: __spreadArray([], DEFAULT_PREFERRED_EXISTING_SECTION_TITLES, true), value: preferExistingTitles, onChange: function (_, value) {
+                                    return setPreferExistingTitles(value
+                                        .map(function (item) { return String(item).trim(); })
+                                        .filter(Boolean)
+                                        .filter(function (title, index, all) {
+                                        return all.findIndex(function (t) { return t.toLowerCase() === title.toLowerCase(); }) === index;
+                                    }));
+                                }, renderTags: function (value, getTagProps) {
+                                    return value.map(function (option, index) { return (createElement(Chip, __assign({ variant: "outlined", label: option, size: "small" }, getTagProps({ index: index }), { key: option }))); });
+                                }, renderInput: function (params) { return (jsx(TextField$1, __assign({}, params, { label: "Prefer existing section if present", placeholder: "Add section title", helperText: 'If a listed section already exists (e.g. Smart Copy \u201CAlternative Locale Properties\u201D), Fix reuses it and keeps other fields in that section.' }))); } })] }), jsxs(Alert, { severity: "info", sx: { mb: 2 }, children: ["Each content type must have exactly one locale/translation section (last on the form, collapsed by default) containing", ' ', TRANSLATION_FORM_REQUIREMENTS.filter(function (req) { return req.id !== 'translation-section'; })
                                 .map(function (req) { return req.label; })
-                                .join('; '), ". The translations control renders at the top of the form. Use ", jsx("strong", { children: "Fix translation setup" }), " to move stray fields, remove duplicates, and repair broken layouts."] }), !typesLoading && typeRows.length === 0 && !typesError && (jsx(Alert, { severity: "info", children: "Scan content types to see which definitions need Translation fields." })), typeRows.length > 0 && (jsx(Box$1, { sx: { overflow: 'auto' }, children: jsxs(Table, { size: "small", stickyHeader: true, children: [jsx(TableHead, { children: jsxs(TableRow, { children: [jsx(TableCell, { padding: "checkbox" }), jsx(TableCell, { children: "Content type" }), jsx(TableCell, { children: "Status" }), jsx(TableCell, { children: "Missing" })] }) }), jsx(TableBody, { children: typeRows.map(function (row) {
+                                .join('; '), ". Scan/Fix use section ", jsx("strong", { children: formSectionOptions.sectionTitle }), preferExistingTitles.length > 0
+                                ? ", preferring existing: ".concat(preferExistingTitles.map(function (t) { return "\u201C".concat(t, "\u201D"); }).join(', '))
+                                : '', ". Extra non-translation fields in a preferred section are preserved."] }), !typesLoading && typeRows.length === 0 && !typesError && (jsx(Alert, { severity: "info", children: "Scan content types to see which definitions need Translation fields." })), typeRows.length > 0 && (jsx(Box$1, { sx: { overflow: 'auto' }, children: jsxs(Table, { size: "small", stickyHeader: true, children: [jsx(TableHead, { children: jsxs(TableRow, { children: [jsx(TableCell, { padding: "checkbox" }), jsx(TableCell, { children: "Content type" }), jsx(TableCell, { children: "Status" }), jsx(TableCell, { children: "Missing" })] }) }), jsx(TableBody, { children: typeRows.map(function (row) {
                                         var checked = selectedTypeIds.has(row.id);
                                         return (jsxs(TableRow, { hover: true, selected: checked, children: [jsx(TableCell, { padding: "checkbox", children: jsx(Checkbox, { checked: checked, onChange: function (event) {
                                                             setSelectedTypeIds(function (prev) {

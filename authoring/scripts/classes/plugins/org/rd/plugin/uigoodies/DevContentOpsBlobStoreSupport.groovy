@@ -791,7 +791,8 @@ final class DevContentOpsBlobStoreSupport {
         String siteId,
         String storeId,
         String publishingTarget,
-        int maxResults = 200
+        int maxResults = 200,
+        String keyword = null
     ) {
         Map configParse = parseBlobStoresConfig(applicationContext, siteId, contentRepo)
         Map store = (configParse.stores as List<Map>)?.find { it.id == storeId }
@@ -835,8 +836,14 @@ final class DevContentOpsBlobStoreSupport {
             String keyMarker = null
             String versionIdMarker = null
             int limit = Math.max(1, Math.min(maxResults, 500))
+            String keywordFilter = DevContentOpsSupport.jsonSafeText(keyword)?.toLowerCase()
+            int pagesScanned = 0
+            final int maxScanPages = 200
+            boolean scanTruncated = false
 
-            while (entries.size() < limit) {
+            // Scan the full prefix before sorting/limiting. Stopping early at `limit` misses delete
+            // markers that appear later in S3 lexicographic order (version history queries one key).
+            while (pagesScanned < maxScanPages) {
                 ListObjectVersionsRequest.Builder requestBuilder = ListObjectVersionsRequest.builder()
                     .bucket(bucket)
                     .prefix(keyPrefix)
@@ -848,6 +855,7 @@ final class DevContentOpsBlobStoreSupport {
                     requestBuilder.versionIdMarker(versionIdMarker)
                 }
                 ListObjectVersionsResponse response = client.listObjectVersions(requestBuilder.build())
+                pagesScanned++
 
                 (response?.deleteMarkers() ?: []).each { DeleteMarkerEntry marker ->
                     if (!Boolean.TRUE.equals(marker?.isLatest())) {
@@ -860,6 +868,13 @@ final class DevContentOpsBlobStoreSupport {
                     String sitePath = keyToSitePath(mapping, markerKey)
                     if (!compiled.matcher(sitePath).matches()) {
                         return
+                    }
+                    if (keywordFilter) {
+                        String pathLower = sitePath.toLowerCase()
+                        String keyLower = markerKey.toLowerCase()
+                        if (!pathLower.contains(keywordFilter) && !keyLower.contains(keywordFilter)) {
+                            return
+                        }
                     }
                     entries.add([
                         path: sitePath,
@@ -879,6 +894,9 @@ final class DevContentOpsBlobStoreSupport {
                     break
                 }
             }
+            if (pagesScanned >= maxScanPages) {
+                scanTruncated = true
+            }
 
             entries = entries.unique { it.path as String }
             entries.sort { a, b ->
@@ -886,7 +904,9 @@ final class DevContentOpsBlobStoreSupport {
                 String bDate = b.lastModified as String
                 return bDate <=> aDate
             }
-            if (entries.size() > limit) {
+            int totalDeletedFound = entries.size()
+            boolean resultsTruncated = totalDeletedFound > limit
+            if (resultsTruncated) {
                 entries = entries.subList(0, limit)
             }
 
@@ -897,6 +917,10 @@ final class DevContentOpsBlobStoreSupport {
                 bucket: bucket,
                 prefix: keyPrefix,
                 deletedCount: entries.size(),
+                totalDeletedFound: totalDeletedFound,
+                truncated: resultsTruncated || scanTruncated,
+                scanComplete: !scanTruncated,
+                keyword: keywordFilter ?: '',
                 entries: entries
             ]
         } catch (Exception e) {

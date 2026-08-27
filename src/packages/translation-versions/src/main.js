@@ -14,13 +14,418 @@ function bootTranslationVersionsControl() {
 
   /** Keep in sync with translation-components `config/multiLocaleConfig.ts`. */
   var BASE_LOCALE = "en";
-  var MULTI_LOCALE_CODES = ["en", "es", "ja", "zh"];
+  var MULTI_LOCALE_CODES = ["aa","ab","ad","ae","af","ag","ai","ak","al","am","an","ao","aq","ar","ar-ae","ar-bh","ar-dz","ar-eg","ar-iq","ar-jo","ar-kw","ar-lb","ar-ly","ar-ma","ar-om","ar-qa","ar-sa","ar-sy","ar-tn","ar-ye","as","at","au","av","aw","ax","ay","az","ba","bb","bd","be","bf","bg","bh","bi","bj","bl","bm","bn","bn-bd","bn-in","bo","bq","br","bs","bt","bv","bw","by","bz","ca","cc","cd","ce","cf","cg","ch","ci","ck","cl","cm","cn","co","common","cr","cs","cu","cv","cw","cx","cy","cz","da","de","de-at","de-ch","de-de","de-li","de-lu","dj","dk","dm","do","dv","dz","ec","ee","eg","eh","el","en","en-au","en-bz","en-ca","en-gb","en-hk","en-ie","en-in","en-jm","en-my","en-nz","en-ph","en-sg","en-tt","en-us","en-za","en-zw","eo","er","es","es-ar","es-bo","es-cl","es-co","es-cr","es-do","es-ec","es-es","es-gt","es-hn","es-mx","es-ni","es-pa","es-pe","es-pr","es-py","es-sv","es-uy","es-ve","et","eu","fa","ff","fi","fj","fk","fm","fo","fr","fr-be","fr-ca","fr-ch","fr-fr","fr-lu","fr-mc","fy","ga","gb","gd","ge","gf","gg","gh","gi","gl","global","gm","gn","gp","gq","gr","gs","gt","gu","gv","gw","gy","ha","he","hi","hk","hm","hn","ho","hr","ht","hu","hy","hz","ia","id","ie","ig","ii","ik","il","im","in","io","iq","ir","is","it","it-ch","it-it","iu","ja","ja-jp","je","jm","jo","jp","jv","ka","ke","kg","kh","ki","kj","kk","kl","km","kn","ko","ko-kr","kp","kr","ks","ku","kv","kw","ky","kz","la","lb","lc","lg","li","lk","ln","lo","lr","ls","lt","lu","lv","ly","ma","mc","md","me","mf","mg","mh","mi","mk","ml","mm","mn","mo","mp","mq","mr","ms","mt","mu","mv","mw","mx","my","mz","na","nb","nb-no","nc","nd","ne","nf","ng","ni","nl","nl-be","nl-nl","nn","nn-no","no","np","nr","nu","nv","ny","nz","oc","oj","om","or","os","pa","pe","pf","pg","ph","pi","pk","pl","pm","pn","pr","ps","pt","pt-ao","pt-br","pt-pt","pw","py","qa","qu","re","rm","rn","ro","rs","ru","ru-ru","rw","sa","sb","sc","sd","se","sg","sh","shared","si","sj","sk","sl","sm","sn","so","sq","sr","ss","st","su","sv","sv-fi","sv-se","sw","sx","sy","sz","ta","tc","td","te","tf","tg","th","ti","tj","tk","tl","tm","tn","to","tr","ts","tt","tv","tw","ty","tz","ua","ug","uk","uk-ua","um","ur","us","uy","uz","va","vc","ve","vg","vi","vn","vo","vu","wa","wf","wo","ws","xh","ye","yi","yo","yt","za","zh","zh-cn","zh-hk","zh-mo","zh-sg","zh-tw","zm","zu","zw"];
   var LOCALE_META = {
-    en: { label: "English", flag: "\uD83C\uDDFA\uD83C\uDDF8" },
-    es: { label: "Spanish", flag: "\uD83C\uDDEA\uD83C\uDDF8" },
-    ja: { label: "Japanese", flag: "\uD83C\uDDEF\uD83C\uDDF5" },
-    zh: { label: "Chinese", flag: "\uD83C\uDDE8\uD83C\uDDF3" },
-    ar: { label: "Arabic", flag: "\uD83C\uDDF8\uD83C\uDDE6" }
+    "aa": { label: "Afar", flag: "🇪🇹" },
+    "ab": { label: "Abkhaz", flag: "🇬🇪" },
+    "ad": { label: "Andorra", flag: "🇦🇩" },
+    "ae": { label: "Arabic (UAE)", flag: "🇦🇪" },
+    "af": { label: "Afrikaans", flag: "🇿🇦" },
+    "ag": { label: "Antigua and Barbuda", flag: "🇦🇬" },
+    "ai": { label: "Anguilla", flag: "🇦🇮" },
+    "ak": { label: "Akan", flag: "🇬🇭" },
+    "al": { label: "Albania", flag: "🇦🇱" },
+    "am": { label: "Amharic", flag: "🇪🇹" },
+    "an": { label: "Aragonese", flag: "🇪🇸" },
+    "ao": { label: "Angola", flag: "🇦🇴" },
+    "aq": { label: "Antarctica", flag: "🇦🇶" },
+    "ar": { label: "Arabic", flag: "🇸🇦" },
+    "ar-ae": { label: "Arabic (UAE)", flag: "🇦🇪" },
+    "ar-bh": { label: "Arabic (Bahrain)", flag: "🇧🇭" },
+    "ar-dz": { label: "Arabic (Algeria)", flag: "🇩🇿" },
+    "ar-eg": { label: "Arabic (Egypt)", flag: "🇪🇬" },
+    "ar-iq": { label: "Arabic (Iraq)", flag: "🇮🇶" },
+    "ar-jo": { label: "Arabic (Jordan)", flag: "🇯🇴" },
+    "ar-kw": { label: "Arabic (Kuwait)", flag: "🇰🇼" },
+    "ar-lb": { label: "Arabic (Lebanon)", flag: "🇱🇧" },
+    "ar-ly": { label: "Arabic (Libya)", flag: "🇱🇾" },
+    "ar-ma": { label: "Arabic (Morocco)", flag: "🇲🇦" },
+    "ar-om": { label: "Arabic (Oman)", flag: "🇴🇲" },
+    "ar-qa": { label: "Arabic (Qatar)", flag: "🇶🇦" },
+    "ar-sa": { label: "Arabic (Saudi Arabia)", flag: "🇸🇦" },
+    "ar-sy": { label: "Arabic (Syria)", flag: "🇸🇾" },
+    "ar-tn": { label: "Arabic (Tunisia)", flag: "🇹🇳" },
+    "ar-ye": { label: "Arabic (Yemen)", flag: "🇾🇪" },
+    "as": { label: "Assamese", flag: "🇮🇳" },
+    "at": { label: "Austria", flag: "🇦🇹" },
+    "au": { label: "English (Australia)", flag: "🇦🇺" },
+    "av": { label: "Avaric", flag: "🇷🇺" },
+    "aw": { label: "Aruba", flag: "🇦🇼" },
+    "ax": { label: "Åland Islands", flag: "🇦🇽" },
+    "ay": { label: "Aymara", flag: "🇧🇴" },
+    "az": { label: "Azerbaijani", flag: "🇦🇿" },
+    "ba": { label: "Bashkir", flag: "🇷🇺" },
+    "bb": { label: "Barbados", flag: "🇧🇧" },
+    "bd": { label: "Bangladesh", flag: "🇧🇩" },
+    "be": { label: "Belarusian", flag: "🇧🇾" },
+    "bf": { label: "Burkina Faso", flag: "🇧🇫" },
+    "bg": { label: "Bulgarian", flag: "🇧🇬" },
+    "bh": { label: "Bihari", flag: "🇮🇳" },
+    "bi": { label: "Bislama", flag: "🇻🇺" },
+    "bj": { label: "Benin", flag: "🇧🇯" },
+    "bl": { label: "Saint Barthélemy", flag: "🇧🇱" },
+    "bm": { label: "Bambara", flag: "🇲🇱" },
+    "bn": { label: "Bengali", flag: "🇧🇩" },
+    "bn-bd": { label: "Bengali (Bangladesh)", flag: "🇧🇩" },
+    "bn-in": { label: "Bengali (India)", flag: "🇮🇳" },
+    "bo": { label: "Tibetan Standard", flag: "🇨🇳" },
+    "bq": { label: "Bonaire, Sint Eustatius and Saba", flag: "🇧🇶" },
+    "br": { label: "Portuguese (Brazil)", flag: "🇧🇷" },
+    "bs": { label: "Bosnian", flag: "🇧🇦" },
+    "bt": { label: "Bhutan", flag: "🇧🇹" },
+    "bv": { label: "Bouvet Island", flag: "🇧🇻" },
+    "bw": { label: "Botswana", flag: "🇧🇼" },
+    "by": { label: "Belarus", flag: "🇧🇾" },
+    "bz": { label: "Belize", flag: "🇧🇿" },
+    "ca": { label: "Catalan", flag: "🇦🇩" },
+    "cc": { label: "Cocos (Keeling) Islands", flag: "🇨🇨" },
+    "cd": { label: "Congo, Democratic Republic of the", flag: "🇨🇩" },
+    "ce": { label: "Chechen", flag: "🇷🇺" },
+    "cf": { label: "Central African Republic", flag: "🇨🇫" },
+    "cg": { label: "Congo", flag: "🇨🇬" },
+    "ch": { label: "Chamorro", flag: "🇬🇺" },
+    "ci": { label: "Côte d'Ivoire", flag: "🇨🇮" },
+    "ck": { label: "Cook Islands", flag: "🇨🇰" },
+    "cl": { label: "Chile", flag: "🇨🇱" },
+    "cm": { label: "Cameroon", flag: "🇨🇲" },
+    "cn": { label: "Chinese", flag: "🇨🇳" },
+    "co": { label: "Corsican", flag: "🇫🇷" },
+    "common": { label: "Common", flag: "🌐" },
+    "cr": { label: "Cree", flag: "🇨🇦" },
+    "cs": { label: "Czech", flag: "🇨🇿" },
+    "cu": { label: "Old Church Slavonic", flag: "🇷🇺" },
+    "cv": { label: "Chuvash", flag: "🇷🇺" },
+    "cw": { label: "Curaçao", flag: "🇨🇼" },
+    "cx": { label: "Christmas Island", flag: "🇨🇽" },
+    "cy": { label: "Welsh", flag: "🇬🇧" },
+    "cz": { label: "Czechia", flag: "🇨🇿" },
+    "da": { label: "Danish", flag: "🇩🇰" },
+    "de": { label: "German", flag: "🇩🇪" },
+    "de-at": { label: "German (Austria)", flag: "🇦🇹" },
+    "de-ch": { label: "German (Switzerland)", flag: "🇨🇭" },
+    "de-de": { label: "German (Germany)", flag: "🇩🇪" },
+    "de-li": { label: "German (Liechtenstein)", flag: "🇱🇮" },
+    "de-lu": { label: "German (Luxembourg)", flag: "🇱🇺" },
+    "dj": { label: "Djibouti", flag: "🇩🇯" },
+    "dk": { label: "Danish", flag: "🇩🇰" },
+    "dm": { label: "Dominica", flag: "🇩🇲" },
+    "do": { label: "Dominican Republic", flag: "🇩🇴" },
+    "dv": { label: "Divehi", flag: "🇲🇻" },
+    "dz": { label: "Dzongkha", flag: "🇧🇹" },
+    "ec": { label: "Ecuador", flag: "🇪🇨" },
+    "ee": { label: "Ewe", flag: "🇬🇭" },
+    "eg": { label: "Egypt", flag: "🇪🇬" },
+    "eh": { label: "Western Sahara", flag: "🇪🇭" },
+    "el": { label: "Greek (modern)", flag: "🇬🇷" },
+    "en": { label: "English", flag: "🇺🇸" },
+    "en-au": { label: "English (Australia)", flag: "🇦🇺" },
+    "en-bz": { label: "English (Belize)", flag: "🇧🇿" },
+    "en-ca": { label: "English (Canada)", flag: "🇨🇦" },
+    "en-gb": { label: "English (UK)", flag: "🇬🇧" },
+    "en-hk": { label: "English (Hong Kong)", flag: "🇭🇰" },
+    "en-ie": { label: "English (Ireland)", flag: "🇮🇪" },
+    "en-in": { label: "English (India)", flag: "🇮🇳" },
+    "en-jm": { label: "English (Jamaica)", flag: "🇯🇲" },
+    "en-my": { label: "English (Malaysia)", flag: "🇲🇾" },
+    "en-nz": { label: "English (New Zealand)", flag: "🇳🇿" },
+    "en-ph": { label: "English (Philippines)", flag: "🇵🇭" },
+    "en-sg": { label: "English (Singapore)", flag: "🇸🇬" },
+    "en-tt": { label: "English (Trinidad & Tobago)", flag: "🇹🇹" },
+    "en-us": { label: "English (US)", flag: "🇺🇸" },
+    "en-za": { label: "English (South Africa)", flag: "🇿🇦" },
+    "en-zw": { label: "English (Zimbabwe)", flag: "🇿🇼" },
+    "eo": { label: "Esperanto", flag: "🌐" },
+    "er": { label: "Eritrea", flag: "🇪🇷" },
+    "es": { label: "Spanish", flag: "🇪🇸" },
+    "es-ar": { label: "Spanish (Argentina)", flag: "🇦🇷" },
+    "es-bo": { label: "Spanish (Bolivia)", flag: "🇧🇴" },
+    "es-cl": { label: "Spanish (Chile)", flag: "🇨🇱" },
+    "es-co": { label: "Spanish (Colombia)", flag: "🇨🇴" },
+    "es-cr": { label: "Spanish (Costa Rica)", flag: "🇨🇷" },
+    "es-do": { label: "Spanish (Dominican Republic)", flag: "🇩🇴" },
+    "es-ec": { label: "Spanish (Ecuador)", flag: "🇪🇨" },
+    "es-es": { label: "Spanish (Spain)", flag: "🇪🇸" },
+    "es-gt": { label: "Spanish (Guatemala)", flag: "🇬🇹" },
+    "es-hn": { label: "Spanish (Honduras)", flag: "🇭🇳" },
+    "es-mx": { label: "Spanish (Mexico)", flag: "🇲🇽" },
+    "es-ni": { label: "Spanish (Nicaragua)", flag: "🇳🇮" },
+    "es-pa": { label: "Spanish (Panama)", flag: "🇵🇦" },
+    "es-pe": { label: "Spanish (Peru)", flag: "🇵🇪" },
+    "es-pr": { label: "Spanish (Puerto Rico)", flag: "🇵🇷" },
+    "es-py": { label: "Spanish (Paraguay)", flag: "🇵🇾" },
+    "es-sv": { label: "Spanish (El Salvador)", flag: "🇸🇻" },
+    "es-uy": { label: "Spanish (Uruguay)", flag: "🇺🇾" },
+    "es-ve": { label: "Spanish (Venezuela)", flag: "🇻🇪" },
+    "et": { label: "Estonian", flag: "🇪🇪" },
+    "eu": { label: "Basque", flag: "🇪🇸" },
+    "fa": { label: "Persian (Farsi)", flag: "🇮🇷" },
+    "ff": { label: "Fula", flag: "🇸🇳" },
+    "fi": { label: "Finnish", flag: "🇫🇮" },
+    "fj": { label: "Fijian", flag: "🇫🇯" },
+    "fk": { label: "Falkland Islands (Malvinas)", flag: "🇫🇰" },
+    "fm": { label: "Micronesia, Federated States of", flag: "🇫🇲" },
+    "fo": { label: "Faroese", flag: "🇫🇴" },
+    "fr": { label: "French", flag: "🇫🇷" },
+    "fr-be": { label: "French (Belgium)", flag: "🇧🇪" },
+    "fr-ca": { label: "French (Canada)", flag: "🇨🇦" },
+    "fr-ch": { label: "French (Switzerland)", flag: "🇨🇭" },
+    "fr-fr": { label: "French (France)", flag: "🇫🇷" },
+    "fr-lu": { label: "French (Luxembourg)", flag: "🇱🇺" },
+    "fr-mc": { label: "French (Monaco)", flag: "🇲🇨" },
+    "fy": { label: "Western Frisian", flag: "🇳🇱" },
+    "ga": { label: "Irish", flag: "🇮🇪" },
+    "gb": { label: "English (UK)", flag: "🇬🇧" },
+    "gd": { label: "Scottish Gaelic", flag: "🇬🇧" },
+    "ge": { label: "Georgia", flag: "🇬🇪" },
+    "gf": { label: "French Guiana", flag: "🇬🇫" },
+    "gg": { label: "Guernsey", flag: "🇬🇬" },
+    "gh": { label: "Ghana", flag: "🇬🇭" },
+    "gi": { label: "Gibraltar", flag: "🇬🇮" },
+    "gl": { label: "Galician", flag: "🇪🇸" },
+    "global": { label: "Global", flag: "🌐" },
+    "gm": { label: "Gambia", flag: "🇬🇲" },
+    "gn": { label: "Guaraní", flag: "🇵🇾" },
+    "gp": { label: "Guadeloupe", flag: "🇬🇵" },
+    "gq": { label: "Equatorial Guinea", flag: "🇬🇶" },
+    "gr": { label: "Greece", flag: "🇬🇷" },
+    "gs": { label: "South Georgia and the South Sandwich Islands", flag: "🇬🇸" },
+    "gt": { label: "Guatemala", flag: "🇬🇹" },
+    "gu": { label: "Gujarati", flag: "🇮🇳" },
+    "gv": { label: "Manx", flag: "🇮🇲" },
+    "gw": { label: "Guinea-Bissau", flag: "🇬🇼" },
+    "gy": { label: "Guyana", flag: "🇬🇾" },
+    "ha": { label: "Hausa", flag: "🇳🇬" },
+    "he": { label: "Hebrew (modern)", flag: "🇮🇱" },
+    "hi": { label: "Hindi", flag: "🇮🇳" },
+    "hk": { label: "Chinese (Hong Kong)", flag: "🇭🇰" },
+    "hm": { label: "Heard Island and McDonald Islands", flag: "🇭🇲" },
+    "hn": { label: "Honduras", flag: "🇭🇳" },
+    "ho": { label: "Hiri Motu", flag: "🇵🇬" },
+    "hr": { label: "Croatian", flag: "🇭🇷" },
+    "ht": { label: "Haitian", flag: "🇭🇹" },
+    "hu": { label: "Hungarian", flag: "🇭🇺" },
+    "hy": { label: "Armenian", flag: "🇦🇲" },
+    "hz": { label: "Herero", flag: "🇳🇦" },
+    "ia": { label: "Interlingua", flag: "🌐" },
+    "id": { label: "Indonesian", flag: "🇮🇩" },
+    "ie": { label: "Interlingue", flag: "🌐" },
+    "ig": { label: "Igbo", flag: "🇳🇬" },
+    "ii": { label: "Nuosu", flag: "🇨🇳" },
+    "ik": { label: "Inupiaq", flag: "🇺🇸" },
+    "il": { label: "Israel", flag: "🇮🇱" },
+    "im": { label: "Isle of Man", flag: "🇮🇲" },
+    "in": { label: "India", flag: "🇮🇳" },
+    "io": { label: "Ido", flag: "🌐" },
+    "iq": { label: "Iraq", flag: "🇮🇶" },
+    "ir": { label: "Iran, Islamic Republic of", flag: "🇮🇷" },
+    "is": { label: "Icelandic", flag: "🇮🇸" },
+    "it": { label: "Italian", flag: "🇮🇹" },
+    "it-ch": { label: "Italian (Switzerland)", flag: "🇨🇭" },
+    "it-it": { label: "Italian (Italy)", flag: "🇮🇹" },
+    "iu": { label: "Inuktitut", flag: "🇨🇦" },
+    "ja": { label: "Japanese", flag: "🇯🇵" },
+    "ja-jp": { label: "Japanese (Japan)", flag: "🇯🇵" },
+    "je": { label: "Jersey", flag: "🇯🇪" },
+    "jm": { label: "Jamaica", flag: "🇯🇲" },
+    "jo": { label: "Jordan", flag: "🇯🇴" },
+    "jp": { label: "Japanese", flag: "🇯🇵" },
+    "jv": { label: "Javanese", flag: "🇮🇩" },
+    "ka": { label: "Georgian", flag: "🇬🇪" },
+    "ke": { label: "Kenya", flag: "🇰🇪" },
+    "kg": { label: "Kongo", flag: "🇨🇩" },
+    "kh": { label: "Cambodia", flag: "🇰🇭" },
+    "ki": { label: "Kikuyu", flag: "🇰🇪" },
+    "kj": { label: "Kwanyama", flag: "🇳🇦" },
+    "kk": { label: "Kazakh", flag: "🇰🇿" },
+    "kl": { label: "Kalaallisut", flag: "🇬🇱" },
+    "km": { label: "Khmer", flag: "🇰🇭" },
+    "kn": { label: "Kannada", flag: "🇮🇳" },
+    "ko": { label: "Korean", flag: "🇰🇷" },
+    "ko-kr": { label: "Korean (Korea)", flag: "🇰🇷" },
+    "kp": { label: "Korea, Democratic People's Republic of", flag: "🇰🇵" },
+    "kr": { label: "Korean", flag: "🇰🇷" },
+    "ks": { label: "Kashmiri", flag: "🇮🇳" },
+    "ku": { label: "Kurdish", flag: "🇮🇶" },
+    "kv": { label: "Komi", flag: "🇷🇺" },
+    "kw": { label: "Cornish", flag: "🇬🇧" },
+    "ky": { label: "Kyrgyz", flag: "🇰🇬" },
+    "kz": { label: "Kazakhstan", flag: "🇰🇿" },
+    "la": { label: "Latin", flag: "🇻🇦" },
+    "lb": { label: "Luxembourgish", flag: "🇱🇺" },
+    "lc": { label: "Saint Lucia", flag: "🇱🇨" },
+    "lg": { label: "Ganda", flag: "🇺🇬" },
+    "li": { label: "Limburgish", flag: "🇳🇱" },
+    "lk": { label: "Sri Lanka", flag: "🇱🇰" },
+    "ln": { label: "Lingala", flag: "🇨🇩" },
+    "lo": { label: "Lao", flag: "🇱🇦" },
+    "lr": { label: "Liberia", flag: "🇱🇷" },
+    "ls": { label: "Lesotho", flag: "🇱🇸" },
+    "lt": { label: "Lithuanian", flag: "🇱🇹" },
+    "lu": { label: "Luba-Katanga", flag: "🇨🇩" },
+    "lv": { label: "Latvian", flag: "🇱🇻" },
+    "ly": { label: "Libya", flag: "🇱🇾" },
+    "ma": { label: "Morocco", flag: "🇲🇦" },
+    "mc": { label: "Monaco", flag: "🇲🇨" },
+    "md": { label: "Moldova, Republic of", flag: "🇲🇩" },
+    "me": { label: "Montenegro", flag: "🇲🇪" },
+    "mf": { label: "Saint Martin (French part)", flag: "🇲🇫" },
+    "mg": { label: "Malagasy", flag: "🇲🇬" },
+    "mh": { label: "Marshallese", flag: "🇲🇭" },
+    "mi": { label: "Māori", flag: "🇳🇿" },
+    "mk": { label: "Macedonian", flag: "🇲🇰" },
+    "ml": { label: "Malayalam", flag: "🇮🇳" },
+    "mm": { label: "Myanmar", flag: "🇲🇲" },
+    "mn": { label: "Mongolian", flag: "🇲🇳" },
+    "mo": { label: "Macao", flag: "🇲🇴" },
+    "mp": { label: "Northern Mariana Islands", flag: "🇲🇵" },
+    "mq": { label: "Martinique", flag: "🇲🇶" },
+    "mr": { label: "Marathi (Marāṭhī)", flag: "🇮🇳" },
+    "ms": { label: "Malay", flag: "🇲🇾" },
+    "mt": { label: "Maltese", flag: "🇲🇹" },
+    "mu": { label: "Mauritius", flag: "🇲🇺" },
+    "mv": { label: "Maldives", flag: "🇲🇻" },
+    "mw": { label: "Malawi", flag: "🇲🇼" },
+    "mx": { label: "Spanish (Mexico)", flag: "🇲🇽" },
+    "my": { label: "Burmese", flag: "🇲🇲" },
+    "mz": { label: "Mozambique", flag: "🇲🇿" },
+    "na": { label: "Nauruan", flag: "🇳🇷" },
+    "nb": { label: "Norwegian Bokmål", flag: "🇳🇴" },
+    "nb-no": { label: "Norwegian Bokmål (Norway)", flag: "🇳🇴" },
+    "nc": { label: "New Caledonia", flag: "🇳🇨" },
+    "nd": { label: "Northern Ndebele", flag: "🇿🇼" },
+    "ne": { label: "Nepali", flag: "🇳🇵" },
+    "nf": { label: "Norfolk Island", flag: "🇳🇫" },
+    "ng": { label: "Ndonga", flag: "🇳🇦" },
+    "ni": { label: "Nicaragua", flag: "🇳🇮" },
+    "nl": { label: "Dutch", flag: "🇳🇱" },
+    "nl-be": { label: "Dutch (Belgium)", flag: "🇧🇪" },
+    "nl-nl": { label: "Dutch (Netherlands)", flag: "🇳🇱" },
+    "nn": { label: "Norwegian Nynorsk", flag: "🇳🇴" },
+    "nn-no": { label: "Norwegian Nynorsk (Norway)", flag: "🇳🇴" },
+    "no": { label: "Norwegian", flag: "🇳🇴" },
+    "np": { label: "Nepal", flag: "🇳🇵" },
+    "nr": { label: "Southern Ndebele", flag: "🇿🇦" },
+    "nu": { label: "Niue", flag: "🇳🇺" },
+    "nv": { label: "Navajo", flag: "🇺🇸" },
+    "ny": { label: "Chichewa", flag: "🇲🇼" },
+    "nz": { label: "New Zealand", flag: "🇳🇿" },
+    "oc": { label: "Occitan", flag: "🇫🇷" },
+    "oj": { label: "Ojibwe", flag: "🇨🇦" },
+    "om": { label: "Oromo", flag: "🇪🇹" },
+    "or": { label: "Oriya", flag: "🇮🇳" },
+    "os": { label: "Ossetian", flag: "🇬🇪" },
+    "pa": { label: "(Eastern) Punjabi", flag: "🇮🇳" },
+    "pe": { label: "Peru", flag: "🇵🇪" },
+    "pf": { label: "French Polynesia", flag: "🇵🇫" },
+    "pg": { label: "Papua New Guinea", flag: "🇵🇬" },
+    "ph": { label: "Philippines", flag: "🇵🇭" },
+    "pi": { label: "Pāli", flag: "🇮🇳" },
+    "pk": { label: "Pakistan", flag: "🇵🇰" },
+    "pl": { label: "Polish", flag: "🇵🇱" },
+    "pm": { label: "Saint Pierre and Miquelon", flag: "🇵🇲" },
+    "pn": { label: "Pitcairn", flag: "🇵🇳" },
+    "pr": { label: "Puerto Rico", flag: "🇵🇷" },
+    "ps": { label: "Pashto", flag: "🇦🇫" },
+    "pt": { label: "Portuguese", flag: "🇵🇹" },
+    "pt-ao": { label: "Portuguese (Angola)", flag: "🇦🇴" },
+    "pt-br": { label: "Portuguese (Brazil)", flag: "🇧🇷" },
+    "pt-pt": { label: "Portuguese (Portugal)", flag: "🇵🇹" },
+    "pw": { label: "Palau", flag: "🇵🇼" },
+    "py": { label: "Paraguay", flag: "🇵🇾" },
+    "qa": { label: "Qatar", flag: "🇶🇦" },
+    "qu": { label: "Quechua", flag: "🇵🇪" },
+    "re": { label: "Réunion", flag: "🇷🇪" },
+    "rm": { label: "Romansh", flag: "🇨🇭" },
+    "rn": { label: "Kirundi", flag: "🇧🇮" },
+    "ro": { label: "Romanian", flag: "🇷🇴" },
+    "rs": { label: "Serbia", flag: "🇷🇸" },
+    "ru": { label: "Russian", flag: "🇷🇺" },
+    "ru-ru": { label: "Russian (Russia)", flag: "🇷🇺" },
+    "rw": { label: "Kinyarwanda", flag: "🇷🇼" },
+    "sa": { label: "Arabic (Saudi Arabia)", flag: "🇸🇦" },
+    "sb": { label: "Solomon Islands", flag: "🇸🇧" },
+    "sc": { label: "Sardinian", flag: "🇮🇹" },
+    "sd": { label: "Sindhi", flag: "🇵🇰" },
+    "se": { label: "Swedish", flag: "🇸🇪" },
+    "sg": { label: "Sango", flag: "🇨🇫" },
+    "sh": { label: "Saint Helena, Ascension and Tristan da Cunha", flag: "🇸🇭" },
+    "shared": { label: "Shared", flag: "🌐" },
+    "si": { label: "Sinhalese", flag: "🇱🇰" },
+    "sj": { label: "Svalbard and Jan Mayen", flag: "🇸🇯" },
+    "sk": { label: "Slovak", flag: "🇸🇰" },
+    "sl": { label: "Slovene", flag: "🇸🇮" },
+    "sm": { label: "Samoan", flag: "🇼🇸" },
+    "sn": { label: "Shona", flag: "🇿🇼" },
+    "so": { label: "Somali", flag: "🇸🇴" },
+    "sq": { label: "Albanian", flag: "🇦🇱" },
+    "sr": { label: "Serbian", flag: "🇷🇸" },
+    "ss": { label: "Swati", flag: "🇸🇿" },
+    "st": { label: "Southern Sotho", flag: "🇱🇸" },
+    "su": { label: "Sundanese", flag: "🇮🇩" },
+    "sv": { label: "Swedish", flag: "🇸🇪" },
+    "sv-fi": { label: "Swedish (Finland)", flag: "🇫🇮" },
+    "sv-se": { label: "Swedish (Sweden)", flag: "🇸🇪" },
+    "sw": { label: "Swahili", flag: "🇹🇿" },
+    "sx": { label: "Sint Maarten (Dutch part)", flag: "🇸🇽" },
+    "sy": { label: "Syrian Arab Republic", flag: "🇸🇾" },
+    "sz": { label: "Eswatini", flag: "🇸🇿" },
+    "ta": { label: "Tamil", flag: "🇮🇳" },
+    "tc": { label: "Turks and Caicos Islands", flag: "🇹🇨" },
+    "td": { label: "Chad", flag: "🇹🇩" },
+    "te": { label: "Telugu", flag: "🇮🇳" },
+    "tf": { label: "French Southern Territories", flag: "🇹🇫" },
+    "tg": { label: "Tajik", flag: "🇹🇯" },
+    "th": { label: "Thai", flag: "🇹🇭" },
+    "ti": { label: "Tigrinya", flag: "🇪🇷" },
+    "tj": { label: "Tajikistan", flag: "🇹🇯" },
+    "tk": { label: "Turkmen", flag: "🇹🇲" },
+    "tl": { label: "Tagalog", flag: "🇵🇭" },
+    "tm": { label: "Turkmenistan", flag: "🇹🇲" },
+    "tn": { label: "Tswana", flag: "🇧🇼" },
+    "to": { label: "Tonga (Tonga Islands)", flag: "🇹🇴" },
+    "tr": { label: "Turkish", flag: "🇹🇷" },
+    "ts": { label: "Tsonga", flag: "🇿🇦" },
+    "tt": { label: "Tatar", flag: "🇷🇺" },
+    "tv": { label: "Tuvalu", flag: "🇹🇻" },
+    "tw": { label: "Chinese (Traditional)", flag: "🇹🇼" },
+    "ty": { label: "Tahitian", flag: "🇵🇫" },
+    "tz": { label: "Tanzania, United Republic of", flag: "🇹🇿" },
+    "ua": { label: "Ukrainian", flag: "🇺🇦" },
+    "ug": { label: "Uyghur", flag: "🇨🇳" },
+    "uk": { label: "English (UK)", flag: "🇬🇧" },
+    "uk-ua": { label: "Ukrainian (Ukraine)", flag: "🇺🇦" },
+    "um": { label: "United States Minor Outlying Islands", flag: "🇺🇲" },
+    "ur": { label: "Urdu", flag: "🇵🇰" },
+    "us": { label: "English (US)", flag: "🇺🇸" },
+    "uy": { label: "Uruguay", flag: "🇺🇾" },
+    "uz": { label: "Uzbek", flag: "🇺🇿" },
+    "va": { label: "Holy See", flag: "🇻🇦" },
+    "vc": { label: "Saint Vincent and the Grenadines", flag: "🇻🇨" },
+    "ve": { label: "Venda", flag: "🇿🇦" },
+    "vg": { label: "Virgin Islands (British)", flag: "🇻🇬" },
+    "vi": { label: "Vietnamese", flag: "🇻🇳" },
+    "vn": { label: "Viet Nam", flag: "🇻🇳" },
+    "vo": { label: "Volapük", flag: "🌐" },
+    "vu": { label: "Vanuatu", flag: "🇻🇺" },
+    "wa": { label: "Walloon", flag: "🇧🇪" },
+    "wf": { label: "Wallis and Futuna", flag: "🇼🇫" },
+    "wo": { label: "Wolof", flag: "🇸🇳" },
+    "ws": { label: "Samoa", flag: "🇼🇸" },
+    "xh": { label: "Xhosa", flag: "🇿🇦" },
+    "ye": { label: "Yemen", flag: "🇾🇪" },
+    "yi": { label: "Yiddish", flag: "🇮🇱" },
+    "yo": { label: "Yoruba", flag: "🇳🇬" },
+    "yt": { label: "Mayotte", flag: "🇾🇹" },
+    "za": { label: "Zhuang", flag: "🇨🇳" },
+    "zh": { label: "Chinese", flag: "🇨🇳" },
+    "zh-cn": { label: "Chinese (Simplified)", flag: "🇨🇳" },
+    "zh-hk": { label: "Chinese (Hong Kong)", flag: "🇭🇰" },
+    "zh-mo": { label: "Chinese (Macau)", flag: "🇲🇴" },
+    "zh-sg": { label: "Chinese (Singapore)", flag: "🇸🇬" },
+    "zh-tw": { label: "Chinese (Traditional)", flag: "🇹🇼" },
+    "zm": { label: "Zambia", flag: "🇿🇲" },
+    "zu": { label: "Zulu", flag: "🇿🇦" },
+    "zw": { label: "Zimbabwe", flag: "🇿🇼" }
   };
 
   /**
@@ -110,6 +515,41 @@ function bootTranslationVersionsControl() {
   }
 
   var SMARTCOPY_COMPARE_WIDTH_LS = "translationSourceCompareWidthPx";
+  /** Per-site: "1" = collapsed on all forms for that site. */
+  var TRANSLATION_WIDGET_COLLAPSE_LS_PREFIX = "uigoodies.translationVersions.collapsed.";
+  var TRANSLATION_WIDGET_COLLAPSE_EVENT = "uigoodies.translationVersions.collapsedChanged";
+
+  function translationWidgetCollapseStorageKey(siteId) {
+    return TRANSLATION_WIDGET_COLLAPSE_LS_PREFIX + String(siteId || "_").trim();
+  }
+
+  function readTranslationWidgetCollapsed(siteId) {
+    try {
+      return (
+        typeof localStorage !== "undefined" &&
+        localStorage.getItem(translationWidgetCollapseStorageKey(siteId)) === "1"
+      );
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function writeTranslationWidgetCollapsed(siteId, collapsed) {
+    try {
+      if (typeof localStorage !== "undefined") {
+        localStorage.setItem(translationWidgetCollapseStorageKey(siteId), collapsed ? "1" : "0");
+      }
+    } catch (eLs) {}
+    try {
+      if (typeof window !== "undefined" && typeof window.dispatchEvent === "function") {
+        window.dispatchEvent(
+          new CustomEvent(TRANSLATION_WIDGET_COLLAPSE_EVENT, {
+            detail: { siteId: String(siteId || "").trim(), collapsed: !!collapsed }
+          })
+        );
+      }
+    } catch (eEv) {}
+  }
 
   function applySourcePaneWidthPx(leftEl, totalRowWidthPx, widthPx) {
     var minW = 200;
@@ -1043,10 +1483,12 @@ function bootTranslationVersionsControl() {
     return names;
   }
 
-  function isMultiLocaleFolderSet(names) {
+  function isMultiLocaleFolderSet(names, baseLocale) {
     if (!names || names.length < 2) return false;
+    if (!baseLocale || !String(baseLocale).trim()) return true;
+    var base = String(baseLocale).trim().toLowerCase().replace(/_/g, "-");
     for (var i = 0; i < names.length; i++) {
-      if (String(names[i]).toLowerCase() === BASE_LOCALE.toLowerCase()) return true;
+      if (localeSegmentsCompatible(names[i], base)) return true;
     }
     return false;
   }
@@ -1079,13 +1521,20 @@ function bootTranslationVersionsControl() {
           break;
         }
       }
-      ordered.push(match || code);
+      if (fromTranslationConfig) {
+        ordered.push(match || code);
+      } else if (match) {
+        var already = ordered.some(function (o) {
+          return String(o).toLowerCase() === String(match).toLowerCase();
+        });
+        if (!already) ordered.push(match);
+      }
     });
     names.forEach(function (n) {
-      var inCfg = activeCodes.some(function (c) {
-        return localeSegmentsCompatible(n, c);
+      var inOrdered = ordered.some(function (o) {
+        return localeSegmentsCompatible(n, o);
       });
-      if (!inCfg) ordered.push(n);
+      if (!inOrdered) ordered.push(n);
     });
     return ordered;
   }
@@ -1830,6 +2279,63 @@ function bootTranslationVersionsControl() {
     var removeModal = removeModalSt[0];
     var setRemoveModal = removeModalSt[1];
 
+    var collapsedSt = React.useState(function () {
+      return readTranslationWidgetCollapsed(siteId);
+    });
+    var widgetCollapsed = collapsedSt[0];
+    var setWidgetCollapsed = collapsedSt[1];
+
+    React.useEffect(
+      function () {
+        setWidgetCollapsed(readTranslationWidgetCollapsed(siteId));
+      },
+      [siteId]
+    );
+
+    React.useEffect(
+      function () {
+        function onStorage(e) {
+          if (!e || e.key !== translationWidgetCollapseStorageKey(siteId)) {
+            return;
+          }
+          var nextCollapsed = e.newValue === "1";
+          setWidgetCollapsed(nextCollapsed);
+          if (nextCollapsed) {
+            setCompareSourcePath(null);
+          }
+        }
+        function onCustom(e) {
+          var detail = e && e.detail;
+          if (!detail || String(detail.siteId || "") !== String(siteId || "")) {
+            return;
+          }
+          var nextCollapsed = !!detail.collapsed;
+          setWidgetCollapsed(nextCollapsed);
+          if (nextCollapsed) {
+            setCompareSourcePath(null);
+          }
+        }
+        window.addEventListener("storage", onStorage);
+        window.addEventListener(TRANSLATION_WIDGET_COLLAPSE_EVENT, onCustom);
+        return function () {
+          window.removeEventListener("storage", onStorage);
+          window.removeEventListener(TRANSLATION_WIDGET_COLLAPSE_EVENT, onCustom);
+        };
+      },
+      [siteId]
+    );
+
+    var toggleWidgetCollapsed = function () {
+      setWidgetCollapsed(function (prev) {
+        var next = !prev;
+        writeTranslationWidgetCollapsed(siteId, next);
+        if (next) {
+          setCompareSourcePath(null);
+        }
+        return next;
+      });
+    };
+
     var suffix = parseSuffixFromFormPath(formPath, rootDir).suffix;
     var currentLocale = (pathLocale || modelLocale || "").toLowerCase();
 
@@ -2146,7 +2652,7 @@ function bootTranslationVersionsControl() {
         if (!host) {
           return function () {};
         }
-        if (!compareSourcePath || !src) {
+        if (widgetCollapsed || !compareSourcePath || !src) {
           unwrapFormCompareLayout(host);
           return function () {
             unwrapFormCompareLayout(host);
@@ -2157,7 +2663,7 @@ function bootTranslationVersionsControl() {
           unwrapFormCompareLayout(host);
         };
       },
-      [compareSourcePath, authoringBase, siteId, formPath, form, controlContainerEl]
+      [compareSourcePath, authoringBase, siteId, formPath, form, controlContainerEl, widgetCollapsed]
     );
 
     if (!siteId || !formPath) {
@@ -2809,20 +3315,62 @@ function bootTranslationVersionsControl() {
             display: "flex",
             flexDirection: "column",
             alignItems: "stretch",
-            gap: "20px",
+            gap: widgetCollapsed ? "0" : "20px",
             width: "100%",
-            boxSizing: "border-box"
+            boxSizing: "border-box",
+            border: "1px solid #dee2e6",
+            borderRadius: "6px",
+            background: "#fff",
+            overflow: "hidden"
           }
         },
         React.createElement(
-          "div",
-          null,
+          "button",
+          {
+            type: "button",
+            className: "translation-versions-collapse-toggle",
+            onClick: toggleWidgetCollapsed,
+            "aria-expanded": widgetCollapsed ? "false" : "true",
+            "aria-controls": "translation-versions-panel-body",
+            title: widgetCollapsed ? "Expand Translations" : "Collapse Translations",
+            style: {
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              width: "100%",
+              margin: 0,
+              padding: "10px 12px",
+              border: "none",
+              borderBottom: widgetCollapsed ? "none" : "1px solid #e9ecef",
+              background: "#f8f9fa",
+              cursor: "pointer",
+              textAlign: "left",
+              boxSizing: "border-box"
+            }
+          },
           React.createElement(
-            "h3",
+            "span",
+            {
+              "aria-hidden": "true",
+              style: {
+                display: "inline-flex",
+                width: "18px",
+                justifyContent: "center",
+                fontSize: "12px",
+                color: "#495057",
+                flex: "0 0 auto",
+                transform: widgetCollapsed ? "rotate(-90deg)" : "rotate(0deg)",
+                transition: "transform 0.15s ease"
+              }
+            },
+            "\u25BC"
+          ),
+          React.createElement(
+            "span",
             {
               style: {
-                margin: 0,
-                padding: 0,
+                flex: "1 1 auto",
+                minWidth: 0,
                 fontSize: "16px",
                 fontWeight: 600,
                 color: "#212529",
@@ -2832,13 +3380,50 @@ function bootTranslationVersionsControl() {
             },
             "Translations"
           ),
-          pathLayoutNote
+          widgetCollapsed && totalFiltered > 0
+            ? React.createElement(
+                "span",
+                {
+                  className: "text-muted",
+                  style: { fontSize: "12px", whiteSpace: "nowrap", flex: "0 0 auto" }
+                },
+                totalFiltered + (totalFiltered === 1 ? " locale" : " locales")
+              )
+            : null,
+          React.createElement(
+            "span",
+            {
+              className: "text-muted",
+              style: { fontSize: "11px", whiteSpace: "nowrap", flex: "0 0 auto" }
+            },
+            widgetCollapsed ? "Show" : "Hide"
+          )
         ),
-        React.createElement(
-          "div",
-          { style: { width: "100%", minWidth: 0 } },
-          compareLayoutBody
-        )
+        widgetCollapsed
+          ? null
+          : React.createElement(
+              "div",
+              {
+                id: "translation-versions-panel-body",
+                style: {
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "stretch",
+                  gap: "20px",
+                  width: "100%",
+                  boxSizing: "border-box",
+                  padding: "12px"
+                }
+              },
+              pathLayoutNote
+                ? React.createElement("div", null, pathLayoutNote)
+                : null,
+              React.createElement(
+                "div",
+                { style: { width: "100%", minWidth: 0 } },
+                compareLayoutBody
+              )
+            )
       ),
       removeTranslationModalEl
     );

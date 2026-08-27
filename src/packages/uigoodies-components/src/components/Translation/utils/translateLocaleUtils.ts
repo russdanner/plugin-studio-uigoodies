@@ -64,12 +64,15 @@ export async function resolveLocaleFoldersOnSite(
   if (!isMultiLocaleLayout(detected, base)) {
     return null;
   }
+  // No site config: only folders that exist on disk (do not invent every catalog code).
   const primary: string[] = [];
   for (const code of configured) {
     const match = detected.find((d) => localeSegmentsCompatible(d, code));
-    primary.push(match ?? code);
+    if (match && !primary.some((p) => p.toLowerCase() === match.toLowerCase())) {
+      primary.push(match);
+    }
   }
-  const extra = detected.filter((d) => !configured.some((c) => localeSegmentsCompatible(d, c)));
+  const extra = detected.filter((d) => !primary.some((p) => localeSegmentsCompatible(d, p)));
   return [...primary, ...extra];
 }
 

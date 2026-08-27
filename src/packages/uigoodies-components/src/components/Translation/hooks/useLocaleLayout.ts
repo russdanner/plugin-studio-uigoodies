@@ -6,12 +6,28 @@ import { useEffect, useState } from 'react';
 
 import StudioAPI from '../api/studio';
 import { MULTI_LOCALE_BASE_LOCALE, MULTI_LOCALE_CODES } from '../config/multiLocaleConfig';
-import { baseLocaleRootPath, detectLocaleFolderNames, isMultiLocaleLayout } from '../utils/localePathUtils';
+import {
+  baseLocaleRootPath,
+  detectLocaleFolderNames,
+  isMultiLocaleLayout,
+  localeSegmentsCompatible
+} from '../utils/localePathUtils';
 
 export type LocaleLayoutInfo = {
   baseRootPath: string;
   locales: string[];
 };
+
+function pickBaseLocale(detected: string[]): string {
+  const preferred = [MULTI_LOCALE_BASE_LOCALE, 'us', 'en-us', 'en-gb', 'uk'];
+  for (const code of preferred) {
+    const match = detected.find((d) => localeSegmentsCompatible(d, code));
+    if (match) {
+      return match;
+    }
+  }
+  return detected[0] || MULTI_LOCALE_BASE_LOCALE;
+}
 
 /**
  * Detects multi-locale folder layout under `rootDir` (e.g. en, es under /site/website).
@@ -42,17 +58,21 @@ export function useLocaleLayout(
         setLocaleLayout(null);
         return;
       }
-      const primary: string[] = [];
+      const ordered: string[] = [];
       for (const code of MULTI_LOCALE_CODES) {
-        const match = detected.find((d) => d.toLowerCase() === code.toLowerCase());
-        primary.push(match ?? code);
+        const match = detected.find((d) => localeSegmentsCompatible(d, code));
+        if (match && !ordered.some((o) => o.toLowerCase() === match.toLowerCase())) {
+          ordered.push(match);
+        }
       }
       const extra = detected.filter(
-        (d) => !MULTI_LOCALE_CODES.some((c) => c.toLowerCase() === d.toLowerCase())
+        (d) => !ordered.some((o) => o.toLowerCase() === d.toLowerCase())
       );
+      const locales = [...ordered, ...extra];
+      const base = pickBaseLocale(locales);
       setLocaleLayout({
-        baseRootPath: baseLocaleRootPath(rootDir, MULTI_LOCALE_BASE_LOCALE),
-        locales: [...primary, ...extra]
+        baseRootPath: baseLocaleRootPath(rootDir, base),
+        locales
       });
     })();
 

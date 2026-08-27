@@ -41,10 +41,13 @@ import { from, of } from 'rxjs';
 import { catchError, concatMap, map, mergeMap, toArray } from 'rxjs/operators';
 import {
   ContentTypeTranslationRow,
+  DEFAULT_PREFERRED_EXISTING_SECTION_TITLES,
+  DEFAULT_TRANSLATION_SECTION_TITLE,
   TRANSLATION_CONFIG_MODULE,
   TRANSLATION_CONFIG_PATH,
   TranslationConfigModel,
   TRANSLATION_FORM_REQUIREMENTS,
+  TranslationFormSectionOptions,
   analyzeFormDefinition,
   buildTranslationConfigXml,
   contentTypeFormPath,
@@ -92,6 +95,18 @@ export function TranslationConfigTools() {
   const [applyLoading, setApplyLoading] = useState(false);
   const [scaffoldOpen, setScaffoldOpen] = useState(false);
   const [scaffoldLoading, setScaffoldLoading] = useState(false);
+  const [sectionTitle, setSectionTitle] = useState(DEFAULT_TRANSLATION_SECTION_TITLE);
+  const [preferExistingTitles, setPreferExistingTitles] = useState<string[]>([
+    ...DEFAULT_PREFERRED_EXISTING_SECTION_TITLES
+  ]);
+
+  const formSectionOptions = useMemo<TranslationFormSectionOptions>(
+    () => ({
+      sectionTitle: sectionTitle.trim() || DEFAULT_TRANSLATION_SECTION_TITLE,
+      preferExistingSectionTitles: preferExistingTitles
+    }),
+    [sectionTitle, preferExistingTitles]
+  );
 
   const localeSuggestions = useMemo(() => suggestedLocaleOptions(), []);
   const localePreview = useMemo(
@@ -162,7 +177,7 @@ export function TranslationConfigTools() {
               id: type.id,
               name: type.name || type.id,
               formPath,
-              status: analyzeFormDefinition(xml)
+              status: analyzeFormDefinition(xml, formSectionOptions)
             })),
             catchError(() =>
               of({
@@ -204,7 +219,7 @@ export function TranslationConfigTools() {
         }
       });
     return () => sub.unsubscribe();
-  }, [siteId]);
+  }, [siteId, formSectionOptions]);
 
   useEffect(() => {
     if (tab === 'content-types' && siteId && typeRows.length === 0 && !typesLoading) {
@@ -308,7 +323,7 @@ export function TranslationConfigTools() {
         concatMap((row) =>
           fetchConfigurationXML(siteId, row.formPath, TRANSLATION_CONFIG_MODULE).pipe(
             mergeMap((xml: string) => {
-              const patched = patchFormDefinitionWithTranslationFields(xml);
+              const patched = patchFormDefinitionWithTranslationFields(xml, formSectionOptions);
               if (!patched.changed) {
                 return of({ id: row.id, skipped: true as const });
               }
@@ -597,14 +612,70 @@ export function TranslationConfigTools() {
             />
           </Box>
           {typesError && <Alert severity="error">{typesError}</Alert>}
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 1.5,
+              p: 1.5,
+              border: 1,
+              borderColor: 'divider',
+              borderRadius: 1,
+              maxWidth: 720
+            }}
+          >
+            <Typography variant="subtitle2">Form section</Typography>
+            <TextField
+              size="small"
+              label="Section title when creating new"
+              value={sectionTitle}
+              onChange={(event) => setSectionTitle(event.target.value)}
+              helperText={`Default: ${DEFAULT_TRANSLATION_SECTION_TITLE}`}
+              sx={{ maxWidth: 420 }}
+            />
+            <Autocomplete
+              multiple
+              freeSolo
+              size="small"
+              options={[...DEFAULT_PREFERRED_EXISTING_SECTION_TITLES]}
+              value={preferExistingTitles}
+              onChange={(_, value) =>
+                setPreferExistingTitles(
+                  value
+                    .map((item) => String(item).trim())
+                    .filter(Boolean)
+                    .filter(
+                      (title, index, all) =>
+                        all.findIndex((t) => t.toLowerCase() === title.toLowerCase()) === index
+                    )
+                )
+              }
+              renderTags={(value, getTagProps) =>
+                value.map((option, index) => (
+                  <Chip variant="outlined" label={option} size="small" {...getTagProps({ index })} key={option} />
+                ))
+              }
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Prefer existing section if present"
+                  placeholder="Add section title"
+                  helperText='If a listed section already exists (e.g. Smart Copy “Alternative Locale Properties”), Fix reuses it and keeps other fields in that section.'
+                />
+              )}
+            />
+          </Box>
           <Alert severity="info" sx={{ mb: 2 }}>
-            Each content type must have exactly one Translation section (last on the form, collapsed by default)
-            containing{' '}
+            Each content type must have exactly one locale/translation section (last on the form, collapsed by
+            default) containing{' '}
             {TRANSLATION_FORM_REQUIREMENTS.filter((req) => req.id !== 'translation-section')
               .map((req) => req.label)
               .join('; ')}
-            . The translations control renders at the top of the form. Use <strong>Fix translation setup</strong> to
-            move stray fields, remove duplicates, and repair broken layouts.
+            . Scan/Fix use section <strong>{formSectionOptions.sectionTitle}</strong>
+            {preferExistingTitles.length > 0
+              ? `, preferring existing: ${preferExistingTitles.map((t) => `“${t}”`).join(', ')}`
+              : ''}
+            . Extra non-translation fields in a preferred section are preserved.
           </Alert>
           {!typesLoading && typeRows.length === 0 && !typesError && (
             <Alert severity="info">Scan content types to see which definitions need Translation fields.</Alert>

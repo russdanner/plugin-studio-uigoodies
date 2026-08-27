@@ -19,9 +19,107 @@ export type TranslationFieldStatus = {
   hasCustomLocaleControl: boolean;
   hasTranslationVersions: boolean;
   hasTranslationsField: boolean;
+  /** Resolved section title found or created (when present). */
+  sectionTitle?: string;
   complete: boolean;
   missing: string[];
 };
+
+/**
+ * Options for scanning / patching Translation form sections on content types.
+ * Prefer an existing section title (e.g. Smart Copy’s “Alternative Locale Properties”)
+ * when present; otherwise create {@link sectionTitle}.
+ */
+export type TranslationFormSectionOptions = {
+  /** Title used when creating a new section. Default: {@link DEFAULT_TRANSLATION_SECTION_TITLE}. */
+  sectionTitle?: string;
+  /**
+   * Prefer these section titles when they already exist (first match wins).
+   * Default: {@link DEFAULT_PREFERRED_EXISTING_SECTION_TITLES}.
+   */
+  preferExistingSectionTitles?: string[];
+};
+
+export const DEFAULT_TRANSLATION_SECTION_TITLE = 'Translation';
+
+/** Legacy / Smart Copy section title reused when present so Fix does not rename it. */
+export const DEFAULT_PREFERRED_EXISTING_SECTION_TITLES: readonly string[] = [
+  'Alternative Locale Properties'
+];
+
+export type ResolvedTranslationFormSectionOptions = {
+  /** Title for a newly created section. */
+  createTitle: string;
+  /** Existing titles to prefer (display casing preserved). */
+  preferExisting: string[];
+  /** All accepted titles for match (create + prefer), lowercased unique. */
+  acceptedLower: Set<string>;
+};
+
+export function resolveTranslationFormSectionOptions(
+  options?: TranslationFormSectionOptions | null
+): ResolvedTranslationFormSectionOptions {
+  const createTitle =
+    String(options?.sectionTitle ?? DEFAULT_TRANSLATION_SECTION_TITLE).trim() ||
+    DEFAULT_TRANSLATION_SECTION_TITLE;
+  const preferRaw =
+    options?.preferExistingSectionTitles !== undefined
+      ? options.preferExistingSectionTitles
+      : [...DEFAULT_PREFERRED_EXISTING_SECTION_TITLES];
+  const preferExisting: string[] = [];
+  const seenPrefer = new Set<string>();
+  for (const raw of preferRaw) {
+    const title = String(raw || '').trim();
+    if (!title) {
+      continue;
+    }
+    const key = title.toLowerCase();
+    if (seenPrefer.has(key) || key === createTitle.toLowerCase()) {
+      continue;
+    }
+    seenPrefer.add(key);
+    preferExisting.push(title);
+  }
+  const acceptedLower = new Set<string>([
+    createTitle.toLowerCase(),
+    ...preferExisting.map((t) => t.toLowerCase())
+  ]);
+  return { createTitle, preferExisting, acceptedLower };
+}
+
+function sectionTitleText(section: Element): string {
+  return (section.querySelector(':scope > title')?.textContent || '').trim();
+}
+
+function isAcceptedTranslationSectionTitle(
+  title: string,
+  resolved: ResolvedTranslationFormSectionOptions
+): boolean {
+  return resolved.acceptedLower.has(title.trim().toLowerCase());
+}
+
+/**
+ * Pick the section title to keep/create: first preferred title that already exists on the form,
+ * else an existing createTitle section, else createTitle for a new section.
+ */
+export function resolveTargetTranslationSectionTitle(
+  doc: Document,
+  options?: TranslationFormSectionOptions | null
+): string {
+  const resolved = resolveTranslationFormSectionOptions(options);
+  const sections = doc.querySelector('form > sections');
+  if (!sections) {
+    return resolved.createTitle;
+  }
+  const titles = Array.from(sections.querySelectorAll(':scope > section')).map(sectionTitleText);
+  for (const preferred of resolved.preferExisting) {
+    if (titles.some((t) => t.toLowerCase() === preferred.toLowerCase())) {
+      return preferred;
+    }
+  }
+  const createMatch = titles.find((t) => t.toLowerCase() === resolved.createTitle.toLowerCase());
+  return createMatch || resolved.createTitle;
+}
 
 /** Human-readable labels for each required piece of the Translation form definition. */
 export const TRANSLATION_FORM_REQUIREMENTS: ReadonlyArray<{ id: string; label: string }> = [
@@ -56,6 +154,7 @@ function lookupMeta(code: string): { label: string; flag: string } {
   if (fromMeta) {
     return { label: fromMeta.label, flag: fromMeta.flag };
   }
+  // Unknown custom folder names (e.g. site-specific aliases) still appear with a globe.
   return { label: k, flag: '🌐' };
 }
 
@@ -207,20 +306,38 @@ function allFormFields(doc: Document): Element[] {
   return Array.from(doc.querySelectorAll('form field')).filter((field) => field.querySelector(':scope > id'));
 }
 
-function allTranslationSections(doc: Document): Element[] {
+function allTranslationSections(
+  doc: Document,
+  resolved: ResolvedTranslationFormSectionOptions = resolveTranslationFormSectionOptions()
+): Element[] {
   const sections = doc.querySelector('form > sections');
   if (!sections) {
     return [];
   }
-  return Array.from(sections.querySelectorAll(':scope > section')).filter((section) => {
-    const title = (section.querySelector(':scope > title')?.textContent || '').trim().toLowerCase();
-    return title === 'translation';
-  });
+  return Array.from(sections.querySelectorAll(':scope > section')).filter((section) =>
+    isAcceptedTranslationSectionTitle(sectionTitleText(section), resolved)
+  );
 }
 
-function findTranslationSection(doc: Document): Element | null {
-  const matches = allTranslationSections(doc);
-  return matches[0] ?? null;
+function findTranslationSection(
+  doc: Document,
+  resolved: ResolvedTranslationFormSectionOptions = resolveTranslationFormSectionOptions()
+): Element | null {
+  const matches = allTranslationSections(doc, resolved);
+  if (matches.length === 0) {
+    return null;
+  }
+  // Prefer preferred-existing title order, then createTitle.
+  for (const preferred of resolved.preferExisting) {
+    const hit = matches.find((s) => sectionTitleText(s).toLowerCase() === preferred.toLowerCase());
+    if (hit) {
+      return hit;
+    }
+  }
+  const createHit = matches.find(
+    (s) => sectionTitleText(s).toLowerCase() === resolved.createTitle.toLowerCase()
+  );
+  return createHit ?? matches[0] ?? null;
 }
 
 function translationSectionFieldElements(section: Element | null): Element[] {
@@ -270,7 +387,11 @@ function isTranslationSectionLast(doc: Document, section: Element | null): boole
   return allSections[allSections.length - 1] === section;
 }
 
-export function analyzeFormDefinition(xml: string): TranslationFieldStatus {
+export function analyzeFormDefinition(
+  xml: string,
+  options?: TranslationFormSectionOptions | null
+): TranslationFieldStatus {
+  const resolved = resolveTranslationFormSectionOptions(options);
   const doc = new DOMParser().parseFromString(String(xml || ''), 'application/xml');
   if (doc.querySelector('parsererror')) {
     return {
@@ -286,9 +407,10 @@ export function analyzeFormDefinition(xml: string): TranslationFieldStatus {
     };
   }
 
-  const translationSections = allTranslationSections(doc);
-  const translationSection = translationSections[0] ?? null;
+  const translationSections = allTranslationSections(doc, resolved);
+  const translationSection = findTranslationSection(doc, resolved);
   const hasTranslationSection = translationSection !== null;
+  const foundSectionTitle = translationSection ? sectionTitleText(translationSection) : undefined;
   const sectionFields = translationSectionFieldElements(translationSection);
 
   const localeCodeField = fieldById(sectionFields, 'localeCode_s');
@@ -304,18 +426,19 @@ export function analyzeFormDefinition(xml: string): TranslationFieldStatus {
   const hasTranslationVersions = isCanonicalTranslationsField(translationsField);
 
   const missing: string[] = [];
+  const sectionLabel = foundSectionTitle || resolved.createTitle;
 
   if (!hasTranslationSection) {
-    missing.push('Translation section');
+    missing.push(`Form section "${resolved.createTitle}" (or preferred existing)`);
   }
   if (translationSections.length > 1) {
-    missing.push(`Multiple Translation sections (${translationSections.length})`);
+    missing.push(`Multiple locale/translation sections (${translationSections.length})`);
   }
   if (translationSection && !isTranslationSectionLast(doc, translationSection)) {
-    missing.push('Translation section must be last');
+    missing.push(`Section "${sectionLabel}" must be last`);
   }
   if (translationSection && !isTranslationSectionCollapsed(translationSection)) {
-    missing.push('Translation section must default closed');
+    missing.push(`Section "${sectionLabel}" must default closed`);
   }
 
   TRANSLATION_FIELD_IDS.forEach((id) => {
@@ -327,7 +450,7 @@ export function analyzeFormDefinition(xml: string): TranslationFieldStatus {
       (field) => !translationSection || !translationSection.contains(field)
     );
     if (outsideSection.length > 0) {
-      missing.push(`${id} outside Translation section`);
+      missing.push(`${id} outside section "${sectionLabel}"`);
     }
   });
 
@@ -352,15 +475,22 @@ export function analyzeFormDefinition(xml: string): TranslationFieldStatus {
     missing.push('translations (must use translation-versions control)');
   }
 
-  if (translationSection && sectionFields.length === CANONICAL_FIELD_ORDER.length) {
-    const orderedIds = sectionFields.map((field) => fieldId(field));
-    if (orderedIds.join(',') !== CANONICAL_FIELD_ORDER.join(',')) {
-      missing.push('Translation fields must be ordered: translations, localeSourceId_s, localeCode_s, sourceLocaleCode_s');
+  const translationFieldIdsInSection = sectionFields
+    .map((field) => fieldId(field))
+    .filter((id) => TRANSLATION_FIELD_IDS.includes(id as (typeof TRANSLATION_FIELD_IDS)[number]));
+
+  if (translationSection && translationFieldIdsInSection.length === CANONICAL_FIELD_ORDER.length) {
+    if (translationFieldIdsInSection.join(',') !== CANONICAL_FIELD_ORDER.join(',')) {
+      missing.push(
+        'Translation fields must be ordered: translations, localeSourceId_s, localeCode_s, sourceLocaleCode_s'
+      );
     }
-  } else if (translationSection && sectionFields.length > 0) {
-    missing.push('Translation section must contain exactly 4 fields');
-  } else if (translationSection && sectionFields.length === 0) {
-    missing.push('Translation section is empty');
+  } else if (translationSection && translationFieldIdsInSection.length === 0) {
+    missing.push(`Section "${sectionLabel}" has no translation fields`);
+  } else if (translationSection && translationFieldIdsInSection.length !== CANONICAL_FIELD_ORDER.length) {
+    missing.push(
+      `Section "${sectionLabel}" must contain all 4 translation fields (found ${translationFieldIdsInSection.length})`
+    );
   }
 
   return {
@@ -371,6 +501,7 @@ export function analyzeFormDefinition(xml: string): TranslationFieldStatus {
     hasCustomLocaleControl,
     hasTranslationVersions,
     hasTranslationsField,
+    sectionTitle: foundSectionTitle,
     complete: missing.length === 0,
     missing
   };
@@ -464,15 +595,6 @@ function parseFieldFragment(fragment: string): Element {
     throw new Error('Unable to build translation field fragment.');
   }
   return doc.documentElement.firstElementChild;
-}
-
-function removeTranslationSections(doc: Document): number {
-  let removed = 0;
-  allTranslationSections(doc).forEach((section) => {
-    section.parentNode?.removeChild(section);
-    removed += 1;
-  });
-  return removed;
 }
 
 function removeTranslationFieldsEverywhere(doc: Document): string[] {
@@ -569,30 +691,60 @@ function ensureTranslationSectionCollapsed(doc: Document, section: Element): boo
   return false;
 }
 
-function createTranslationSectionAtBottom(doc: Document): Element {
+function createTranslationSectionAtBottom(doc: Document, sectionTitle: string): Element {
   const sections = doc.querySelector('form > sections');
   if (!sections) {
     throw new Error('form-definition.xml has no <sections> element.');
   }
   const section = doc.createElement('section');
   const title = doc.createElement('title');
-  title.textContent = 'Translation';
+  title.textContent = sectionTitle;
   const description = doc.createElement('description');
   const defaultOpen = doc.createElement('defaultOpen');
   defaultOpen.textContent = 'false';
   const fields = doc.createElement('fields');
   section.append(title, description, defaultOpen, fields);
   sections.appendChild(section);
+  return section;
+}
+
+function ensureSectionFieldsContainer(doc: Document, section: Element): Element {
+  let fields = section.querySelector(':scope > fields');
+  if (!fields) {
+    fields = doc.createElement('fields');
+    section.appendChild(fields);
+  }
   return fields;
 }
 
-/** Move Translation section to the bottom and put translation-versions first inside it. */
-export function ensureTranslationFormLayout(doc: Document): boolean {
+function moveNonTranslationFields(fromSection: Element, toFields: Element): number {
+  const fromFields = fromSection.querySelector(':scope > fields');
+  if (!fromFields) {
+    return 0;
+  }
+  let moved = 0;
+  Array.from(fromFields.querySelectorAll(':scope > field')).forEach((field) => {
+    const id = fieldId(field);
+    if (TRANSLATION_FIELD_IDS.includes(id as (typeof TRANSLATION_FIELD_IDS)[number])) {
+      return;
+    }
+    toFields.appendChild(field);
+    moved += 1;
+  });
+  return moved;
+}
+
+/** Move locale/translation section to the bottom and collapse it by default. */
+export function ensureTranslationFormLayout(
+  doc: Document,
+  options?: TranslationFormSectionOptions | null
+): boolean {
+  const resolved = resolveTranslationFormSectionOptions(options);
   const sections = doc.querySelector('form > sections');
   if (!sections) {
     return false;
   }
-  const translationSection = findTranslationSection(doc);
+  const translationSection = findTranslationSection(doc, resolved);
   if (!translationSection) {
     return false;
   }
@@ -608,21 +760,60 @@ export function ensureTranslationFormLayout(doc: Document): boolean {
   }
 
   const fields = translationSection.querySelector(':scope > fields');
-  if (fields) {
-    const translationField = Array.from(fields.querySelectorAll(':scope > field')).find((field) =>
-      fieldId(field) === 'translations'
-    );
-    const firstField = fields.querySelector(':scope > field');
-    if (translationField && firstField && translationField !== firstField) {
-      fields.insertBefore(translationField, firstField);
-      changed = true;
-    }
+  if (fields && orderTranslationFieldsInSection(fields)) {
+    changed = true;
   }
 
   return changed;
 }
 
-function consolidateTranslationForm(doc: Document): string[] {
+function orderTranslationFieldsInSection(fields: Element): boolean {
+  const allFields = Array.from(fields.querySelectorAll(':scope > field'));
+  const byId = new Map<string, Element>();
+  allFields.forEach((field) => {
+    const id = fieldId(field);
+    if (TRANSLATION_FIELD_IDS.includes(id as (typeof TRANSLATION_FIELD_IDS)[number]) && !byId.has(id)) {
+      byId.set(id, field);
+    }
+  });
+  const ordered = CANONICAL_FIELD_ORDER.map((id) => byId.get(id)).filter((f): f is Element => Boolean(f));
+  if (ordered.length === 0) {
+    return false;
+  }
+  const currentOrder = allFields
+    .map((field) => fieldId(field))
+    .filter((id) => TRANSLATION_FIELD_IDS.includes(id as (typeof TRANSLATION_FIELD_IDS)[number]));
+  const desiredOrder = ordered.map((field) => fieldId(field));
+  if (currentOrder.join(',') === desiredOrder.join(',')) {
+    return false;
+  }
+
+  let insertAt = 0;
+  for (let i = 0; i < allFields.length; i += 1) {
+    if (TRANSLATION_FIELD_IDS.includes(fieldId(allFields[i]) as (typeof TRANSLATION_FIELD_IDS)[number])) {
+      break;
+    }
+    insertAt += 1;
+  }
+  const others = allFields.filter(
+    (field) => !TRANSLATION_FIELD_IDS.includes(fieldId(field) as (typeof TRANSLATION_FIELD_IDS)[number])
+  );
+
+  while (fields.firstChild) {
+    fields.removeChild(fields.firstChild);
+  }
+  others.slice(0, insertAt).forEach((field) => fields.appendChild(field));
+  ordered.forEach((field) => fields.appendChild(field));
+  others.slice(insertAt).forEach((field) => fields.appendChild(field));
+  return true;
+}
+
+function consolidateTranslationForm(
+  doc: Document,
+  options?: TranslationFormSectionOptions | null
+): string[] {
+  const resolved = resolveTranslationFormSectionOptions(options);
+  const targetTitle = resolveTargetTranslationSectionTitle(doc, options);
   const actions: string[] = [];
   const harvested = harvestTranslationFields(doc);
   const movedFromElsewhere = TRANSLATION_FIELD_IDS.filter((id) => {
@@ -631,43 +822,76 @@ function consolidateTranslationForm(doc: Document): string[] {
       return false;
     }
     const section = field.closest('section');
-    const title = (section?.querySelector(':scope > title')?.textContent || '').trim().toLowerCase();
-    return title !== 'translation';
+    const title = section ? sectionTitleText(section) : '';
+    return title.toLowerCase() !== targetTitle.toLowerCase();
   });
   if (movedFromElsewhere.length > 0) {
-    actions.push(`Moved translation fields into Translation section: ${movedFromElsewhere.join(', ')}`);
+    actions.push(`Moved translation fields into section "${targetTitle}": ${movedFromElsewhere.join(', ')}`);
   }
 
-  const removedSections = removeTranslationSections(doc);
-  if (removedSections > 0) {
+  // Prefer keeping an existing target section (preserves non-translation fields).
+  let targetSection: Element | null = null;
+  const sectionsEl = doc.querySelector('form > sections');
+  if (sectionsEl) {
+    targetSection =
+      Array.from(sectionsEl.querySelectorAll(':scope > section')).find(
+        (section) => sectionTitleText(section).toLowerCase() === targetTitle.toLowerCase()
+      ) ?? null;
+  }
+  if (!targetSection) {
+    targetSection = createTranslationSectionAtBottom(doc, targetTitle);
+    actions.push(`Created section "${targetTitle}"`);
+  }
+
+  const targetFields = ensureSectionFieldsContainer(doc, targetSection);
+
+  // Merge extras from duplicate accepted sections, then remove those duplicates.
+  const duplicates = allTranslationSections(doc, resolved).filter((section) => section !== targetSection);
+  let preservedExtras = 0;
+  duplicates.forEach((section) => {
+    preservedExtras += moveNonTranslationFields(section, targetFields);
+    section.parentNode?.removeChild(section);
+  });
+  if (duplicates.length > 0) {
     actions.push(
-      removedSections === 1 ? 'Rebuilt Translation section' : `Rebuilt ${removedSections} Translation sections`
+      duplicates.length === 1
+        ? `Removed duplicate locale/translation section`
+        : `Removed ${duplicates.length} duplicate locale/translation sections`
     );
+  }
+  if (preservedExtras > 0) {
+    actions.push(`Preserved ${preservedExtras} non-translation field(s) in "${targetTitle}"`);
   }
 
   const removedFields = removeTranslationFieldsEverywhere(doc);
   if (removedFields.length > 0 && movedFromElsewhere.length === 0) {
     const unique = Array.from(new Set(removedFields));
-    actions.push(`Removed stray translation fields: ${unique.join(', ')}`);
+    actions.push(`Normalized translation fields: ${unique.join(', ')}`);
   }
 
-  const fieldsContainer = createTranslationSectionAtBottom(doc);
   const added: string[] = [];
   CANONICAL_FIELD_ORDER.forEach((id) => {
     if (!harvested.has(id)) {
       added.push(id);
     }
-    fieldsContainer.appendChild(buildCanonicalTranslationField(doc, id, harvested));
+    targetFields.appendChild(buildCanonicalTranslationField(doc, id, harvested));
   });
   if (added.length > 0) {
     actions.push(`Added missing translation fields: ${added.join(', ')}`);
   }
 
-  ensureTranslationFormLayout(doc);
+  if (orderTranslationFieldsInSection(targetFields)) {
+    actions.push(`Ordered translation fields in "${targetTitle}"`);
+  }
+
+  ensureTranslationFormLayout(doc, options);
   return actions;
 }
 
-export function patchFormDefinitionWithTranslationFields(xml: string): {
+export function patchFormDefinitionWithTranslationFields(
+  xml: string,
+  options?: TranslationFormSectionOptions | null
+): {
   xml: string;
   added: string[];
   changed: boolean;
@@ -678,10 +902,10 @@ export function patchFormDefinitionWithTranslationFields(xml: string): {
     throw new Error('Unable to parse form-definition.xml.');
   }
 
-  const beforeStatus = analyzeFormDefinition(originalXml);
-  const actions = consolidateTranslationForm(doc);
+  const beforeStatus = analyzeFormDefinition(originalXml, options);
+  const actions = consolidateTranslationForm(doc, options);
   const serialized = new XMLSerializer().serializeToString(doc);
-  const afterStatus = analyzeFormDefinition(serialized);
+  const afterStatus = analyzeFormDefinition(serialized, options);
   const changed = serialized !== originalXml || !beforeStatus.complete;
 
   return {
