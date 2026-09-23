@@ -14,6 +14,7 @@ import IconButton from '@mui/material/IconButton';
 import Switch from '@mui/material/Switch';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import CircularProgress from '@mui/material/CircularProgress';
 import FolderOpenOutlinedIcon from '@mui/icons-material/FolderOpenOutlined';
 import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
 
@@ -42,6 +43,7 @@ export default function DirectoryTreeView({ rootDir, sourceItemPath = null }: Di
   const siteId = useActiveSiteId();
   const { authoringBase } = useEnv();
   const [refreshKey, setRefreshKey] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
   const localeLayout = useLocaleLayout(rootDir, siteId, authoringBase, refreshKey);
 
   const [viewMode, setViewMode] = useState<PathTreeViewMode>('traditional');
@@ -71,8 +73,17 @@ export default function DirectoryTreeView({ rootDir, sourceItemPath = null }: Di
   const bumpTreeRefresh = () => {
     setSelectedPath('');
     publishDestinationPath('', 'DirectoryTreeView.refresh');
+    setRefreshing(true);
     setRefreshKey((k) => k + 1);
   };
+
+  useEffect(() => {
+    if (!refreshing) {
+      return;
+    }
+    const t = window.setTimeout(() => setRefreshing(false), 1200);
+    return () => window.clearTimeout(t);
+  }, [refreshKey, refreshing]);
 
   const onCreateFolderClose = (isSuccess: boolean) => {
     if (isSuccess) {
@@ -139,14 +150,17 @@ export default function DirectoryTreeView({ rootDir, sourceItemPath = null }: Di
             action={
               <Box sx={{ display: 'flex', alignItems: 'center', flexShrink: 0, gap: 0.25 }}>
                 <Tooltip title="Reload folder list, locale detection, and translation checks (same REST calls as initial load).">
-                  <IconButton
-                    size="small"
-                    aria-label="Refresh destination tree"
-                    onClick={() => bumpTreeRefresh()}
-                    edge="end"
-                  >
-                    <RefreshOutlinedIcon fontSize="small" />
-                  </IconButton>
+                  <span>
+                    <IconButton
+                      size="small"
+                      aria-label="Refresh destination tree"
+                      onClick={() => bumpTreeRefresh()}
+                      disabled={refreshing}
+                      edge="end"
+                    >
+                      {refreshing ? <CircularProgress size={18} /> : <RefreshOutlinedIcon fontSize="small" />}
+                    </IconButton>
+                  </span>
                 </Tooltip>
                 {localeLayout ? (
                   <FormControlLabel

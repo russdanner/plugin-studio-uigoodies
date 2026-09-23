@@ -143,6 +143,8 @@ const InputLabel$1 = craftercms.libs.MaterialUI.InputLabel && Object.prototype.h
 const Select$1 = craftercms.libs.MaterialUI.Select && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Select, 'default') ? craftercms.libs.MaterialUI.Select['default'] : craftercms.libs.MaterialUI.Select;
 const RefreshOutlinedIcon = craftercms.utils.constants.components.get('@mui/icons-material/RefreshOutlined') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/RefreshOutlined'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/RefreshOutlined')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/RefreshOutlined');
 const HomeWorkOutlinedIcon = craftercms.utils.constants.components.get('@mui/icons-material/HomeWorkOutlined') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/HomeWorkOutlined'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/HomeWorkOutlined')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/HomeWorkOutlined');
+const ArrowUpwardRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/ArrowUpwardRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ArrowUpwardRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ArrowUpwardRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ArrowUpwardRounded');
+const ArrowDownwardRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/ArrowDownwardRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ArrowDownwardRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ArrowDownwardRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ArrowDownwardRounded');
 const Dialog$1 = craftercms.libs.MaterialUI.Dialog && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Dialog, 'default') ? craftercms.libs.MaterialUI.Dialog['default'] : craftercms.libs.MaterialUI.Dialog;
 const DialogActions$1 = craftercms.libs.MaterialUI.DialogActions && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.DialogActions, 'default') ? craftercms.libs.MaterialUI.DialogActions['default'] : craftercms.libs.MaterialUI.DialogActions;
 const DialogContent$1 = craftercms.libs.MaterialUI.DialogContent && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.DialogContent, 'default') ? craftercms.libs.MaterialUI.DialogContent['default'] : craftercms.libs.MaterialUI.DialogContent;
@@ -39450,12 +39452,14 @@ function vscodeDarkInit(options) {
     styles: [...vscodeDarkStyle, ...styles]
   });
 }
-vscodeDarkInit();
+var vscodeDark = vscodeDarkInit();
 
 function OpenSearchJsonEditor(_a) {
     var value = _a.value, onChange = _a.onChange, readOnly = _a.readOnly, onModEnter = _a.onModEnter;
+    var muiTheme = useTheme();
+    var isDark = muiTheme.palette.mode === 'dark';
     var extensions = useMemo(function () {
-        var theme = vscodeLight;
+        var theme = isDark ? vscodeDark : vscodeLight;
         var modEnter = onModEnter && !readOnly
             ? [
                 {
@@ -39475,7 +39479,7 @@ function OpenSearchJsonEditor(_a) {
             keymap.of(__spreadArray(__spreadArray(__spreadArray(__spreadArray([indentWithTab], defaultKeymap, true), historyKeymap, true), foldKeymap, true), modEnter, true)),
             theme
         ];
-    }, [readOnly, onModEnter]);
+    }, [readOnly, onModEnter, isDark]);
     var editable = Boolean(onChange) && !readOnly;
     return (jsx(Box$1, { sx: {
             flex: 1,
@@ -45883,7 +45887,9 @@ function ImageRepoBrowserDialog(_a) {
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    bgcolor: 'rgba(255,255,255,0.6)',
+                                    bgcolor: function (theme) {
+                                        return theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.6)';
+                                    },
                                     zIndex: 1
                                 }, children: jsx(CircularProgress, { size: 28 }) })), folders.length > 0 && (jsx(List, { dense: true, disablePadding: true, sx: { mb: images.length ? 1 : 0 }, children: folders.map(function (folder) { return (jsxs(ListItemButton, { onClick: function () { return loadFolder(folder.path); }, sx: { borderRadius: 1 }, children: [jsx(ListItemIcon, { sx: { minWidth: 36 }, children: jsx(FolderRoundedIcon, { fontSize: "small", color: "action" }) }), jsx(ListItemText, { primary: itemName(folder) })] }, folder.path)); }) })), images.length > 0 && (jsx(Box$1, { sx: {
                                     display: 'grid',
@@ -47341,11 +47347,18 @@ function CommitFileList(_a) {
 }
 
 function lineColor(type, theme) {
+    var dark = theme.palette.mode === 'dark';
     switch (type) {
         case 'add':
-            return { bg: alpha(theme.palette.success.main, 0.18), color: theme.palette.success.dark };
+            return {
+                bg: alpha(theme.palette.success.main, dark ? 0.22 : 0.18),
+                color: dark ? theme.palette.success.light : theme.palette.success.dark
+            };
         case 'remove':
-            return { bg: alpha(theme.palette.error.main, 0.15), color: theme.palette.error.dark };
+            return {
+                bg: alpha(theme.palette.error.main, dark ? 0.2 : 0.15),
+                color: dark ? theme.palette.error.light : theme.palette.error.dark
+            };
         case 'meta':
             return { bg: alpha(theme.palette.info.main, 0.08), color: theme.palette.text.secondary };
         default:
@@ -49039,7 +49052,19 @@ function ConfigRow(_a) {
                     bgcolor: function (theme) { return alpha(theme.palette.warning.main, 0.14); }
                 }
             }
-            : undefined, children: [jsx(TableCell, { sx: { fontWeight: 600, width: '22%', verticalAlign: 'top' }, children: jsxs(Stack$1, { direction: "row", spacing: 0.75, alignItems: "flex-start", children: [deviates ? (jsx(WarningAmberRoundedIcon, { color: "warning", sx: { fontSize: 18, mt: 0.25, flexShrink: 0 } })) : null, jsxs(Box$1, { children: [jsx(Typography, { variant: "body2", sx: monoSx, children: setting.label }), setting.description && (jsx(Typography, { variant: "caption", color: "text.secondary", display: "block", sx: { mt: 0.5, fontWeight: 400 }, children: setting.description }))] })] }) }), jsxs(TableCell, { sx: { width: '14%', verticalAlign: 'top' }, children: [jsx(Typography, { variant: "body2", sx: __assign(__assign({}, monoSx), { fontWeight: deviates ? 700 : 400, color: deviates ? 'warning.dark' : 'text.primary' }), children: setting.value }), deviates && recommended && (jsxs(Typography, { variant: "caption", color: "warning.dark", display: "block", sx: { mt: 0.5, fontWeight: 600 }, children: ["Recommended: ", recommended] }))] }), jsxs(TableCell, { sx: { width: '14%', verticalAlign: 'top' }, children: [jsx(Typography, { variant: "caption", color: "text.secondary", children: sourceLabel(setting) }), setting.defaultValue && setting.value !== setting.defaultValue && !deviates && (jsxs(Typography, { variant: "caption", color: "text.secondary", display: "block", children: ["default: ", setting.defaultValue] })), deviates && setting.defaultValue && (jsxs(Typography, { variant: "caption", color: "text.secondary", display: "block", children: ["Git default: ", setting.defaultValue] }))] }), jsx(TableCell, { sx: { verticalAlign: 'top' }, children: jsx(Typography, { variant: "body2", children: setting.performanceNote || '—' }) }), jsx(TableCell, { align: "right", sx: { width: 120, verticalAlign: 'top' }, children: jsxs(Stack$1, { spacing: 0.5, alignItems: "flex-end", children: [deviates ? (jsx(Chip, { size: "small", color: "warning", variant: "outlined", label: "Non-recommended" })) : null, jsx(ConcernIndicator, { concern: (_c = setting.concern) !== null && _c !== void 0 ? _c : 0, compact: true })] }) })] }));
+            : undefined, children: [jsx(TableCell, { sx: { fontWeight: 600, width: '22%', verticalAlign: 'top' }, children: jsxs(Stack$1, { direction: "row", spacing: 0.75, alignItems: "flex-start", children: [deviates ? (jsx(WarningAmberRoundedIcon, { color: "warning", sx: { fontSize: 18, mt: 0.25, flexShrink: 0 } })) : null, jsxs(Box$1, { children: [jsx(Typography, { variant: "body2", sx: monoSx, children: setting.label }), setting.description && (jsx(Typography, { variant: "caption", color: "text.secondary", display: "block", sx: { mt: 0.5, fontWeight: 400 }, children: setting.description }))] })] }) }), jsxs(TableCell, { sx: { width: '14%', verticalAlign: 'top' }, children: [jsx(Typography, { variant: "body2", sx: __assign(__assign({}, monoSx), { fontWeight: deviates ? 700 : 400, color: function (theme) {
+                                return deviates
+                                    ? theme.palette.mode === 'dark'
+                                        ? theme.palette.warning.light
+                                        : theme.palette.warning.dark
+                                    : 'text.primary';
+                            } }), children: setting.value }), deviates && recommended && (jsxs(Typography, { variant: "caption", display: "block", sx: {
+                            mt: 0.5,
+                            fontWeight: 600,
+                            color: function (theme) {
+                                return theme.palette.mode === 'dark' ? theme.palette.warning.light : theme.palette.warning.dark;
+                            }
+                        }, children: ["Recommended: ", recommended] }))] }), jsxs(TableCell, { sx: { width: '14%', verticalAlign: 'top' }, children: [jsx(Typography, { variant: "caption", color: "text.secondary", children: sourceLabel(setting) }), setting.defaultValue && setting.value !== setting.defaultValue && !deviates && (jsxs(Typography, { variant: "caption", color: "text.secondary", display: "block", children: ["default: ", setting.defaultValue] })), deviates && setting.defaultValue && (jsxs(Typography, { variant: "caption", color: "text.secondary", display: "block", children: ["Git default: ", setting.defaultValue] }))] }), jsx(TableCell, { sx: { verticalAlign: 'top' }, children: jsx(Typography, { variant: "body2", children: setting.performanceNote || '—' }) }), jsx(TableCell, { align: "right", sx: { width: 120, verticalAlign: 'top' }, children: jsxs(Stack$1, { spacing: 0.5, alignItems: "flex-end", children: [deviates ? (jsx(Chip, { size: "small", color: "warning", variant: "outlined", label: "Non-recommended" })) : null, jsx(ConcernIndicator, { concern: (_c = setting.concern) !== null && _c !== void 0 ? _c : 0, compact: true })] }) })] }));
 }
 function OptimizeRiskDetails(_a) {
     var option = _a.option;
@@ -49263,7 +49288,13 @@ function RepoHealthTab(_a) {
                                 }), configGroups.length > 0 && (jsxs(Box$1, { children: [jsxs(Box$1, { sx: { px: 2, py: 1.5, bgcolor: function (theme) { return alpha(theme.palette.text.primary, 0.03); } }, children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, children: "Repository configuration" }), jsx(Typography, { variant: "caption", color: "text.secondary", display: "block", children: "Git settings and runtime object-store stats that affect GC, repack, status, and Studio commit performance." }), configGroups.some(function (_a) {
                                                     var settings = _a.settings;
                                                     return settings.some(function (s) { return s.deviatesFromRecommended; });
-                                                }) && (jsxs(Stack$1, { direction: "row", spacing: 0.75, alignItems: "center", sx: { mt: 1 }, children: [jsx(WarningAmberRoundedIcon, { color: "warning", sx: { fontSize: 16 } }), jsx(Typography, { variant: "caption", color: "warning.dark", fontWeight: 600, children: "Highlighted rows use a non-recommended value \u2014 compare current vs recommended in the Value column." })] }))] }), jsxs(Table, { size: "small", children: [jsx(TableHead, { children: jsxs(TableRow, { children: [jsx(TableCell, { children: "Setting" }), jsx(TableCell, { children: "Value" }), jsx(TableCell, { children: "Source" }), jsx(TableCell, { children: "Performance impact" }), jsx(TableCell, { align: "right", children: "Status" })] }) }), jsx(TableBody, { children: configGroups.map(function (_a) {
+                                                }) && (jsxs(Stack$1, { direction: "row", spacing: 0.75, alignItems: "center", sx: { mt: 1 }, children: [jsx(WarningAmberRoundedIcon, { color: "warning", sx: { fontSize: 16 } }), jsx(Typography, { variant: "caption", fontWeight: 600, sx: {
+                                                                color: function (theme) {
+                                                                    return theme.palette.mode === 'dark'
+                                                                        ? theme.palette.warning.light
+                                                                        : theme.palette.warning.dark;
+                                                                }
+                                                            }, children: "Highlighted rows use a non-recommended value \u2014 compare current vs recommended in the Value column." })] }))] }), jsxs(Table, { size: "small", children: [jsx(TableHead, { children: jsxs(TableRow, { children: [jsx(TableCell, { children: "Setting" }), jsx(TableCell, { children: "Value" }), jsx(TableCell, { children: "Source" }), jsx(TableCell, { children: "Performance impact" }), jsx(TableCell, { align: "right", children: "Status" })] }) }), jsx(TableBody, { children: configGroups.map(function (_a) {
                                                         var group = _a.group, settings = _a.settings;
                                                         return (jsxs(React__default.Fragment, { children: [jsx(TableRow, { children: jsx(TableCell, { colSpan: 5, sx: { bgcolor: function (theme) { return alpha(theme.palette.text.primary, 0.04); }, fontWeight: 700 }, children: group }) }), settings.map(function (setting) { return (jsx(ConfigRow, { setting: setting }, setting.key)); })] }, group));
                                                     }) })] })] }))] })), jsx(Box$1, { sx: {
@@ -52379,8 +52410,8 @@ function lookupLocaleMetaForUi(key) {
     return null;
 }
 /**
- * Parse `translation-config.xml` the same way as `translation-config.get.groovy`
- * (2-char folder locales, default falls back to first listed).
+ * Parse `translation-config.xml` the same way as `translation-config.get.groovy`.
+ * Document order of locale entries is preserved. Optional language/flag override the catalog.
  */
 function parseTranslationConfigFromXml(xml) {
     var _a;
@@ -52408,10 +52439,37 @@ function parseTranslationConfigFromXml(xml) {
     }
     var seen = new Set();
     var languages = [];
-    codesParent.querySelectorAll('localeCode').forEach(function (codeElm) {
-        var _a, _b;
-        var rawCode = (codeElm.textContent || '').trim();
-        if (!rawCode) {
+    Array.from(codesParent.children).forEach(function (elm) {
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j;
+        var tag = (elm.tagName || '').toLowerCase();
+        var rawCode = '';
+        var languageRaw = '';
+        var flagRaw = '';
+        if (tag === 'locale') {
+            rawCode =
+                (((_a = elm.querySelector(':scope > code')) === null || _a === void 0 ? void 0 : _a.textContent) || '').trim() ||
+                    (((_b = elm.querySelector(':scope > localeCode')) === null || _b === void 0 ? void 0 : _b.textContent) || '').trim();
+            languageRaw =
+                (((_c = elm.querySelector(':scope > language')) === null || _c === void 0 ? void 0 : _c.textContent) || '').trim() ||
+                    (((_d = elm.querySelector(':scope > label')) === null || _d === void 0 ? void 0 : _d.textContent) || '').trim();
+            flagRaw = (((_e = elm.querySelector(':scope > flag')) === null || _e === void 0 ? void 0 : _e.textContent) || '').trim();
+        }
+        else if (tag === 'localecode') {
+            var nestedCode = (((_f = elm.querySelector(':scope > code')) === null || _f === void 0 ? void 0 : _f.textContent) || '').trim();
+            if (nestedCode) {
+                rawCode = nestedCode;
+                languageRaw =
+                    (((_g = elm.querySelector(':scope > language')) === null || _g === void 0 ? void 0 : _g.textContent) || '').trim() ||
+                        (((_h = elm.querySelector(':scope > label')) === null || _h === void 0 ? void 0 : _h.textContent) || '').trim();
+                flagRaw = (((_j = elm.querySelector(':scope > flag')) === null || _j === void 0 ? void 0 : _j.textContent) || '').trim();
+            }
+            else {
+                rawCode = (elm.textContent || '').trim();
+                languageRaw = (elm.getAttribute('language') || elm.getAttribute('label') || '').trim();
+                flagRaw = (elm.getAttribute('flag') || '').trim();
+            }
+        }
+        else {
             return;
         }
         var key = normalizeLookupKey$1(rawCode);
@@ -52419,16 +52477,13 @@ function parseTranslationConfigFromXml(xml) {
             return;
         }
         var norm = folderLocaleFromKey$1(key);
-        if (!norm) {
-            return;
-        }
-        if (seen.has(norm)) {
+        if (!norm || seen.has(norm)) {
             return;
         }
         seen.add(norm);
         var meta = lookupLocaleMetaForUi(key) || lookupLocaleMetaForUi(norm);
-        var label = (_a = meta === null || meta === void 0 ? void 0 : meta.label) !== null && _a !== void 0 ? _a : norm;
-        var flag = (_b = meta === null || meta === void 0 ? void 0 : meta.flag) !== null && _b !== void 0 ? _b : getFlagForLocale(norm);
+        var label = languageRaw || (meta === null || meta === void 0 ? void 0 : meta.label) || norm;
+        var flag = flagRaw || (meta === null || meta === void 0 ? void 0 : meta.flag) || getFlagForLocale(norm);
         languages.push({ locale: norm, label: label, flag: flag });
     });
     if (languages.length === 0) {
@@ -53331,7 +53386,7 @@ function TranslateToLocalePicker(props) {
                             }
                             var o = options.find(function (x) { return x.locale === v; });
                             return o ? "".concat(o.flag, " ").concat(o.label) : v;
-                        }, children: [jsx(MenuItem, { value: "", disabled: true, children: jsx("em", { children: "Choose locale\u2026" }) }), options.map(function (o) { return (jsxs(MenuItem, { value: o.locale, disabled: o.exists, children: [o.flag, " ", o.label, " (", o.locale, ")", o.exists ? ' — exists' : ''] }, o.locale)); })] })] }), jsxs(Stack$2, { direction: "row", spacing: 1, alignItems: "center", flexWrap: "wrap", children: [jsx(Tooltip$1, { title: "Reload locale list and content-exists checks", children: jsx("span", { children: jsx(IconButton, { size: "small", "aria-label": "Refresh locales", onClick: function () { return void loadTargets(); }, disabled: disabledCore || loading || copyBusy, children: loading ? jsx(CircularProgress$1, { size: 18 }) : jsx(RefreshOutlinedIcon, { fontSize: "small" }) }) }) }), jsx(Button, { size: "small", variant: "contained", disabled: !selected || !!(selected === null || selected === void 0 ? void 0 : selected.exists) || copyBusy || loading, onClick: function () { return void runCopy(false); }, children: "Copy" }), jsx(Button, { size: "small", variant: "outlined", disabled: !selected || !!(selected === null || selected === void 0 ? void 0 : selected.exists) || copyBusy || loading, onClick: function () { return void runCopy(true); }, children: "Copy & edit" })] })] }));
+                        }, children: [jsx(MenuItem, { value: "", disabled: true, children: jsx("em", { children: "Choose locale\u2026" }) }), options.map(function (o) { return (jsxs(MenuItem, { value: o.locale, disabled: o.exists, children: [o.flag, " ", o.label, " (", o.locale, ")", o.exists ? ' — exists' : ''] }, o.locale)); })] })] }), jsxs(Stack$2, { direction: "row", spacing: 1, alignItems: "center", flexWrap: "wrap", children: [jsx(Tooltip$1, { title: "Reload locale list and content-exists checks", children: jsx("span", { children: jsx(IconButton, { size: "small", "aria-label": "Refresh locales", onClick: function () { return void loadTargets(); }, disabled: disabledCore || loading || copyBusy, children: loading ? jsx(CircularProgress$1, { size: 18 }) : jsx(RefreshOutlinedIcon, { fontSize: "small" }) }) }) }), jsx(Button, { size: "small", variant: "contained", disabled: !selected || !!(selected === null || selected === void 0 ? void 0 : selected.exists) || copyBusy || loading, onClick: function () { return void runCopy(false); }, startIcon: copyBusy ? jsx(CircularProgress$1, { size: 14, color: "inherit" }) : undefined, children: copyBusy ? 'Copying…' : 'Copy' }), jsx(Button, { size: "small", variant: "outlined", disabled: !selected || !!(selected === null || selected === void 0 ? void 0 : selected.exists) || copyBusy || loading, onClick: function () { return void runCopy(true); }, startIcon: copyBusy ? jsx(CircularProgress$1, { size: 14, color: "inherit" }) : undefined, children: copyBusy ? 'Copying…' : 'Copy & edit' })] })] }));
     if (isToolbar) {
         return (jsx(Box, { sx: { display: 'inline-flex', alignItems: 'center', maxWidth: '100%' }, children: hint ? (jsx(Tooltip$1, { title: hint, children: jsx("span", { style: { display: 'inline-flex' }, children: controls }) })) : (controls) }));
     }
@@ -53462,6 +53517,61 @@ function contentTypeFormPath(contentTypeId) {
     var id = contentTypeId.startsWith('/') ? contentTypeId : "/".concat(contentTypeId);
     return "/content-types".concat(id, "/form-definition.xml").replace(/\/{2,}/g, '/');
 }
+function childText(parent, tag) {
+    var el = parent.querySelector(":scope > ".concat(tag));
+    return ((el === null || el === void 0 ? void 0 : el.textContent) || '').trim();
+}
+function attrText(el, name) {
+    return (el.getAttribute(name) || '').trim();
+}
+/**
+ * Parse one locale entry from translation-config.xml (document order = UI order).
+ * Supports:
+ * - `<locale><code>…</code><language>…</language><flag>…</flag></locale>`
+ * - `<localeCode>…</localeCode>` (plain or with optional label/language/flag attributes)
+ */
+function parseLocaleEntry(elm) {
+    var tag = (elm.tagName || '').toLowerCase();
+    var rawCode = '';
+    var languageRaw = '';
+    var flagRaw = '';
+    if (tag === 'locale') {
+        rawCode = childText(elm, 'code') || childText(elm, 'localeCode');
+        languageRaw = childText(elm, 'language') || childText(elm, 'label');
+        flagRaw = childText(elm, 'flag');
+    }
+    else if (tag === 'localecode') {
+        // Prefer nested <code> when present; otherwise direct text (ignore nested language/flag text).
+        var nestedCode = childText(elm, 'code');
+        if (nestedCode) {
+            rawCode = nestedCode;
+            languageRaw = childText(elm, 'language') || childText(elm, 'label');
+            flagRaw = childText(elm, 'flag');
+        }
+        else {
+            rawCode = (elm.textContent || '').trim();
+            languageRaw = attrText(elm, 'language') || attrText(elm, 'label');
+            flagRaw = attrText(elm, 'flag');
+        }
+    }
+    else {
+        return null;
+    }
+    var norm = folderLocaleFromKey(rawCode);
+    if (!norm) {
+        return null;
+    }
+    var meta = lookupMeta(norm);
+    var customLanguage = Boolean(languageRaw);
+    var customFlag = Boolean(flagRaw);
+    return {
+        locale: norm,
+        label: customLanguage ? languageRaw : meta.label,
+        flag: customFlag ? flagRaw : meta.flag,
+        customLanguage: customLanguage,
+        customFlag: customFlag
+    };
+}
 function parseTranslationConfigXml(xml) {
     var _a;
     var trimmed = String(xml || '').trim();
@@ -53482,18 +53592,14 @@ function parseTranslationConfigXml(xml) {
     }
     var seen = new Set();
     var languages = [];
-    codesParent.querySelectorAll('localeCode').forEach(function (codeElm) {
-        var rawCode = (codeElm.textContent || '').trim();
-        if (!rawCode) {
+    // Preserve document order — do not sort.
+    Array.from(codesParent.children).forEach(function (elm) {
+        var row = parseLocaleEntry(elm);
+        if (!row || seen.has(row.locale)) {
             return;
         }
-        var norm = folderLocaleFromKey(rawCode);
-        if (!norm || seen.has(norm)) {
-            return;
-        }
-        seen.add(norm);
-        var meta = lookupMeta(norm);
-        languages.push({ locale: norm, label: meta.label, flag: meta.flag });
+        seen.add(row.locale);
+        languages.push(row);
     });
     if (languages.length === 0) {
         return null;
@@ -53506,26 +53612,58 @@ function parseTranslationConfigXml(xml) {
     return { baseLanguage: baseLanguage, languages: languages };
 }
 function buildTranslationConfigXml(model) {
-    var languages = model.languages
-        .map(function (row) { return folderLocaleFromKey(row.locale); })
-        .filter(Boolean)
-        .filter(function (code, index, all) { return all.indexOf(code) === index; });
-    if (languages.length === 0) {
+    var rows = [];
+    var seen = new Set();
+    for (var _i = 0, _a = model.languages; _i < _a.length; _i++) {
+        var row = _a[_i];
+        var code = folderLocaleFromKey(row.locale);
+        if (!code || seen.has(code)) {
+            continue;
+        }
+        seen.add(code);
+        rows.push(__assign(__assign({}, row), { locale: code }));
+    }
+    if (rows.length === 0) {
         throw new Error('At least one locale is required.');
     }
     var baseLanguage = folderLocaleFromKey(model.baseLanguage);
-    if (!baseLanguage || !languages.includes(baseLanguage)) {
-        baseLanguage = languages[0];
+    if (!baseLanguage || !seen.has(baseLanguage)) {
+        baseLanguage = rows[0].locale;
     }
-    var lines = languages.map(function (code) { return "    <localeCode>".concat(escapeXmlText(code), "</localeCode>"); });
+    var lines = rows.map(function (row) {
+        var parts = ["      <code>".concat(escapeXmlText(row.locale), "</code>")];
+        if (row.customLanguage && row.label.trim()) {
+            parts.push("      <language>".concat(escapeXmlText(row.label.trim()), "</language>"));
+        }
+        if (row.customFlag && row.flag.trim()) {
+            parts.push("      <flag>".concat(escapeXmlText(row.flag.trim()), "</flag>"));
+        }
+        return "    <locale>\n".concat(parts.join('\n'), "\n    </locale>");
+    });
     return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<translation-config>\n  <defaultLocaleCode>".concat(escapeXmlText(baseLanguage), "</defaultLocaleCode>\n  <localeCodes>\n").concat(lines.join('\n'), "\n  </localeCodes>\n</translation-config>\n");
+}
+/** Resolved display label (custom language or catalog). */
+function resolveLocaleLanguage(row) {
+    var label = String(row.label || '').trim();
+    if (label) {
+        return label;
+    }
+    return lookupMeta(row.locale).label;
+}
+/** Resolved display flag (custom or catalog). */
+function resolveLocaleFlag(row) {
+    var flag = String(row.flag || '').trim();
+    if (flag) {
+        return flag;
+    }
+    return lookupMeta(row.locale).flag;
 }
 function defaultTranslationConfigModel() {
     return {
         baseLanguage: 'en',
         languages: [
-            { locale: 'en', label: 'English', flag: '🇺🇸' },
-            { locale: 'es', label: 'Spanish', flag: '🇪🇸' }
+            { locale: 'en', label: 'English', flag: '🇺🇸', customLanguage: false, customFlag: false },
+            { locale: 'es', label: 'Spanish', flag: '🇪🇸', customLanguage: false, customFlag: false }
         ]
     };
 }
@@ -54573,14 +54711,14 @@ function TranslationConfigTools() {
                 else {
                     setConfigModel(defaultTranslationConfigModel());
                     setConfigExists(false);
-                    setConfigError('translation-config.xml is missing or invalid. Save below to create it.');
+                    setConfigError('translation-config.xml is missing or invalid. Save below to create it (not site-config.xml).');
                 }
                 setConfigLoading(false);
             },
             error: function () {
                 setConfigModel(defaultTranslationConfigModel());
                 setConfigExists(false);
-                setConfigError('translation-config.xml is not configured yet. Save below to create it.');
+                setConfigError('translation-config.xml is not configured yet. Save below to create it (not site-config.xml).');
                 setConfigLoading(false);
             }
         });
@@ -54687,7 +54825,7 @@ function TranslationConfigTools() {
                 setConfigExists(true);
                 setConfigError('');
                 dispatch(showSystemNotification({
-                    message: 'Saved translation-config.xml',
+                    message: 'Saved /config/studio/translation-config.xml',
                     options: { variant: 'success' }
                 }));
             },
@@ -54709,13 +54847,16 @@ function TranslationConfigTools() {
             return;
         }
         var suggestion = localeSuggestions.find(function (row) { return row.code === code; });
+        var catalog = getLocaleMeta(code);
         setConfigModel(function (prev) {
-            var _a, _b;
+            var _a, _b, _c, _d;
             return (__assign(__assign({}, prev), { languages: __spreadArray(__spreadArray([], prev.languages, true), [
                     {
                         locale: code,
-                        label: (_a = suggestion === null || suggestion === void 0 ? void 0 : suggestion.label) !== null && _a !== void 0 ? _a : code,
-                        flag: (_b = suggestion === null || suggestion === void 0 ? void 0 : suggestion.flag) !== null && _b !== void 0 ? _b : '🌐'
+                        label: (_b = (_a = suggestion === null || suggestion === void 0 ? void 0 : suggestion.label) !== null && _a !== void 0 ? _a : catalog.label) !== null && _b !== void 0 ? _b : code,
+                        flag: (_d = (_c = suggestion === null || suggestion === void 0 ? void 0 : suggestion.flag) !== null && _c !== void 0 ? _c : catalog.flag) !== null && _d !== void 0 ? _d : '🌐',
+                        customLanguage: false,
+                        customFlag: false
                     }
                 ], false) }));
         });
@@ -54731,6 +54872,22 @@ function TranslationConfigTools() {
             }
             return { baseLanguage: baseLanguage, languages: languages };
         });
+    };
+    var moveLocale = function (index, delta) {
+        setConfigModel(function (prev) {
+            var next = __spreadArray([], prev.languages, true);
+            var target = index + delta;
+            if (target < 0 || target >= next.length) {
+                return prev;
+            }
+            var tmp = next[index];
+            next[index] = next[target];
+            next[target] = tmp;
+            return __assign(__assign({}, prev), { languages: next });
+        });
+    };
+    var updateLocaleRow = function (locale, patch) {
+        setConfigModel(function (prev) { return (__assign(__assign({}, prev), { languages: prev.languages.map(function (row) { return (row.locale === locale ? __assign(__assign({}, row), patch) : row); }) })); });
     };
     var applyTranslationFields = function () {
         if (!siteId || selectedTypeIds.size === 0) {
@@ -54814,9 +54971,40 @@ function TranslationConfigTools() {
         });
     }); };
     var incompleteCount = typeRows.filter(function (row) { return !row.status.complete; }).length;
-    return (jsxs(Box$1, { sx: { height: '100%', minHeight: 0, display: 'flex', flexDirection: 'column', p: 2, gap: 2 }, children: [jsxs(Box$1, { children: [jsx(Typography, { variant: "h5", sx: { fontWeight: 700 }, children: "Translation" }), jsxs(Typography, { variant: "body2", color: "text.secondary", children: ["Configure site locales and add Translation form controls to content types for project", ' ', jsx(Box$1, { component: "span", sx: { fontFamily: 'monospace' }, children: siteId || '—' }), "."] })] }), jsxs(Tabs, { value: tab, onChange: function (_, value) { return setTab(value); }, children: [jsx(Tab, { value: "locales", label: "Locales" }), jsx(Tab, { value: "content-types", label: "Content types".concat(incompleteCount ? " (".concat(incompleteCount, ")") : '') })] }), tab === 'locales' && (jsx(Paper, { sx: { p: 2, display: 'flex', flexDirection: 'column', gap: 2 }, children: configLoading ? (jsx(Box$1, { sx: { display: 'flex', justifyContent: 'center', py: 4 }, children: jsx(CircularProgress, { size: 28 }) })) : (jsxs(Fragment, { children: [configError && (jsx(Alert, { severity: configExists ? 'warning' : 'info', onClose: function () { return setConfigError(''); }, children: configError })), jsxs(Typography, { variant: "subtitle2", color: "text.secondary", children: ["File: ", jsx(Box$1, { component: "code", children: "/config/studio/translation-config.xml" })] }), jsx(TextField$1, { select: true, SelectProps: { native: true }, label: "Default locale", value: configModel.baseLanguage, onChange: function (event) {
+    return (jsxs(Box$1, { sx: { height: '100%', minHeight: 0, display: 'flex', flexDirection: 'column', p: 2, gap: 2 }, children: [jsxs(Box$1, { children: [jsx(Typography, { variant: "h5", sx: { fontWeight: 700 }, children: "Translation" }), jsxs(Typography, { variant: "body2", color: "text.secondary", children: ["Configure site locales and add Translation form controls to content types for project", ' ', jsx(Box$1, { component: "span", sx: { fontFamily: 'monospace' }, children: siteId || '—' }), "."] })] }), jsxs(Tabs, { value: tab, onChange: function (_, value) { return setTab(value); }, children: [jsx(Tab, { value: "locales", label: "Locales" }), jsx(Tab, { value: "content-types", label: "Content types".concat(incompleteCount ? " (".concat(incompleteCount, ")") : '') })] }), tab === 'locales' && (jsx(Paper, { sx: { p: 2, display: 'flex', flexDirection: 'column', gap: 2 }, children: configLoading ? (jsx(Box$1, { sx: { display: 'flex', justifyContent: 'center', py: 4 }, children: jsx(CircularProgress, { size: 28 }) })) : (jsxs(Fragment, { children: [configError && (jsx(Alert, { severity: configExists ? 'warning' : 'info', onClose: function () { return setConfigError(''); }, children: configError })), jsxs(Typography, { variant: "subtitle2", color: "text.secondary", children: ["File: ", jsx(Box$1, { component: "code", children: "/config/studio/translation-config.xml" }), ' — ', "not ", jsx(Box$1, { component: "code", children: "site-config.xml" }), ". List order is used by all translation UIs."] }), jsx(TextField$1, { select: true, SelectProps: { native: true }, label: "Default locale", value: configModel.baseLanguage, onChange: function (event) {
                                 return setConfigModel(function (prev) { return (__assign(__assign({}, prev), { baseLanguage: event.target.value })); });
-                            }, size: "small", sx: { maxWidth: 280 }, children: configModel.languages.map(function (row) { return (jsxs("option", { value: row.locale, children: [row.flag, " ", row.label, " (", row.locale, ")"] }, row.locale)); }) }), jsx(Box$1, { sx: { display: 'flex', flexWrap: 'wrap', gap: 1 }, children: configModel.languages.map(function (row) { return (jsx(Chip, { label: "".concat(row.flag, " ").concat(row.label, " (").concat(row.locale, ")"), color: row.locale === configModel.baseLanguage ? 'primary' : 'default', onDelete: configModel.languages.length > 1 ? function () { return removeLocale(row.locale); } : undefined }, row.locale)); }) }), jsxs(Box$1, { sx: { display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }, children: [jsx(Autocomplete, { size: "small", sx: { minWidth: 280 }, options: localeSuggestions, getOptionLabel: function (option) { return "".concat(option.flag, " ").concat(option.label, " (").concat(option.code, ")"); }, value: (_a = localeSuggestions.find(function (row) { return row.code === newLocaleCode; })) !== null && _a !== void 0 ? _a : null, onChange: function (_, value) { var _a; return setNewLocaleCode((_a = value === null || value === void 0 ? void 0 : value.code) !== null && _a !== void 0 ? _a : null); }, renderInput: function (params) { return jsx(TextField$1, __assign({}, params, { label: "Add locale", placeholder: "Search locales" })); } }), jsx(Button$1, { variant: "outlined", onClick: addLocale, disabled: !newLocaleCode, children: "Add locale" })] }), jsxs(Box$1, { sx: { display: 'flex', gap: 1, flexWrap: 'wrap' }, children: [jsx(Button$1, { variant: "contained", startIcon: configSaving ? jsx(CircularProgress, { size: 16, color: "inherit" }) : jsx(SaveRoundedIcon, {}), onClick: saveConfig, disabled: configSaving, children: "Save locale config" }), jsx(Button$1, { variant: "outlined", startIcon: jsx(HomeWorkOutlinedIcon, {}), onClick: function () { return setScaffoldOpen(true); }, disabled: configLoading || configModel.languages.length < 2 || !siteId, children: "Create locale site structure" }), jsx(Button$1, { variant: "text", startIcon: jsx(RefreshRoundedIcon, {}), onClick: loadConfig, children: "Reload" })] }), jsxs(Typography, { variant: "caption", color: "text.secondary", sx: { display: 'block', maxWidth: 720 }, children: [jsx("strong", { children: "Create locale site structure" }), " copies", ' ', jsx(Box$1, { component: "code", children: GLOBAL_HOME_PATH }), " into each configured locale folder, renames the global page to ", jsx("strong", { children: GLOBAL_HOME_INTERNAL_NAME }), ", and creates locale home pages named", ' ', jsx("strong", { children: localeHomeInternalName('en') }), ", etc. Empty", ' ', jsx(Box$1, { component: "code", children: "/site/components/<locale>/" }), " folders are added when", ' ', jsx(Box$1, { component: "code", children: "/site/components" }), " exists."] })] })) })), jsxs(Dialog, { open: scaffoldOpen, onClose: scaffoldLoading ? undefined : function () { return setScaffoldOpen(false); }, maxWidth: "sm", fullWidth: true, children: [jsx(DialogTitle, { children: "Create locale site structure" }), jsxs(DialogContent, { dividers: true, children: [jsxs(Typography, { variant: "body2", sx: { mb: 2 }, children: ["This will update ", jsx(Box$1, { component: "code", children: GLOBAL_HOME_PATH }), " to internal-name", ' ', jsx("strong", { children: GLOBAL_HOME_INTERNAL_NAME }), " (standalone \u2014 not grouped with locale homes), then copy it into each locale folder below. Locale homes share one translation lineage and each gets its own", ' ', jsx(Box$1, { component: "code", children: "objectId" }), ". Existing locale home pages are updated, not overwritten."] }), jsx(Typography, { variant: "subtitle2", sx: { mb: 1 }, children: "Planned locale home pages" }), jsx(Box$1, { component: "pre", sx: {
+                            }, size: "small", sx: { maxWidth: 280 }, children: configModel.languages.map(function (row) { return (jsxs("option", { value: row.locale, children: [resolveLocaleFlag(row), " ", resolveLocaleLanguage(row), " (", row.locale, ")"] }, row.locale)); }) }), jsxs(Table, { size: "small", sx: { maxWidth: 920 }, children: [jsx(TableHead, { children: jsxs(TableRow, { children: [jsx(TableCell, { width: 88, children: "Order" }), jsx(TableCell, { width: 100, children: "Code" }), jsx(TableCell, { children: "Language (optional)" }), jsx(TableCell, { width: 120, children: "Flag (optional)" }), jsx(TableCell, { width: 56 })] }) }), jsx(TableBody, { children: configModel.languages.map(function (row, index) {
+                                        var catalog = getLocaleMeta(row.locale);
+                                        return (jsxs(TableRow, { selected: row.locale === configModel.baseLanguage, children: [jsx(TableCell, { children: jsxs(Box$1, { sx: { display: 'flex', gap: 0.25 }, children: [jsx(Tooltip$1, { title: "Move up", children: jsx("span", { children: jsx(IconButton, { size: "small", disabled: index === 0, onClick: function () { return moveLocale(index, -1); }, "aria-label": "Move ".concat(row.locale, " up"), children: jsx(ArrowUpwardRoundedIcon, { fontSize: "small" }) }) }) }), jsx(Tooltip$1, { title: "Move down", children: jsx("span", { children: jsx(IconButton, { size: "small", disabled: index === configModel.languages.length - 1, onClick: function () { return moveLocale(index, 1); }, "aria-label": "Move ".concat(row.locale, " down"), children: jsx(ArrowDownwardRoundedIcon, { fontSize: "small" }) }) }) })] }) }), jsxs(TableCell, { children: [jsx(Box$1, { component: "code", sx: { fontWeight: 600 }, children: row.locale }), row.locale === configModel.baseLanguage ? (jsx(Typography, { variant: "caption", color: "primary", display: "block", children: "default" })) : null] }), jsx(TableCell, { children: jsx(TextField$1, { size: "small", fullWidth: true, placeholder: catalog.label || row.locale, value: row.customLanguage ? row.label : '', onChange: function (event) {
+                                                            var value = event.target.value;
+                                                            if (!value.trim()) {
+                                                                updateLocaleRow(row.locale, {
+                                                                    label: catalog.label || row.locale,
+                                                                    customLanguage: false
+                                                                });
+                                                            }
+                                                            else {
+                                                                updateLocaleRow(row.locale, {
+                                                                    label: value,
+                                                                    customLanguage: true
+                                                                });
+                                                            }
+                                                        }, helperText: row.customLanguage ? 'Saved in config' : "Catalog: ".concat(catalog.label || row.locale) }) }), jsx(TableCell, { children: jsx(TextField$1, { size: "small", fullWidth: true, placeholder: catalog.flag || '🌐', value: row.customFlag ? row.flag : '', onChange: function (event) {
+                                                            var value = event.target.value;
+                                                            if (!value.trim()) {
+                                                                updateLocaleRow(row.locale, {
+                                                                    flag: catalog.flag || '🌐',
+                                                                    customFlag: false
+                                                                });
+                                                            }
+                                                            else {
+                                                                updateLocaleRow(row.locale, {
+                                                                    flag: value,
+                                                                    customFlag: true
+                                                                });
+                                                            }
+                                                        }, helperText: row.customFlag ? 'Saved in config' : "Catalog: ".concat(catalog.flag || '🌐') }) }), jsx(TableCell, { children: jsx(Tooltip$1, { title: "Remove locale", children: jsx("span", { children: jsx(IconButton, { size: "small", color: "error", disabled: configModel.languages.length <= 1, onClick: function () { return removeLocale(row.locale); }, "aria-label": "Remove ".concat(row.locale), children: jsx(DeleteOutlineRoundedIcon, { fontSize: "small" }) }) }) }) })] }, row.locale));
+                                    }) })] }), jsxs(Box$1, { sx: { display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }, children: [jsx(Autocomplete, { size: "small", sx: { minWidth: 280 }, options: localeSuggestions, getOptionLabel: function (option) { return "".concat(option.flag, " ").concat(option.label, " (").concat(option.code, ")"); }, value: (_a = localeSuggestions.find(function (row) { return row.code === newLocaleCode; })) !== null && _a !== void 0 ? _a : null, onChange: function (_, value) { var _a; return setNewLocaleCode((_a = value === null || value === void 0 ? void 0 : value.code) !== null && _a !== void 0 ? _a : null); }, renderInput: function (params) { return jsx(TextField$1, __assign({}, params, { label: "Add locale", placeholder: "Search locales" })); } }), jsx(Button$1, { variant: "outlined", onClick: addLocale, disabled: !newLocaleCode, children: "Add locale" })] }), jsxs(Box$1, { sx: { display: 'flex', gap: 1, flexWrap: 'wrap' }, children: [jsx(Button$1, { variant: "contained", startIcon: configSaving ? jsx(CircularProgress, { size: 16, color: "inherit" }) : jsx(SaveRoundedIcon, {}), onClick: saveConfig, disabled: configSaving, children: "Save locale config" }), jsx(Button$1, { variant: "outlined", startIcon: jsx(HomeWorkOutlinedIcon, {}), onClick: function () { return setScaffoldOpen(true); }, disabled: configLoading || configModel.languages.length < 2 || !siteId, children: "Create locale site structure" }), jsx(Button$1, { variant: "text", startIcon: jsx(RefreshRoundedIcon, {}), onClick: loadConfig, children: "Reload" })] }), jsxs(Typography, { variant: "caption", color: "text.secondary", sx: { display: 'block', maxWidth: 720 }, children: [jsx("strong", { children: "Create locale site structure" }), " copies", ' ', jsx(Box$1, { component: "code", children: GLOBAL_HOME_PATH }), " into each configured locale folder, renames the global page to ", jsx("strong", { children: GLOBAL_HOME_INTERNAL_NAME }), ", and creates locale home pages named", ' ', jsx("strong", { children: localeHomeInternalName('en') }), ", etc. Empty", ' ', jsx(Box$1, { component: "code", children: "/site/components/<locale>/" }), " folders are added when", ' ', jsx(Box$1, { component: "code", children: "/site/components" }), " exists."] })] })) })), jsxs(Dialog, { open: scaffoldOpen, onClose: scaffoldLoading ? undefined : function () { return setScaffoldOpen(false); }, maxWidth: "sm", fullWidth: true, children: [jsx(DialogTitle, { children: "Create locale site structure" }), jsxs(DialogContent, { dividers: true, children: [jsxs(Typography, { variant: "body2", sx: { mb: 2 }, children: ["This will update ", jsx(Box$1, { component: "code", children: GLOBAL_HOME_PATH }), " to internal-name", ' ', jsx("strong", { children: GLOBAL_HOME_INTERNAL_NAME }), " (standalone \u2014 not grouped with locale homes), then copy it into each locale folder below. Locale homes share one translation lineage and each gets its own", ' ', jsx(Box$1, { component: "code", children: "objectId" }), ". Existing locale home pages are updated, not overwritten."] }), jsx(Typography, { variant: "subtitle2", sx: { mb: 1 }, children: "Planned locale home pages" }), jsx(Box$1, { component: "pre", sx: {
                                     m: 0,
                                     p: 1.5,
                                     bgcolor: 'action.hover',
@@ -54900,9 +55088,21 @@ var pillBase = {
     lineHeight: 1.3
 };
 var translationIndicatorSx = {
-    source: __assign(__assign({}, pillBase), { backgroundColor: '#e8f1ff', color: '#0d4ea6', border: '1px solid #b6d4fe' }),
-    outdated: __assign(__assign({}, pillBase), { backgroundColor: '#fff7e6', color: '#ad6800', border: '1px solid #ffd591' }),
-    current: __assign(__assign({}, pillBase), { backgroundColor: '#f6ffed', color: '#237804', border: '1px solid #b7eb8f' })
+    source: __assign(__assign({}, pillBase), { backgroundColor: function (theme) {
+            return theme.palette.mode === 'dark' ? 'rgba(59,130,246,0.22)' : '#e8f1ff';
+        }, color: function (theme) { return (theme.palette.mode === 'dark' ? '#93c5fd' : '#0d4ea6'); }, border: function (theme) {
+            return theme.palette.mode === 'dark' ? '1px solid rgba(147,197,253,0.45)' : '1px solid #b6d4fe';
+        } }),
+    outdated: __assign(__assign({}, pillBase), { backgroundColor: function (theme) {
+            return theme.palette.mode === 'dark' ? 'rgba(245,158,11,0.2)' : '#fff7e6';
+        }, color: function (theme) { return (theme.palette.mode === 'dark' ? '#fcd34d' : '#ad6800'); }, border: function (theme) {
+            return theme.palette.mode === 'dark' ? '1px solid rgba(252,211,77,0.4)' : '1px solid #ffd591';
+        } }),
+    current: __assign(__assign({}, pillBase), { backgroundColor: function (theme) {
+            return theme.palette.mode === 'dark' ? 'rgba(34,197,94,0.2)' : '#f6ffed';
+        }, color: function (theme) { return (theme.palette.mode === 'dark' ? '#86efac' : '#237804'); }, border: function (theme) {
+            return theme.palette.mode === 'dark' ? '1px solid rgba(134,239,172,0.4)' : '1px solid #b7eb8f';
+        } })
 };
 
 function TranslationSourceBadge() {
@@ -54924,6 +55124,52 @@ function normalizeRepoPath(p) {
 function isPageRepoPath(p) {
     var n = normalizeRepoPath(p).toLowerCase();
     return n.includes('/website/') && n.endsWith('.xml');
+}
+/** Studio ItemMegaMenu ignores includeOnly; keep only these action labels visible. */
+var TRANSLATION_ITEM_MENU_LABELS = {
+    edit: true,
+    view: true,
+    'view form': true,
+    history: true,
+    dependencies: true,
+    publish: true,
+    'request publish': true,
+    approve: true,
+    preview: true
+};
+function normalizeMegaMenuLabel(text) {
+    return String(text || '')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .toLowerCase();
+}
+function isAllowedMegaMenuLabel(text, hideEdit) {
+    if (hideEdit === void 0) { hideEdit = false; }
+    var txt = normalizeMegaMenuLabel(text);
+    if (!txt)
+        return false;
+    if (hideEdit && (txt === 'edit' || txt.startsWith('edit ')))
+        return false;
+    if (TRANSLATION_ITEM_MENU_LABELS[txt])
+        return true;
+    return Object.keys(TRANSLATION_ITEM_MENU_LABELS).some(function (key) { return txt === key || txt.startsWith("".concat(key, " ")); });
+}
+function enforceAllowedItemsInOpenMegaMenu(hideEdit) {
+    if (hideEdit === void 0) { hideEdit = false; }
+    if (typeof document === 'undefined')
+        return;
+    document.querySelectorAll("li[role='menuitem'], .MuiMenuItem-root").forEach(function (node) {
+        if (!isAllowedMegaMenuLabel(node.textContent || '', hideEdit)) {
+            node.style.display = 'none';
+        }
+    });
+}
+function scheduleEnforceAllowedItemsInMegaMenu(hideEdit) {
+    if (hideEdit === void 0) { hideEdit = false; }
+    enforceAllowedItemsInOpenMegaMenu(hideEdit);
+    window.setTimeout(function () { return enforceAllowedItemsInOpenMegaMenu(hideEdit); }, 0);
+    window.setTimeout(function () { return enforceAllowedItemsInOpenMegaMenu(hideEdit); }, 60);
+    window.setTimeout(function () { return enforceAllowedItemsInOpenMegaMenu(hideEdit); }, 160);
 }
 function storePathToPreviewPath(storePath) {
     var m = String(storePath || '').match(/^\/site\/[^/]+\/website\/([^/]+)(\/.*)?$/i);
@@ -55365,6 +55611,7 @@ function OpenTranslationToolbarButton(props) {
         openEditFormStudioDispatch(dispatch, siteId, targetPath, authoringBase);
     };
     var showStudioItemMegaMenu = function (event, path) {
+        var _a;
         event.preventDefault();
         event.stopPropagation();
         dispatch({
@@ -55378,6 +55625,8 @@ function OpenTranslationToolbarButton(props) {
                 }
             }
         });
+        var hideEdit = normalizeRepoPath(path) === normalizeRepoPath((_a = sourceItem === null || sourceItem === void 0 ? void 0 : sourceItem.path) !== null && _a !== void 0 ? _a : '');
+        scheduleEnforceAllowedItemsInMegaMenu(hideEdit);
     };
     var tooltipText = disabledCore
         ? 'Select an item in preview'
@@ -55387,7 +55636,7 @@ function OpenTranslationToolbarButton(props) {
     if (!hasConfiguredTranslationLocales(translationConfig)) {
         return null;
     }
-    return (jsxs(Fragment, { children: [jsx(Tooltip$1, { title: tooltipText, children: jsx("span", { children: jsx(IconButton, { size: buttonSize, onClick: openMenu, disabled: disabledCore || copyBusy, "aria-label": tooltip, "aria-haspopup": "true", "aria-expanded": menuOpen ? 'true' : undefined, children: jsx(SystemIcon, { icon: icon }) }) }) }), jsx(Menu, { anchorEl: anchorEl, open: menuOpen, onClose: closeMenu, anchorOrigin: { vertical: 'bottom', horizontal: 'right' }, transformOrigin: { vertical: 'top', horizontal: 'right' }, PaperProps: { sx: { minWidth: 220 } }, children: loading ? (jsx(MenuItem, { disabled: true, dense: true, children: jsx(Box, { sx: { display: 'flex', alignItems: 'center', gap: 1, py: 0.5 }, children: "Loading\u2026" }) })) : rows.length === 0 ? (jsx(MenuItem, { disabled: true, dense: true, sx: { bgcolor: 'background.paper', alignItems: 'flex-start' }, children: jsxs(Box, { component: "div", sx: {
+    return (jsxs(Fragment, { children: [jsx(Tooltip$1, { title: tooltipText, children: jsx("span", { children: jsx(IconButton, { size: buttonSize, onClick: openMenu, disabled: disabledCore || copyBusy, "aria-label": tooltip, "aria-haspopup": "true", "aria-expanded": menuOpen ? 'true' : undefined, children: copyBusy || (loading && menuOpen) ? (jsx(CircularProgress$1, { size: buttonSize === 'small' ? 18 : 22 })) : (jsx(SystemIcon, { icon: icon })) }) }) }), jsx(Menu, { anchorEl: anchorEl, open: menuOpen, onClose: closeMenu, anchorOrigin: { vertical: 'bottom', horizontal: 'right' }, transformOrigin: { vertical: 'top', horizontal: 'right' }, PaperProps: { sx: { minWidth: 220 } }, children: loading ? (jsx(MenuItem, { disabled: true, dense: true, children: jsxs(Box, { sx: { display: 'flex', alignItems: 'center', gap: 1, py: 0.5 }, children: [jsx(CircularProgress$1, { size: 16 }), "Loading locales\u2026"] }) })) : rows.length === 0 ? (jsx(MenuItem, { disabled: true, dense: true, sx: { bgcolor: 'background.paper', alignItems: 'flex-start' }, children: jsxs(Box, { component: "div", sx: {
                             whiteSpace: 'normal',
                             py: 0.75,
                             fontSize: '0.8125rem',
@@ -55425,9 +55674,14 @@ function OpenTranslationToolbarButton(props) {
                                         fontSize: '0.75rem',
                                         color: 'white',
                                         bgcolor: copyBusy ? 'grey.400' : 'primary.main',
-                                        cursor: copyBusy ? 'not-allowed' : 'pointer'
-                                    }, children: "Add to Scope" })) })] }, o.locale));
-                })) }), jsx(Dialog$1, { open: Boolean(removeDialog), onClose: (removeDialog === null || removeDialog === void 0 ? void 0 : removeDialog.submitting) ? undefined : closeRemoveDialog, maxWidth: "sm", fullWidth: true, children: removeDialog ? (jsxs(Fragment, { children: [jsx(DialogTitle$1, { children: "Remove translation" }), jsxs(DialogContent$1, { dividers: true, children: [removeDialog.loading ? (jsx(Typography$1, { variant: "body2", color: "text.secondary", children: "Loading removable components\u2026" })) : null, removeDialog.error ? (jsx(Typography$1, { variant: "body2", color: "error", sx: { mb: 1 }, children: removeDialog.error })) : null, !removeDialog.loading && !removeDialog.error && removeDialog.candidates.length === 0 ? (jsx(Typography$1, { variant: "body2", color: "text.secondary", sx: { mb: 1 }, children: "No locale-only components were found that are safe to delete automatically. The translated page will still be removed." })) : null, removeDialog.candidates.length > 0 ? (jsxs(Fragment, { children: [jsx(Typography$1, { variant: "subtitle2", sx: { mb: 1 }, children: "Also delete these components (checked by default)" }), jsxs(Box, { sx: { display: 'flex', gap: 1, mb: 1 }, children: [jsx(Button, { size: "small", onClick: function () {
+                                        cursor: copyBusy ? 'not-allowed' : 'pointer',
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: 0.5,
+                                        minWidth: 96,
+                                        justifyContent: 'center'
+                                    }, children: copyBusy ? (jsxs(Fragment, { children: [jsx(CircularProgress$1, { size: 12, sx: { color: 'white' } }), "Adding\u2026"] })) : ('Add to Scope') })) })] }, o.locale));
+                })) }), jsx(Dialog$1, { open: Boolean(removeDialog), onClose: (removeDialog === null || removeDialog === void 0 ? void 0 : removeDialog.submitting) ? undefined : closeRemoveDialog, maxWidth: "sm", fullWidth: true, children: removeDialog ? (jsxs(Fragment, { children: [jsx(DialogTitle$1, { children: "Remove translation" }), jsxs(DialogContent$1, { dividers: true, children: [removeDialog.loading ? (jsxs(Box, { sx: { display: 'flex', alignItems: 'center', gap: 1.5, py: 1 }, children: [jsx(CircularProgress$1, { size: 20 }), jsx(Typography$1, { variant: "body2", color: "text.secondary", children: "Loading removable components\u2026" })] })) : null, removeDialog.error ? (jsx(Typography$1, { variant: "body2", color: "error", sx: { mb: 1 }, children: removeDialog.error })) : null, !removeDialog.loading && !removeDialog.error && removeDialog.candidates.length === 0 ? (jsx(Typography$1, { variant: "body2", color: "text.secondary", sx: { mb: 1 }, children: "No locale-only components were found that are safe to delete automatically. The translated page will still be removed." })) : null, removeDialog.candidates.length > 0 ? (jsxs(Fragment, { children: [jsx(Typography$1, { variant: "subtitle2", sx: { mb: 1 }, children: "Also delete these components (checked by default)" }), jsxs(Box, { sx: { display: 'flex', gap: 1, mb: 1 }, children: [jsx(Button, { size: "small", onClick: function () {
                                                         return setRemoveDialog(function (prev) {
                                                             if (!prev || prev.loading) {
                                                                 return prev;
@@ -55462,7 +55716,7 @@ function OpenTranslationToolbarButton(props) {
                                                         }
                                                         return __assign(__assign({}, prev), { selected: __assign(__assign({}, prev.selected), (_a = {}, _a[c.path] = checked, _a)) });
                                                     });
-                                                } }), label: jsxs(Box, { children: [jsx(Typography$1, { variant: "body2", children: c.internalName || '(no internal name)' }), jsx(Typography$1, { variant: "caption", color: "text.secondary", sx: { wordBreak: 'break-all' }, children: c.path })] }), sx: { alignItems: 'flex-start', ml: 0, display: 'flex' } }, c.path)); })] })) : null, jsx(Typography$1, { variant: "caption", color: "warning.main", sx: { display: 'block', mt: 2 }, children: "The translated page will be deleted. This cannot be undone." })] }), jsxs(DialogActions$1, { children: [jsx(Button, { onClick: closeRemoveDialog, disabled: Boolean(removeDialog.submitting), children: "Cancel" }), jsx(Button, { color: "error", variant: "contained", disabled: Boolean(removeDialog.loading || removeDialog.submitting), onClick: function () { return void confirmRemoveTranslation(); }, children: removeDialog.submitting ? 'Removing…' : 'Remove translation' })] })] })) : null })] }));
+                                                } }), label: jsxs(Box, { children: [jsx(Typography$1, { variant: "body2", children: c.internalName || '(no internal name)' }), jsx(Typography$1, { variant: "caption", color: "text.secondary", sx: { wordBreak: 'break-all' }, children: c.path })] }), sx: { alignItems: 'flex-start', ml: 0, display: 'flex' } }, c.path)); })] })) : null, jsx(Typography$1, { variant: "caption", color: "warning.main", sx: { display: 'block', mt: 2 }, children: "The translated page will be deleted. This cannot be undone." })] }), jsxs(DialogActions$1, { children: [jsx(Button, { onClick: closeRemoveDialog, disabled: Boolean(removeDialog.submitting), children: "Cancel" }), jsx(Button, { color: "error", variant: "contained", disabled: Boolean(removeDialog.loading || removeDialog.submitting), onClick: function () { return void confirmRemoveTranslation(); }, startIcon: removeDialog.submitting ? jsx(CircularProgress$1, { size: 16, color: "inherit" }) : undefined, children: removeDialog.submitting ? 'Removing…' : 'Remove translation' })] })] })) : null })] }));
 }
 
 /**

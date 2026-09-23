@@ -253,13 +253,27 @@ function ConfigRow({ setting }: { setting: RepoConfigSetting }) {
           sx={{
             ...monoSx,
             fontWeight: deviates ? 700 : 400,
-            color: deviates ? 'warning.dark' : 'text.primary'
+            color: (theme) =>
+              deviates
+                ? theme.palette.mode === 'dark'
+                  ? theme.palette.warning.light
+                  : theme.palette.warning.dark
+                : 'text.primary'
           }}
         >
           {setting.value}
         </Typography>
         {deviates && recommended && (
-          <Typography variant="caption" color="warning.dark" display="block" sx={{ mt: 0.5, fontWeight: 600 }}>
+          <Typography
+            variant="caption"
+            display="block"
+            sx={{
+              mt: 0.5,
+              fontWeight: 600,
+              color: (theme) =>
+                theme.palette.mode === 'dark' ? theme.palette.warning.light : theme.palette.warning.dark
+            }}
+          >
             Recommended: {recommended}
           </Typography>
         )}
@@ -732,7 +746,16 @@ export function RepoHealthTab({ siteId, siteName }: { siteId: string; siteName?:
                     {configGroups.some(({ settings }) => settings.some((s) => s.deviatesFromRecommended)) && (
                       <Stack direction="row" spacing={0.75} alignItems="center" sx={{ mt: 1 }}>
                         <WarningAmberRoundedIcon color="warning" sx={{ fontSize: 16 }} />
-                        <Typography variant="caption" color="warning.dark" fontWeight={600}>
+                        <Typography
+                          variant="caption"
+                          fontWeight={600}
+                          sx={{
+                            color: (theme) =>
+                              theme.palette.mode === 'dark'
+                                ? theme.palette.warning.light
+                                : theme.palette.warning.dark
+                          }}
+                        >
                           Highlighted rows use a non-recommended value — compare current vs recommended in the Value column.
                         </Typography>
                       </Stack>

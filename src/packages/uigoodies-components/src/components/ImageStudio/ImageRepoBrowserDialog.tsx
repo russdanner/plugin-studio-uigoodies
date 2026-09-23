@@ -410,7 +410,8 @@ export function ImageRepoBrowserDialog({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                bgcolor: 'rgba(255,255,255,0.6)',
+                bgcolor: (theme) =>
+                  theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.6)',
                 zIndex: 1
               }}
             >

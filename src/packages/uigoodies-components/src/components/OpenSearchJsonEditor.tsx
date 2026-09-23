@@ -3,13 +3,13 @@
  */
 
 import React, { useMemo } from 'react';
-import { Box } from '@mui/material';
+import { Box, useTheme } from '@mui/material';
 import ReactCodeMirror from '@uiw/react-codemirror';
 import { json } from '@codemirror/lang-json';
 import { foldGutter, foldKeymap } from '@codemirror/language';
 import { defaultKeymap, historyKeymap, indentWithTab } from '@codemirror/commands';
 import { keymap, lineNumbers } from '@codemirror/view';
-import { vscodeLight } from '@uiw/codemirror-theme-vscode';
+import { vscodeDark, vscodeLight } from '@uiw/codemirror-theme-vscode';
 
 export type OpenSearchJsonEditorProps = {
   value: string;
@@ -26,8 +26,11 @@ export function OpenSearchJsonEditor({
   readOnly,
   onModEnter
 }: OpenSearchJsonEditorProps) {
+  const muiTheme = useTheme();
+  const isDark = muiTheme.palette.mode === 'dark';
+
   const extensions = useMemo(() => {
-    const theme = vscodeLight;
+    const theme = isDark ? vscodeDark : vscodeLight;
     const modEnter =
       onModEnter && !readOnly
         ? [
@@ -48,7 +51,7 @@ export function OpenSearchJsonEditor({
       keymap.of([indentWithTab, ...defaultKeymap, ...historyKeymap, ...foldKeymap, ...modEnter]),
       theme
     ];
-  }, [readOnly, onModEnter]);
+  }, [readOnly, onModEnter, isDark]);
 
   const editable = Boolean(onChange) && !readOnly;
 

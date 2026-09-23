@@ -16,6 +16,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
+import CircularProgress from '@mui/material/CircularProgress';
 import DialogActions from '@mui/material/DialogActions';
 import { closeWidgetDialog } from '@craftercms/studio-ui/state/actions/dialogs';
 import { showSystemNotification } from '@craftercms/studio-ui/state/actions/system';
@@ -116,16 +117,18 @@ export default function AppActions({
         color="primary"
         onClick={(event) => handleCopy(event, false)}
         disabled={isProcessing || !rootDir || !destinationPath}
+        startIcon={isProcessing ? <CircularProgress size={16} color="inherit" /> : undefined}
       >
-        Copy
+        {isProcessing ? 'Copying…' : 'Copy'}
       </StyledActionButton>
       <StyledActionButton
         variant="contained"
         color="primary"
         onClick={handleCopyAndOpen}
         disabled={isProcessing || !rootDir || !destinationPath}
+        startIcon={isProcessing ? <CircularProgress size={16} color="inherit" /> : undefined}
       >
-        Copy and Edit
+        {isProcessing ? 'Copying…' : 'Copy and Edit'}
       </StyledActionButton>
     </DialogActions>
   );

@@ -57,56 +57,54 @@ function bootCustomLocaleControl() {
 
     var pathLocale = (locale.localeCode || "").toLowerCase();
     var sourceLocale = (locale.sourceLocaleCode || "").toLowerCase();
-    var linkedElsewhere = pathLocale && sourceLocale && pathLocale !== sourceLocale;
+    var canUnlink = !!(pathLocale && sourceLocale && pathLocale !== sourceLocale);
 
-    // Match stock form controls: same container class as built-in inputs; no custom panels.
+    // Match stock form action buttons (image-picker, etc.): cstudio-button + bootstrap btn classes.
+    // Parent control widget is right-aligned so the button sits upper-right of the field row.
     return React.createElement(
       "div",
-      { className: "cstudio-form-control-input-container" },
-      linkedElsewhere
-        ? React.createElement(
-            React.Fragment,
-            null,
-            React.createElement(
-              "p",
-              {
-                className: "help-block",
-                style: { marginBottom: "8px", marginTop: 0 }
-              },
-              "This item is linked to a translation (source locale differs from this folder). Locale Code and Source Locale Code are shown in the fields below."
-            ),
-            React.createElement(
-              "button",
-              {
-                type: "button",
-                className: "btn btn-default btn-sm edit-position",
-                style: { marginRight: "6px" },
-                onClick: function () {
-                  setIsDialogOpen(true);
-                }
-              },
-              "Unlink"
-            ),
-            React.createElement(
-              CrafterCMSNextBridge,
-              null,
-              React.createElement(ConfirmDialog, {
-                open: isDialogOpen,
-                onOk: onConfirmOk,
-                onCancel: function () {
-                  setIsDialogOpen(false);
-                },
-                onClose: function () {
-                  setIsDialogOpen(false);
-                },
-                body:
-                  "Warning: By unlinking this content you are indicating that this object has no localization relationships to any other objects in the system. Do you wish to continue?",
-                title: "Unlink",
-                disableEnforceFocus: false
-              })
-            )
-          )
-        : null
+      {
+        className: "cstudio-form-control-input-container",
+        style: {
+          display: "inline-block",
+          textAlign: "right",
+          verticalAlign: "top"
+        }
+      },
+      React.createElement(
+        "button",
+        {
+          type: "button",
+          className: "cstudio-button btn btn-default btn-sm",
+          disabled: !canUnlink,
+          title: canUnlink
+            ? "Unlink this item from its translation source"
+            : "This item is not linked to a different source locale",
+          onClick: function () {
+            if (!canUnlink) return;
+            setIsDialogOpen(true);
+          }
+        },
+        "Unlink Translation"
+      ),
+      React.createElement(
+        CrafterCMSNextBridge,
+        null,
+        React.createElement(ConfirmDialog, {
+          open: isDialogOpen,
+          onOk: onConfirmOk,
+          onCancel: function () {
+            setIsDialogOpen(false);
+          },
+          onClose: function () {
+            setIsDialogOpen(false);
+          },
+          body:
+            "Warning: By unlinking this content you are indicating that this object has no localization relationships to any other objects in the system. Do you wish to continue?",
+          title: "Unlink Translation",
+          disableEnforceFocus: false
+        })
+      )
     );
   }
 
@@ -241,9 +239,10 @@ function bootCustomLocaleControl() {
       if (obj._cmsRenderHandles[handleKey] && obj._cmsRenderHandles[handleKey].unmount) {
         obj._cmsRenderHandles[handleKey].unmount({ removeContainer: false });
       }
+      var mountEl = obj.controlWidgetContainerEl || obj.containerEl;
       cms
         .render(
-          obj.containerEl,
+          mountEl,
           function CustomLocaleBridge(props) {
             return React.createElement(CustomLocale, props);
           },
@@ -254,7 +253,7 @@ function bootCustomLocaleControl() {
         })
         .catch(function (err) {
           console.error("[custom-locale] Failed to render control", err);
-          obj.containerEl.innerHTML =
+          mountEl.innerHTML =
             '<div class="alert alert-warning" style="margin:8px 0">Locale control could not load. Refresh Studio and check the console.</div>';
         });
     },
@@ -291,6 +290,28 @@ function bootCustomLocaleControl() {
     render: function (config, containerEl) {
       containerEl.id = this.id;
       this.containerEl = containerEl;
+
+      // Same chrome as stock controls: title left, control widget right.
+      var titleEl = document.createElement("span");
+      YAHOO.util.Dom.addClass(titleEl, "cstudio-form-field-title");
+      titleEl.textContent = config.title || "Locale Source ID";
+      containerEl.appendChild(titleEl);
+
+      var controlWidgetContainerEl = document.createElement("div");
+      YAHOO.util.Dom.addClass(controlWidgetContainerEl, "cstudio-form-control-uuid-container");
+      controlWidgetContainerEl.style.cssText =
+        "display:inline-block;width:75%;vertical-align:top;text-align:right;";
+      containerEl.appendChild(controlWidgetContainerEl);
+      this.controlWidgetContainerEl = controlWidgetContainerEl;
+
+      if (config.description) {
+        var descriptionEl = document.createElement("span");
+        YAHOO.util.Dom.addClass(descriptionEl, "description");
+        YAHOO.util.Dom.addClass(descriptionEl, "cstudio-form-field-description");
+        descriptionEl.innerHTML = config.description;
+        containerEl.appendChild(descriptionEl);
+      }
+
       this._renderReactComponent(this);
     },
     getValue: function () {

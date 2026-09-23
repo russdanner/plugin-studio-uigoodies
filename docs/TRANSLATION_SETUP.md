@@ -31,7 +31,37 @@ Related docs:
 
 File: `/config/studio/translation-config.xml` (module `studio`)
 
+**Not** `site-config.xml` — Studio’s site-config locale is for authoring UI date/number formatting only.
+Translation UIs (toolbar, form control, Project Tools) read **only** `translation-config.xml`.
+
 Locale codes should match first-segment folder names under `/site/website` and `/site/components`.
+**Document order is user-defined** and is respected by all translation UIs (lists, menus, Translate dropdown).
+
+Optional per-locale `language` (display name) and `flag` override the built-in catalog when present.
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<translation-config>
+  <defaultLocaleCode>us</defaultLocaleCode>
+  <localeCodes>
+    <locale>
+      <code>us</code>
+      <language>English (US)</language>
+      <flag>🇺🇸</flag>
+    </locale>
+    <locale>
+      <code>uk</code>
+    </locale>
+    <locale>
+      <code>fr</code>
+      <language>Français</language>
+    </locale>
+  </localeCodes>
+</translation-config>
+```
+
+Legacy plain `<localeCode>en</localeCode>` entries are still read. Saving from Project Tools writes the `<locale>` form above.
+
 The plugin catalog includes:
 
 - **ISO 639-1** language codes (e.g. `de`, `fr`, `ja`)
@@ -40,18 +70,6 @@ The plugin catalog includes:
 - **CMS aliases** such as `us`, `uk`, `br`, `cn`, `shared`, `global`, `common`
 
 Note: `uk` is English (UK) for folders; use `ua` / `uk-ua` for Ukrainian. Some rare ISO language codes that collide with market folders (`br`, `ae`, `sa`, `tw`, …) prefer the market label.
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<translation-config>
-  <defaultLocaleCode>en</defaultLocaleCode>
-  <localeCodes>
-    <localeCode>en</localeCode>
-    <localeCode>es</localeCode>
-    <localeCode>ar</localeCode>
-  </localeCodes>
-</translation-config>
-```
 
 Save in Studio and commit. The preview **Translation** toolbar button appears only when **two or more** locale codes are configured.
 
@@ -140,7 +158,7 @@ Re-run scaffold after changing locales or to fix sites that previously shared on
 
 ### Content Form
 
-Open any translatable item. The **Translations** control (pinned at the top of the form) shows:
+Open any translatable item. The **Translations** control (where it is placed in the form definition) shows:
 
 - Locale shortcuts and translation list
 - Filter, translate, compare, remove actions

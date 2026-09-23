@@ -32,6 +32,11 @@ import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
 import SaveRoundedIcon from '@mui/icons-material/SaveRounded';
 import PlaylistAddRoundedIcon from '@mui/icons-material/PlaylistAddRounded';
 import HomeWorkOutlinedIcon from '@mui/icons-material/HomeWorkOutlined';
+import ArrowUpwardRoundedIcon from '@mui/icons-material/ArrowUpwardRounded';
+import ArrowDownwardRoundedIcon from '@mui/icons-material/ArrowDownwardRounded';
+import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
 import useActiveSiteId from '@craftercms/studio-ui/hooks/useActiveSiteId';
 import useEnv from '@craftercms/studio-ui/hooks/useEnv';
 import { fetchContentTypes } from '@craftercms/studio-ui/services/contentTypes';
@@ -54,8 +59,11 @@ import {
   defaultTranslationConfigModel,
   parseTranslationConfigXml,
   patchFormDefinitionWithTranslationFields,
+  resolveLocaleFlag,
+  resolveLocaleLanguage,
   suggestedLocaleOptions
 } from './translationConfigSupport';
+import { getLocaleMeta } from './config/multiLocaleConfig';
 import {
   GLOBAL_HOME_INTERNAL_NAME,
   GLOBAL_HOME_PATH,
@@ -133,14 +141,14 @@ export function TranslationConfigTools() {
         } else {
           setConfigModel(defaultTranslationConfigModel());
           setConfigExists(false);
-          setConfigError('translation-config.xml is missing or invalid. Save below to create it.');
+          setConfigError('translation-config.xml is missing or invalid. Save below to create it (not site-config.xml).');
         }
         setConfigLoading(false);
       },
       error() {
         setConfigModel(defaultTranslationConfigModel());
         setConfigExists(false);
-        setConfigError('translation-config.xml is not configured yet. Save below to create it.');
+        setConfigError('translation-config.xml is not configured yet. Save below to create it (not site-config.xml).');
         setConfigLoading(false);
       }
     });
@@ -261,7 +269,7 @@ export function TranslationConfigTools() {
         setConfigError('');
         dispatch(
           showSystemNotification({
-            message: 'Saved translation-config.xml',
+            message: 'Saved /config/studio/translation-config.xml',
             options: { variant: 'success' }
           })
         );
@@ -287,14 +295,17 @@ export function TranslationConfigTools() {
       return;
     }
     const suggestion = localeSuggestions.find((row) => row.code === code);
+    const catalog = getLocaleMeta(code);
     setConfigModel((prev) => ({
       ...prev,
       languages: [
         ...prev.languages,
         {
           locale: code,
-          label: suggestion?.label ?? code,
-          flag: suggestion?.flag ?? '🌐'
+          label: suggestion?.label ?? catalog.label ?? code,
+          flag: suggestion?.flag ?? catalog.flag ?? '🌐',
+          customLanguage: false,
+          customFlag: false
         }
       ]
     }));
@@ -310,6 +321,30 @@ export function TranslationConfigTools() {
       }
       return { baseLanguage, languages };
     });
+  };
+
+  const moveLocale = (index: number, delta: number) => {
+    setConfigModel((prev) => {
+      const next = [...prev.languages];
+      const target = index + delta;
+      if (target < 0 || target >= next.length) {
+        return prev;
+      }
+      const tmp = next[index];
+      next[index] = next[target];
+      next[target] = tmp;
+      return { ...prev, languages: next };
+    });
+  };
+
+  const updateLocaleRow = (
+    locale: string,
+    patch: Partial<{ label: string; flag: string; customLanguage: boolean; customFlag: boolean }>
+  ) => {
+    setConfigModel((prev) => ({
+      ...prev,
+      languages: prev.languages.map((row) => (row.locale === locale ? { ...row, ...patch } : row))
+    }));
   };
 
   const applyTranslationFields = () => {
@@ -435,6 +470,8 @@ export function TranslationConfigTools() {
               )}
               <Typography variant="subtitle2" color="text.secondary">
                 File: <Box component="code">/config/studio/translation-config.xml</Box>
+                {' — '}
+                not <Box component="code">site-config.xml</Box>. List order is used by all translation UIs.
               </Typography>
               <TextField
                 select
@@ -449,20 +486,131 @@ export function TranslationConfigTools() {
               >
                 {configModel.languages.map((row) => (
                   <option key={row.locale} value={row.locale}>
-                    {row.flag} {row.label} ({row.locale})
+                    {resolveLocaleFlag(row)} {resolveLocaleLanguage(row)} ({row.locale})
                   </option>
                 ))}
               </TextField>
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                {configModel.languages.map((row) => (
-                  <Chip
-                    key={row.locale}
-                    label={`${row.flag} ${row.label} (${row.locale})`}
-                    color={row.locale === configModel.baseLanguage ? 'primary' : 'default'}
-                    onDelete={configModel.languages.length > 1 ? () => removeLocale(row.locale) : undefined}
-                  />
-                ))}
-              </Box>
+              <Table size="small" sx={{ maxWidth: 920 }}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell width={88}>Order</TableCell>
+                    <TableCell width={100}>Code</TableCell>
+                    <TableCell>Language (optional)</TableCell>
+                    <TableCell width={120}>Flag (optional)</TableCell>
+                    <TableCell width={56} />
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {configModel.languages.map((row, index) => {
+                    const catalog = getLocaleMeta(row.locale);
+                    return (
+                      <TableRow key={row.locale} selected={row.locale === configModel.baseLanguage}>
+                        <TableCell>
+                          <Box sx={{ display: 'flex', gap: 0.25 }}>
+                            <Tooltip title="Move up">
+                              <span>
+                                <IconButton
+                                  size="small"
+                                  disabled={index === 0}
+                                  onClick={() => moveLocale(index, -1)}
+                                  aria-label={`Move ${row.locale} up`}
+                                >
+                                  <ArrowUpwardRoundedIcon fontSize="small" />
+                                </IconButton>
+                              </span>
+                            </Tooltip>
+                            <Tooltip title="Move down">
+                              <span>
+                                <IconButton
+                                  size="small"
+                                  disabled={index === configModel.languages.length - 1}
+                                  onClick={() => moveLocale(index, 1)}
+                                  aria-label={`Move ${row.locale} down`}
+                                >
+                                  <ArrowDownwardRoundedIcon fontSize="small" />
+                                </IconButton>
+                              </span>
+                            </Tooltip>
+                          </Box>
+                        </TableCell>
+                        <TableCell>
+                          <Box component="code" sx={{ fontWeight: 600 }}>
+                            {row.locale}
+                          </Box>
+                          {row.locale === configModel.baseLanguage ? (
+                            <Typography variant="caption" color="primary" display="block">
+                              default
+                            </Typography>
+                          ) : null}
+                        </TableCell>
+                        <TableCell>
+                          <TextField
+                            size="small"
+                            fullWidth
+                            placeholder={catalog.label || row.locale}
+                            value={row.customLanguage ? row.label : ''}
+                            onChange={(event) => {
+                              const value = event.target.value;
+                              if (!value.trim()) {
+                                updateLocaleRow(row.locale, {
+                                  label: catalog.label || row.locale,
+                                  customLanguage: false
+                                });
+                              } else {
+                                updateLocaleRow(row.locale, {
+                                  label: value,
+                                  customLanguage: true
+                                });
+                              }
+                            }}
+                            helperText={
+                              row.customLanguage ? 'Saved in config' : `Catalog: ${catalog.label || row.locale}`
+                            }
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <TextField
+                            size="small"
+                            fullWidth
+                            placeholder={catalog.flag || '🌐'}
+                            value={row.customFlag ? row.flag : ''}
+                            onChange={(event) => {
+                              const value = event.target.value;
+                              if (!value.trim()) {
+                                updateLocaleRow(row.locale, {
+                                  flag: catalog.flag || '🌐',
+                                  customFlag: false
+                                });
+                              } else {
+                                updateLocaleRow(row.locale, {
+                                  flag: value,
+                                  customFlag: true
+                                });
+                              }
+                            }}
+                            helperText={row.customFlag ? 'Saved in config' : `Catalog: ${catalog.flag || '🌐'}`}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Tooltip title="Remove locale">
+                            <span>
+                              <IconButton
+                                size="small"
+                                color="error"
+                                disabled={configModel.languages.length <= 1}
+                                onClick={() => removeLocale(row.locale)}
+                                aria-label={`Remove ${row.locale}`}
+                              >
+                                <DeleteOutlineRoundedIcon fontSize="small" />
+                              </IconButton>
+                            </span>
+                          </Tooltip>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
               <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }}>
                 <Autocomplete
                   size="small"

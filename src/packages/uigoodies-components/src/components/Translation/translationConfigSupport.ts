@@ -4,7 +4,23 @@ export const TRANSLATION_CONFIG_PATH = '/translation-config.xml';
 export const TRANSLATION_CONFIG_MODULE = 'studio';
 export const UIGOODIES_PLUGIN_ID = 'org.rd.plugin.uigoodies';
 
-export type LocaleRow = { locale: string; label: string; flag: string };
+/**
+ * One configured site locale. Order in {@link TranslationConfigModel.languages} is author-defined
+ * and must be preserved in XML and all translation UIs.
+ *
+ * {@link label} / {@link flag} may be catalog defaults; {@link customLanguage} / {@link customFlag}
+ * mark values that were (or should be) persisted in translation-config.xml.
+ */
+export type LocaleRow = {
+  locale: string;
+  /** Display language name (catalog or custom). */
+  label: string;
+  flag: string;
+  /** Persist {@link label} as optional `<language>` in XML when true. */
+  customLanguage?: boolean;
+  /** Persist {@link flag} as optional `<flag>` in XML when true. */
+  customFlag?: boolean;
+};
 
 export type TranslationConfigModel = {
   baseLanguage: string;
@@ -163,6 +179,63 @@ export function contentTypeFormPath(contentTypeId: string): string {
   return `/content-types${id}/form-definition.xml`.replace(/\/{2,}/g, '/');
 }
 
+function childText(parent: Element, tag: string): string {
+  const el = parent.querySelector(`:scope > ${tag}`);
+  return (el?.textContent || '').trim();
+}
+
+function attrText(el: Element, name: string): string {
+  return (el.getAttribute(name) || '').trim();
+}
+
+/**
+ * Parse one locale entry from translation-config.xml (document order = UI order).
+ * Supports:
+ * - `<locale><code>…</code><language>…</language><flag>…</flag></locale>`
+ * - `<localeCode>…</localeCode>` (plain or with optional label/language/flag attributes)
+ */
+function parseLocaleEntry(elm: Element): LocaleRow | null {
+  const tag = (elm.tagName || '').toLowerCase();
+  let rawCode = '';
+  let languageRaw = '';
+  let flagRaw = '';
+
+  if (tag === 'locale') {
+    rawCode = childText(elm, 'code') || childText(elm, 'localeCode');
+    languageRaw = childText(elm, 'language') || childText(elm, 'label');
+    flagRaw = childText(elm, 'flag');
+  } else if (tag === 'localecode') {
+    // Prefer nested <code> when present; otherwise direct text (ignore nested language/flag text).
+    const nestedCode = childText(elm, 'code');
+    if (nestedCode) {
+      rawCode = nestedCode;
+      languageRaw = childText(elm, 'language') || childText(elm, 'label');
+      flagRaw = childText(elm, 'flag');
+    } else {
+      rawCode = (elm.textContent || '').trim();
+      languageRaw = attrText(elm, 'language') || attrText(elm, 'label');
+      flagRaw = attrText(elm, 'flag');
+    }
+  } else {
+    return null;
+  }
+
+  const norm = folderLocaleFromKey(rawCode);
+  if (!norm) {
+    return null;
+  }
+  const meta = lookupMeta(norm);
+  const customLanguage = Boolean(languageRaw);
+  const customFlag = Boolean(flagRaw);
+  return {
+    locale: norm,
+    label: customLanguage ? languageRaw : meta.label,
+    flag: customFlag ? flagRaw : meta.flag,
+    customLanguage,
+    customFlag
+  };
+}
+
 export function parseTranslationConfigXml(xml: string): TranslationConfigModel | null {
   const trimmed = String(xml || '').trim();
   if (!trimmed) {
@@ -182,18 +255,14 @@ export function parseTranslationConfigXml(xml: string): TranslationConfigModel |
   }
   const seen = new Set<string>();
   const languages: LocaleRow[] = [];
-  codesParent.querySelectorAll('localeCode').forEach((codeElm) => {
-    const rawCode = (codeElm.textContent || '').trim();
-    if (!rawCode) {
+  // Preserve document order — do not sort.
+  Array.from(codesParent.children).forEach((elm) => {
+    const row = parseLocaleEntry(elm as Element);
+    if (!row || seen.has(row.locale)) {
       return;
     }
-    const norm = folderLocaleFromKey(rawCode);
-    if (!norm || seen.has(norm)) {
-      return;
-    }
-    seen.add(norm);
-    const meta = lookupMeta(norm);
-    languages.push({ locale: norm, label: meta.label, flag: meta.flag });
+    seen.add(row.locale);
+    languages.push(row);
   });
   if (languages.length === 0) {
     return null;
@@ -207,18 +276,33 @@ export function parseTranslationConfigXml(xml: string): TranslationConfigModel |
 }
 
 export function buildTranslationConfigXml(model: TranslationConfigModel): string {
-  const languages = model.languages
-    .map((row) => folderLocaleFromKey(row.locale))
-    .filter(Boolean)
-    .filter((code, index, all) => all.indexOf(code) === index);
-  if (languages.length === 0) {
+  const rows: LocaleRow[] = [];
+  const seen = new Set<string>();
+  for (const row of model.languages) {
+    const code = folderLocaleFromKey(row.locale);
+    if (!code || seen.has(code)) {
+      continue;
+    }
+    seen.add(code);
+    rows.push({ ...row, locale: code });
+  }
+  if (rows.length === 0) {
     throw new Error('At least one locale is required.');
   }
   let baseLanguage = folderLocaleFromKey(model.baseLanguage);
-  if (!baseLanguage || !languages.includes(baseLanguage)) {
-    baseLanguage = languages[0];
+  if (!baseLanguage || !seen.has(baseLanguage)) {
+    baseLanguage = rows[0].locale;
   }
-  const lines = languages.map((code) => `    <localeCode>${escapeXmlText(code)}</localeCode>`);
+  const lines = rows.map((row) => {
+    const parts = [`      <code>${escapeXmlText(row.locale)}</code>`];
+    if (row.customLanguage && row.label.trim()) {
+      parts.push(`      <language>${escapeXmlText(row.label.trim())}</language>`);
+    }
+    if (row.customFlag && row.flag.trim()) {
+      parts.push(`      <flag>${escapeXmlText(row.flag.trim())}</flag>`);
+    }
+    return `    <locale>\n${parts.join('\n')}\n    </locale>`;
+  });
   return `<?xml version="1.0" encoding="UTF-8"?>
 <translation-config>
   <defaultLocaleCode>${escapeXmlText(baseLanguage)}</defaultLocaleCode>
@@ -229,12 +313,30 @@ ${lines.join('\n')}
 `;
 }
 
+/** Resolved display label (custom language or catalog). */
+export function resolveLocaleLanguage(row: Pick<LocaleRow, 'locale' | 'label'>): string {
+  const label = String(row.label || '').trim();
+  if (label) {
+    return label;
+  }
+  return lookupMeta(row.locale).label;
+}
+
+/** Resolved display flag (custom or catalog). */
+export function resolveLocaleFlag(row: Pick<LocaleRow, 'locale' | 'flag'>): string {
+  const flag = String(row.flag || '').trim();
+  if (flag) {
+    return flag;
+  }
+  return lookupMeta(row.locale).flag;
+}
+
 export function defaultTranslationConfigModel(): TranslationConfigModel {
   return {
     baseLanguage: 'en',
     languages: [
-      { locale: 'en', label: 'English', flag: '🇺🇸' },
-      { locale: 'es', label: 'Spanish', flag: '🇪🇸' }
+      { locale: 'en', label: 'English', flag: '🇺🇸', customLanguage: false, customFlag: false },
+      { locale: 'es', label: 'Spanish', flag: '🇪🇸', customLanguage: false, customFlag: false }
     ]
   };
 }

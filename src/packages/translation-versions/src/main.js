@@ -3,6 +3,152 @@
 function bootTranslationVersionsControl() {
   var React = CrafterCMSNext.React;
 
+  var SPINNER_STYLE_ID = "uigoodies-translation-versions-spinner-css";
+  function ensureSpinnerStyles() {
+    if (typeof document === "undefined") return;
+    if (document.getElementById(SPINNER_STYLE_ID)) return;
+    var style = document.createElement("style");
+    style.id = SPINNER_STYLE_ID;
+    style.textContent =
+      ":root,.translation-versions-control{" +
+      "--tv-bg:#ffffff;" +
+      "--tv-header:#f8f9fa;" +
+      "--tv-paper:#f9f9f9;" +
+      "--tv-paper-2:#fafafa;" +
+      "--tv-elevated:#ffffff;" +
+      "--tv-text:#212529;" +
+      "--tv-text-muted:#495057;" +
+      "--tv-text-soft:#64748b;" +
+      "--tv-text-dim:#555555;" +
+      "--tv-border:#dee2e6;" +
+      "--tv-border-soft:#e9ecef;" +
+      "--tv-border-input:#e2e8f0;" +
+      "--tv-border-row:#e0e0e0;" +
+      "--tv-input-bg:#ffffff;" +
+      "--tv-input-bg-disabled:#f8fafc;" +
+      "--tv-input-text:#0f172a;" +
+      "--tv-btn-icon-bg:#ffffff;" +
+      "--tv-btn-icon-fg:#475569;" +
+      "--tv-actions-bg:linear-gradient(180deg,#ffffff 0%,#f8fafc 100%);" +
+      "--tv-actions-border:#e8eaed;" +
+      "--tv-busy-chip-bg:rgba(255,255,255,0.92);" +
+      "--tv-select-focus:#3b82f6;" +
+      "--tv-compare-selected-bg:#f8fafc;" +
+      "--tv-pill-source-bg:#e8f1ff;" +
+      "--tv-pill-source-fg:#0d4ea6;" +
+      "--tv-pill-source-bd:#b6d4fe;" +
+      "--tv-pill-current-bg:#f6ffed;" +
+      "--tv-pill-current-fg:#237804;" +
+      "--tv-pill-current-bd:#b7eb8f;" +
+      "--tv-pill-outdated-bg:#fff7e6;" +
+      "--tv-pill-outdated-fg:#ad6800;" +
+      "--tv-pill-outdated-bd:#ffd591;" +
+      "--tv-warn-bg:#fffbe6;" +
+      "--tv-warn-fg:#8c4a00;" +
+      "--tv-warn-bd:#ffe58f;" +
+      "--tv-modal-bg:#ffffff;" +
+      "--tv-modal-border:#eeeeee;" +
+      "--tv-resize:#e9ecef;" +
+      "--tv-resize-bd:#cfd4db;" +
+      "--tv-shadow:0 1px 3px rgba(15,23,42,0.06);" +
+      "--tv-shadow-chip:0 1px 2px rgba(15,23,42,0.08);" +
+      "--tv-input-inset:inset 0 1px 2px rgba(15,23,42,0.04);" +
+      "--tv-select-chevron:url(\"data:image/svg+xml," +
+      encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>'
+      ) +
+      "\");" +
+      "}" +
+      "@media (prefers-color-scheme: dark){" +
+      ":root,.translation-versions-control{" +
+      "--tv-bg:#1e1e1e;" +
+      "--tv-header:#2a2a2a;" +
+      "--tv-paper:#252525;" +
+      "--tv-paper-2:#2a2a2a;" +
+      "--tv-elevated:#2d2d2d;" +
+      "--tv-text:#e8eaed;" +
+      "--tv-text-muted:#b0b4ba;" +
+      "--tv-text-soft:#9aa0a6;" +
+      "--tv-text-dim:#a8adb4;" +
+      "--tv-border:#3c4043;" +
+      "--tv-border-soft:#3c4043;" +
+      "--tv-border-input:#5f6368;" +
+      "--tv-border-row:#3c4043;" +
+      "--tv-input-bg:#2d2d2d;" +
+      "--tv-input-bg-disabled:#252525;" +
+      "--tv-input-text:#e8eaed;" +
+      "--tv-btn-icon-bg:#2d2d2d;" +
+      "--tv-btn-icon-fg:#c4c7cc;" +
+      "--tv-actions-bg:linear-gradient(180deg,#2d2d2d 0%,#252525 100%);" +
+      "--tv-actions-border:#3c4043;" +
+      "--tv-busy-chip-bg:rgba(45,45,45,0.94);" +
+      "--tv-select-focus:#60a5fa;" +
+      "--tv-compare-selected-bg:#1e3a5f;" +
+      "--tv-pill-source-bg:rgba(59,130,246,0.22);" +
+      "--tv-pill-source-fg:#93c5fd;" +
+      "--tv-pill-source-bd:rgba(147,197,253,0.45);" +
+      "--tv-pill-current-bg:rgba(34,197,94,0.2);" +
+      "--tv-pill-current-fg:#86efac;" +
+      "--tv-pill-current-bd:rgba(134,239,172,0.4);" +
+      "--tv-pill-outdated-bg:rgba(245,158,11,0.2);" +
+      "--tv-pill-outdated-fg:#fcd34d;" +
+      "--tv-pill-outdated-bd:rgba(252,211,77,0.4);" +
+      "--tv-warn-bg:rgba(245,158,11,0.15);" +
+      "--tv-warn-fg:#fcd34d;" +
+      "--tv-warn-bd:rgba(252,211,77,0.35);" +
+      "--tv-modal-bg:#2d2d2d;" +
+      "--tv-modal-border:#3c4043;" +
+      "--tv-resize:#3c4043;" +
+      "--tv-resize-bd:#5f6368;" +
+      "--tv-shadow:0 1px 3px rgba(0,0,0,0.45);" +
+      "--tv-shadow-chip:0 1px 2px rgba(0,0,0,0.4);" +
+      "--tv-input-inset:inset 0 1px 2px rgba(0,0,0,0.35);" +
+      "--tv-select-chevron:url(\"data:image/svg+xml," +
+      encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9aa0a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>'
+      ) +
+      "\");" +
+      "}" +
+      ".uigoodies-tv-spinner{border-color:rgba(255,255,255,0.22);border-top-color:#60a5fa}" +
+      "}" +
+      "@keyframes uigoodies-tv-spin{to{transform:rotate(360deg)}}" +
+      ".uigoodies-tv-spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(15,23,42,0.18);" +
+      "border-top-color:#2563eb;border-radius:50%;animation:uigoodies-tv-spin 0.7s linear infinite;" +
+      "vertical-align:-2px;flex-shrink:0}" +
+      ".uigoodies-tv-spinner--light{border-color:rgba(255,255,255,0.35);border-top-color:#fff}" +
+      ".uigoodies-tv-busy{display:inline-flex;align-items:center;gap:8px}" +
+      ".uigoodies-tv-pager-btn{display:inline-flex;align-items:center;justify-content:center;" +
+      "min-height:28px;padding:4px 10px;font-size:12px;line-height:1.2;border-radius:6px;" +
+      "border:1px solid var(--tv-border);background:var(--tv-btn-icon-bg);color:var(--tv-btn-icon-fg);" +
+      "cursor:pointer;box-shadow:var(--tv-shadow-chip)}" +
+      ".uigoodies-tv-pager-btn:hover:not(:disabled){border-color:var(--tv-border-input)}" +
+      ".uigoodies-tv-pager-btn:disabled{opacity:0.45;cursor:not-allowed}";
+    document.head.appendChild(style);
+  }
+  ensureSpinnerStyles();
+
+  function SpinnerEl(opts) {
+    opts = opts || {};
+    return React.createElement("span", {
+      className: "uigoodies-tv-spinner" + (opts.light ? " uigoodies-tv-spinner--light" : ""),
+      role: "progressbar",
+      "aria-label": opts.label || "Loading",
+      style: opts.size
+        ? { width: opts.size, height: opts.size, borderWidth: Math.max(2, Math.round(opts.size / 7)) }
+        : undefined
+    });
+  }
+
+  function BusyLabel(text, opts) {
+    opts = opts || {};
+    return React.createElement(
+      "span",
+      { className: "uigoodies-tv-busy" },
+      SpinnerEl({ light: !!opts.light, size: opts.size, label: text }),
+      React.createElement("span", null, text)
+    );
+  }
+
   var RESERVED_FIRST_SEGMENTS = {
     website: 1,
     components: 1,
@@ -428,49 +574,6 @@ function bootTranslationVersionsControl() {
     "zw": { label: "Zimbabwe", flag: "🇿🇼" }
   };
 
-  /**
-   * Crafter forms-engine lays out sections as `.panel.panel-default` children of `.panel-group`
-   * (standard form) or uses `#ice-container` (ICE). Reparent this field's `.cstudio-form-field-container`
-   * so it always renders immediately before the first section container, no matter where the field
-   * appears in the form definition.
-   */
-  function pinTranslationVersionsFieldToTopOfForm(form, containerEl) {
-    try {
-      if (!form || !containerEl || typeof containerEl.closest !== "function") {
-        return;
-      }
-      if (containerEl.closest(".cstudio-form-repeat-container")) {
-        return;
-      }
-
-      var row = containerEl.closest(".cstudio-form-field-container");
-      if (!row) {
-        return;
-      }
-      if (!form.sections || form.sections.length === 0) {
-        return;
-      }
-      var firstSection = form.sections[0];
-      if (!firstSection || !firstSection.containerEl) {
-        return;
-      }
-
-      var marker = firstSection.containerEl;
-      var parent = marker.parentNode;
-      if (!parent) {
-        return;
-      }
-
-      if (row.parentNode === parent && row.nextSibling === marker) {
-        return;
-      }
-
-      parent.insertBefore(row, marker);
-      row.style.marginBottom = "12px";
-      row.setAttribute("data-translation-translation-versions-pinned", "true");
-    } catch (e) {}
-  }
-
   /** @returns {HTMLElement|null} */
   function findFormFieldsCompareHost(form, controlContainerEl) {
     try {
@@ -581,7 +684,7 @@ function bootTranslationVersionsControl() {
     splitter.setAttribute("aria-label", "Drag to resize source panel width");
     splitter.tabIndex = 0;
     splitter.style.cssText =
-      "flex:0 0 10px;width:10px;cursor:col-resize;align-self:stretch;touch-action:none;-webkit-user-select:none;user-select:none;position:relative;background:#e9ecef;border-radius:4px;border:1px solid #cfd4db;";
+      "flex:0 0 10px;width:10px;cursor:col-resize;align-self:stretch;touch-action:none;-webkit-user-select:none;user-select:none;position:relative;background:var(--tv-resize);border-radius:4px;border:1px solid var(--tv-resize-bd);";
     splitter.addEventListener("pointerdown", function (e) {
       if (e.pointerType === "mouse" && e.button !== 0) return;
       e.preventDefault();
@@ -626,7 +729,7 @@ function bootTranslationVersionsControl() {
   }
 
   /**
-   * Puts read-only source iframe to the left of all current form fields (sections + pinned widgets).
+   * Puts read-only source iframe to the left of all current form fields (sections).
    * @param {string} iframeSrc
    * @param {string} pathLabel
    */
@@ -638,7 +741,7 @@ function bootTranslationVersionsControl() {
         if (existingIframe) {
           existingIframe.src = iframeSrc;
           existingIframe.style.cssText =
-            "flex:1 1 auto;min-height:0;width:100%;height:100%;border:1px solid #cfd4db;border-radius:6px;background:#fff;box-sizing:border-box;";
+            "flex:1 1 auto;min-height:0;width:100%;height:100%;border:1px solid var(--tv-resize-bd);border-radius:6px;background:var(--tv-bg);box-sizing:border-box;";
         }
         var codeEl = host.querySelector(".translation-source-compare-path");
         if (codeEl) codeEl.textContent = pathLabel || "";
@@ -662,7 +765,7 @@ function bootTranslationVersionsControl() {
       var titleBlock = document.createElement("div");
       titleBlock.style.minWidth = "0";
       var strong = document.createElement("strong");
-      strong.style.cssText = "font-size:12px;color:#212529;";
+      strong.style.cssText = "font-size:12px;color:var(--tv-text);";
       strong.textContent = "Source (read-only)";
       titleBlock.appendChild(strong);
       var sub = document.createElement("div");
@@ -691,7 +794,7 @@ function bootTranslationVersionsControl() {
       iframe.title = "Source item — read-only form";
       iframe.src = iframeSrc;
       iframe.style.cssText =
-        "flex:1 1 auto;min-height:0;width:100%;height:100%;border:1px solid #cfd4db;border-radius:6px;background:#fff;box-sizing:border-box;";
+        "flex:1 1 auto;min-height:0;width:100%;height:100%;border:1px solid var(--tv-resize-bd);border-radius:6px;background:var(--tv-bg);box-sizing:border-box;";
       left.appendChild(iframe);
 
       var main = document.createElement("div");
@@ -1260,9 +1363,27 @@ function bootTranslationVersionsControl() {
     return m && m.label ? m.label : loc;
   }
 
-  /** Source locale row(s) first; remaining rows A–Z by display label, then path. */
-  function sortTranslationPathsForDisplay(paths, sourceLocaleKey) {
+  /** Source locale row(s) first; remaining rows follow translation-config.xml order when provided. */
+  function sortTranslationPathsForDisplay(paths, sourceLocaleKey, orderedLocaleCodes) {
     var src = (sourceLocaleKey || "").toLowerCase();
+    var order = Array.isArray(orderedLocaleCodes) ? orderedLocaleCodes : [];
+    var orderIndex = {};
+    order.forEach(function (code, i) {
+      var k = String(code || "")
+        .toLowerCase()
+        .replace(/_/g, "-");
+      if (k && orderIndex[k] == null) orderIndex[k] = i;
+    });
+    function configRank(path) {
+      var loc = (getLocaleFromPath(path) || "").toLowerCase().replace(/_/g, "-");
+      if (!loc) return 100000;
+      if (orderIndex[loc] != null) return orderIndex[loc];
+      for (var key in orderIndex) {
+        if (!Object.prototype.hasOwnProperty.call(orderIndex, key)) continue;
+        if (localeSegmentsCompatible(loc, key)) return orderIndex[key];
+      }
+      return 100000 + String(loc).charCodeAt(0);
+    }
     var arr = paths.slice();
     function isSourcePath(p) {
       return !!(src && localeSegmentsCompatible(getLocaleFromPath(p) || "", src));
@@ -1276,11 +1397,19 @@ function bootTranslationVersionsControl() {
       if (!as && bs) {
         return 1;
       }
-      var la = localeLabelForPath(a).toLowerCase();
-      var lb = localeLabelForPath(b).toLowerCase();
-      var cmp = la.localeCompare(lb, undefined, { sensitivity: "base" });
-      if (cmp !== 0) {
-        return cmp;
+      if (order.length > 0) {
+        var ra = configRank(a);
+        var rb = configRank(b);
+        if (ra !== rb) {
+          return ra - rb;
+        }
+      } else {
+        var la = localeLabelForPath(a).toLowerCase();
+        var lb = localeLabelForPath(b).toLowerCase();
+        var cmp = la.localeCompare(lb, undefined, { sensitivity: "base" });
+        if (cmp !== 0) {
+          return cmp;
+        }
       }
       return String(a).localeCompare(String(b));
     });
@@ -1585,13 +1714,6 @@ function bootTranslationVersionsControl() {
       });
   }
 
-  /** Chevron for native select (no Bootstrap). */
-  var ADD_TRANSLATION_SELECT_CHEVRON =
-    "data:image/svg+xml," +
-    encodeURIComponent(
-      '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>'
-    );
-
   /**
    * Dropdown: locales still missing this item; copy uses the same path under the chosen locale folder.
    */
@@ -1666,7 +1788,7 @@ function bootTranslationVersionsControl() {
           activeCodes.forEach(function (loc) {
             if (translationLocaleAlreadyPresent(translatedLocales, loc)) return;
             var targetPath = pathForTargetLocale(rootDir, loc, effSuffix);
-            var meta = activeMeta[lk] || {
+            var meta = metaForPathLocale(activeMeta, loc) || {
               label: loc,
               flag: flagForLocaleCode(loc)
             };
@@ -1792,25 +1914,25 @@ function bootTranslationVersionsControl() {
       width: "100%",
       boxSizing: "border-box",
       minHeight: "42px",
-      border: "1px solid " + (selectFocused && !selectDisabled ? "#3b82f6" : "#e2e8f0"),
+      border: "1px solid " + (selectFocused && !selectDisabled ? "var(--tv-select-focus)" : "var(--tv-border-input)"),
       borderRadius: "10px",
       padding: "10px 14px",
       paddingRight: "44px",
       fontSize: "14px",
       lineHeight: 1.45,
-      color: "#0f172a",
-      backgroundColor: selectDisabled ? "#f8fafc" : "#ffffff",
+      color: "var(--tv-input-text)",
+      backgroundColor: selectDisabled ? "var(--tv-input-bg-disabled)" : "var(--tv-input-bg)",
       boxShadow:
         selectFocused && !selectDisabled
           ? "0 0 0 3px rgba(59, 130, 246, 0.2)"
-          : "inset 0 1px 2px rgba(15, 23, 42, 0.04)",
+          : "var(--tv-input-inset)",
       outline: "none",
       cursor: selectDisabled ? "not-allowed" : "pointer",
       opacity: selectDisabled ? 0.88 : 1,
       appearance: "none",
       WebkitAppearance: "none",
       MozAppearance: "none",
-      backgroundImage: 'url("' + ADD_TRANSLATION_SELECT_CHEVRON + '")',
+      backgroundImage: "var(--tv-select-chevron)",
       backgroundRepeat: "no-repeat",
       backgroundPosition: "right 12px center",
       backgroundSize: "20px 20px",
@@ -1824,9 +1946,9 @@ function bootTranslationVersionsControl() {
       alignItems: "center",
       padding: "14px 16px",
       borderRadius: "10px",
-      border: "1px solid #e8eaed",
-      background: "linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)",
-      boxShadow: "0 1px 3px rgba(15, 23, 42, 0.06)",
+      border: "1px solid var(--tv-actions-border)",
+      background: "var(--tv-actions-bg)",
+      boxShadow: "var(--tv-shadow)",
       boxSizing: "border-box"
     };
 
@@ -1844,14 +1966,14 @@ function bootTranslationVersionsControl() {
       height: "42px",
       padding: 0,
       borderRadius: "10px",
-      border: "1px solid #e2e8f0",
-      background: "#ffffff",
-      color: "#475569",
+      border: "1px solid var(--tv-border-input)",
+      background: "var(--tv-btn-icon-bg)",
+      color: "var(--tv-btn-icon-fg)",
       cursor: copyBusy || loading ? "not-allowed" : "pointer",
       fontSize: "20px",
       lineHeight: 1,
       flexShrink: 0,
-      boxShadow: "0 1px 2px rgba(15, 23, 42, 0.04)",
+      boxShadow: "var(--tv-shadow-chip)",
       transition: "background 0.15s ease, border-color 0.15s ease"
     };
 
@@ -1876,7 +1998,7 @@ function bootTranslationVersionsControl() {
       { style: { width: "100%", marginTop: "8px" } },
       React.createElement(
         "div",
-        { style: { fontSize: "13px", fontWeight: 600, color: "#212529", marginBottom: "8px" } },
+        { style: { fontSize: "13px", fontWeight: 600, color: "var(--tv-text)", marginBottom: "8px" } },
         "Translate"
       ),
       hint
@@ -1932,9 +2054,10 @@ function bootTranslationVersionsControl() {
               loadTargets();
             },
             title: "Reload locale list",
+            "aria-label": loading ? "Loading locales" : "Reload locale list",
             style: btnIconStyle
           },
-          "\u21BB"
+          loading ? SpinnerEl({ size: 16, label: "Loading locales" }) : "\u21BB"
         ),
         React.createElement(
           "button",
@@ -1946,7 +2069,7 @@ function bootTranslationVersionsControl() {
               runTranslate();
             }
           },
-          "Translate"
+          copyBusy ? BusyLabel("Translating\u2026", { light: true, size: 14 }) : "Translate"
         )
       )
     );
@@ -1964,14 +2087,14 @@ function bootTranslationVersionsControl() {
       lineHeight: 1.3
     },
     source: {
-      background: "#e8f1ff",
-      color: "#0d4ea6",
-      border: "1px solid #b6d4fe"
+      background: "var(--tv-pill-source-bg)",
+      color: "var(--tv-pill-source-fg)",
+      border: "1px solid var(--tv-pill-source-bd)"
     },
     current: {
-      background: "#f6ffed",
-      color: "#237804",
-      border: "1px solid #b7eb8f"
+      background: "var(--tv-pill-current-bg)",
+      color: "var(--tv-pill-current-fg)",
+      border: "1px solid var(--tv-pill-current-bd)"
     }
   };
 
@@ -1981,47 +2104,62 @@ function bootTranslationVersionsControl() {
     gap: "10px",
     padding: "6px 10px",
     borderRadius: "6px",
-    border: "1px solid #e0e0e0",
+    border: "1px solid var(--tv-border-row)",
     marginBottom: "6px",
-    background: "#f9f9f9"
+    background: "var(--tv-paper)"
   };
 
   var MENU_TRIGGER_STYLE = {
-    background: "#fff",
-    border: "1px solid #e0e0e0",
+    background: "var(--tv-elevated)",
+    border: "1px solid var(--tv-border-row)",
     borderRadius: "4px",
     padding: "4px 8px",
     minWidth: "32px",
     fontSize: "16px",
     lineHeight: 1,
-    color: "#444",
+    color: "var(--tv-text-muted)",
     cursor: "pointer"
   };
 
-  /** Studio 4.4 mega menu doesn't honor includeOnly; enforce a whitelist after open. */
+  /** Studio ItemMegaMenu ignores includeOnly; whitelist visible labels after open. */
+  var TRANSLATION_ITEM_MENU_LABELS = {
+    edit: 1,
+    view: 1,
+    "view form": 1,
+    history: 1,
+    dependencies: 1,
+    publish: 1,
+    "request publish": 1,
+    approve: 1,
+    preview: 1
+  };
+
+  function normalizeMegaMenuLabel(text) {
+    return String(text || "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .toLowerCase();
+  }
+
+  function isAllowedMegaMenuLabel(text, hideEdit) {
+    var txt = normalizeMegaMenuLabel(text);
+    if (!txt) return false;
+    if (hideEdit && (txt === "edit" || txt.indexOf("edit ") === 0)) return false;
+    if (TRANSLATION_ITEM_MENU_LABELS[txt]) return true;
+    for (var key in TRANSLATION_ITEM_MENU_LABELS) {
+      if (!Object.prototype.hasOwnProperty.call(TRANSLATION_ITEM_MENU_LABELS, key)) continue;
+      if (txt === key || txt.indexOf(key + " ") === 0) return true;
+    }
+    return false;
+  }
+
   function enforceAllowedItemsInOpenMegaMenu(hideEdit) {
     if (typeof document === "undefined") return;
-    var allowedLabels = hideEdit
-      ? {
-          delete: 1,
-          "view form": 1,
-          unlock: 1,
-          history: 1,
-          dependencies: 1
-        }
-      : {
-          edit: 1,
-          delete: 1,
-          "view form": 1,
-          unlock: 1,
-          history: 1,
-          dependencies: 1
-        };
     var nodes = document.querySelectorAll("li[role='menuitem'], .MuiMenuItem-root");
     for (var i = 0; i < nodes.length; i++) {
       var n = nodes[i];
-      var txt = (n.textContent || "").trim().toLowerCase();
-      if (!allowedLabels[txt]) {
+      var txt = n.textContent || "";
+      if (!isAllowedMegaMenuLabel(txt, hideEdit)) {
         n.style.display = "none";
       }
     }
@@ -2048,6 +2186,7 @@ function bootTranslationVersionsControl() {
     var dispatch = props.dispatch;
     var isOutdated = !!props.isOutdated;
     var onTranslate = props.onTranslate;
+    var translateBusy = !!props.translateBusy;
     var showRemoveTranslation = !!props.showRemoveTranslation;
     var onRemoveTranslation = props.onRemoveTranslation;
     var formPath = props.formPath || "";
@@ -2057,9 +2196,9 @@ function bootTranslationVersionsControl() {
     var rowStyle = Object.assign({}, ROW_SURFACE);
     if (isCompareSelected) {
       rowStyle = Object.assign({}, rowStyle, {
-        borderColor: "#2563eb",
+        borderColor: "var(--tv-select-focus)",
         boxShadow: "0 0 0 1px rgba(37, 99, 235, 0.45) inset",
-        background: "#f8fafc"
+        background: "var(--tv-compare-selected-bg)"
       });
     }
     if (rowClickable) {
@@ -2121,7 +2260,7 @@ function bootTranslationVersionsControl() {
       ),
       React.createElement(
         "span",
-        { style: { fontWeight: 600, minWidth: "72px", fontSize: "13px", color: "#212529" } },
+        { style: { fontWeight: 600, minWidth: "72px", fontSize: "13px", color: "var(--tv-text)" } },
         meta.label
       ),
       React.createElement(
@@ -2145,7 +2284,7 @@ function bootTranslationVersionsControl() {
         isOutdated
           ? React.createElement(
               "span",
-              { style: Object.assign({}, PILL_STYLES.base, { background: "#fff7e6", color: "#ad6800", border: "1px solid #ffd591" }), title: "Outdated translation" },
+              { style: Object.assign({}, PILL_STYLES.base, { background: "var(--tv-pill-outdated-bg)", color: "var(--tv-pill-outdated-fg)", border: "1px solid var(--tv-pill-outdated-bd)" }), title: "Outdated translation" },
               "\uD83D\uDEA9 Outdated"
             )
           : null,
@@ -2203,15 +2342,18 @@ function bootTranslationVersionsControl() {
               {
                 type: "button",
                 className: "btn btn-primary btn-xs",
+                disabled: translateBusy,
                 onClick: function (ev) {
                   if (ev && ev.stopPropagation) ev.stopPropagation();
+                  if (translateBusy) return;
                   if (typeof onTranslate === "function") {
                     onTranslate(targetPath, meta);
                   }
                 },
-                "aria-label": "Translate to " + meta.label
+                "aria-label": translateBusy ? "Translating to " + meta.label : "Translate to " + meta.label,
+                style: { whiteSpace: "nowrap", minWidth: "88px" }
               },
-              "Translate"
+              translateBusy ? BusyLabel("Translating\u2026", { light: true, size: 12 }) : "Translate"
             )
       )
     );
@@ -2278,6 +2420,10 @@ function bootTranslationVersionsControl() {
     var removeModalSt = React.useState(null);
     var removeModal = removeModalSt[0];
     var setRemoveModal = removeModalSt[1];
+
+    var rowTranslateBusySt = React.useState("");
+    var rowTranslateBusyPath = rowTranslateBusySt[0];
+    var setRowTranslateBusyPath = rowTranslateBusySt[1];
 
     var collapsedSt = React.useState(function () {
       return readTranslationWidgetCollapsed(siteId);
@@ -2420,7 +2566,7 @@ function bootTranslationVersionsControl() {
               if (formPath) {
                 m[formPath] = true;
               }
-              finish(sortTranslationPathsForDisplay(Object.keys(m), resolvedSourceKey));
+              finish(sortTranslationPathsForDisplay(Object.keys(m), resolvedSourceKey, translationCfg && translationCfg.codes));
             })
             .catch(function () {
               mergePathsAndFinish([formPath]);
@@ -2443,7 +2589,7 @@ function bootTranslationVersionsControl() {
 
           function applyMap() {
             if (cancelled) return;
-            finish(sortTranslationPathsForDisplay(Object.keys(m), resolvedSourceKey));
+            finish(sortTranslationPathsForDisplay(Object.keys(m), resolvedSourceKey, translationCfg && translationCfg.codes));
           }
 
           var base = ab || getAuthoringBase();
@@ -2822,6 +2968,10 @@ function bootTranslationVersionsControl() {
       if (!dispatch || !resolveAuthoringContentApiBase(authoringBase) || !siteId || !translateCopySourcePath || !targetPath) {
         return;
       }
+      if (rowTranslateBusyPath) {
+        return;
+      }
+      setRowTranslateBusyPath(normalizeStudioPath(targetPath));
       var parent = parentFolderPathForCopy(targetPath);
       var contentApiBase = resolveAuthoringContentApiBase(authoringBase);
       copyItemPasteStudio(contentApiBase, siteId, translateCopySourcePath, parent, targetPath)
@@ -2838,6 +2988,9 @@ function bootTranslationVersionsControl() {
         })
         .catch(function () {
           notifyDispatch(dispatch, "Translate failed.");
+        })
+        .finally(function () {
+          setRowTranslateBusyPath("");
         });
     };
     var pathLayoutNote =
@@ -2856,7 +3009,11 @@ function bootTranslationVersionsControl() {
           )
         : null;
 
-    var sortedPaths = sortTranslationPathsForDisplay(translationPaths, resolvedSourceKey);
+    var sortedPaths = sortTranslationPathsForDisplay(
+      translationPaths,
+      resolvedSourceKey,
+      translationCfg && translationCfg.codes
+    );
     var filteredPaths = filterTranslationPaths(sortedPaths, filterQuery);
     /** List rows only for locales that have content (or this form); missing locales appear under Translate only. */
     var translatedOnlyPaths = filteredPaths.filter(function (p) {
@@ -2894,13 +3051,19 @@ function bootTranslationVersionsControl() {
         onChange: function (e) {
           setFilterQuery(e.target.value);
         },
-        style: { maxWidth: "280px", flex: "1 1 180px" },
+        style: {
+          maxWidth: "280px",
+          flex: "1 1 180px",
+          background: "var(--tv-input-bg)",
+          color: "var(--tv-input-text)",
+          border: "1px solid var(--tv-border-input)"
+        },
         "aria-label": "Filter translations"
       }),
       totalFiltered > 0
         ? React.createElement(
             "span",
-            { className: "text-muted", style: { fontSize: "12px", whiteSpace: "nowrap" } },
+            { style: { fontSize: "12px", whiteSpace: "nowrap", color: "var(--tv-text-muted)" } },
             "Showing ",
             rangeFrom,
             "\u2013",
@@ -2928,7 +3091,7 @@ function bootTranslationVersionsControl() {
               "button",
               {
                 type: "button",
-                className: "btn btn-default btn-xs",
+                className: "uigoodies-tv-pager-btn",
                 disabled: safePage <= 0,
                 onClick: function () {
                   setPageIndex(Math.max(0, safePage - 1));
@@ -2938,7 +3101,7 @@ function bootTranslationVersionsControl() {
             ),
             React.createElement(
               "span",
-              { className: "text-muted", style: { fontSize: "12px" } },
+              { style: { fontSize: "12px", color: "var(--tv-text-muted)" } },
               "Page ",
               safePage + 1,
               " / ",
@@ -2948,7 +3111,7 @@ function bootTranslationVersionsControl() {
               "button",
               {
                 type: "button",
-                className: "btn btn-default btn-xs",
+                className: "uigoodies-tv-pager-btn",
                 disabled: safePage >= totalPages - 1,
                 onClick: function () {
                   setPageIndex(Math.min(totalPages - 1, safePage + 1));
@@ -2977,10 +3140,13 @@ function bootTranslationVersionsControl() {
         ? React.createElement(
             "div",
             {
-              className: "text-muted",
-              style: { fontSize: "13px", padding: "4px 0 8px" }
+              className: "text-muted uigoodies-tv-busy",
+              style: { fontSize: "13px", padding: "8px 0", gap: "10px" },
+              role: "status",
+              "aria-live": "polite"
             },
-            "Loading translations\u2026"
+            SpinnerEl({ size: 16, label: "Loading translations" }),
+            React.createElement("span", null, "Loading translations\u2026")
           )
         : translationPaths.length === 0
           ? React.createElement(
@@ -2993,14 +3159,36 @@ function bootTranslationVersionsControl() {
             )
           : React.createElement(
               "div",
-              { style: { opacity: loading ? 0.9 : 1 } },
+              { style: { opacity: loading ? 0.55 : 1, position: "relative", pointerEvents: loading ? "none" : undefined } },
+              loading && translationPaths.length > 0
+                ? React.createElement(
+                    "div",
+                    {
+                      className: "uigoodies-tv-busy",
+                      style: {
+                        position: "absolute",
+                        top: 4,
+                        right: 4,
+                        zIndex: 2,
+                        fontSize: "12px",
+                        color: "var(--tv-text-soft)",
+                        background: "var(--tv-busy-chip-bg)",
+                        padding: "4px 8px",
+                        borderRadius: "8px",
+                        boxShadow: "var(--tv-shadow-chip)"
+                      },
+                      role: "status"
+                    },
+                    SpinnerEl({ size: 12, label: "Refreshing translations" }),
+                    React.createElement("span", null, "Refreshing\u2026")
+                  )
+                : null,
               filterToolbar,
               pageSlice.length === 0
                 ? React.createElement(
                     "div",
                     {
-                      className: "text-muted",
-                      style: { fontSize: "13px", padding: "6px 0" }
+                      style: { fontSize: "13px", padding: "6px 0", color: "var(--tv-text-muted)" }
                     },
                     totalFiltered === 0 && filteredPaths.length > 0
                       ? "No translated locales match your filter (untranslated locales are in Translate below)."
@@ -3029,6 +3217,9 @@ function bootTranslationVersionsControl() {
                       targetPath: targetPath,
                       dispatch: dispatch,
                       onTranslate: runTranslateForRow,
+                      translateBusy:
+                        !!rowTranslateBusyPath &&
+                        normalizeStudioPath(rowTranslateBusyPath) === normalizeStudioPath(targetPath),
                       formPath: formPath,
                       onActivate: onTranslationRowActivate,
                       isCompareSelected:
@@ -3091,10 +3282,10 @@ function bootTranslationVersionsControl() {
                     alignItems: "flex-start",
                     padding: "8px 10px",
                     borderRadius: "4px",
-                    border: "1px solid #e8e8e8",
+                    border: "1px solid var(--tv-border-soft)",
                     marginBottom: "6px",
                     cursor: rm.submitting ? "default" : "pointer",
-                    background: "#fafafa"
+                    background: "var(--tv-paper-2)"
                   }
                 },
                 React.createElement("input", {
@@ -3111,10 +3302,10 @@ function bootTranslationVersionsControl() {
                   { style: { fontSize: "13px", lineHeight: 1.4, wordBreak: "break-all" } },
                   React.createElement(
                     "strong",
-                    { style: { display: "block", color: "#212529" } },
+                    { style: { display: "block", color: "var(--tv-text)" } },
                     (c.internalName && String(c.internalName).trim()) || "(no internal name)"
                   ),
-                  React.createElement("code", { style: { fontSize: "12px", color: "#555" } }, pth)
+                  React.createElement("code", { style: { fontSize: "12px", color: "var(--tv-text-dim)" } }, pth)
                 )
               );
             })
@@ -3145,7 +3336,7 @@ function bootTranslationVersionsControl() {
           "div",
           {
             style: {
-              background: "#fff",
+              background: "var(--tv-modal-bg)",
               borderRadius: "8px",
               maxWidth: "560px",
               width: "100%",
@@ -3164,7 +3355,7 @@ function bootTranslationVersionsControl() {
             {
               style: {
                 padding: "14px 18px",
-                borderBottom: "1px solid #eee",
+                borderBottom: "1px solid var(--tv-modal-border)",
                 flexShrink: 0
               }
             },
@@ -3190,8 +3381,17 @@ function bootTranslationVersionsControl() {
             rm.loading
               ? React.createElement(
                   "div",
-                  { className: "text-muted", style: { fontSize: "13px", padding: "8px 0" } },
-                  "Finding locale-specific components only used by this page\u2026"
+                  {
+                    className: "text-muted uigoodies-tv-busy",
+                    style: { fontSize: "13px", padding: "8px 0", gap: "10px" },
+                    role: "status"
+                  },
+                  SpinnerEl({ size: 16, label: "Finding components" }),
+                  React.createElement(
+                    "span",
+                    null,
+                    "Finding locale-specific components only used by this page\u2026"
+                  )
                 )
               : null,
             rm.error
@@ -3256,9 +3456,9 @@ function bootTranslationVersionsControl() {
               {
                 style: {
                   fontSize: "12px",
-                  color: "#8c4a00",
-                  background: "#fffbe6",
-                  border: "1px solid #ffe58f",
+                  color: "var(--tv-warn-fg)",
+                  background: "var(--tv-warn-bg)",
+                  border: "1px solid var(--tv-warn-bd)",
                   borderRadius: "4px",
                   padding: "8px 10px",
                   marginTop: "12px",
@@ -3273,7 +3473,7 @@ function bootTranslationVersionsControl() {
             {
               style: {
                 padding: "12px 18px",
-                borderTop: "1px solid #eee",
+                borderTop: "1px solid var(--tv-modal-border)",
                 display: "flex",
                 justifyContent: "flex-end",
                 gap: "8px",
@@ -3318,9 +3518,9 @@ function bootTranslationVersionsControl() {
             gap: widgetCollapsed ? "0" : "20px",
             width: "100%",
             boxSizing: "border-box",
-            border: "1px solid #dee2e6",
+            border: "1px solid var(--tv-border)",
             borderRadius: "6px",
-            background: "#fff",
+            background: "var(--tv-bg)",
             overflow: "hidden"
           }
         },
@@ -3341,8 +3541,8 @@ function bootTranslationVersionsControl() {
               margin: 0,
               padding: "10px 12px",
               border: "none",
-              borderBottom: widgetCollapsed ? "none" : "1px solid #e9ecef",
-              background: "#f8f9fa",
+              borderBottom: widgetCollapsed ? "none" : "1px solid var(--tv-border-soft)",
+              background: "var(--tv-header)",
               cursor: "pointer",
               textAlign: "left",
               boxSizing: "border-box"
@@ -3357,7 +3557,7 @@ function bootTranslationVersionsControl() {
                 width: "18px",
                 justifyContent: "center",
                 fontSize: "12px",
-                color: "#495057",
+                color: "var(--tv-text-muted)",
                 flex: "0 0 auto",
                 transform: widgetCollapsed ? "rotate(-90deg)" : "rotate(0deg)",
                 transition: "transform 0.15s ease"
@@ -3373,7 +3573,7 @@ function bootTranslationVersionsControl() {
                 minWidth: 0,
                 fontSize: "16px",
                 fontWeight: 600,
-                color: "#212529",
+                color: "var(--tv-text)",
                 letterSpacing: "-0.01em",
                 lineHeight: 1.3
               }
@@ -3483,7 +3683,6 @@ function bootTranslationVersionsControl() {
         )
         .then(function (handle) {
           self._cmsRenderHandle = handle;
-          pinTranslationVersionsFieldToTopOfForm(self.form, self.containerEl);
         })
         .catch(function (err) {
           console.error("[translation-versions] Failed to render control", err);

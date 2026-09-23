@@ -17,6 +17,7 @@ import Popover from '@mui/material/Popover';
 import Typography from '@mui/material/Typography';
 import Tooltip from '@mui/material/Tooltip';
 import Chip from '@mui/material/Chip';
+import CircularProgress from '@mui/material/CircularProgress';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import TranslateIcon from '@mui/icons-material/Translate';
 import PublicOutlinedIcon from '@mui/icons-material/PublicOutlined';
@@ -98,6 +99,7 @@ function TranslationTreeItemLabelInner({
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
   const statusCache = useRef<Map<string, CachedTranslationOverlay>>(new Map());
   const [statuses, setStatuses] = useState<TranslationStatusMap | null>(null);
+  const [translateBusyLocale, setTranslateBusyLocale] = useState<string | null>(null);
   const [insights, setInsights] = useState<Record<string, TranslationLocaleInsight> | null>(null);
   const [loading, setLoading] = useState(false);
   /** Prevents overlapping contentExists storms if menu/globe retriggers load rapidly. */
@@ -190,36 +192,41 @@ function TranslationTreeItemLabelInner({
   };
 
   const runTranslate = async (targetLocale: string) => {
-    setMenuAnchor(null);
-    if (relative == null) {
+    if (relative == null || translateBusyLocale) {
       return;
     }
+    setMenuAnchor(null);
     const sourcePath = nodePath;
     const targetPath = pathForLocale(rootDir, relative, targetLocale);
     const targetParent = parentFolderPath(targetPath);
-    const exists = await StudioAPI.contentExists(authoringBase, siteId, targetPath);
-    if (exists) {
-      dispatch(
-        showSystemNotification({
-          message: `Already exists: ${targetPath}`
-        })
-      );
-      return;
-    }
-    const res = await StudioAPI.copyItem(authoringBase, siteId, sourcePath, targetParent, targetPath);
-    if (res?.ok && (res?.pastedPath || res?.items?.[0])) {
-      statusCache.current.delete(nodePath);
-      dispatch(
-        showSystemNotification({
-          message: `Copied to ${targetLocale}: ${targetPath}`
-        })
-      );
-    } else {
-      dispatch(
-        showSystemNotification({
-          message: res?.message || `Could not copy to ${targetLocale}.`
-        })
-      );
+    setTranslateBusyLocale(targetLocale);
+    try {
+      const exists = await StudioAPI.contentExists(authoringBase, siteId, targetPath);
+      if (exists) {
+        dispatch(
+          showSystemNotification({
+            message: `Already exists: ${targetPath}`
+          })
+        );
+        return;
+      }
+      const res = await StudioAPI.copyItem(authoringBase, siteId, sourcePath, targetParent, targetPath);
+      if (res?.ok && (res?.pastedPath || res?.items?.[0])) {
+        statusCache.current.delete(nodePath);
+        dispatch(
+          showSystemNotification({
+            message: `Copied to ${targetLocale}: ${targetPath}`
+          })
+        );
+      } else {
+        dispatch(
+          showSystemNotification({
+            message: res?.message || `Could not copy to ${targetLocale}.`
+          })
+        );
+      }
+    } finally {
+      setTranslateBusyLocale(null);
     }
   };
 
@@ -293,13 +300,14 @@ function TranslationTreeItemLabelInner({
           <IconButton
             size="small"
             aria-label="translation actions"
+            disabled={Boolean(translateBusyLocale)}
             onClick={(e) => {
               e.stopPropagation();
               setMenuAnchor(e.currentTarget);
               void loadStatuses();
             }}
           >
-            <MoreVertIcon fontSize="small" />
+            {translateBusyLocale ? <CircularProgress size={18} /> : <MoreVertIcon fontSize="small" />}
           </IconButton>
         </Tooltip>
       </Box>
@@ -380,6 +388,9 @@ function TranslationTreeItemLabelInner({
         <Menu anchorEl={menuAnchor} open onClose={() => setMenuAnchor(null)}>
           {loading && !statuses && (
             <MenuItem disabled>
+              <ListItemIcon>
+                <CircularProgress size={18} />
+              </ListItemIcon>
               <ListItemText primary="Loading…" />
             </MenuItem>
           )}
@@ -438,7 +449,11 @@ function TranslationTreeItemLabelInner({
               );
             }
             return (
-              <MenuItem key={loc} onClick={() => void runTranslate(loc)}>
+              <MenuItem
+                key={loc}
+                disabled={Boolean(translateBusyLocale)}
+                onClick={() => void runTranslate(loc)}
+              >
                 <ListItemIcon>
                   <TranslateIcon fontSize="small" />
                 </ListItemIcon>

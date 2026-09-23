@@ -3,7 +3,8 @@ import org.dom4j.DocumentHelper
 import org.craftercms.studio.api.v1.service.content.ContentService as V1ContentService
 
 /**
- * Reads Translation locale list from /config/studio/translation-config.xml.
+ * Reads Translation locale list from /config/studio/translation-config.xml (not site-config.xml).
+ * Locale document order is preserved. Optional per-locale language/flag override the catalog.
  * No auto-seed and no hardcoded default locale list: missing or invalid XML returns ok:false.
  *
  * Query param ensureDefault is ignored (kept for backward-compatible URLs).
@@ -472,17 +473,14 @@ Map parseTranslationConfig(def root) {
 
     def seen = [:]
     def list = []
-    codesParent.elements('localeCode').each { codeElm ->
-        def rawCode = text(codeElm)
-        if (!rawCode) return
-        def key = normalizeLookupKey(rawCode)
-        if (!key) return
-        def norm = folderLocaleFromKey(key)
-        if (!norm) return
-        if (seen[norm]) return
+    // Preserve document order (author-defined). Support <locale>…</locale> and legacy <localeCode>.
+    codesParent.elements().each { elm ->
+        def row = parseLocaleEntry(elm)
+        if (!row) return
+        def norm = row.locale as String
+        if (!norm || seen[norm]) return
         seen[norm] = true
-        def meta = lookupLocaleMeta(key) ?: lookupLocaleMeta(norm) ?: [label: norm, flag: '\uD83C\uDF10']
-        list << [locale: norm, label: meta.label, flag: meta.flag]
+        list << row
     }
 
     if (list.isEmpty()) return null
@@ -496,6 +494,55 @@ Map parseTranslationConfig(def root) {
         baseLanguage: normalizedDefault,
         languages   : list
     ]
+}
+
+/**
+ * Parse one locale entry. Optional language/flag override catalog defaults when present.
+ */
+Map parseLocaleEntry(def elm) {
+    if (elm == null) return null
+    def tag = String.valueOf(elm.name ?: '').toLowerCase()
+    def rawCode = ''
+    def languageRaw = ''
+    def flagRaw = ''
+
+    if (tag == 'locale') {
+        rawCode = text(elm.element('code')) ?: text(elm.element('localeCode'))
+        languageRaw = text(elm.element('language')) ?: text(elm.element('label'))
+        flagRaw = text(elm.element('flag'))
+    } else if (tag == 'localecode') {
+        def nestedCode = text(elm.element('code'))
+        if (nestedCode) {
+            rawCode = nestedCode
+            languageRaw = text(elm.element('language')) ?: text(elm.element('label'))
+            flagRaw = text(elm.element('flag'))
+        } else {
+            rawCode = text(elm)
+            languageRaw = attrText(elm, 'language') ?: attrText(elm, 'label')
+            flagRaw = attrText(elm, 'flag')
+        }
+    } else {
+        return null
+    }
+
+    def key = normalizeLookupKey(rawCode)
+    if (!key) return null
+    def norm = folderLocaleFromKey(key)
+    if (!norm) return null
+    def meta = lookupLocaleMeta(key) ?: lookupLocaleMeta(norm) ?: [label: norm, flag: '\uD83C\uDF10']
+    def label = languageRaw ? languageRaw : (meta.label as String)
+    def flag = flagRaw ? flagRaw : (meta.flag as String)
+    return [locale: norm, label: label, flag: flag]
+}
+
+String attrText(def e, String name) {
+    if (e == null || !name) return ''
+    try {
+        def v = e.attributeValue(name)
+        return v != null ? String.valueOf(v).trim() : ''
+    } catch (Throwable ignored) {
+        return ''
+    }
 }
 
 /** Lowercase, hyphen; preserve 5-char style keys for map lookup. */

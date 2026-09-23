@@ -118,8 +118,8 @@ function lookupLocaleMetaForUi(key: string): { label: string; flag: string } | n
 }
 
 /**
- * Parse `translation-config.xml` the same way as `translation-config.get.groovy`
- * (2-char folder locales, default falls back to first listed).
+ * Parse `translation-config.xml` the same way as `translation-config.get.groovy`.
+ * Document order of locale entries is preserved. Optional language/flag override the catalog.
  */
 function parseTranslationConfigFromXml(xml: string): SiteTranslationConfig | null {
   const trimmed = String(xml || '').trim();
@@ -145,9 +145,33 @@ function parseTranslationConfigFromXml(xml: string): SiteTranslationConfig | nul
   }
   const seen = new Set<string>();
   const languages: Array<{ locale: string; label: string; flag?: string }> = [];
-  codesParent.querySelectorAll('localeCode').forEach((codeElm) => {
-    const rawCode = (codeElm.textContent || '').trim();
-    if (!rawCode) {
+  Array.from(codesParent.children).forEach((elm) => {
+    const tag = (elm.tagName || '').toLowerCase();
+    let rawCode = '';
+    let languageRaw = '';
+    let flagRaw = '';
+    if (tag === 'locale') {
+      rawCode =
+        (elm.querySelector(':scope > code')?.textContent || '').trim() ||
+        (elm.querySelector(':scope > localeCode')?.textContent || '').trim();
+      languageRaw =
+        (elm.querySelector(':scope > language')?.textContent || '').trim() ||
+        (elm.querySelector(':scope > label')?.textContent || '').trim();
+      flagRaw = (elm.querySelector(':scope > flag')?.textContent || '').trim();
+    } else if (tag === 'localecode') {
+      const nestedCode = (elm.querySelector(':scope > code')?.textContent || '').trim();
+      if (nestedCode) {
+        rawCode = nestedCode;
+        languageRaw =
+          (elm.querySelector(':scope > language')?.textContent || '').trim() ||
+          (elm.querySelector(':scope > label')?.textContent || '').trim();
+        flagRaw = (elm.querySelector(':scope > flag')?.textContent || '').trim();
+      } else {
+        rawCode = (elm.textContent || '').trim();
+        languageRaw = (elm.getAttribute('language') || elm.getAttribute('label') || '').trim();
+        flagRaw = (elm.getAttribute('flag') || '').trim();
+      }
+    } else {
       return;
     }
     const key = normalizeLookupKey(rawCode);
@@ -155,16 +179,13 @@ function parseTranslationConfigFromXml(xml: string): SiteTranslationConfig | nul
       return;
     }
     const norm = folderLocaleFromKey(key);
-    if (!norm) {
-      return;
-    }
-    if (seen.has(norm)) {
+    if (!norm || seen.has(norm)) {
       return;
     }
     seen.add(norm);
     const meta = lookupLocaleMetaForUi(key) || lookupLocaleMetaForUi(norm);
-    const label = meta?.label ?? norm;
-    const flag = meta?.flag ?? getFlagForLocale(norm);
+    const label = languageRaw || meta?.label || norm;
+    const flag = flagRaw || meta?.flag || getFlagForLocale(norm);
     languages.push({ locale: norm, label, flag });
   });
   if (languages.length === 0) {

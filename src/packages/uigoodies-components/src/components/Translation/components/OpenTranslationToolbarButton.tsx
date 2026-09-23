@@ -18,6 +18,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import CircularProgress from '@mui/material/CircularProgress';
 import SystemIcon from '@craftercms/studio-ui/components/SystemIcon';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { showSystemNotification } from '@craftercms/studio-ui/state/actions/system';
@@ -66,6 +67,52 @@ function normalizeRepoPath(p: string | null | undefined): string {
 function isPageRepoPath(p: string): boolean {
   const n = normalizeRepoPath(p).toLowerCase();
   return n.includes('/website/') && n.endsWith('.xml');
+}
+
+/** Studio ItemMegaMenu ignores includeOnly; keep only these action labels visible. */
+const TRANSLATION_ITEM_MENU_LABELS: Record<string, true> = {
+  edit: true,
+  view: true,
+  'view form': true,
+  history: true,
+  dependencies: true,
+  publish: true,
+  'request publish': true,
+  approve: true,
+  preview: true
+};
+
+function normalizeMegaMenuLabel(text: string): string {
+  return String(text || '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
+}
+
+function isAllowedMegaMenuLabel(text: string, hideEdit = false): boolean {
+  const txt = normalizeMegaMenuLabel(text);
+  if (!txt) return false;
+  if (hideEdit && (txt === 'edit' || txt.startsWith('edit '))) return false;
+  if (TRANSLATION_ITEM_MENU_LABELS[txt]) return true;
+  return Object.keys(TRANSLATION_ITEM_MENU_LABELS).some(
+    (key) => txt === key || txt.startsWith(`${key} `)
+  );
+}
+
+function enforceAllowedItemsInOpenMegaMenu(hideEdit = false): void {
+  if (typeof document === 'undefined') return;
+  document.querySelectorAll<HTMLElement>("li[role='menuitem'], .MuiMenuItem-root").forEach((node) => {
+    if (!isAllowedMegaMenuLabel(node.textContent || '', hideEdit)) {
+      node.style.display = 'none';
+    }
+  });
+}
+
+function scheduleEnforceAllowedItemsInMegaMenu(hideEdit = false): void {
+  enforceAllowedItemsInOpenMegaMenu(hideEdit);
+  window.setTimeout(() => enforceAllowedItemsInOpenMegaMenu(hideEdit), 0);
+  window.setTimeout(() => enforceAllowedItemsInOpenMegaMenu(hideEdit), 60);
+  window.setTimeout(() => enforceAllowedItemsInOpenMegaMenu(hideEdit), 160);
 }
 
 type RemoveDialogState =
@@ -487,6 +534,8 @@ export function OpenTranslationToolbarButton(props: {
         }
       }
     });
+    const hideEdit = normalizeRepoPath(path) === normalizeRepoPath(sourceItem?.path ?? '');
+    scheduleEnforceAllowedItemsInMegaMenu(hideEdit);
   };
 
   const tooltipText = disabledCore
@@ -511,7 +560,11 @@ export function OpenTranslationToolbarButton(props: {
             aria-haspopup="true"
             aria-expanded={menuOpen ? 'true' : undefined}
           >
-            <SystemIcon icon={icon} />
+            {copyBusy || (loading && menuOpen) ? (
+              <CircularProgress size={buttonSize === 'small' ? 18 : 22} />
+            ) : (
+              <SystemIcon icon={icon} />
+            )}
           </IconButton>
         </span>
       </Tooltip>
@@ -526,7 +579,8 @@ export function OpenTranslationToolbarButton(props: {
         {loading ? (
           <MenuItem disabled dense>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 0.5 }}>
-              Loading…
+              <CircularProgress size={16} />
+              Loading locales…
             </Box>
           </MenuItem>
         ) : rows.length === 0 ? (
@@ -639,10 +693,22 @@ export function OpenTranslationToolbarButton(props: {
                       fontSize: '0.75rem',
                       color: 'white',
                       bgcolor: copyBusy ? 'grey.400' : 'primary.main',
-                      cursor: copyBusy ? 'not-allowed' : 'pointer'
+                      cursor: copyBusy ? 'not-allowed' : 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 0.5,
+                      minWidth: 96,
+                      justifyContent: 'center'
                     }}
                   >
-                    Add to Scope
+                    {copyBusy ? (
+                      <>
+                        <CircularProgress size={12} sx={{ color: 'white' }} />
+                        Adding…
+                      </>
+                    ) : (
+                      'Add to Scope'
+                    )}
                   </Box>
                 )}
               </Box>
@@ -657,9 +723,12 @@ export function OpenTranslationToolbarButton(props: {
             <DialogTitle>Remove translation</DialogTitle>
             <DialogContent dividers>
               {removeDialog.loading ? (
-                <Typography variant="body2" color="text.secondary">
-                  Loading removable components…
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, py: 1 }}>
+                  <CircularProgress size={20} />
+                  <Typography variant="body2" color="text.secondary">
+                    Loading removable components…
+                  </Typography>
+                </Box>
               ) : null}
               {removeDialog.error ? (
                 <Typography variant="body2" color="error" sx={{ mb: 1 }}>
@@ -765,6 +834,9 @@ export function OpenTranslationToolbarButton(props: {
                 variant="contained"
                 disabled={Boolean(removeDialog.loading || removeDialog.submitting)}
                 onClick={() => void confirmRemoveTranslation()}
+                startIcon={
+                  removeDialog.submitting ? <CircularProgress size={16} color="inherit" /> : undefined
+                }
               >
                 {removeDialog.submitting ? 'Removing…' : 'Remove translation'}
               </Button>

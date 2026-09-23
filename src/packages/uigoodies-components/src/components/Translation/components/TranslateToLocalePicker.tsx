@@ -293,16 +293,18 @@ export function TranslateToLocalePicker(props: TranslateToLocalePickerProps) {
           variant="contained"
           disabled={!selected || !!selected?.exists || copyBusy || loading}
           onClick={() => void runCopy(false)}
+          startIcon={copyBusy ? <CircularProgress size={14} color="inherit" /> : undefined}
         >
-          Copy
+          {copyBusy ? 'Copying…' : 'Copy'}
         </Button>
         <Button
           size="small"
           variant="outlined"
           disabled={!selected || !!selected?.exists || copyBusy || loading}
           onClick={() => void runCopy(true)}
+          startIcon={copyBusy ? <CircularProgress size={14} color="inherit" /> : undefined}
         >
-          Copy &amp; edit
+          {copyBusy ? 'Copying…' : 'Copy & edit'}
         </Button>
       </Stack>
     </Stack>

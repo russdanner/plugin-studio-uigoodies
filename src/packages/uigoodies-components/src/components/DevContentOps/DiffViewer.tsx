@@ -16,11 +16,18 @@ type Props = {
 };
 
 function lineColor(type: DiffLine['type'], theme: Theme) {
+  const dark = theme.palette.mode === 'dark';
   switch (type) {
     case 'add':
-      return { bg: alpha(theme.palette.success.main, 0.18), color: theme.palette.success.dark };
+      return {
+        bg: alpha(theme.palette.success.main, dark ? 0.22 : 0.18),
+        color: dark ? theme.palette.success.light : theme.palette.success.dark
+      };
     case 'remove':
-      return { bg: alpha(theme.palette.error.main, 0.15), color: theme.palette.error.dark };
+      return {
+        bg: alpha(theme.palette.error.main, dark ? 0.2 : 0.15),
+        color: dark ? theme.palette.error.light : theme.palette.error.dark
+      };
     case 'meta':
       return { bg: alpha(theme.palette.info.main, 0.08), color: theme.palette.text.secondary };
     default:

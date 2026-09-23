@@ -8,8 +8,9 @@
 
 ### Locales tab
 
-- Loads and edits `/config/studio/translation-config.xml`
-- Set default locale and manage the locale list (add/remove)
+- Loads and edits `/config/studio/translation-config.xml` (**not** `site-config.xml`)
+- Set default locale; add/remove locales; **reorder** (order is used by all translation UIs)
+- Optionally set per-locale **language** (display name) and **flag** (saved only when overridden)
 - Creates the config file if missing (requires at least two locales)
 - **Create locale site structure** — global home + per-locale home pages and component folders (see below)
 

@@ -15,6 +15,7 @@
  */
 
 import React, { useState } from 'react';
+import CircularProgress from '@mui/material/CircularProgress';
 import TextField from '@mui/material/TextField';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -108,8 +109,9 @@ export default function NewFolderDialog({
             color="primary"
             onClick={handleSubmit}
             disabled={!folderName || isProcessing}
+            startIcon={isProcessing ? <CircularProgress size={16} color="inherit" /> : undefined}
           >
-            Create
+            {isProcessing ? 'Creating…' : 'Create'}
           </StyledActionButton>
         </DialogActions>
       </StyledDialogComponent>

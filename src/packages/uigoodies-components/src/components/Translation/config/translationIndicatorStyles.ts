@@ -17,20 +17,26 @@ export const translationIndicatorSx = {
   pillBase,
   source: {
     ...pillBase,
-    backgroundColor: '#e8f1ff',
-    color: '#0d4ea6',
-    border: '1px solid #b6d4fe'
+    backgroundColor: (theme) =>
+      theme.palette.mode === 'dark' ? 'rgba(59,130,246,0.22)' : '#e8f1ff',
+    color: (theme) => (theme.palette.mode === 'dark' ? '#93c5fd' : '#0d4ea6'),
+    border: (theme) =>
+      theme.palette.mode === 'dark' ? '1px solid rgba(147,197,253,0.45)' : '1px solid #b6d4fe'
   } satisfies SxProps<Theme>,
   outdated: {
     ...pillBase,
-    backgroundColor: '#fff7e6',
-    color: '#ad6800',
-    border: '1px solid #ffd591'
+    backgroundColor: (theme) =>
+      theme.palette.mode === 'dark' ? 'rgba(245,158,11,0.2)' : '#fff7e6',
+    color: (theme) => (theme.palette.mode === 'dark' ? '#fcd34d' : '#ad6800'),
+    border: (theme) =>
+      theme.palette.mode === 'dark' ? '1px solid rgba(252,211,77,0.4)' : '1px solid #ffd591'
   } satisfies SxProps<Theme>,
   current: {
     ...pillBase,
-    backgroundColor: '#f6ffed',
-    color: '#237804',
-    border: '1px solid #b7eb8f'
+    backgroundColor: (theme) =>
+      theme.palette.mode === 'dark' ? 'rgba(34,197,94,0.2)' : '#f6ffed',
+    color: (theme) => (theme.palette.mode === 'dark' ? '#86efac' : '#237804'),
+    border: (theme) =>
+      theme.palette.mode === 'dark' ? '1px solid rgba(134,239,172,0.4)' : '1px solid #b7eb8f'
   } satisfies SxProps<Theme>
 };

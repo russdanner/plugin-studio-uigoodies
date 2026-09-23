@@ -11,6 +11,7 @@ import TreeView from '@mui/lab/TreeView';
 import TreeItem from '@mui/lab/TreeItem';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import CircularProgress from '@mui/material/CircularProgress';
 import ExpandMoreOutlinedIcon from '@mui/icons-material/ExpandMoreOutlined';
 import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
 
@@ -196,6 +197,7 @@ export default function LocalePathTreeView({
   const [selected, setSelected] = useState('');
   const [folderCapNotice, setFolderCapNotice] = useState<string | null>(null);
   const [rootFilterNotice, setRootFilterNotice] = useState<string | null>(null);
+  const [loadingChildPaths, setLoadingChildPaths] = useState<Record<string, boolean>>({});
   /** Avoid selection/subscriber storms when MUI TreeView re-fires onNodeSelect with the same node. */
   const lastSelectedPathRef = useRef<string>('');
 
@@ -229,6 +231,7 @@ export default function LocalePathTreeView({
         return;
       }
       inFlightChildFetchRef.current.add(nodeId);
+      setLoadingChildPaths((prev) => ({ ...prev, [nodeId]: true }));
       try {
         const items = await StudioAPI.getChildrenPaths(authoringBase, siteId, nodeId);
         if (debug || isTranslationDebugStorage()) {
@@ -264,6 +267,11 @@ export default function LocalePathTreeView({
         }
       } finally {
         inFlightChildFetchRef.current.delete(nodeId);
+        setLoadingChildPaths((prev) => {
+          const next = { ...prev };
+          delete next[nodeId];
+          return next;
+        });
       }
     },
     [authoringBase, siteId, anchorRoot, maxChildrenPerFolder, debug]
@@ -527,17 +535,20 @@ export default function LocalePathTreeView({
           }
         }}
         label={
-          <TranslationTreeItemLabel
-            displayName={tree.name}
-            nodePath={tree.id}
-            rootDir={rootDir}
-            baseRootPath={localeLayout?.baseRootPath ?? `${rootDir}/${MULTI_LOCALE_BASE_LOCALE}`}
-            locales={locales}
-            siteId={siteId}
-            translationMode={translationActive}
-            missingTranslationFlags={tree.missingTranslationFlags}
-            openItemPath={openItemPath}
-          />
+          <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.75, minWidth: 0 }}>
+            <TranslationTreeItemLabel
+              displayName={tree.name}
+              nodePath={tree.id}
+              rootDir={rootDir}
+              baseRootPath={localeLayout?.baseRootPath ?? `${rootDir}/${MULTI_LOCALE_BASE_LOCALE}`}
+              locales={locales}
+              siteId={siteId}
+              translationMode={translationActive}
+              missingTranslationFlags={tree.missingTranslationFlags}
+              openItemPath={openItemPath}
+            />
+            {loadingChildPaths[tree.id] ? <CircularProgress size={14} /> : null}
+          </Box>
         }
         onContextMenu={
           onNodeContextMenu
@@ -579,9 +590,10 @@ export default function LocalePathTreeView({
         </Typography>
       ) : null}
       {!nodes ? (
-        <Typography variant="body2" color="text.secondary" sx={{ p: 1.5 }}>
-          Loading folders…
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, p: 1.5, color: 'text.secondary' }}>
+          <CircularProgress size={18} />
+          <Typography variant="body2">Loading folders…</Typography>
+        </Box>
       ) : (
         <TreeView
           key={nodes.id}
