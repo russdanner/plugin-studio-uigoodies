@@ -27,6 +27,7 @@ import {
 } from './devContentOpsApi';
 import { selectionKey } from './PatchBasketPanel';
 import { SectionLabel } from './devContentOpsUi';
+import { WRITE_OPS_DISABLED_HINT, useWriteOpsLocked } from './devContentOpsWriteGate';
 import {
   FileChangeSummary,
   FileChangeTypeChip,
@@ -56,6 +57,7 @@ export function CommitFileList({
   onRemoveFromHistory,
   patchKeys
 }: Props) {
+  const writeLocked = useWriteOpsLocked();
   const [files, setFiles] = useState<CommitFileChange[]>([]);
   const [total, setTotal] = useState(0);
   const [skip, setSkip] = useState(0);
@@ -186,10 +188,16 @@ export function CommitFileList({
                       </IconButton>
                     </span>
                   </Tooltip>
-                  <Tooltip title="Remove from history">
-                    <IconButton size="small" onClick={() => onRemoveFromHistory(commit, file)}>
-                      <DeleteForeverRoundedIcon fontSize="small" />
-                    </IconButton>
+                  <Tooltip title={writeLocked ? WRITE_OPS_DISABLED_HINT : 'Remove from history'}>
+                    <span>
+                      <IconButton
+                        size="small"
+                        disabled={writeLocked}
+                        onClick={() => onRemoveFromHistory(commit, file)}
+                      >
+                        <DeleteForeverRoundedIcon fontSize="small" />
+                      </IconButton>
+                    </span>
                   </Tooltip>
                 </Stack>
               </ListItem>

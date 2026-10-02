@@ -16,6 +16,7 @@ import {
   Paper,
   Stack,
   TextField,
+  Tooltip,
   Typography
 } from '@mui/material';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
@@ -25,6 +26,7 @@ import ExpandMoreRoundedIcon from '@mui/icons-material/ExpandMoreRounded';
 import type { PatchSelection } from './devContentOpsApi';
 import { codeBlockSx, monoSx, surfacePaperSx } from './devContentOpsUi';
 import { changeLabel, changeColor } from './changeTypeUi';
+import { WRITE_OPS_DISABLED_HINT, useWriteOpsLocked } from './devContentOpsWriteGate';
 
 type SiteOption = { id: string; name: string };
 
@@ -62,6 +64,7 @@ export function PatchBasketPanel({
   onApplyTargetSiteChange
 }: Props) {
   const [expanded, setExpanded] = React.useState(false);
+  const writeLocked = useWriteOpsLocked();
   const applyTarget = applyTargetSiteId || sourceSiteId || '';
   const applyTargetSite = sites.find((site) => site.id === applyTarget) ?? null;
   const applyToOtherProject = Boolean(sourceSiteId && applyTarget && applyTarget !== sourceSiteId);
@@ -116,15 +119,19 @@ export function PatchBasketPanel({
           >
             Download
           </Button>
-          <Button
-            size="small"
-            variant="outlined"
-            disabled={!patchPreview}
-            startIcon={<ContentPasteRoundedIcon />}
-            onClick={onApplyPatch}
-          >
-            Apply
-          </Button>
+          <Tooltip title={writeLocked ? WRITE_OPS_DISABLED_HINT : ''}>
+            <span>
+              <Button
+                size="small"
+                variant="outlined"
+                disabled={!patchPreview || writeLocked}
+                startIcon={<ContentPasteRoundedIcon />}
+                onClick={onApplyPatch}
+              >
+                Apply
+              </Button>
+            </span>
+          </Tooltip>
           <Button size="small" color="inherit" disabled={!selections.length} onClick={onClear}>
             Clear
           </Button>

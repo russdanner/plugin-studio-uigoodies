@@ -50,6 +50,7 @@ import {
   type RepoOptimizeOption,
   type RepoOptimizeRisk
 } from './repoOptimizeOptions';
+import { useWriteOpsLocked } from './devContentOpsWriteGate';
 import {
   codeBlockSx,
   monoSx,
@@ -431,6 +432,7 @@ function MetricGroupSection({ group, metrics }: { group: string; metrics: RepoHe
 }
 
 export function RepoHealthTab({ siteId, siteName }: { siteId: string; siteName?: string }) {
+  const writeLocked = useWriteOpsLocked();
   const [loading, setLoading] = useState(false);
   const [loadProgress, setLoadProgress] = useState<RepoHealthProgress | null>(null);
   const loadAbortRef = useRef<AbortController | null>(null);
@@ -645,7 +647,7 @@ export function RepoHealthTab({ siteId, siteName }: { siteId: string; siteName?:
             size="small"
             variant="contained"
             color={selectedOptimize.risk === 'destructive' ? 'error' : 'primary'}
-            disabled={loading || Boolean(optimizing)}
+            disabled={writeLocked || loading || Boolean(optimizing)}
             startIcon={
               optimizing === selectedOperation ? (
                 <CircularProgress size={16} color="inherit" />
@@ -870,7 +872,7 @@ export function RepoHealthTab({ siteId, siteName }: { siteId: string; siteName?:
         </DialogContent>
         <DialogActions>
           <Button onClick={closeConfirm}>Cancel</Button>
-          <Button color="error" variant="contained" disabled={!confirmReady || Boolean(optimizing)} onClick={confirmAndRun}>
+          <Button color="error" variant="contained" disabled={writeLocked || !confirmReady || Boolean(optimizing)} onClick={confirmAndRun}>
             Run optimization
           </Button>
         </DialogActions>

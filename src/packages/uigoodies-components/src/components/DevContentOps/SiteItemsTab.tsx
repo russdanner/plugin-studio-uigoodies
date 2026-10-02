@@ -35,6 +35,7 @@ import { useDebouncedInput } from '@craftercms/studio-ui/hooks/useDebouncedInput
 import { firstValueFrom } from 'rxjs';
 import { postUpdateItemStateBits } from './devContentOpsApi';
 import { monoSx, PanelHeader, SectionLabel, surfacePaperSx, TabAlertStack, TabContentPanel, TabShell, TabToolbar } from './devContentOpsUi';
+import { useWriteOpsLocked } from './devContentOpsWriteGate';
 import {
   ITEM_STATE_TOGGLE_CONTROLS,
   STATE_FILTER_BITS,
@@ -123,6 +124,7 @@ function ItemStatesCell({ item }: { item: SandboxItem }) {
 }
 
 export function SiteItemsTab({ siteId }: { siteId: string; siteName?: string }) {
+  const writeLocked = useWriteOpsLocked();
   const [fetching, setFetching] = useState(false);
   const [items, setItems] = useState<SandboxItem[] | null>(null);
   const [total, setTotal] = useState(0);
@@ -553,7 +555,7 @@ export function SiteItemsTab({ siteId }: { siteId: string; siteName?: string }) 
                           <Switch
                             size="small"
                             checked={Boolean(itemStateDraft[control.id])}
-                            disabled={applying}
+                            disabled={writeLocked || applying}
                             onChange={(_, checked) =>
                               setItemStateDraft({ ...itemStateDraft, [control.id]: checked })
                             }
@@ -583,7 +585,7 @@ export function SiteItemsTab({ siteId }: { siteId: string; siteName?: string }) 
                       size="small"
                       variant="outlined"
                       fullWidth
-                      disabled={applying || !itemStateDraftDirty}
+                      disabled={writeLocked || applying || !itemStateDraftDirty}
                       onClick={onResetItemStateDraft}
                     >
                       Reset
@@ -592,7 +594,7 @@ export function SiteItemsTab({ siteId }: { siteId: string; siteName?: string }) 
                       size="small"
                       variant="contained"
                       fullWidth
-                      disabled={applying || !itemStateDraftDirty}
+                      disabled={writeLocked || applying || !itemStateDraftDirty}
                       onClick={onApplyItemStateDraft}
                     >
                       Apply

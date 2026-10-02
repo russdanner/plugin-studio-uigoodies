@@ -73,6 +73,7 @@ import {
   ToolbarGroup,
   ToolbarRow
 } from './devContentOpsUi';
+import { useWriteOpsLocked } from './devContentOpsWriteGate';
 
 type LoadedFolder = {
   entries: BlobStoreTreeEntry[];
@@ -490,6 +491,7 @@ function BlobVersionHistoryDialog({
   onClose: () => void;
   onRestored: () => void;
 }) {
+  const writeLocked = useWriteOpsLocked();
   const targetOptions = useMemo(() => {
     const options: BlobPublishingTarget[] = ['preview'];
     if (store.mappings.some((m) => m.publishingTarget.toLowerCase() === 'staging') && overview.stagingEnabled) {
@@ -726,7 +728,7 @@ function BlobVersionHistoryDialog({
                             <RestoreRoundedIcon />
                           )
                         }
-                        disabled={Boolean(store.readOnly) || restoringId !== null}
+                        disabled={writeLocked || Boolean(store.readOnly) || restoringId !== null}
                         onClick={() => restore(version)}
                       >
                         {version.deleteMarker ? 'Undelete' : 'Restore'}
@@ -761,6 +763,7 @@ function DeletedBlobsPanel({
   onOpenHistory: (path: string) => void;
   onRestored: () => void;
 }) {
+  const writeLocked = useWriteOpsLocked();
   const targetOptions = useMemo(() => {
     const options: BlobPublishingTarget[] = ['preview'];
     if (store.mappings.some((m) => m.publishingTarget.toLowerCase() === 'staging') && overview.stagingEnabled) {
@@ -1000,7 +1003,7 @@ function DeletedBlobsPanel({
                         startIcon={
                           restoringId === entry.versionId ? <CircularProgress size={14} /> : <RestoreRoundedIcon />
                         }
-                        disabled={Boolean(store.readOnly) || restoringId !== null}
+                        disabled={writeLocked || Boolean(store.readOnly) || restoringId !== null}
                         onClick={() => undelete(entry)}
                       >
                         Restore
@@ -1026,6 +1029,7 @@ function BlobStoreSection({
   store: BlobStoreConfig;
   overview: BlobStoreOverview;
 }) {
+  const writeLocked = useWriteOpsLocked();
   const [rootState, setRootState] = useState<LoadedFolder>({ entries: [], loading: true });
   const [selectedPaths, setSelectedPaths] = useState<Record<string, boolean>>({});
   const [syncing, setSyncing] = useState<'staging' | 'live' | null>(null);
@@ -1176,6 +1180,7 @@ function BlobStoreSection({
               variant="outlined"
               startIcon={syncing === 'staging' ? <CircularProgress size={14} /> : <CloudUploadRoundedIcon />}
               disabled={
+                writeLocked ||
                 !selectedList.length ||
                 syncing !== null ||
                 !overview.stagingEnabled ||
@@ -1189,7 +1194,7 @@ function BlobStoreSection({
               size="small"
               variant="outlined"
               startIcon={syncing === 'live' ? <CircularProgress size={14} /> : <CloudUploadRoundedIcon />}
-              disabled={!selectedList.length || syncing !== null || !hasLiveMapping}
+              disabled={writeLocked || !selectedList.length || syncing !== null || !hasLiveMapping}
               onClick={() => sync('live')}
             >
               Preview → live

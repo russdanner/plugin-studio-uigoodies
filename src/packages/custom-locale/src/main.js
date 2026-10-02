@@ -5,6 +5,53 @@ function bootCustomLocaleControl() {
   var CrafterCMSNextBridge = CrafterCMSNext.components.CrafterCMSNextBridge;
   var ConfirmDialog = CrafterCMSNext.components.ConfirmDialog;
 
+  var STYLE_ID = "uigoodies-custom-locale-css";
+  function ensureStyles() {
+    if (typeof document === "undefined") return;
+    if (document.getElementById(STYLE_ID)) return;
+    var style = document.createElement("style");
+    style.id = STYLE_ID;
+    style.textContent =
+      ".uigoodies-custom-locale{" +
+      "--cl-input-bg:#f8fafc;" +
+      "--cl-input-fg:#0f172a;" +
+      "--cl-input-bd:#cbd5e1;" +
+      "--cl-btn-on:#2563eb;" +
+      "--cl-btn-off:#94a3b8;" +
+      "--cl-btn-fg:#ffffff;" +
+      "--cl-btn-shadow:0 1px 2px rgba(37,99,235,0.35);" +
+      "}" +
+      "@media (prefers-color-scheme: dark){" +
+      ".uigoodies-custom-locale{" +
+      "--cl-input-bg:#2d2d2d;" +
+      "--cl-input-fg:#e8eaed;" +
+      "--cl-input-bd:#5f6368;" +
+      "--cl-btn-on:#409cff;" +
+      "--cl-btn-off:#5f6368;" +
+      "--cl-btn-fg:#ffffff;" +
+      "--cl-btn-shadow:0 1px 2px rgba(0,0,0,0.45);" +
+      "}" +
+      "}" +
+      ".uigoodies-custom-locale-field{display:block;width:100%;box-sizing:border-box;clear:both;}" +
+      ".uigoodies-custom-locale-field>.cstudio-form-field-title{" +
+      "display:block!important;float:none!important;width:100%!important;" +
+      "margin:0 0 6px 0!important;padding:0!important;text-align:left!important;" +
+      "line-height:1.4!important;box-sizing:border-box;" +
+      "}" +
+      ".uigoodies-custom-locale-control{display:block;width:100%;float:none;clear:both;min-width:0;box-sizing:border-box;}" +
+      ".uigoodies-custom-locale-row{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:center;" +
+      "gap:12px;width:100%;min-width:0;box-sizing:border-box;}" +
+      ".uigoodies-custom-locale-input{flex:1 1 auto;min-width:0;box-sizing:border-box;padding:10px 12px;" +
+      "border:1px solid var(--cl-input-bd);border-radius:8px;background:var(--cl-input-bg);color:var(--cl-input-fg);" +
+      "font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:12px;line-height:1.4;}" +
+      ".uigoodies-custom-locale-btn{flex-shrink:0;white-space:nowrap;padding:11px 20px;border-radius:10px;border:none;" +
+      "font-weight:600;font-size:13px;letter-spacing:0.02em;color:var(--cl-btn-fg);transition:background 0.15s ease,box-shadow 0.15s ease;}" +
+      ".uigoodies-custom-locale-btn.is-enabled{background:var(--cl-btn-on);cursor:pointer;box-shadow:var(--cl-btn-shadow);}" +
+      ".uigoodies-custom-locale-btn.is-disabled{background:var(--cl-btn-off);cursor:not-allowed;box-shadow:none;}";
+    document.head.appendChild(style);
+  }
+  ensureStyles();
+
   var RESERVED_FIRST_SEGMENTS = {
     website: 1,
     components: 1,
@@ -58,24 +105,25 @@ function bootCustomLocaleControl() {
     var pathLocale = (locale.localeCode || "").toLowerCase();
     var sourceLocale = (locale.sourceLocaleCode || "").toLowerCase();
     var canUnlink = !!(pathLocale && sourceLocale && pathLocale !== sourceLocale);
+    var sourceId = (locale.localeSourceId && String(locale.localeSourceId).trim()) || "";
 
-    // Match stock form action buttons (image-picker, etc.): cstudio-button + bootstrap btn classes.
-    // Parent control widget is right-aligned so the button sits upper-right of the field row.
     return React.createElement(
       "div",
-      {
-        className: "cstudio-form-control-input-container",
-        style: {
-          display: "inline-block",
-          textAlign: "right",
-          verticalAlign: "top"
-        }
-      },
+      { className: "uigoodies-custom-locale uigoodies-custom-locale-row" },
+      React.createElement("input", {
+        type: "text",
+        readOnly: true,
+        className: "uigoodies-custom-locale-input",
+        value: sourceId,
+        title: sourceId || "No locale source id",
+        "aria-label": "Locale Source ID"
+      }),
       React.createElement(
         "button",
         {
           type: "button",
-          className: "cstudio-button btn btn-default btn-sm",
+          className:
+            "uigoodies-custom-locale-btn " + (canUnlink ? "is-enabled" : "is-disabled"),
           disabled: !canUnlink,
           title: canUnlink
             ? "Unlink this item from its translation source"
@@ -221,9 +269,11 @@ function bootCustomLocaleControl() {
     },
     _mountCustomLocale: function (obj, locale, key) {
       var cms = CrafterCMSNext;
+      obj.value = locale.localeSourceId || "";
       var props = {
         locale: locale,
         onLocaleChange: function (nextLocale) {
+          obj.value = nextLocale.localeSourceId || "";
           obj.form.updateModel("localeCode_s", nextLocale.localeCode || "");
           obj.form.updateModel("sourceLocaleCode_s", nextLocale.sourceLocaleCode || "");
           obj.form.updateModel("localeSourceId_s", nextLocale.localeSourceId || "");
@@ -240,6 +290,9 @@ function bootCustomLocaleControl() {
         obj._cmsRenderHandles[handleKey].unmount({ removeContainer: false });
       }
       var mountEl = obj.controlWidgetContainerEl || obj.containerEl;
+      mountEl.style.width = "100%";
+      mountEl.style.minWidth = "0";
+      mountEl.style.boxSizing = "border-box";
       cms
         .render(
           mountEl,
@@ -250,6 +303,14 @@ function bootCustomLocaleControl() {
         )
         .then(function (handle) {
           obj._cmsRenderHandles[handleKey] = handle;
+          // React root wrappers from CrafterCMSNext.render often don't stretch; force full width.
+          var root = mountEl.firstElementChild;
+          if (root && root.style) {
+            root.style.width = "100%";
+            root.style.minWidth = "0";
+            root.style.boxSizing = "border-box";
+            root.style.display = "block";
+          }
         })
         .catch(function (err) {
           console.error("[custom-locale] Failed to render control", err);
@@ -290,8 +351,9 @@ function bootCustomLocaleControl() {
     render: function (config, containerEl) {
       containerEl.id = this.id;
       this.containerEl = containerEl;
+      YAHOO.util.Dom.addClass(containerEl, "uigoodies-custom-locale");
+      YAHOO.util.Dom.addClass(containerEl, "uigoodies-custom-locale-field");
 
-      // Same chrome as stock controls: title left, control widget right.
       var titleEl = document.createElement("span");
       YAHOO.util.Dom.addClass(titleEl, "cstudio-form-field-title");
       titleEl.textContent = config.title || "Locale Source ID";
@@ -299,8 +361,7 @@ function bootCustomLocaleControl() {
 
       var controlWidgetContainerEl = document.createElement("div");
       YAHOO.util.Dom.addClass(controlWidgetContainerEl, "cstudio-form-control-uuid-container");
-      controlWidgetContainerEl.style.cssText =
-        "display:inline-block;width:75%;vertical-align:top;text-align:right;";
+      YAHOO.util.Dom.addClass(controlWidgetContainerEl, "uigoodies-custom-locale-control");
       containerEl.appendChild(controlWidgetContainerEl);
       this.controlWidgetContainerEl = controlWidgetContainerEl;
 
@@ -308,6 +369,8 @@ function bootCustomLocaleControl() {
         var descriptionEl = document.createElement("span");
         YAHOO.util.Dom.addClass(descriptionEl, "description");
         YAHOO.util.Dom.addClass(descriptionEl, "cstudio-form-field-description");
+        descriptionEl.style.cssText =
+          "display:block;width:100%;float:none;margin:6px 0 0 0;padding:0;text-align:left;";
         descriptionEl.innerHTML = config.description;
         containerEl.appendChild(descriptionEl);
       }

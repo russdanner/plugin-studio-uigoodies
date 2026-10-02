@@ -52,6 +52,7 @@ import {
   TabToolbar,
   ToolbarRow
 } from './devContentOpsUi';
+import { useWriteOpsLocked } from './devContentOpsWriteGate';
 
 type Props = {
   siteId: string;
@@ -59,6 +60,7 @@ type Props = {
 };
 
 export function DatabaseTab({ siteId, siteName }: Props) {
+  const writeLocked = useWriteOpsLocked();
   const [accessLoading, setAccessLoading] = useState(true);
   const [systemAdmin, setSystemAdmin] = useState(false);
   const [username, setUsername] = useState('');
@@ -378,7 +380,7 @@ export function DatabaseTab({ siteId, siteName }: Props) {
             title="Destructive database operation"
             description={option.consequence}
             action={
-              <Button color="error" variant="contained" onClick={onOpenConfirm} disabled={mode === 'beforeDate' && !beforeDate}>
+              <Button color="error" variant="contained" onClick={onOpenConfirm} disabled={writeLocked || (mode === 'beforeDate' && !beforeDate)}>
                 Truncate audit history
               </Button>
             }
@@ -455,7 +457,7 @@ export function DatabaseTab({ siteId, siteName }: Props) {
             title="Clear sync cache"
             description={processedOption.consequence}
             action={
-              <Button color="warning" variant="contained" onClick={onOpenProcessedConfirm}>
+              <Button color="warning" variant="contained" disabled={writeLocked} onClick={onOpenProcessedConfirm}>
                 Truncate processed commits
               </Button>
             }
@@ -500,7 +502,7 @@ export function DatabaseTab({ siteId, siteName }: Props) {
           <Button onClick={() => setConfirmOpen(false)} disabled={busy}>
             Cancel
           </Button>
-          <Button color="error" variant="contained" disabled={!canConfirm || busy} onClick={onTruncate}>
+          <Button color="error" variant="contained" disabled={writeLocked || !canConfirm || busy} onClick={onTruncate}>
             {busy ? 'Deleting…' : 'Delete audit history'}
           </Button>
         </DialogActions>
@@ -555,7 +557,7 @@ export function DatabaseTab({ siteId, siteName }: Props) {
           <Button
             color="warning"
             variant="contained"
-            disabled={!canConfirmProcessed || processedBusy}
+            disabled={writeLocked || !canConfirmProcessed || processedBusy}
             onClick={onTruncateProcessed}
           >
             {processedBusy ? 'Clearing…' : 'Truncate processed commits'}

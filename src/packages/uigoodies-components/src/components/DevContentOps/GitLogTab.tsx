@@ -80,6 +80,7 @@ import {
   monoSx,
   surfacePaperSx
 } from './devContentOpsUi';
+import { WRITE_OPS_DISABLED_HINT, useWriteOpsLocked } from './devContentOpsWriteGate';
 
 const LOG_LIMIT = 50;
 
@@ -93,6 +94,7 @@ type Props = {
 
 export function GitLogTab({ siteId, sites = [] }: Props) {
   const dispatch = useDispatch();
+  const writeLocked = useWriteOpsLocked();
   const [status, setStatus] = useState<RepoStatus | null>(null);
   const [branch, setBranch] = useState('');
   const [commits, setCommits] = useState<GitCommit[]>([]);
@@ -1002,24 +1004,39 @@ export function GitLogTab({ siteId, sites = [] }: Props) {
                     <Button size="small" variant="outlined" startIcon={<CompareArrowsRoundedIcon />} onClick={onDiffCommits}>
                       Diff parent
                     </Button>
-                    <Button size="small" variant="outlined" startIcon={<HistoryRoundedIcon />} onClick={onSetProcessed}>
-                      Set processed + sync
-                    </Button>
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      color="warning"
-                      startIcon={<RestoreRoundedIcon />}
-                      onClick={() =>
-                        destructiveAction('Revert working tree', 'Revert working tree to this commit?', async () => {
-                          await firstValueFrom(postDevContentOpsAction(siteId, { action: 'revertToCommit', commitId: selected.id }));
-                          notify('Working tree reverted', 'success');
-                          loadLog(true);
-                        })
-                      }
-                    >
-                      Revert to commit
-                    </Button>
+                    <Tooltip title={writeLocked ? WRITE_OPS_DISABLED_HINT : 'Mark this commit as processed and sync Studio'}>
+                      <span>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          startIcon={<HistoryRoundedIcon />}
+                          disabled={writeLocked}
+                          onClick={onSetProcessed}
+                        >
+                          Set processed + sync
+                        </Button>
+                      </span>
+                    </Tooltip>
+                    <Tooltip title={writeLocked ? WRITE_OPS_DISABLED_HINT : ''}>
+                      <span>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          color="warning"
+                          startIcon={<RestoreRoundedIcon />}
+                          disabled={writeLocked}
+                          onClick={() =>
+                            destructiveAction('Revert working tree', 'Revert working tree to this commit?', async () => {
+                              await firstValueFrom(postDevContentOpsAction(siteId, { action: 'revertToCommit', commitId: selected.id }));
+                              notify('Working tree reverted', 'success');
+                              loadLog(true);
+                            })
+                          }
+                        >
+                          Revert to commit
+                        </Button>
+                      </span>
+                    </Tooltip>
                   </ActionButtonStack>
                 </Box>
 
@@ -1036,67 +1053,77 @@ export function GitLogTab({ siteId, sites = [] }: Props) {
                 )}
 
                 <DangerZone>
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    color="error"
-                    startIcon={<WarningAmberRoundedIcon />}
-                    onClick={() =>
-                      destructiveAction(
-                        'Reset HEAD',
-                        'Reset HEAD to this commit? History after this point will be discarded from the branch tip. Commit IDs before this point stay the same, but any work based on the abandoned tip will diverge.',
-                        async () => {
-                          const result = await firstValueFrom(
-                            postDevContentOpsAction<{ processedCommitUpdate?: ProcessedCommitUpdate }>(siteId, {
-                              action: 'resetHead',
-                              commitId: selected.id
-                            })
-                          );
-                          reportProcessedCommitUpdate(
-                            result.processedCommitUpdate,
-                            'HEAD reset and sync triggered',
-                            'HEAD reset; sync failed'
-                          );
-                          loadStatus();
-                          loadLog(true);
-                        },
-                        selected,
-                        { historyRewrite: true, confirmLabel: 'Reset HEAD' }
-                      )
-                    }
-                  >
-                    Reset HEAD
-                  </Button>
-                  <Button
-                    size="small"
-                    color="error"
-                    variant="outlined"
-                    onClick={() =>
-                      destructiveAction(
-                        'Trim history',
-                        'Trim/discard history relative to this commit? This is a destructive history operation and can invalidate commit IDs and disrupt other workflows that depend on the current history.',
-                        async () => {
-                          const result = await firstValueFrom(
-                            postDevContentOpsAction<{ processedCommitUpdate?: ProcessedCommitUpdate }>(siteId, {
-                              action: 'trimHistory',
-                              keepCommitId: selected.id
-                            })
-                          );
-                          reportProcessedCommitUpdate(
-                            result.processedCommitUpdate,
-                            'History trimmed and sync triggered',
-                            'History trimmed; sync failed'
-                          );
-                          loadStatus();
-                          loadLog(true);
-                        },
-                        selected,
-                        { historyRewrite: true, confirmLabel: 'Trim history' }
-                      )
-                    }
-                  >
-                    Trim History
-                  </Button>
+                  <Tooltip title={writeLocked ? WRITE_OPS_DISABLED_HINT : ''}>
+                    <span>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        color="error"
+                        startIcon={<WarningAmberRoundedIcon />}
+                        disabled={writeLocked}
+                        onClick={() =>
+                          destructiveAction(
+                            'Reset HEAD',
+                            'Reset HEAD to this commit? History after this point will be discarded from the branch tip. Commit IDs before this point stay the same, but any work based on the abandoned tip will diverge.',
+                            async () => {
+                              const result = await firstValueFrom(
+                                postDevContentOpsAction<{ processedCommitUpdate?: ProcessedCommitUpdate }>(siteId, {
+                                  action: 'resetHead',
+                                  commitId: selected.id
+                                })
+                              );
+                              reportProcessedCommitUpdate(
+                                result.processedCommitUpdate,
+                                'HEAD reset and sync triggered',
+                                'HEAD reset; sync failed'
+                              );
+                              loadStatus();
+                              loadLog(true);
+                            },
+                            selected,
+                            { historyRewrite: true, confirmLabel: 'Reset HEAD' }
+                          )
+                        }
+                      >
+                        Reset HEAD
+                      </Button>
+                    </span>
+                  </Tooltip>
+                  <Tooltip title={writeLocked ? WRITE_OPS_DISABLED_HINT : ''}>
+                    <span>
+                      <Button
+                        size="small"
+                        color="error"
+                        variant="outlined"
+                        disabled={writeLocked}
+                        onClick={() =>
+                          destructiveAction(
+                            'Trim history',
+                            'Trim/discard history relative to this commit? This is a destructive history operation and can invalidate commit IDs and disrupt other workflows that depend on the current history.',
+                            async () => {
+                              const result = await firstValueFrom(
+                                postDevContentOpsAction<{ processedCommitUpdate?: ProcessedCommitUpdate }>(siteId, {
+                                  action: 'trimHistory',
+                                  keepCommitId: selected.id
+                                })
+                              );
+                              reportProcessedCommitUpdate(
+                                result.processedCommitUpdate,
+                                'History trimmed and sync triggered',
+                                'History trimmed; sync failed'
+                              );
+                              loadStatus();
+                              loadLog(true);
+                            },
+                            selected,
+                            { historyRewrite: true, confirmLabel: 'Trim history' }
+                          )
+                        }
+                      >
+                        Trim History
+                      </Button>
+                    </span>
+                  </Tooltip>
                 </DangerZone>
               </Stack>
             )}

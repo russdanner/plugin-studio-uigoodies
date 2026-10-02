@@ -52,6 +52,7 @@ import {
   type WorkTreeResponse
 } from './devContentOpsApi';
 import { monoSx, TabAlertStack, TabContentPanel, TabShell, TabToolbar, ToolbarGroup } from './devContentOpsUi';
+import { useWriteOpsLocked } from './devContentOpsWriteGate';
 
 type Props = {
   siteId: string;
@@ -106,6 +107,7 @@ function statusChipColor(status: string): 'default' | 'success' | 'warning' | 'e
 }
 
 export function WorkingTreeTab({ siteId, siteName }: Props) {
+  const writeLocked = useWriteOpsLocked();
   const [data, setData] = useState<WorkTreeResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -320,7 +322,7 @@ export function WorkingTreeTab({ siteId, siteName }: Props) {
                   <Button
                     size="small"
                     variant="outlined"
-                    disabled={busy || loading || !canStageAction}
+                    disabled={writeLocked || busy || loading || !canStageAction}
                     startIcon={<PlaylistAddCheckRoundedIcon />}
                     onClick={() =>
                       runAction(async () => {
@@ -340,7 +342,7 @@ export function WorkingTreeTab({ siteId, siteName }: Props) {
                   <Button
                     size="small"
                     variant="outlined"
-                    disabled={busy || loading || !canUnstageAction}
+                    disabled={writeLocked || busy || loading || !canUnstageAction}
                     onClick={() =>
                       runAction(async () => {
                         const result = await firstValueFrom(postWorkTreeUnstage(siteId, { paths: selectedPaths }));
@@ -362,7 +364,7 @@ export function WorkingTreeTab({ siteId, siteName }: Props) {
                   <Button
                     size="small"
                     variant="contained"
-                    disabled={busy || loading || !canCommitAction}
+                    disabled={writeLocked || busy || loading || !canCommitAction}
                     startIcon={<CommitRoundedIcon />}
                     onClick={() => {
                       setCommitMessage('');
@@ -384,7 +386,7 @@ export function WorkingTreeTab({ siteId, siteName }: Props) {
                     size="small"
                     variant="outlined"
                     color="warning"
-                    disabled={busy || loading || !canDiscardAction}
+                    disabled={writeLocked || busy || loading || !canDiscardAction}
                     startIcon={<RestoreRoundedIcon />}
                     onClick={() =>
                       runAction(async () => {
@@ -404,7 +406,7 @@ export function WorkingTreeTab({ siteId, siteName }: Props) {
                   <Button
                     size="small"
                     variant="outlined"
-                    disabled={busy || loading || !canCleanAction}
+                    disabled={writeLocked || busy || loading || !canCleanAction}
                     startIcon={<CleaningServicesRoundedIcon />}
                     onClick={() =>
                       runAction(async () => {
@@ -428,7 +430,7 @@ export function WorkingTreeTab({ siteId, siteName }: Props) {
                     size="small"
                     variant="outlined"
                     color="error"
-                    disabled={busy || loading || !canResetAction}
+                    disabled={writeLocked || busy || loading || !canResetAction}
                     onClick={() => {
                       setResetAck(false);
                       setResetOpen(true);
@@ -526,7 +528,7 @@ export function WorkingTreeTab({ siteId, siteName }: Props) {
                           <Button
                             size="small"
                             variant="text"
-                            disabled={busy || loading}
+                            disabled={writeLocked || busy || loading}
                             onClick={() =>
                               runAction(async () => {
                                 const result = await firstValueFrom(
@@ -543,7 +545,7 @@ export function WorkingTreeTab({ siteId, siteName }: Props) {
                           <Button
                             size="small"
                             variant="text"
-                            disabled={busy || loading}
+                            disabled={writeLocked || busy || loading}
                             onClick={() =>
                               runAction(async () => {
                                 const result = await firstValueFrom(
@@ -561,7 +563,7 @@ export function WorkingTreeTab({ siteId, siteName }: Props) {
                             size="small"
                             variant="text"
                             color="warning"
-                            disabled={busy || loading}
+                            disabled={writeLocked || busy || loading}
                             startIcon={<DeleteOutlineRoundedIcon />}
                             onClick={() =>
                               runAction(async () => {
@@ -580,7 +582,7 @@ export function WorkingTreeTab({ siteId, siteName }: Props) {
                             <Button
                               size="small"
                               variant="text"
-                              disabled={busy || loading}
+                              disabled={writeLocked || busy || loading}
                               onClick={() =>
                                 runAction(async () => {
                                   const result = await firstValueFrom(
@@ -595,7 +597,7 @@ export function WorkingTreeTab({ siteId, siteName }: Props) {
                             <Button
                               size="small"
                               variant="text"
-                              disabled={busy || loading}
+                              disabled={writeLocked || busy || loading}
                               onClick={() =>
                                 runAction(async () => {
                                   const result = await firstValueFrom(
@@ -639,7 +641,7 @@ export function WorkingTreeTab({ siteId, siteName }: Props) {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setCommitOpen(false)} disabled={busy}>Cancel</Button>
-          <Button variant="contained" disabled={busy || !commitMessage.trim()} onClick={onCommit}>
+          <Button variant="contained" disabled={writeLocked || busy || !commitMessage.trim()} onClick={onCommit}>
             {busy ? 'Committing…' : 'Commit'}
           </Button>
         </DialogActions>
@@ -660,7 +662,7 @@ export function WorkingTreeTab({ siteId, siteName }: Props) {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setResetOpen(false)} disabled={busy}>Cancel</Button>
-          <Button color="error" variant="contained" disabled={!resetAck || busy} onClick={onResetHard}>
+          <Button color="error" variant="contained" disabled={writeLocked || !resetAck || busy} onClick={onResetHard}>
             Reset hard
           </Button>
         </DialogActions>

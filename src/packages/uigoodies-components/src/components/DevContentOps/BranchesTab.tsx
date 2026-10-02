@@ -50,6 +50,7 @@ import {
   type GitRefsResponse
 } from './devContentOpsApi';
 import { monoSx, TabContentPanel, TabAlertStack, TabShell, TabToolbar, ToolbarDivider, ToolbarGroup, ToolbarRow } from './devContentOpsUi';
+import { useWriteOpsLocked } from './devContentOpsWriteGate';
 
 type Props = {
   siteId: string;
@@ -71,6 +72,7 @@ type DeleteDialog =
   | null;
 
 export function BranchesTab({ siteId, siteName }: Props) {
+  const writeLocked = useWriteOpsLocked();
   const [refs, setRefs] = useState<GitRefsResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -259,6 +261,10 @@ export function BranchesTab({ siteId, siteName }: Props) {
   }, [sandboxBranch, currentBranch, syncBranch, branchNames]);
 
   const onPull = async () => {
+    if (writeLocked) {
+      setError('Write operations are disabled. Turn on “Enable write Operations” next to the project selector.');
+      return;
+    }
     if (!canRemoteSync) {
       setError('Select a remote and branch before pulling');
       return;
@@ -281,6 +287,10 @@ export function BranchesTab({ siteId, siteName }: Props) {
   };
 
   const onPush = async () => {
+    if (writeLocked) {
+      setError('Write operations are disabled. Turn on “Enable write Operations” next to the project selector.');
+      return;
+    }
     if (!canRemoteSync) {
       setError('Select a remote and branch before pushing');
       return;
@@ -369,7 +379,7 @@ export function BranchesTab({ siteId, siteName }: Props) {
                   startIcon={
                     remoteSyncing ? <CircularProgress size={14} /> : <CloudDownloadRoundedIcon />
                   }
-                  disabled={!canRemoteSync || remoteSyncing}
+                  disabled={writeLocked || !canRemoteSync || remoteSyncing}
                   onClick={onPull}
                 >
                   Pull
@@ -380,7 +390,7 @@ export function BranchesTab({ siteId, siteName }: Props) {
                   startIcon={
                     remoteSyncing ? <CircularProgress size={14} /> : <CloudUploadRoundedIcon />
                   }
-                  disabled={!canRemoteSync || remoteSyncing}
+                  disabled={writeLocked || !canRemoteSync || remoteSyncing}
                   onClick={onPush}
                 >
                   Push
@@ -394,6 +404,7 @@ export function BranchesTab({ siteId, siteName }: Props) {
               size="small"
               variant="contained"
               startIcon={<AddRoundedIcon />}
+              disabled={writeLocked}
               onClick={() => {
                 resetCreateForm();
                 setCreateDialog({ kind: section === 'tags' ? 'tag' : 'branch' });
@@ -479,6 +490,7 @@ export function BranchesTab({ siteId, siteName }: Props) {
                           size="small"
                           color="error"
                           startIcon={<DeleteOutlineRoundedIcon />}
+                          disabled={writeLocked}
                           onClick={() => openDelete(section === 'tags' ? 'tag' : 'branch', row)}
                         >
                           Delete
@@ -553,6 +565,7 @@ export function BranchesTab({ siteId, siteName }: Props) {
           <Button
             variant="contained"
             disabled={
+              writeLocked ||
               busy ||
               (createDialog?.kind === 'branch' ? !branchName.trim() : !tagName.trim() || (tagAnnotated && !tagMessage.trim()))
             }
@@ -620,6 +633,7 @@ export function BranchesTab({ siteId, siteName }: Props) {
             color="error"
             variant="contained"
             disabled={
+              writeLocked ||
               busy ||
               (!deleteLocal && !deleteRemote) ||
               (deleteDialog?.kind === 'branch' && deleteDialog.ref.current && deleteLocal) ||

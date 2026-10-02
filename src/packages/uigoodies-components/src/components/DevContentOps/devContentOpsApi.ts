@@ -385,6 +385,26 @@ function normalizeFileDiff(diff: FileDiff): FileDiff {
 
 let devContentOpsStudioSiteId: string | null = null;
 
+/** When false, mutating DevContentOps POSTs are rejected client-side. Default off for safety. */
+let writeOperationsEnabled = false;
+
+export const WRITE_OPERATIONS_DISABLED_MESSAGE =
+  'Write operations are disabled. Turn on “Enable write Operations” next to the project selector.';
+
+export function setDevContentOpsWriteOperationsEnabled(enabled: boolean) {
+  writeOperationsEnabled = Boolean(enabled);
+}
+
+export function isDevContentOpsWriteOperationsEnabled(): boolean {
+  return writeOperationsEnabled;
+}
+
+export function assertDevContentOpsWriteOperationsEnabled() {
+  if (!writeOperationsEnabled) {
+    throw new Error(WRITE_OPERATIONS_DISABLED_MESSAGE);
+  }
+}
+
 /** Studio session site for plugin API auth; DevContentOps tools pass the selected project as targetSiteId. */
 export function setDevContentOpsStudioSiteId(studioSiteId: string | null) {
   devContentOpsStudioSiteId = studioSiteId?.trim() || null;
@@ -886,6 +906,7 @@ export function buildPatchFromSelection(siteId: string, selections: PatchSelecti
 }
 
 export function postDevContentOpsAction<T = Record<string, unknown>>(siteId: string, body: Record<string, unknown>) {
+  assertDevContentOpsWriteOperationsEnabled();
   return postJSON(pluginUrl('dev-content-ops-git', siteId), pluginPostBody(siteId, body)).pipe(
     map((r) => {
       const data = unwrapPluginResponse<T & { siteId?: string }>(r);
@@ -1224,6 +1245,7 @@ export function postTruncateAudit(
     confirmed: boolean;
   }
 ) {
+  assertDevContentOpsWriteOperationsEnabled();
   return postJSON(databasePluginUrl(siteId), pluginPostBody(siteId, { action: 'truncateAudit', ...opts })).pipe(
     map((r) => {
       const data = unwrapPluginResponse<{
@@ -1250,6 +1272,7 @@ export function postTruncateProcessedCommits(
     confirmed: boolean;
   }
 ) {
+  assertDevContentOpsWriteOperationsEnabled();
   return postJSON(databasePluginUrl(siteId), pluginPostBody(siteId, { action: 'truncateProcessedCommits', ...opts })).pipe(
     map((r) => {
       const data = unwrapPluginResponse<{
@@ -1333,6 +1356,7 @@ export function postSyncBlobStore(
     storeId?: string;
   }
 ) {
+  assertDevContentOpsWriteOperationsEnabled();
   return postJSON(pluginUrl('dev-content-ops-git', siteId), pluginPostBody(siteId, {
     action: 'syncBlobStore',
     target: opts.target,
@@ -1517,6 +1541,7 @@ export function postRestoreBlobVersion(
     deleteMarker?: boolean;
   }
 ) {
+  assertDevContentOpsWriteOperationsEnabled();
   return postJSON(pluginUrl('dev-content-ops-git', siteId), pluginPostBody(siteId, {
     action: 'restoreBlobVersion',
     storeId: opts.storeId,

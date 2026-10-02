@@ -6,9 +6,9 @@ const Button = craftercms.libs.MaterialUI.Button && Object.prototype.hasOwnPrope
 const SystemIcon = craftercms.components.SystemIcon && Object.prototype.hasOwnProperty.call(craftercms.components.SystemIcon, 'default') ? craftercms.components.SystemIcon['default'] : craftercms.components.SystemIcon;
 const { isItemLockedForMe } = craftercms.utils.content;
 const React = craftercms.libs.React;
-const { useState, useRef, useEffect, useMemo, useCallback, createContext, useSyncExternalStore, useId, useImperativeHandle, useLayoutEffect, useContext, forwardRef, createElement } = craftercms.libs.React;
+const { useState, useRef, useReducer, useEffect, useMemo, useCallback, createContext, useSyncExternalStore, useId, useImperativeHandle, useLayoutEffect, useContext, forwardRef, createElement } = craftercms.libs.React;
 const React__default = craftercms.libs.React && Object.prototype.hasOwnProperty.call(craftercms.libs.React, 'default') ? craftercms.libs.React['default'] : craftercms.libs.React;
-const { SystemIcon: SystemIcon$1, WidgetsGrid, DialogBody, DialogFooter: DialogFooter$1, DialogHeader, BasePathSelector } = craftercms.components;
+const { SystemIcon: SystemIcon$1, WidgetsGrid, PublishOnDemandForm, DialogBody, DialogFooter: DialogFooter$1, DialogHeader, BasePathSelector } = craftercms.components;
 const ExpandMore = craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreOutlined') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreOutlined'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreOutlined')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreOutlined');
 const { createCustomDocumentEventListener } = craftercms.utils.dom;
 const TextField = craftercms.libs.MaterialUI.TextField && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.TextField, 'default') ? craftercms.libs.MaterialUI.TextField['default'] : craftercms.libs.MaterialUI.TextField;
@@ -22,18 +22,19 @@ const { pull, push: push$1, fetchRepositories } = craftercms.services.repositori
 const DownloadIcon = craftercms.utils.constants.components.get('@mui/icons-material/DownloadOutlined') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/DownloadOutlined'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/DownloadOutlined')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/DownloadOutlined');
 const PublishIcon = craftercms.utils.constants.components.get('@mui/icons-material/PublishOutlined') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/PublishOutlined'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/PublishOutlined')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/PublishOutlined');
 const Snackbar = craftercms.libs.MaterialUI.Snackbar && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Snackbar, 'default') ? craftercms.libs.MaterialUI.Snackbar['default'] : craftercms.libs.MaterialUI.Snackbar;
-const { FormattedMessage } = craftercms.libs.ReactIntl;
-const { of, from, concatMap: concatMap$1, forkJoin, Subject, firstValueFrom } = craftercms.libs.rxjs;
-const { concatMap, expand, toArray, catchError, switchMap, takeUntil, map, take, filter, debounceTime, distinctUntilChanged, mergeMap } = craftercms.libs.rxjs;
-const { fetchUnpublished, fetchMyActivity } = craftercms.services.dashboard;
+const { defineMessages, useIntl, FormattedMessage } = craftercms.libs.ReactIntl;
 const { nou } = craftercms.utils.object;
 const { lookupItemByPath } = craftercms.utils.content;
 const { hasInitialPublish, fetchAll, fetchLegacySite } = craftercms.services.sites;
+const { fetchPublishingTargets, bulkGoLive } = craftercms.services.publishing;
+const { isBlank } = craftercms.utils.string;
 const { useTheme: useTheme$1, useThemeProps: useThemeProps$2, styled, alpha: alpha$1 } = craftercms.libs.MaterialUI;
 const InfoOutlinedIcon = craftercms.utils.constants.components.get('@mui/icons-material/InfoOutlined') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/InfoOutlined'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/InfoOutlined')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/InfoOutlined');
 const Menu = craftercms.libs.MaterialUI.Menu && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Menu, 'default') ? craftercms.libs.MaterialUI.Menu['default'] : craftercms.libs.MaterialUI.Menu;
 const MenuItem = craftercms.libs.MaterialUI.MenuItem && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.MenuItem, 'default') ? craftercms.libs.MaterialUI.MenuItem['default'] : craftercms.libs.MaterialUI.MenuItem;
 const ExpandMoreRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ExpandMoreRounded');
+const { from, concatMap, forkJoin, Subject, of, firstValueFrom } = craftercms.libs.rxjs;
+const { catchError, switchMap, takeUntil, map, take, filter, debounceTime, distinctUntilChanged, mergeMap, toArray, concatMap: concatMap$1 } = craftercms.libs.rxjs;
 const { fetchContentTypes: fetchContentTypes$1 } = craftercms.services.contentTypes;
 const { fetchConfigurationXML, writeConfiguration } = craftercms.services.configuration;
 const { createSvgIcon } = craftercms.libs.MaterialUI;
@@ -99,6 +100,7 @@ const ZoomOutRoundedIcon = craftercms.utils.constants.components.get('@mui/icons
 const FitScreenRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/FitScreenRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/FitScreenRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/FitScreenRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/FitScreenRounded');
 const Search = craftercms.components.Search && Object.prototype.hasOwnProperty.call(craftercms.components.Search, 'default') ? craftercms.components.Search['default'] : craftercms.components.Search;
 const PathNavigator$1 = craftercms.components.PathNavigator && Object.prototype.hasOwnProperty.call(craftercms.components.PathNavigator, 'default') ? craftercms.components.PathNavigator['default'] : craftercms.components.PathNavigator;
+const { fetchMyActivity, fetchUnpublished } = craftercms.services.dashboard;
 const CloudUploadRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/CloudUploadRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/CloudUploadRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/CloudUploadRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/CloudUploadRounded');
 const PhotoLibraryRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/PhotoLibraryRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/PhotoLibraryRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/PhotoLibraryRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/PhotoLibraryRounded');
 const ContentPasteRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/ContentPasteRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ContentPasteRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ContentPasteRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ContentPasteRounded');
@@ -1191,6 +1193,10 @@ function formatProdErrorMessage(code) {
 // region History
 const showHistoryDialog = /*#__PURE__*/ createAction('SHOW_HISTORY_DIALOG');
 // endregion
+// region Confirm
+const showConfirmDialog = /*#__PURE__*/ createAction('SHOW_CONFIRM_DIALOG');
+const closeConfirmDialog = /*#__PURE__*/ createAction('CLOSE_CONFIRM_DIALOG');
+// endregion
 // region Publish
 const showPublishDialog = /*#__PURE__*/ createAction('SHOW_PUBLISH_DIALOG');
 const closePublishDialog = /*#__PURE__*/ createAction('CLOSE_PUBLISH_DIALOG');
@@ -1380,7 +1386,6 @@ function ToolPanelAccordion(props) {
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const showPublishItemSuccessNotification = /*#__PURE__*/ createAction('SHOW_PUBLISH_ITEM_SUCCESS_NOTIFICATION');
 const showSystemNotification = /*#__PURE__*/ createAction('SHOW_SYSTEM_NOTIFICATION');
 // endregion
 
@@ -1815,6 +1820,30 @@ function usePermissionsBySite() {
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+function useSpreadState(initialState, init) {
+  return useReducer(
+    (state, nextState) => (nextState === '$RESET$' ? { ...initialState } : { ...state, ...nextState }),
+    initialState,
+    init
+  );
+}
+
+/*
+ * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License version 3 as published by
+ * the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 const completeDetailedItem = /*#__PURE__*/ createAction('COMPLETE_DETAILED_ITEM');
 // endregion
 
@@ -1887,18 +1916,64 @@ createReducer(initialState, (builder) => {
 // for 4.1.x since `@craftercms/studio-ui/PathSelector` is not a valid component
 // @ts-ignore
 var PathSelector = craftercms.components.SiteSearchPathSelector;
-var FETCH_UNPUBLISHED_ITEMS_LIMIT = 100;
+var messages = defineMessages({
+    publishStudioWarning: {
+        id: 'publishingDashboard.warning',
+        defaultMessage: "This will force publish all items that match the pattern requested including their dependencies, and it may take a long time depending on the number of items. Please make sure that all modified items (including potentially someone's work in progress) are ready to be published before continuing."
+    },
+    warningLabel: {
+        id: 'words.warning',
+        defaultMessage: 'Warning'
+    },
+    publishStudioNote: {
+        id: 'publishingDashboard.studioNote',
+        defaultMessage: 'Publishing by path should be used to publish changes made in Studio via the UI. For changes made via direct git actions, please <a>publish by commit or tag</a>.'
+    },
+    publishSuccess: {
+        id: 'publishingDashboard.publishSuccess',
+        defaultMessage: 'Published successfully.'
+    },
+    bulkPublishStarted: {
+        id: 'publishingDashboard.bulkPublishStarted',
+        defaultMessage: 'Bulk Publish process has been started.'
+    },
+    invalidForm: {
+        id: 'publishingDashboard.invalidForm',
+        defaultMessage: 'You cannot publish until form requirements are satisfied.'
+    }
+});
 function BulkPublishView(props) {
-    var _a, _b;
+    var _a, _b, _c;
+    var formatMessage = useIntl().formatMessage;
     var dispatch = useDispatch();
     var siteId = useActiveSiteId();
     var theme = useTheme$1();
     var permissionsBySite = usePermissionsBySite();
     var hasPublishPermission = (_a = permissionsBySite[siteId]) === null || _a === void 0 ? void 0 : _a.includes('publish');
     var initialPublishItem = useDetailedItem('/site/website/index.xml');
-    var _c = useState((_b = props.defaultPath) !== null && _b !== void 0 ? _b : BULK_PUBLISH_DEFAULTS.defaultPath), selectedPath = _c[0], setSelectedPath = _c[1];
-    var _d = useState(false), isSubmitting = _d[0], setIsSubmitting = _d[1];
-    var _e = useState(null), hasInitialPublish$1 = _e[0], setHasInitialPublish = _e[1];
+    var _d = useState((_b = props.defaultPath) !== null && _b !== void 0 ? _b : BULK_PUBLISH_DEFAULTS.defaultPath), path = _d[0], setPath = _d[1];
+    var _e = useState(false), isSubmitting = _e[0], setIsSubmitting = _e[1];
+    var _f = useSelection(function (state) { return state.uiConfig.publishing; }), bulkPublishCommentRequired = _f.bulkPublishCommentRequired, publishByCommitCommentRequired = _f.publishByCommitCommentRequired;
+    var initialPublishStudioFormData = {
+        path: (_c = props.defaultPath) !== null && _c !== void 0 ? _c : BULK_PUBLISH_DEFAULTS.defaultPath,
+        publishingTarget: '',
+        comment: ''
+    };
+    var _g = useSpreadState(initialPublishStudioFormData), publishStudioFormData = _g[0], setPublishStudioFormData = _g[1];
+    var _h = useState(null), hasInitialPublish$1 = _h[0], setHasInitialPublish = _h[1];
+    var _j = useState(null), publishingTargets = _j[0], setPublishingTargets = _j[1];
+    var _k = useState(null), publishingTargetsError = _k[0], setPublishingTargetsError = _k[1];
+    var publishStudioFormValid = !isBlank(publishStudioFormData.publishingTarget) &&
+        (!bulkPublishCommentRequired || !isBlank(publishStudioFormData.comment)) &&
+        publishStudioFormData.path.replace(/\s/g, '') !== '';
+    var setDefaultPublishingTarget = function (targets, clearData) {
+        var _a;
+        if (targets.length) {
+            var stagingEnv = targets.find(function (target) { return target.name === 'staging'; });
+            var publishingTarget = (_a = stagingEnv === null || stagingEnv === void 0 ? void 0 : stagingEnv.name) !== null && _a !== void 0 ? _a : targets[0].name;
+            setPublishStudioFormData(__assign(__assign({}, (clearData)), { publishingTarget: publishingTarget }));
+        }
+    };
     useEffect(function () {
         hasInitialPublish(siteId).subscribe({
             next: function (response) {
@@ -1908,39 +1983,54 @@ function BulkPublishView(props) {
                 dispatch(showErrorDialog(error));
             }
         });
+        fetchPublishingTargets(siteId).subscribe({
+            next: function (_a) {
+                var targets = _a.publishingTargets;
+                setPublishingTargets(targets);
+                // Set pre-selected environment.
+                setDefaultPublishingTarget(targets);
+            },
+            error: function (error) {
+                setPublishingTargetsError(error);
+            }
+        });
+        // We only want to re-fetch the publishingTargets when the site changes.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [siteId]);
-    var customEventId = 'dialogDismissConfirm';
     var onSubmitBulkPublish = function () {
-        setIsSubmitting(true);
-        var fetchItems = function (offset) { return fetchUnpublished(siteId, { limit: FETCH_UNPUBLISHED_ITEMS_LIMIT, offset: offset }); };
-        var itemsByPath = [];
-        of(0)
-            .pipe(concatMap(function (offset) { return fetchItems(offset); }), expand(function (data) {
-            itemsByPath.push.apply(itemsByPath, data.filter(function (item) { return item.path.startsWith(selectedPath); }));
-            return data.total > data.limit + data.offset ? fetchItems(data.limit + data.offset) : of();
-        }), toArray())
-            .subscribe({
-            complete: function () {
-                if (itemsByPath.length === 0) {
-                    dispatch(showSystemNotification({
-                        message: 'No items to publish at provided path'
-                    }));
-                    setIsSubmitting(false);
-                    return;
-                }
-                dispatch(showPublishDialog({
-                    items: itemsByPath,
-                    onSuccess: batchActions([
-                        showPublishItemSuccessNotification(),
-                        closePublishDialog(),
-                        dispatchDOMEvent({ id: customEventId, type: 'publish' })
-                    ]),
-                    onClosed: dispatchDOMEvent({ id: customEventId, type: 'cancel' })
-                }));
-                setIsSubmitting(false);
+        var eventId = 'bulkPublishWidgetSubmit';
+        var studioNote = formatMessage(messages.publishStudioNote, { a: function (msg) { return msg[0]; } });
+        dispatch(showConfirmDialog({
+            body: "".concat(formatMessage(messages.publishStudioWarning), " ").concat(studioNote),
+            onCancel: batchActions([closeConfirmDialog(), dispatchDOMEvent({ id: eventId, button: 'cancel' })]),
+            onOk: batchActions([closeConfirmDialog(), dispatchDOMEvent({ id: eventId, button: 'ok' })])
+        }));
+        createCustomDocumentEventListener(eventId, function (_a) {
+            var button = _a.button;
+            if (button === 'ok') {
+                setIsSubmitting(true);
+                var path_1 = publishStudioFormData.path, publishingTarget_1 = publishStudioFormData.publishingTarget, comment = publishStudioFormData.comment;
+                bulkGoLive(siteId, path_1, publishingTarget_1, comment).subscribe({
+                    next: function () {
+                        setIsSubmitting(false);
+                        setPublishStudioFormData(__assign(__assign({}, initialPublishStudioFormData), { publishingTarget: publishingTarget_1 }));
+                        dispatch(showSystemNotification({
+                            message: formatMessage(messages.bulkPublishStarted)
+                        }));
+                    },
+                    error: function (_a) {
+                        var response = _a.response;
+                        setIsSubmitting(false);
+                        showSystemNotification({
+                            message: response.message,
+                            options: { variant: 'error' }
+                        });
+                    }
+                });
             }
         });
     };
+    var customEventId = 'dialogDismissConfirm';
     var onInitialPublish = function () {
         dispatch(showPublishDialog({
             items: [initialPublishItem],
@@ -1953,15 +2043,13 @@ function BulkPublishView(props) {
         });
     };
     var onPathSelected = function (value) {
-        setSelectedPath(value.replace('/index.xml', ''));
+        setPath(value);
+        setPublishStudioFormData(__assign(__assign({}, publishStudioFormData), { path: value }));
     };
     if (hasInitialPublish$1 === null) {
-        return jsx(Paper, { elevation: 2, sx: { height: '100%' } });
+        return (jsx(Paper, { elevation: 2, sx: { height: '100%' }, children: jsx(Typography, { children: "Loading..." }) }));
     }
-    return (jsx(Paper, { elevation: 2, sx: { height: '100%' }, children: jsx(Box$1, { sx: { p: 1 }, children: hasInitialPublish$1 ? (jsxs(Fragment, { children: [jsxs(DialogBody, { sx: { minHeight: '24vh', minWidth: '48vh' }, children: [jsx(Typography, { variant: "body1", sx: {
-                                    paddingBottom: 2,
-                                    float: 'left'
-                                }, children: "Select a path to calculate publish packages." }), jsx(Box$1, { sx: { paddingBottom: 1 }, children: jsx(PathSelector, { value: selectedPath, disabled: false, onPathSelected: onPathSelected, stripXmlIndex: false }) })] }), jsx(DialogFooter$1, { children: jsx(Button$1, { sx: { float: 'right' }, variant: "contained", color: "primary", disabled: isSubmitting, onClick: onSubmitBulkPublish, children: "Bulk Publish" }) })] })) : (jsxs(Box$1, { sx: {
+    return (jsx(Paper, { elevation: 2, sx: { height: '100%' }, children: jsx(Box$1, { sx: { p: 3 }, children: hasInitialPublish$1 ? (jsxs(Fragment, { children: [jsx(Box$1, { sx: { mb: 3 }, children: jsx(PathSelector, { value: path, disabled: false, onPathSelected: onPathSelected, stripXmlIndex: false }) }), jsx(PublishOnDemandForm, { disabled: isSubmitting, formData: publishStudioFormData, setFormData: setPublishStudioFormData, mode: 'studio', publishingTargets: publishingTargets, publishingTargetsError: publishingTargetsError, bulkPublishCommentRequired: bulkPublishCommentRequired, publishByCommitCommentRequired: publishByCommitCommentRequired }), jsx(Box$1, { sx: { display: 'flex', justifyContent: 'flex-end', mt: 3 }, children: jsx(MyLoadingButton, { variant: "contained", color: "primary", disabled: !publishStudioFormValid, loading: isSubmitting, onClick: onSubmitBulkPublish, children: "Bulk Publish" }) })] })) : (jsxs(Box$1, { sx: {
                     display: 'flex',
                     alignItems: 'center',
                     flexDirection: 'column',
@@ -2458,7 +2546,7 @@ function CrossSiteContentTypeCopy() {
         }
         setCopying(true);
         from(selectedList)
-            .pipe(concatMap$1(function (sourceTypeId) {
+            .pipe(concatMap(function (sourceTypeId) {
             var _a, _b, _c, _d;
             var sourceRow = selectedLookup[sourceTypeId];
             var isConflict = conflictingIds.includes(sourceTypeId);
@@ -46326,6 +46414,17 @@ function normalizeFileDiff(diff) {
     return __assign(__assign({}, diff), { changeType: apiText(diff.changeType), path: apiText(diff.path), oldPath: diff.oldPath ? apiText(diff.oldPath) : diff.oldPath, newPath: diff.newPath ? apiText(diff.newPath) : diff.newPath, diff: apiText(diff.diff), lines: ((_a = diff.lines) !== null && _a !== void 0 ? _a : []).map(function (line) { return (__assign(__assign({}, line), { content: apiText(line.content) })); }) });
 }
 var devContentOpsStudioSiteId = null;
+/** When false, mutating DevContentOps POSTs are rejected client-side. Default off for safety. */
+var writeOperationsEnabled = false;
+var WRITE_OPERATIONS_DISABLED_MESSAGE = 'Write operations are disabled. Turn on “Enable write Operations” next to the project selector.';
+function setDevContentOpsWriteOperationsEnabled(enabled) {
+    writeOperationsEnabled = Boolean(enabled);
+}
+function assertDevContentOpsWriteOperationsEnabled() {
+    if (!writeOperationsEnabled) {
+        throw new Error(WRITE_OPERATIONS_DISABLED_MESSAGE);
+    }
+}
 /** Studio session site for plugin API auth; DevContentOps tools pass the selected project as targetSiteId. */
 function setDevContentOpsStudioSiteId(studioSiteId) {
     devContentOpsStudioSiteId = (studioSiteId === null || studioSiteId === void 0 ? void 0 : studioSiteId.trim()) || null;
@@ -46610,6 +46709,7 @@ function buildPatchFromSelection(siteId, selections) {
     }));
 }
 function postDevContentOpsAction(siteId, body) {
+    assertDevContentOpsWriteOperationsEnabled();
     return postJSON(pluginUrl('dev-content-ops-git', siteId), pluginPostBody(siteId, body)).pipe(map(function (r) {
         var data = unwrapPluginResponse(r);
         assertSiteScope(siteId, data);
@@ -46772,6 +46872,7 @@ function fetchAuditStats(siteId, opts) {
     return pluginGet(siteId, databasePluginUrl(siteId, q));
 }
 function postTruncateAudit(siteId, opts) {
+    assertDevContentOpsWriteOperationsEnabled();
     return postJSON(databasePluginUrl(siteId), pluginPostBody(siteId, __assign({ action: 'truncateAudit' }, opts))).pipe(map(function (r) {
         var data = unwrapPluginResponse(r);
         assertSiteScope(siteId, data);
@@ -46783,6 +46884,7 @@ function fetchProcessedCommitsStats(siteId, opts) {
     return pluginGet(siteId, databasePluginUrl(siteId, q));
 }
 function postTruncateProcessedCommits(siteId, opts) {
+    assertDevContentOpsWriteOperationsEnabled();
     return postJSON(databasePluginUrl(siteId), pluginPostBody(siteId, __assign({ action: 'truncateProcessedCommits' }, opts))).pipe(map(function (r) {
         var data = unwrapPluginResponse(r);
         assertSiteScope(siteId, data);
@@ -46822,6 +46924,7 @@ function fetchBlobStoreChildren(siteId, storeId, path) {
     }));
 }
 function postSyncBlobStore(siteId, opts) {
+    assertDevContentOpsWriteOperationsEnabled();
     return postJSON(pluginUrl('dev-content-ops-git', siteId), pluginPostBody(siteId, {
         action: 'syncBlobStore',
         target: opts.target,
@@ -46947,6 +47050,7 @@ function fetchBlobVersionPreview(siteId, storeId, path, versionId, target) {
 }
 function postRestoreBlobVersion(siteId, opts) {
     var _a;
+    assertDevContentOpsWriteOperationsEnabled();
     return postJSON(pluginUrl('dev-content-ops-git', siteId), pluginPostBody(siteId, {
         action: 'restoreBlobVersion',
         storeId: opts.storeId,
@@ -46959,6 +47063,35 @@ function postRestoreBlobVersion(siteId, opts) {
         assertSiteScope(siteId, data);
         return __assign(__assign({}, data), { storeId: apiText(data.storeId), path: apiText(data.path), publishingTarget: apiText(data.publishingTarget), restoredFromVersionId: apiText(data.restoredFromVersionId), newVersionId: data.newVersionId ? apiText(data.newVersionId) : undefined, pointerPath: data.pointerPath ? apiText(data.pointerPath) : undefined, pointerError: data.pointerError ? apiText(data.pointerError) : undefined, message: data.message ? apiText(data.message) : undefined });
     }));
+}
+
+var WRITE_OPS_DISABLED_HINT = 'Enable write Operations in the toolbar to use mutating actions.';
+var DevContentOpsWriteGateContext = createContext(null);
+function DevContentOpsWriteGateProvider(_a) {
+    var writeOperationsEnabled = _a.writeOperationsEnabled, onWriteOperationsEnabledChange = _a.onWriteOperationsEnabledChange, children = _a.children;
+    useEffect(function () {
+        setDevContentOpsWriteOperationsEnabled(writeOperationsEnabled);
+        return function () { return setDevContentOpsWriteOperationsEnabled(false); };
+    }, [writeOperationsEnabled]);
+    var value = useMemo(function () { return ({
+        writeOperationsEnabled: writeOperationsEnabled,
+        setWriteOperationsEnabled: onWriteOperationsEnabledChange
+    }); }, [writeOperationsEnabled, onWriteOperationsEnabledChange]);
+    return (jsx(DevContentOpsWriteGateContext.Provider, { value: value, children: children }));
+}
+function useDevContentOpsWriteGate() {
+    var ctx = useContext(DevContentOpsWriteGateContext);
+    if (!ctx) {
+        return {
+            writeOperationsEnabled: false,
+            setWriteOperationsEnabled: setDevContentOpsWriteOperationsEnabled
+        };
+    }
+    return ctx;
+}
+/** True when write controls should be disabled. */
+function useWriteOpsLocked() {
+    return !useDevContentOpsWriteGate().writeOperationsEnabled;
 }
 
 function CommitGraphMarker(_a) {
@@ -47235,6 +47368,7 @@ function PatchBasketPanel(_a) {
     var _b;
     var selections = _a.selections, onRemove = _a.onRemove, onClear = _a.onClear, onBuildPatch = _a.onBuildPatch, onApplyPatch = _a.onApplyPatch, onDownloadPatch = _a.onDownloadPatch, building = _a.building, patchPreview = _a.patchPreview, sourceSiteId = _a.sourceSiteId, _c = _a.sites, sites = _c === void 0 ? [] : _c, applyTargetSiteId = _a.applyTargetSiteId, onApplyTargetSiteChange = _a.onApplyTargetSiteChange;
     var _d = React__default.useState(false), expanded = _d[0], setExpanded = _d[1];
+    var writeLocked = useWriteOpsLocked();
     var applyTarget = applyTargetSiteId || sourceSiteId || '';
     var applyTargetSite = (_b = sites.find(function (site) { return site.id === applyTarget; })) !== null && _b !== void 0 ? _b : null;
     var applyToOtherProject = Boolean(sourceSiteId && applyTarget && applyTarget !== sourceSiteId);
@@ -47250,7 +47384,7 @@ function PatchBasketPanel(_a) {
                 }, children: [jsx(IconButton$1, { size: "small", onClick: function () { return setExpanded(function (v) { return !v; }); }, "aria-label": showExpanded ? 'Collapse patch basket' : 'Expand patch basket', sx: { ml: -0.5 }, children: jsx(ExpandMoreRoundedIcon, { fontSize: "small", sx: {
                                 transform: showExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
                                 transition: 'transform 0.15s ease'
-                            } }) }), jsxs(Typography, { variant: "subtitle2", fontWeight: 700, sx: { flex: 1, minWidth: 0 }, children: ["Patch basket", jsxs(Typography, { component: "span", variant: "body2", color: "text.secondary", sx: { ml: 0.75 }, children: ["(", selections.length, ")"] })] }), jsxs(Stack$1, { direction: "row", spacing: 0.75, flexWrap: "wrap", useFlexGap: true, children: [jsx(Button$1, { size: "small", variant: "contained", disabled: !selections.length || building, onClick: onBuildPatch, children: "Build" }), jsx(Button$1, { size: "small", variant: "outlined", disabled: !patchPreview, startIcon: jsx(DownloadRoundedIcon, {}), onClick: onDownloadPatch, children: "Download" }), jsx(Button$1, { size: "small", variant: "outlined", disabled: !patchPreview, startIcon: jsx(ContentPasteRoundedIcon, {}), onClick: onApplyPatch, children: "Apply" }), jsx(Button$1, { size: "small", color: "inherit", disabled: !selections.length, onClick: onClear, children: "Clear" })] })] }), jsx(Collapse$1, { in: showExpanded, children: jsx(Box$1, { sx: { p: 1.5 }, children: !hasContent ? (jsx(Typography, { variant: "body2", color: "text.secondary", children: "Add commits or files from the log, then build a patch." })) : (jsxs(Stack$1, { spacing: 1.5, children: [selections.length > 0 && (jsx(List, { dense: true, disablePadding: true, sx: { maxHeight: 140, overflow: 'auto' }, children: selections.map(function (sel, idx) {
+                            } }) }), jsxs(Typography, { variant: "subtitle2", fontWeight: 700, sx: { flex: 1, minWidth: 0 }, children: ["Patch basket", jsxs(Typography, { component: "span", variant: "body2", color: "text.secondary", sx: { ml: 0.75 }, children: ["(", selections.length, ")"] })] }), jsxs(Stack$1, { direction: "row", spacing: 0.75, flexWrap: "wrap", useFlexGap: true, children: [jsx(Button$1, { size: "small", variant: "contained", disabled: !selections.length || building, onClick: onBuildPatch, children: "Build" }), jsx(Button$1, { size: "small", variant: "outlined", disabled: !patchPreview, startIcon: jsx(DownloadRoundedIcon, {}), onClick: onDownloadPatch, children: "Download" }), jsx(Tooltip, { title: writeLocked ? WRITE_OPS_DISABLED_HINT : '', children: jsx("span", { children: jsx(Button$1, { size: "small", variant: "outlined", disabled: !patchPreview || writeLocked, startIcon: jsx(ContentPasteRoundedIcon, {}), onClick: onApplyPatch, children: "Apply" }) }) }), jsx(Button$1, { size: "small", color: "inherit", disabled: !selections.length, onClick: onClear, children: "Clear" })] })] }), jsx(Collapse$1, { in: showExpanded, children: jsx(Box$1, { sx: { p: 1.5 }, children: !hasContent ? (jsx(Typography, { variant: "body2", color: "text.secondary", children: "Add commits or files from the log, then build a patch." })) : (jsxs(Stack$1, { spacing: 1.5, children: [selections.length > 0 && (jsx(List, { dense: true, disablePadding: true, sx: { maxHeight: 140, overflow: 'auto' }, children: selections.map(function (sel, idx) {
                                     var _a;
                                     return (jsx(ListItem, { sx: {
                                             py: 0.5,
@@ -47269,6 +47403,7 @@ var FILE_PAGE = 25;
 function CommitFileList(_a) {
     var _this = this;
     var siteId = _a.siteId, commit = _a.commit, onViewFile = _a.onViewFile, onDiffFile = _a.onDiffFile, onAddToPatch = _a.onAddToPatch, onRemoveFromHistory = _a.onRemoveFromHistory, patchKeys = _a.patchKeys;
+    var writeLocked = useWriteOpsLocked();
     var _b = useState([]), files = _b[0], setFiles = _b[1];
     var _c = useState(0), total = _c[0], setTotal = _c[1];
     var _d = useState(0), skip = _d[0], setSkip = _d[1];
@@ -47342,7 +47477,7 @@ function CommitFileList(_a) {
                                                         path: file.path,
                                                         changeType: file.changeType
                                                     });
-                                                }, children: jsx(PlaylistAddRoundedIcon, { fontSize: "small" }) }) }) }), jsx(Tooltip, { title: "Remove from history", children: jsx(IconButton$1, { size: "small", onClick: function () { return onRemoveFromHistory(commit, file); }, children: jsx(DeleteForeverRoundedIcon, { fontSize: "small" }) }) })] })] }, file.path + file.changeType));
+                                                }, children: jsx(PlaylistAddRoundedIcon, { fontSize: "small" }) }) }) }), jsx(Tooltip, { title: writeLocked ? WRITE_OPS_DISABLED_HINT : 'Remove from history', children: jsx("span", { children: jsx(IconButton$1, { size: "small", disabled: writeLocked, onClick: function () { return onRemoveFromHistory(commit, file); }, children: jsx(DeleteForeverRoundedIcon, { fontSize: "small" }) }) }) })] })] }, file.path + file.changeType));
                 }) })), hasMore && (jsx(Button$1, { size: "small", disabled: loading, onClick: function () { return load(skip, true); }, sx: { mt: 0.5 }, children: loading ? 'Loading…' : 'Load more files' }))] }));
 }
 
@@ -47439,6 +47574,7 @@ function GitLogTab(_a) {
     var _b, _c, _d, _e;
     var siteId = _a.siteId, _f = _a.sites, sites = _f === void 0 ? [] : _f;
     var dispatch = useDispatch();
+    var writeLocked = useWriteOpsLocked();
     var _g = useState(null), status = _g[0], setStatus = _g[1];
     var _h = useState(''), branch = _h[0], setBranch = _h[1];
     var _j = useState([]), commits = _j[0], setCommits = _j[1];
@@ -48117,56 +48253,56 @@ function GitLogTab(_a) {
                             flexDirection: 'column',
                             gap: 2,
                             overflow: 'hidden'
-                        }, children: [jsxs(Paper, { variant: "outlined", sx: __assign(__assign({}, surfacePaperSx), { flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }), children: [jsx(PanelHeader, { title: "Details & actions" }), jsx(Box$1, { sx: { p: 2, flex: 1, minHeight: 0, overflow: 'auto' }, children: !selected ? (jsx(Typography, { variant: "body2", color: "text.secondary", sx: { py: 4, textAlign: 'center' }, children: "No commit selected" })) : (jsxs(Stack$1, { spacing: 2, children: [jsx(CommitSummaryCard, { commit: selected, processed: selected.processed }), jsxs(Box$1, { children: [jsx(SectionLabel, { children: "Patch" }), jsx(ActionButtonStack, { spacing: 1, sx: { mt: 1, mb: 1.5 }, children: jsx(Button$1, { size: "small", variant: "outlined", startIcon: jsx(PlaylistAddRoundedIcon, {}), disabled: patchKeys.has(selectionKey({ commitId: selected.id })), onClick: function () { return onAddEntireCommitToPatch(selected); }, children: "Add commit to patch" }) }), jsx(CommitFileList, { siteId: siteId, commit: selected, onViewFile: onViewFileAtCommit, onDiffFile: onDiffFile, onAddToPatch: addToPatch, onRemoveFromHistory: onRemoveFileFromHistory, patchKeys: patchKeys })] }), jsxs(Box$1, { children: [jsx(SectionLabel, { children: "Actions" }), jsxs(ActionButtonStack, { spacing: 1, sx: { mt: 1 }, children: [jsx(Button$1, { size: "small", variant: "outlined", startIcon: jsx(CompareArrowsRoundedIcon, {}), onClick: onDiffCommits, children: "Diff parent" }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: jsx(HistoryRoundedIcon, {}), onClick: onSetProcessed, children: "Set processed + sync" }), jsx(Button$1, { size: "small", variant: "outlined", color: "warning", startIcon: jsx(RestoreRoundedIcon, {}), onClick: function () {
-                                                                        return destructiveAction('Revert working tree', 'Revert working tree to this commit?', function () { return __awaiter(_this, void 0, void 0, function () {
+                        }, children: [jsxs(Paper, { variant: "outlined", sx: __assign(__assign({}, surfacePaperSx), { flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }), children: [jsx(PanelHeader, { title: "Details & actions" }), jsx(Box$1, { sx: { p: 2, flex: 1, minHeight: 0, overflow: 'auto' }, children: !selected ? (jsx(Typography, { variant: "body2", color: "text.secondary", sx: { py: 4, textAlign: 'center' }, children: "No commit selected" })) : (jsxs(Stack$1, { spacing: 2, children: [jsx(CommitSummaryCard, { commit: selected, processed: selected.processed }), jsxs(Box$1, { children: [jsx(SectionLabel, { children: "Patch" }), jsx(ActionButtonStack, { spacing: 1, sx: { mt: 1, mb: 1.5 }, children: jsx(Button$1, { size: "small", variant: "outlined", startIcon: jsx(PlaylistAddRoundedIcon, {}), disabled: patchKeys.has(selectionKey({ commitId: selected.id })), onClick: function () { return onAddEntireCommitToPatch(selected); }, children: "Add commit to patch" }) }), jsx(CommitFileList, { siteId: siteId, commit: selected, onViewFile: onViewFileAtCommit, onDiffFile: onDiffFile, onAddToPatch: addToPatch, onRemoveFromHistory: onRemoveFileFromHistory, patchKeys: patchKeys })] }), jsxs(Box$1, { children: [jsx(SectionLabel, { children: "Actions" }), jsxs(ActionButtonStack, { spacing: 1, sx: { mt: 1 }, children: [jsx(Button$1, { size: "small", variant: "outlined", startIcon: jsx(CompareArrowsRoundedIcon, {}), onClick: onDiffCommits, children: "Diff parent" }), jsx(Tooltip, { title: writeLocked ? WRITE_OPS_DISABLED_HINT : 'Mark this commit as processed and sync Studio', children: jsx("span", { children: jsx(Button$1, { size: "small", variant: "outlined", startIcon: jsx(HistoryRoundedIcon, {}), disabled: writeLocked, onClick: onSetProcessed, children: "Set processed + sync" }) }) }), jsx(Tooltip, { title: writeLocked ? WRITE_OPS_DISABLED_HINT : '', children: jsx("span", { children: jsx(Button$1, { size: "small", variant: "outlined", color: "warning", startIcon: jsx(RestoreRoundedIcon, {}), disabled: writeLocked, onClick: function () {
+                                                                                return destructiveAction('Revert working tree', 'Revert working tree to this commit?', function () { return __awaiter(_this, void 0, void 0, function () {
+                                                                                    return __generator(this, function (_a) {
+                                                                                        switch (_a.label) {
+                                                                                            case 0: return [4 /*yield*/, firstValueFrom(postDevContentOpsAction(siteId, { action: 'revertToCommit', commitId: selected.id }))];
+                                                                                            case 1:
+                                                                                                _a.sent();
+                                                                                                notify('Working tree reverted', 'success');
+                                                                                                loadLog(true);
+                                                                                                return [2 /*return*/];
+                                                                                        }
+                                                                                    });
+                                                                                }); });
+                                                                            }, children: "Revert to commit" }) }) })] })] }), fileContent && (jsxs(Box$1, { children: [jsx(SectionLabel, { children: "File preview" }), jsx(Typography, { variant: "caption", color: "text.secondary", display: "block", sx: { mt: 0.75, mb: 0.5, wordBreak: 'break-all' }, children: fileContent.path }), jsx(Paper, { variant: "outlined", sx: __assign(__assign({}, codeBlockSx), { maxHeight: 220, overflow: 'auto', fontSize: 11 }), children: jsx("pre", { style: { margin: 0, whiteSpace: 'pre-wrap' }, children: fileContent.content }) })] })), jsxs(DangerZone, { children: [jsx(Tooltip, { title: writeLocked ? WRITE_OPS_DISABLED_HINT : '', children: jsx("span", { children: jsx(Button$1, { size: "small", variant: "outlined", color: "error", startIcon: jsx(WarningAmberRoundedIcon, {}), disabled: writeLocked, onClick: function () {
+                                                                        return destructiveAction('Reset HEAD', 'Reset HEAD to this commit? History after this point will be discarded from the branch tip. Commit IDs before this point stay the same, but any work based on the abandoned tip will diverge.', function () { return __awaiter(_this, void 0, void 0, function () {
+                                                                            var result;
                                                                             return __generator(this, function (_a) {
                                                                                 switch (_a.label) {
-                                                                                    case 0: return [4 /*yield*/, firstValueFrom(postDevContentOpsAction(siteId, { action: 'revertToCommit', commitId: selected.id }))];
+                                                                                    case 0: return [4 /*yield*/, firstValueFrom(postDevContentOpsAction(siteId, {
+                                                                                            action: 'resetHead',
+                                                                                            commitId: selected.id
+                                                                                        }))];
                                                                                     case 1:
-                                                                                        _a.sent();
-                                                                                        notify('Working tree reverted', 'success');
+                                                                                        result = _a.sent();
+                                                                                        reportProcessedCommitUpdate(result.processedCommitUpdate, 'HEAD reset and sync triggered', 'HEAD reset; sync failed');
+                                                                                        loadStatus();
                                                                                         loadLog(true);
                                                                                         return [2 /*return*/];
                                                                                 }
                                                                             });
-                                                                        }); });
-                                                                    }, children: "Revert to commit" })] })] }), fileContent && (jsxs(Box$1, { children: [jsx(SectionLabel, { children: "File preview" }), jsx(Typography, { variant: "caption", color: "text.secondary", display: "block", sx: { mt: 0.75, mb: 0.5, wordBreak: 'break-all' }, children: fileContent.path }), jsx(Paper, { variant: "outlined", sx: __assign(__assign({}, codeBlockSx), { maxHeight: 220, overflow: 'auto', fontSize: 11 }), children: jsx("pre", { style: { margin: 0, whiteSpace: 'pre-wrap' }, children: fileContent.content }) })] })), jsxs(DangerZone, { children: [jsx(Button$1, { size: "small", variant: "outlined", color: "error", startIcon: jsx(WarningAmberRoundedIcon, {}), onClick: function () {
-                                                                return destructiveAction('Reset HEAD', 'Reset HEAD to this commit? History after this point will be discarded from the branch tip. Commit IDs before this point stay the same, but any work based on the abandoned tip will diverge.', function () { return __awaiter(_this, void 0, void 0, function () {
-                                                                    var result;
-                                                                    return __generator(this, function (_a) {
-                                                                        switch (_a.label) {
-                                                                            case 0: return [4 /*yield*/, firstValueFrom(postDevContentOpsAction(siteId, {
-                                                                                    action: 'resetHead',
-                                                                                    commitId: selected.id
-                                                                                }))];
-                                                                            case 1:
-                                                                                result = _a.sent();
-                                                                                reportProcessedCommitUpdate(result.processedCommitUpdate, 'HEAD reset and sync triggered', 'HEAD reset; sync failed');
-                                                                                loadStatus();
-                                                                                loadLog(true);
-                                                                                return [2 /*return*/];
-                                                                        }
-                                                                    });
-                                                                }); }, selected, { historyRewrite: true, confirmLabel: 'Reset HEAD' });
-                                                            }, children: "Reset HEAD" }), jsx(Button$1, { size: "small", color: "error", variant: "outlined", onClick: function () {
-                                                                return destructiveAction('Trim history', 'Trim/discard history relative to this commit? This is a destructive history operation and can invalidate commit IDs and disrupt other workflows that depend on the current history.', function () { return __awaiter(_this, void 0, void 0, function () {
-                                                                    var result;
-                                                                    return __generator(this, function (_a) {
-                                                                        switch (_a.label) {
-                                                                            case 0: return [4 /*yield*/, firstValueFrom(postDevContentOpsAction(siteId, {
-                                                                                    action: 'trimHistory',
-                                                                                    keepCommitId: selected.id
-                                                                                }))];
-                                                                            case 1:
-                                                                                result = _a.sent();
-                                                                                reportProcessedCommitUpdate(result.processedCommitUpdate, 'History trimmed and sync triggered', 'History trimmed; sync failed');
-                                                                                loadStatus();
-                                                                                loadLog(true);
-                                                                                return [2 /*return*/];
-                                                                        }
-                                                                    });
-                                                                }); }, selected, { historyRewrite: true, confirmLabel: 'Trim history' });
-                                                            }, children: "Trim History" })] })] })) })] }), jsx(PatchBasketPanel, { selections: patchSelections, onRemove: removeFromPatch, onClear: clearPatchBasket, onBuildPatch: onBuildPatchBasket, onApplyPatch: onApplyPatch, onDownloadPatch: onDownloadPatch, building: buildingPatch, patchPreview: patchPreview, sourceSiteId: siteId, sites: sites, applyTargetSiteId: patchApplyTargetSiteId, onApplyTargetSiteChange: setPatchApplyTargetSiteId })] })] }), jsxs(Dialog, { open: diffDialogOpen, onClose: function () { return setDiffDialogOpen(false); }, maxWidth: "lg", fullWidth: true, PaperProps: { sx: { minHeight: 520, borderRadius: 2 } }, children: [jsx(DialogTitle, { sx: { pb: 1 }, children: "Diff viewer" }), jsx(DialogContent, { sx: { display: 'flex', flexDirection: 'column', minHeight: 400 }, children: diffView && (jsx(DiffViewer, { title: diffView.title, fileDiffs: diffView.fileDiffs, activePath: diffView.activePath, fallbackText: diffView.fallbackText, onActivePathChange: function (path) { return setDiffView(function (prev) { return (prev ? __assign(__assign({}, prev), { activePath: path }) : prev); }); } })) }), jsx(DialogActions, { children: jsx(Button$1, { onClick: function () { return setDiffDialogOpen(false); }, children: "Close" }) })] }), jsxs(Dialog, { open: Boolean(filterFileResult), onClose: function () { return setFilterFileResult(null); }, maxWidth: "sm", fullWidth: true, children: [jsx(DialogTitle, { children: (filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.success) ? 'File removed from history' : 'Remove file from history' }), jsxs(DialogContent, { children: [(filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.error) && (filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.success) != true && (jsx(Alert, { severity: "error", sx: { mb: 2 }, children: apiText(filterFileResult.error) })), (filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.warning) && (jsx(Alert, { severity: "warning", sx: { mb: 2 }, children: apiText(filterFileResult.warning) })), (filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.message) && (jsx(Typography, { variant: "body2", sx: { mb: 2 }, children: apiText(filterFileResult.message) })), ((_b = filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.processedCommitUpdate) === null || _b === void 0 ? void 0 : _b.error) && (jsxs(Alert, { severity: "warning", sx: { mb: 2 }, children: ["Re-ingest sync failed: ", apiText(filterFileResult.processedCommitUpdate.error)] })), (filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.headCommitId) && (jsxs(Fragment, { children: [jsx(Typography, { variant: "caption", color: "text.secondary", fontWeight: 600, children: "New HEAD commit" }), jsx(Paper, { variant: "outlined", sx: __assign(__assign({}, codeBlockSx), { mb: 1.5 }), children: apiText(filterFileResult.headCommitId) })] })), ((filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.reingestFromCommitId) || ((_c = filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.processedCommitUpdate) === null || _c === void 0 ? void 0 : _c.commitId)) && (jsxs(Fragment, { children: [jsx(Typography, { variant: "caption", color: "text.secondary", fontWeight: 600, children: "Re-ingest baseline (last processed)" }), jsx(Paper, { variant: "outlined", sx: __assign(__assign({}, codeBlockSx), { mb: 1.5 }), children: apiText(filterFileResult.reingestFromCommitId || ((_d = filterFileResult.processedCommitUpdate) === null || _d === void 0 ? void 0 : _d.commitId) || '') })] })), (filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.lastProcessedCommitId) && (jsxs(Fragment, { children: [jsx(Typography, { variant: "caption", color: "text.secondary", fontWeight: 600, children: "Previous processed commit" }), jsx(Paper, { variant: "outlined", sx: __assign(__assign({}, codeBlockSx), { mb: 1.5 }), children: apiText(filterFileResult.lastProcessedCommitId) })] }))] }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: copyFilterFileDetails, children: "Copy" }), ((_e = filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.processedCommitUpdate) === null || _e === void 0 ? void 0 : _e.error) && filterFileResult.headCommitId && (jsx(Button$1, { color: "primary", onClick: function () {
+                                                                        }); }, selected, { historyRewrite: true, confirmLabel: 'Reset HEAD' });
+                                                                    }, children: "Reset HEAD" }) }) }), jsx(Tooltip, { title: writeLocked ? WRITE_OPS_DISABLED_HINT : '', children: jsx("span", { children: jsx(Button$1, { size: "small", color: "error", variant: "outlined", disabled: writeLocked, onClick: function () {
+                                                                        return destructiveAction('Trim history', 'Trim/discard history relative to this commit? This is a destructive history operation and can invalidate commit IDs and disrupt other workflows that depend on the current history.', function () { return __awaiter(_this, void 0, void 0, function () {
+                                                                            var result;
+                                                                            return __generator(this, function (_a) {
+                                                                                switch (_a.label) {
+                                                                                    case 0: return [4 /*yield*/, firstValueFrom(postDevContentOpsAction(siteId, {
+                                                                                            action: 'trimHistory',
+                                                                                            keepCommitId: selected.id
+                                                                                        }))];
+                                                                                    case 1:
+                                                                                        result = _a.sent();
+                                                                                        reportProcessedCommitUpdate(result.processedCommitUpdate, 'History trimmed and sync triggered', 'History trimmed; sync failed');
+                                                                                        loadStatus();
+                                                                                        loadLog(true);
+                                                                                        return [2 /*return*/];
+                                                                                }
+                                                                            });
+                                                                        }); }, selected, { historyRewrite: true, confirmLabel: 'Trim history' });
+                                                                    }, children: "Trim History" }) }) })] })] })) })] }), jsx(PatchBasketPanel, { selections: patchSelections, onRemove: removeFromPatch, onClear: clearPatchBasket, onBuildPatch: onBuildPatchBasket, onApplyPatch: onApplyPatch, onDownloadPatch: onDownloadPatch, building: buildingPatch, patchPreview: patchPreview, sourceSiteId: siteId, sites: sites, applyTargetSiteId: patchApplyTargetSiteId, onApplyTargetSiteChange: setPatchApplyTargetSiteId })] })] }), jsxs(Dialog, { open: diffDialogOpen, onClose: function () { return setDiffDialogOpen(false); }, maxWidth: "lg", fullWidth: true, PaperProps: { sx: { minHeight: 520, borderRadius: 2 } }, children: [jsx(DialogTitle, { sx: { pb: 1 }, children: "Diff viewer" }), jsx(DialogContent, { sx: { display: 'flex', flexDirection: 'column', minHeight: 400 }, children: diffView && (jsx(DiffViewer, { title: diffView.title, fileDiffs: diffView.fileDiffs, activePath: diffView.activePath, fallbackText: diffView.fallbackText, onActivePathChange: function (path) { return setDiffView(function (prev) { return (prev ? __assign(__assign({}, prev), { activePath: path }) : prev); }); } })) }), jsx(DialogActions, { children: jsx(Button$1, { onClick: function () { return setDiffDialogOpen(false); }, children: "Close" }) })] }), jsxs(Dialog, { open: Boolean(filterFileResult), onClose: function () { return setFilterFileResult(null); }, maxWidth: "sm", fullWidth: true, children: [jsx(DialogTitle, { children: (filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.success) ? 'File removed from history' : 'Remove file from history' }), jsxs(DialogContent, { children: [(filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.error) && (filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.success) != true && (jsx(Alert, { severity: "error", sx: { mb: 2 }, children: apiText(filterFileResult.error) })), (filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.warning) && (jsx(Alert, { severity: "warning", sx: { mb: 2 }, children: apiText(filterFileResult.warning) })), (filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.message) && (jsx(Typography, { variant: "body2", sx: { mb: 2 }, children: apiText(filterFileResult.message) })), ((_b = filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.processedCommitUpdate) === null || _b === void 0 ? void 0 : _b.error) && (jsxs(Alert, { severity: "warning", sx: { mb: 2 }, children: ["Re-ingest sync failed: ", apiText(filterFileResult.processedCommitUpdate.error)] })), (filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.headCommitId) && (jsxs(Fragment, { children: [jsx(Typography, { variant: "caption", color: "text.secondary", fontWeight: 600, children: "New HEAD commit" }), jsx(Paper, { variant: "outlined", sx: __assign(__assign({}, codeBlockSx), { mb: 1.5 }), children: apiText(filterFileResult.headCommitId) })] })), ((filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.reingestFromCommitId) || ((_c = filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.processedCommitUpdate) === null || _c === void 0 ? void 0 : _c.commitId)) && (jsxs(Fragment, { children: [jsx(Typography, { variant: "caption", color: "text.secondary", fontWeight: 600, children: "Re-ingest baseline (last processed)" }), jsx(Paper, { variant: "outlined", sx: __assign(__assign({}, codeBlockSx), { mb: 1.5 }), children: apiText(filterFileResult.reingestFromCommitId || ((_d = filterFileResult.processedCommitUpdate) === null || _d === void 0 ? void 0 : _d.commitId) || '') })] })), (filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.lastProcessedCommitId) && (jsxs(Fragment, { children: [jsx(Typography, { variant: "caption", color: "text.secondary", fontWeight: 600, children: "Previous processed commit" }), jsx(Paper, { variant: "outlined", sx: __assign(__assign({}, codeBlockSx), { mb: 1.5 }), children: apiText(filterFileResult.lastProcessedCommitId) })] }))] }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: copyFilterFileDetails, children: "Copy" }), ((_e = filterFileResult === null || filterFileResult === void 0 ? void 0 : filterFileResult.processedCommitUpdate) === null || _e === void 0 ? void 0 : _e.error) && filterFileResult.headCommitId && (jsx(Button$1, { color: "primary", onClick: function () {
                                     var _a;
                                     var baseline = apiText(filterFileResult.reingestFromCommitId ||
                                         ((_a = filterFileResult.processedCommitUpdate) === null || _a === void 0 ? void 0 : _a.commitId) ||
@@ -49116,6 +49252,7 @@ function RepoHealthTab(_a) {
     var _this = this;
     var _b, _c, _d, _e, _f, _g;
     var siteId = _a.siteId, siteName = _a.siteName;
+    var writeLocked = useWriteOpsLocked();
     var _h = useState(false), loading = _h[0], setLoading = _h[1];
     var _j = useState(null), loadProgress = _j[0], setLoadProgress = _j[1];
     var loadAbortRef = useRef(null);
@@ -49273,7 +49410,7 @@ function RepoHealthTab(_a) {
         setNotice('Repository health report downloaded');
     };
     var overall = (_c = report === null || report === void 0 ? void 0 : report.overallConcern) !== null && _c !== void 0 ? _c : 0;
-    return (jsxs(TabShell, { children: [jsxs(TabToolbar, { children: [jsxs(ToolbarRow, { children: [jsxs(Box$1, { sx: { minWidth: 0, flex: '1 1 200px' }, children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, children: "Repository health" }), jsxs(Typography, { variant: "caption", color: "text.secondary", display: "block", children: [siteName ? "".concat(siteName, " (").concat(siteId, ")") : siteId, (report === null || report === void 0 ? void 0 : report.thresholdProfileLabel) ? " \u00B7 Thresholds: ".concat(report.thresholdProfileLabel) : ''] }), (report === null || report === void 0 ? void 0 : report.repoPath) && (jsx(Typography, { variant: "caption", color: "text.secondary", sx: __assign(__assign({}, monoSx), { display: 'block', mt: 0.25 }), noWrap: true, children: report.repoPath }))] }), jsxs(Stack$1, { direction: "row", spacing: 1, flexWrap: "wrap", useFlexGap: true, alignItems: "center", sx: { flexShrink: 0 }, children: [report ? jsx(ConcernIndicator, { concern: overall, compact: true }) : null, jsx(Button$1, { size: "small", variant: "outlined", startIcon: jsx(DownloadRoundedIcon, {}), disabled: !report || loading, onClick: onDownloadReport, children: "Download report" }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: jsx(HelpOutlineRoundedIcon, {}), onClick: function () { return setLearnMoreOpen(true); }, children: "Learn more" }), jsx(Button$1, { size: "small", variant: report ? 'outlined' : 'contained', startIcon: loading ? jsx(CircularProgress, { size: 16 }) : jsx(RefreshRoundedIcon, {}), disabled: loading || Boolean(optimizing), onClick: function () { return load(); }, children: report ? 'Re-run analysis' : 'Run analysis' })] })] }), jsx(Divider, {}), jsxs(ToolbarGroup, { label: "Optimize", children: [jsxs(FormControl, { size: "small", sx: { minWidth: 220, maxWidth: 320 }, children: [jsx(InputLabel, { children: "Operation" }), jsx(Select, { label: "Operation", value: selectedOperation, onChange: function (e) { return setSelectedOperation(e.target.value); }, disabled: loading || Boolean(optimizing), children: REPO_OPTIMIZE_OPTIONS.map(function (option) { return (jsx(MenuItem$1, { value: option.id, children: option.label }, option.id)); }) })] }), jsx(Chip, { size: "small", label: riskLabel(selectedOptimize.risk), color: riskColor(selectedOptimize.risk) }), jsx(Button$1, { size: "small", variant: "contained", color: selectedOptimize.risk === 'destructive' ? 'error' : 'primary', disabled: loading || Boolean(optimizing), startIcon: optimizing === selectedOperation ? (jsx(CircularProgress, { size: 16, color: "inherit" })) : (jsx(AutoFixHighRoundedIcon, {})), onClick: requestOptimize, children: "Run" })] }), jsx(Box$1, { sx: { minWidth: 0 }, children: jsx(OptimizeRiskDetails, { option: selectedOptimize }) })] }), jsxs(TabAlertStack, { children: [error && (jsx(Alert, { severity: "error", onClose: function () { return setError(null); }, children: error })), notice && (jsx(Alert, { severity: "success", onClose: function () { return setNotice(null); }, children: notice }))] }), jsx(Box$1, { sx: {
+    return (jsxs(TabShell, { children: [jsxs(TabToolbar, { children: [jsxs(ToolbarRow, { children: [jsxs(Box$1, { sx: { minWidth: 0, flex: '1 1 200px' }, children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, children: "Repository health" }), jsxs(Typography, { variant: "caption", color: "text.secondary", display: "block", children: [siteName ? "".concat(siteName, " (").concat(siteId, ")") : siteId, (report === null || report === void 0 ? void 0 : report.thresholdProfileLabel) ? " \u00B7 Thresholds: ".concat(report.thresholdProfileLabel) : ''] }), (report === null || report === void 0 ? void 0 : report.repoPath) && (jsx(Typography, { variant: "caption", color: "text.secondary", sx: __assign(__assign({}, monoSx), { display: 'block', mt: 0.25 }), noWrap: true, children: report.repoPath }))] }), jsxs(Stack$1, { direction: "row", spacing: 1, flexWrap: "wrap", useFlexGap: true, alignItems: "center", sx: { flexShrink: 0 }, children: [report ? jsx(ConcernIndicator, { concern: overall, compact: true }) : null, jsx(Button$1, { size: "small", variant: "outlined", startIcon: jsx(DownloadRoundedIcon, {}), disabled: !report || loading, onClick: onDownloadReport, children: "Download report" }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: jsx(HelpOutlineRoundedIcon, {}), onClick: function () { return setLearnMoreOpen(true); }, children: "Learn more" }), jsx(Button$1, { size: "small", variant: report ? 'outlined' : 'contained', startIcon: loading ? jsx(CircularProgress, { size: 16 }) : jsx(RefreshRoundedIcon, {}), disabled: loading || Boolean(optimizing), onClick: function () { return load(); }, children: report ? 'Re-run analysis' : 'Run analysis' })] })] }), jsx(Divider, {}), jsxs(ToolbarGroup, { label: "Optimize", children: [jsxs(FormControl, { size: "small", sx: { minWidth: 220, maxWidth: 320 }, children: [jsx(InputLabel, { children: "Operation" }), jsx(Select, { label: "Operation", value: selectedOperation, onChange: function (e) { return setSelectedOperation(e.target.value); }, disabled: loading || Boolean(optimizing), children: REPO_OPTIMIZE_OPTIONS.map(function (option) { return (jsx(MenuItem$1, { value: option.id, children: option.label }, option.id)); }) })] }), jsx(Chip, { size: "small", label: riskLabel(selectedOptimize.risk), color: riskColor(selectedOptimize.risk) }), jsx(Button$1, { size: "small", variant: "contained", color: selectedOptimize.risk === 'destructive' ? 'error' : 'primary', disabled: writeLocked || loading || Boolean(optimizing), startIcon: optimizing === selectedOperation ? (jsx(CircularProgress, { size: 16, color: "inherit" })) : (jsx(AutoFixHighRoundedIcon, {})), onClick: requestOptimize, children: "Run" })] }), jsx(Box$1, { sx: { minWidth: 0 }, children: jsx(OptimizeRiskDetails, { option: selectedOptimize }) })] }), jsxs(TabAlertStack, { children: [error && (jsx(Alert, { severity: "error", onClose: function () { return setError(null); }, children: error })), notice && (jsx(Alert, { severity: "success", onClose: function () { return setNotice(null); }, children: notice }))] }), jsx(Box$1, { sx: {
                     flex: 1,
                     minHeight: 0,
                     overflowY: 'auto',
@@ -49315,7 +49452,7 @@ function RepoHealthTab(_a) {
                                                 borderRadius: 1,
                                                 border: 1,
                                                 borderColor: 'divider'
-                                            }, children: [jsxs(Typography, { variant: "subtitle2", gutterBottom: true, children: ["Why this is labeled ", riskLabel(confirmOption.risk).toLowerCase()] }), jsx(Typography, { variant: "body2", sx: { mb: 1.5 }, children: confirmOption.whyRisky }), jsxs(Typography, { variant: "caption", color: "text.secondary", display: "block", sx: { mb: 0.5 }, children: [jsx("strong", { children: "Preserved:" }), " ", confirmOption.whatIsPreserved] }), jsxs(Typography, { variant: "caption", color: "text.secondary", display: "block", children: [jsx("strong", { children: "May be permanently removed:" }), " ", confirmOption.whatIsDestroyed] })] })] })), jsx(Box$1, { sx: codeBlockSx, children: confirmOption === null || confirmOption === void 0 ? void 0 : confirmOption.command }), jsx(FormControlLabel, { control: jsx(Checkbox, { checked: ackChecked, onChange: function (_, checked) { return setAckChecked(checked); } }), label: "I understand what may be removed, what stays on branches, and want to proceed." })] }) }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: closeConfirm, children: "Cancel" }), jsx(Button$1, { color: "error", variant: "contained", disabled: !confirmReady || Boolean(optimizing), onClick: confirmAndRun, children: "Run optimization" })] })] }), jsx(RepoHealthLearnMoreDialog, { open: learnMoreOpen, onClose: function () { return setLearnMoreOpen(false); }, profileLabel: report === null || report === void 0 ? void 0 : report.thresholdProfileLabel })] }));
+                                            }, children: [jsxs(Typography, { variant: "subtitle2", gutterBottom: true, children: ["Why this is labeled ", riskLabel(confirmOption.risk).toLowerCase()] }), jsx(Typography, { variant: "body2", sx: { mb: 1.5 }, children: confirmOption.whyRisky }), jsxs(Typography, { variant: "caption", color: "text.secondary", display: "block", sx: { mb: 0.5 }, children: [jsx("strong", { children: "Preserved:" }), " ", confirmOption.whatIsPreserved] }), jsxs(Typography, { variant: "caption", color: "text.secondary", display: "block", children: [jsx("strong", { children: "May be permanently removed:" }), " ", confirmOption.whatIsDestroyed] })] })] })), jsx(Box$1, { sx: codeBlockSx, children: confirmOption === null || confirmOption === void 0 ? void 0 : confirmOption.command }), jsx(FormControlLabel, { control: jsx(Checkbox, { checked: ackChecked, onChange: function (_, checked) { return setAckChecked(checked); } }), label: "I understand what may be removed, what stays on branches, and want to proceed." })] }) }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: closeConfirm, children: "Cancel" }), jsx(Button$1, { color: "error", variant: "contained", disabled: writeLocked || !confirmReady || Boolean(optimizing), onClick: confirmAndRun, children: "Run optimization" })] })] }), jsx(RepoHealthLearnMoreDialog, { open: learnMoreOpen, onClose: function () { return setLearnMoreOpen(false); }, profileLabel: report === null || report === void 0 ? void 0 : report.thresholdProfileLabel })] }));
 }
 
 /*
@@ -49549,6 +49686,7 @@ function ItemStatesCell(_a) {
 function SiteItemsTab(_a) {
     var _this = this;
     var siteId = _a.siteId;
+    var writeLocked = useWriteOpsLocked();
     var _b = useState(false), fetching = _b[0], setFetching = _b[1];
     var _c = useState(null), items = _c[0], setItems = _c[1];
     var _d = useState(0), total = _d[0], setTotal = _d[1];
@@ -49775,7 +49913,7 @@ function SiteItemsTab(_a) {
                             overflowY: 'auto',
                             overflowX: 'hidden',
                             pb: 0.5
-                        }, children: jsxs(Paper, { elevation: 0, sx: __assign(__assign({}, surfacePaperSx), { display: 'flex', flexDirection: 'column', minHeight: { lg: 280 }, maxHeight: { lg: 'min(52vh, 520px)' } }), children: [jsx(PanelHeader, { title: jsxs(Stack$1, { direction: "row", spacing: 1, alignItems: "center", flexWrap: "wrap", useFlexGap: true, children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, lineHeight: 1.3, children: "Item states" }), applyTargetItems.length > 0 && (jsx(Chip, { size: "small", variant: "outlined", label: draftStateValue, sx: __assign(__assign({}, monoSx), { fontWeight: 700 }), title: "Combined state integer from toggles below" }))] }), subtitle: itemStatesSubtitle }), applyTargetItems.length > 0 ? (jsxs(Fragment, { children: [jsx(Box$1, { sx: { flex: 1, minHeight: 120, overflow: 'auto', px: 1.5, py: 0.5 }, children: jsx(Stack$1, { spacing: 0.25, children: ITEM_STATE_TOGGLE_CONTROLS.map(function (control) { return (jsx(FormControlLabel, { sx: { ml: 0, mr: 0, py: 0.25, alignItems: 'center' }, control: jsx(Switch, { size: "small", checked: Boolean(itemStateDraft[control.id]), disabled: applying, onChange: function (_, checked) {
+                        }, children: jsxs(Paper, { elevation: 0, sx: __assign(__assign({}, surfacePaperSx), { display: 'flex', flexDirection: 'column', minHeight: { lg: 280 }, maxHeight: { lg: 'min(52vh, 520px)' } }), children: [jsx(PanelHeader, { title: jsxs(Stack$1, { direction: "row", spacing: 1, alignItems: "center", flexWrap: "wrap", useFlexGap: true, children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, lineHeight: 1.3, children: "Item states" }), applyTargetItems.length > 0 && (jsx(Chip, { size: "small", variant: "outlined", label: draftStateValue, sx: __assign(__assign({}, monoSx), { fontWeight: 700 }), title: "Combined state integer from toggles below" }))] }), subtitle: itemStatesSubtitle }), applyTargetItems.length > 0 ? (jsxs(Fragment, { children: [jsx(Box$1, { sx: { flex: 1, minHeight: 120, overflow: 'auto', px: 1.5, py: 0.5 }, children: jsx(Stack$1, { spacing: 0.25, children: ITEM_STATE_TOGGLE_CONTROLS.map(function (control) { return (jsx(FormControlLabel, { sx: { ml: 0, mr: 0, py: 0.25, alignItems: 'center' }, control: jsx(Switch, { size: "small", checked: Boolean(itemStateDraft[control.id]), disabled: writeLocked || applying, onChange: function (_, checked) {
                                                             var _a;
                                                             return setItemStateDraft(__assign(__assign({}, itemStateDraft), (_a = {}, _a[control.id] = checked, _a)));
                                                         } }), label: jsx(Typography, { variant: "body2", sx: { fontSize: '0.8125rem' }, children: formatStateBitLabel(control.label, control.mask) }) }, control.id)); }) }) }), jsx(Box$1, { sx: {
@@ -49785,13 +49923,14 @@ function SiteItemsTab(_a) {
                                                 borderTop: 1,
                                                 borderColor: 'divider',
                                                 bgcolor: function (theme) { return alpha(theme.palette.background.default, 0.5); }
-                                            }, children: jsxs(Stack$1, { spacing: 1, children: [jsx(Button$1, { size: "small", variant: "outlined", fullWidth: true, disabled: applying || !itemStateDraftDirty, onClick: onResetItemStateDraft, children: "Reset" }), jsxs(Button$1, { size: "small", variant: "contained", fullWidth: true, disabled: applying || !itemStateDraftDirty, onClick: onApplyItemStateDraft, children: ["Apply", applyTargetItems.length > 1 ? " (".concat(applyTargetItems.length, ")") : ''] })] }) })] })) : (jsx(Box$1, { sx: { p: 1.5 }, children: jsx(Typography, { variant: "body2", color: "text.secondary", children: "Check items or click a row, adjust flags, then Apply" }) }))] }) })] })] }));
+                                            }, children: jsxs(Stack$1, { spacing: 1, children: [jsx(Button$1, { size: "small", variant: "outlined", fullWidth: true, disabled: writeLocked || applying || !itemStateDraftDirty, onClick: onResetItemStateDraft, children: "Reset" }), jsxs(Button$1, { size: "small", variant: "contained", fullWidth: true, disabled: writeLocked || applying || !itemStateDraftDirty, onClick: onApplyItemStateDraft, children: ["Apply", applyTargetItems.length > 1 ? " (".concat(applyTargetItems.length, ")") : ''] })] }) })] })) : (jsx(Box$1, { sx: { p: 1.5 }, children: jsx(Typography, { variant: "body2", color: "text.secondary", children: "Check items or click a row, adjust flags, then Apply" }) }))] }) })] })] }));
 }
 
 function BranchesTab(_a) {
     var _this = this;
     var _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
     var siteId = _a.siteId, siteName = _a.siteName;
+    var writeLocked = useWriteOpsLocked();
     var _p = useState(null), refs = _p[0], setRefs = _p[1];
     var _q = useState(false), loading = _q[0], setLoading = _q[1];
     var _r = useState(''), error = _r[0], setError = _r[1];
@@ -50028,6 +50167,10 @@ function BranchesTab(_a) {
         return __generator(this, function (_c) {
             switch (_c.label) {
                 case 0:
+                    if (writeLocked) {
+                        setError('Write operations are disabled. Turn on “Enable write Operations” next to the project selector.');
+                        return [2 /*return*/];
+                    }
                     if (!canRemoteSync) {
                         setError('Select a remote and branch before pulling');
                         return [2 /*return*/];
@@ -50064,6 +50207,10 @@ function BranchesTab(_a) {
         return __generator(this, function (_c) {
             switch (_c.label) {
                 case 0:
+                    if (writeLocked) {
+                        setError('Write operations are disabled. Turn on “Enable write Operations” next to the project selector.');
+                        return [2 /*return*/];
+                    }
                     if (!canRemoteSync) {
                         setError('Select a remote and branch before pushing');
                         return [2 /*return*/];
@@ -50091,11 +50238,13 @@ function BranchesTab(_a) {
             }
         });
     }); };
-    return (jsxs(TabShell, { children: [jsxs(TabToolbar, { children: [jsxs(ToolbarRow, { children: [jsxs(Box$1, { sx: { minWidth: 0 }, children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, children: "Branches & tags" }), jsx(Typography, { variant: "caption", color: "text.secondary", display: "block", children: siteName ? "".concat(siteName, " (").concat(siteId, ")") : siteId })] }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: loading ? jsx(CircularProgress, { size: 14 }) : jsx(RefreshRoundedIcon, {}), disabled: loading, onClick: loadRefs, children: "Refresh" })] }), jsxs(Stack$1, { direction: "row", spacing: 1, flexWrap: "wrap", useFlexGap: true, alignItems: "center", children: [jsx(Chip, { size: "small", label: "HEAD \u00B7 ".concat(currentBranch || '(detached)'), sx: __assign(__assign({}, monoSx), { fontWeight: 600 }) }), sandboxBranch && (jsx(Chip, { size: "small", variant: "outlined", label: "Sandbox \u00B7 ".concat(sandboxBranch), sx: monoSx }))] }), jsx(Divider, {}), jsxs(ToolbarRow, { justify: "flex-start", children: [remotes.length > 0 && (jsxs(Fragment, { children: [jsxs(ToolbarGroup, { label: "Remote sync", children: [jsxs(FormControl, { size: "small", required: true, sx: { minWidth: 132 }, children: [jsx(InputLabel, { children: "Remote" }), jsxs(Select, { label: "Remote", value: remoteName, displayEmpty: true, onChange: function (e) { return setRemoteName(e.target.value); }, disabled: remoteSyncing, children: [jsx(MenuItem$1, { value: "", disabled: true, children: jsx("em", { children: "Select remote" }) }), remotes.map(function (name) { return (jsx(MenuItem$1, { value: name, children: name }, name)); })] })] }), jsxs(FormControl, { size: "small", sx: { minWidth: 148 }, children: [jsx(InputLabel, { children: "Branch" }), jsx(Select, { label: "Branch", value: syncBranch, onChange: function (e) { return setSyncBranch(e.target.value); }, disabled: remoteSyncing || branchNames.length === 0, children: branchNames.map(function (name) { return (jsx(MenuItem$1, { value: name, children: name }, name)); }) })] }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: remoteSyncing ? jsx(CircularProgress, { size: 14 }) : jsx(CloudDownloadRoundedIcon, {}), disabled: !canRemoteSync || remoteSyncing, onClick: onPull, children: "Pull" }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: remoteSyncing ? jsx(CircularProgress, { size: 14 }) : jsx(CloudUploadRoundedIcon, {}), disabled: !canRemoteSync || remoteSyncing, onClick: onPush, children: "Push" })] }), jsx(ToolbarDivider, {})] })), jsx(ToolbarGroup, { label: "Actions", children: jsx(Button$1, { size: "small", variant: "contained", startIcon: jsx(AddRoundedIcon, {}), onClick: function () {
+    return (jsxs(TabShell, { children: [jsxs(TabToolbar, { children: [jsxs(ToolbarRow, { children: [jsxs(Box$1, { sx: { minWidth: 0 }, children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, children: "Branches & tags" }), jsx(Typography, { variant: "caption", color: "text.secondary", display: "block", children: siteName ? "".concat(siteName, " (").concat(siteId, ")") : siteId })] }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: loading ? jsx(CircularProgress, { size: 14 }) : jsx(RefreshRoundedIcon, {}), disabled: loading, onClick: loadRefs, children: "Refresh" })] }), jsxs(Stack$1, { direction: "row", spacing: 1, flexWrap: "wrap", useFlexGap: true, alignItems: "center", children: [jsx(Chip, { size: "small", label: "HEAD \u00B7 ".concat(currentBranch || '(detached)'), sx: __assign(__assign({}, monoSx), { fontWeight: 600 }) }), sandboxBranch && (jsx(Chip, { size: "small", variant: "outlined", label: "Sandbox \u00B7 ".concat(sandboxBranch), sx: monoSx }))] }), jsx(Divider, {}), jsxs(ToolbarRow, { justify: "flex-start", children: [remotes.length > 0 && (jsxs(Fragment, { children: [jsxs(ToolbarGroup, { label: "Remote sync", children: [jsxs(FormControl, { size: "small", required: true, sx: { minWidth: 132 }, children: [jsx(InputLabel, { children: "Remote" }), jsxs(Select, { label: "Remote", value: remoteName, displayEmpty: true, onChange: function (e) { return setRemoteName(e.target.value); }, disabled: remoteSyncing, children: [jsx(MenuItem$1, { value: "", disabled: true, children: jsx("em", { children: "Select remote" }) }), remotes.map(function (name) { return (jsx(MenuItem$1, { value: name, children: name }, name)); })] })] }), jsxs(FormControl, { size: "small", sx: { minWidth: 148 }, children: [jsx(InputLabel, { children: "Branch" }), jsx(Select, { label: "Branch", value: syncBranch, onChange: function (e) { return setSyncBranch(e.target.value); }, disabled: remoteSyncing || branchNames.length === 0, children: branchNames.map(function (name) { return (jsx(MenuItem$1, { value: name, children: name }, name)); }) })] }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: remoteSyncing ? jsx(CircularProgress, { size: 14 }) : jsx(CloudDownloadRoundedIcon, {}), disabled: writeLocked || !canRemoteSync || remoteSyncing, onClick: onPull, children: "Pull" }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: remoteSyncing ? jsx(CircularProgress, { size: 14 }) : jsx(CloudUploadRoundedIcon, {}), disabled: writeLocked || !canRemoteSync || remoteSyncing, onClick: onPush, children: "Push" })] }), jsx(ToolbarDivider, {})] })), jsx(ToolbarGroup, { label: "Actions", children: jsx(Button$1, { size: "small", variant: "contained", startIcon: jsx(AddRoundedIcon, {}), disabled: writeLocked, onClick: function () {
                                         resetCreateForm();
                                         setCreateDialog({ kind: section === 'tags' ? 'tag' : 'branch' });
-                                    }, children: section === 'tags' ? 'New tag' : 'New branch' }) })] })] }), jsxs(TabAlertStack, { children: [error && (jsx(Alert, { severity: "error", onClose: function () { return setError(''); }, children: error })), notice && (jsx(Alert, { severity: "success", onClose: function () { return setNotice(''); }, children: notice }))] }), jsxs(TabContentPanel, { children: [jsxs(Tabs, { value: section, onChange: function (_, value) { return setSection(value); }, sx: { px: 2, borderBottom: 1, borderColor: 'divider', minHeight: 42, flexShrink: 0 }, children: [jsx(Tab, { value: "branches", label: "Local branches (".concat((_e = (_d = refs === null || refs === void 0 ? void 0 : refs.branches) === null || _d === void 0 ? void 0 : _d.length) !== null && _e !== void 0 ? _e : 0, ")"), sx: { textTransform: 'none', minHeight: 42 } }), jsx(Tab, { value: "tags", label: "Tags (".concat((_g = (_f = refs === null || refs === void 0 ? void 0 : refs.tags) === null || _f === void 0 ? void 0 : _f.length) !== null && _g !== void 0 ? _g : 0, ")"), sx: { textTransform: 'none', minHeight: 42 } }), jsx(Tab, { value: "remote", label: "Remote tracking (".concat((_j = (_h = refs === null || refs === void 0 ? void 0 : refs.remoteBranches) === null || _h === void 0 ? void 0 : _h.length) !== null && _j !== void 0 ? _j : 0, ")"), sx: { textTransform: 'none', minHeight: 42 } })] }), jsx(Box$1, { sx: { flex: 1, minHeight: 0, overflow: 'auto' }, children: loading && !refs ? (jsx(Box$1, { sx: { p: 4, display: 'flex', justifyContent: 'center' }, children: jsx(CircularProgress, { size: 28 }) })) : rows.length === 0 ? (jsx(Box$1, { sx: { p: 3 }, children: jsx(Typography, { variant: "body2", color: "text.secondary", children: section === 'tags' ? 'No tags in this repository.' : section === 'remote' ? 'No remote tracking branches.' : 'No local branches.' }) })) : (jsxs(Table, { size: "small", stickyHeader: true, children: [jsx(TableHead, { children: jsxs(TableRow, { children: [jsx(TableCell, { children: "Name" }), jsx(TableCell, { sx: { width: 110 }, children: "Commit" }), jsx(TableCell, { children: "Subject" }), jsx(TableCell, { align: "right", sx: { width: 88 }, children: "Actions" })] }) }), jsx(TableBody, { children: rows.map(function (row) { return (jsxs(TableRow, { hover: true, children: [jsx(TableCell, { sx: __assign(__assign({}, monoSx), { wordBreak: 'break-all' }), children: jsxs(Stack$1, { direction: "row", spacing: 0.75, alignItems: "center", flexWrap: "wrap", useFlexGap: true, children: [jsx("span", { children: row.name }), row.current && jsx(Chip, { size: "small", color: "primary", label: "current", sx: { height: 20 } }), section === 'branches' && row.name === sandboxBranch && (jsx(Chip, { size: "small", variant: "outlined", label: "sandbox", sx: { height: 20 } })), section === 'remote' && row.remote && (jsx(Chip, { size: "small", variant: "outlined", label: row.remote, sx: { height: 20 } }))] }) }), jsx(TableCell, { sx: monoSx, children: row.commit || '—' }), jsx(TableCell, { children: jsx(Typography, { variant: "body2", noWrap: true, title: row.subject, children: row.subject || '—' }) }), jsx(TableCell, { align: "right", children: section !== 'remote' && (jsx(Button$1, { size: "small", color: "error", startIcon: jsx(DeleteOutlineRoundedIcon, {}), onClick: function () { return openDelete(section === 'tags' ? 'tag' : 'branch', row); }, children: "Delete" })) })] }, row.name)); }) })] })) })] }), jsxs(Dialog, { open: Boolean(createDialog), onClose: function () { return !busy && setCreateDialog(null); }, maxWidth: "sm", fullWidth: true, children: [jsx(DialogTitle, { children: (createDialog === null || createDialog === void 0 ? void 0 : createDialog.kind) === 'tag' ? 'Create tag' : 'Create branch' }), jsx(DialogContent, { children: (createDialog === null || createDialog === void 0 ? void 0 : createDialog.kind) === 'branch' ? (jsxs(Stack$1, { spacing: 2, sx: { mt: 1 }, children: [jsx(TextField$1, { label: "Branch name", value: branchName, onChange: function (e) { return setBranchName(e.target.value); }, fullWidth: true, autoFocus: true }), jsx(TextField$1, { label: "Start point (optional)", value: branchStart, onChange: function (e) { return setBranchStart(e.target.value); }, placeholder: "commit, tag, or branch", fullWidth: true, helperText: "Leave empty to branch from HEAD." }), jsx(FormControlLabel, { control: jsx(Checkbox, { checked: branchForce, onChange: function (e) { return setBranchForce(e.target.checked); } }), label: "Force (reset branch if it already exists)" })] })) : (jsxs(Stack$1, { spacing: 2, sx: { mt: 1 }, children: [jsx(TextField$1, { label: "Tag name", value: tagName, onChange: function (e) { return setTagName(e.target.value); }, fullWidth: true, autoFocus: true }), jsx(TextField$1, { label: "Commit (optional)", value: tagCommit, onChange: function (e) { return setTagCommit(e.target.value); }, placeholder: "defaults to HEAD", fullWidth: true }), jsx(FormControlLabel, { control: jsx(Checkbox, { checked: tagAnnotated, onChange: function (e) { return setTagAnnotated(e.target.checked); } }), label: "Annotated tag" }), tagAnnotated && (jsx(TextField$1, { label: "Tag message", value: tagMessage, onChange: function (e) { return setTagMessage(e.target.value); }, fullWidth: true, multiline: true, minRows: 2, required: true }))] })) }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: function () { return setCreateDialog(null); }, disabled: busy, children: "Cancel" }), jsx(Button$1, { variant: "contained", disabled: busy ||
-                                    ((createDialog === null || createDialog === void 0 ? void 0 : createDialog.kind) === 'branch' ? !branchName.trim() : !tagName.trim() || (tagAnnotated && !tagMessage.trim())), onClick: onCreate, children: "Create" })] })] }), jsxs(Dialog, { open: Boolean(deleteDialog), onClose: function () { return !busy && setDeleteDialog(null); }, maxWidth: "sm", fullWidth: true, children: [jsxs(DialogTitle, { children: ["Delete ", (deleteDialog === null || deleteDialog === void 0 ? void 0 : deleteDialog.kind) === 'tag' ? 'tag' : 'branch', " \u00B7 ", deleteDialog === null || deleteDialog === void 0 ? void 0 : deleteDialog.ref.name] }), jsx(DialogContent, { children: jsxs(Stack$1, { spacing: 2, sx: { mt: 1 }, children: [jsx(Typography, { variant: "body2", color: "text.secondary", children: "Remove the ref locally, from the remote, or both. Remote deletion is permanent for collaborators." }), jsx(FormControlLabel, { control: jsx(Checkbox, { checked: deleteLocal, onChange: function (e) { return setDeleteLocal(e.target.checked); } }), label: "Delete locally" }), jsx(FormControlLabel, { control: jsx(Checkbox, { checked: deleteRemote, onChange: function (e) { return setDeleteRemote(e.target.checked); } }), label: "Delete from remote (permanent)" }), (deleteDialog === null || deleteDialog === void 0 ? void 0 : deleteDialog.kind) === 'branch' && (jsx(FormControlLabel, { control: jsx(Checkbox, { checked: deleteForce, onChange: function (e) { return setDeleteForce(e.target.checked); } }), label: "Force local delete (-D)" })), deleteRemote && ((_l = (_k = refs === null || refs === void 0 ? void 0 : refs.remotes) === null || _k === void 0 ? void 0 : _k.length) !== null && _l !== void 0 ? _l : 0) > 0 && (jsxs(FormControl, { fullWidth: true, size: "small", children: [jsx(InputLabel, { children: "Remote" }), jsx(Select, { label: "Remote", value: deleteRemoteName || ((_m = refs === null || refs === void 0 ? void 0 : refs.remotes) === null || _m === void 0 ? void 0 : _m[0]) || '', onChange: function (e) { return setDeleteRemoteName(e.target.value); }, children: ((_o = refs === null || refs === void 0 ? void 0 : refs.remotes) !== null && _o !== void 0 ? _o : []).map(function (remote) { return (jsx(MenuItem$1, { value: remote, children: remote }, remote)); }) })] })), (deleteDialog === null || deleteDialog === void 0 ? void 0 : deleteDialog.kind) === 'branch' && deleteDialog.ref.name === sandboxBranch && deleteLocal && !deleteForce && (jsx(Alert, { severity: "warning", children: "This is the site sandbox branch. Enable force to delete it locally." })), (deleteDialog === null || deleteDialog === void 0 ? void 0 : deleteDialog.kind) === 'branch' && deleteDialog.ref.current && deleteLocal && (jsx(Alert, { severity: "warning", children: "This branch is currently checked out and cannot be deleted locally." }))] }) }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: function () { return setDeleteDialog(null); }, disabled: busy, children: "Cancel" }), jsx(Button$1, { color: "error", variant: "contained", disabled: busy ||
+                                    }, children: section === 'tags' ? 'New tag' : 'New branch' }) })] })] }), jsxs(TabAlertStack, { children: [error && (jsx(Alert, { severity: "error", onClose: function () { return setError(''); }, children: error })), notice && (jsx(Alert, { severity: "success", onClose: function () { return setNotice(''); }, children: notice }))] }), jsxs(TabContentPanel, { children: [jsxs(Tabs, { value: section, onChange: function (_, value) { return setSection(value); }, sx: { px: 2, borderBottom: 1, borderColor: 'divider', minHeight: 42, flexShrink: 0 }, children: [jsx(Tab, { value: "branches", label: "Local branches (".concat((_e = (_d = refs === null || refs === void 0 ? void 0 : refs.branches) === null || _d === void 0 ? void 0 : _d.length) !== null && _e !== void 0 ? _e : 0, ")"), sx: { textTransform: 'none', minHeight: 42 } }), jsx(Tab, { value: "tags", label: "Tags (".concat((_g = (_f = refs === null || refs === void 0 ? void 0 : refs.tags) === null || _f === void 0 ? void 0 : _f.length) !== null && _g !== void 0 ? _g : 0, ")"), sx: { textTransform: 'none', minHeight: 42 } }), jsx(Tab, { value: "remote", label: "Remote tracking (".concat((_j = (_h = refs === null || refs === void 0 ? void 0 : refs.remoteBranches) === null || _h === void 0 ? void 0 : _h.length) !== null && _j !== void 0 ? _j : 0, ")"), sx: { textTransform: 'none', minHeight: 42 } })] }), jsx(Box$1, { sx: { flex: 1, minHeight: 0, overflow: 'auto' }, children: loading && !refs ? (jsx(Box$1, { sx: { p: 4, display: 'flex', justifyContent: 'center' }, children: jsx(CircularProgress, { size: 28 }) })) : rows.length === 0 ? (jsx(Box$1, { sx: { p: 3 }, children: jsx(Typography, { variant: "body2", color: "text.secondary", children: section === 'tags' ? 'No tags in this repository.' : section === 'remote' ? 'No remote tracking branches.' : 'No local branches.' }) })) : (jsxs(Table, { size: "small", stickyHeader: true, children: [jsx(TableHead, { children: jsxs(TableRow, { children: [jsx(TableCell, { children: "Name" }), jsx(TableCell, { sx: { width: 110 }, children: "Commit" }), jsx(TableCell, { children: "Subject" }), jsx(TableCell, { align: "right", sx: { width: 88 }, children: "Actions" })] }) }), jsx(TableBody, { children: rows.map(function (row) { return (jsxs(TableRow, { hover: true, children: [jsx(TableCell, { sx: __assign(__assign({}, monoSx), { wordBreak: 'break-all' }), children: jsxs(Stack$1, { direction: "row", spacing: 0.75, alignItems: "center", flexWrap: "wrap", useFlexGap: true, children: [jsx("span", { children: row.name }), row.current && jsx(Chip, { size: "small", color: "primary", label: "current", sx: { height: 20 } }), section === 'branches' && row.name === sandboxBranch && (jsx(Chip, { size: "small", variant: "outlined", label: "sandbox", sx: { height: 20 } })), section === 'remote' && row.remote && (jsx(Chip, { size: "small", variant: "outlined", label: row.remote, sx: { height: 20 } }))] }) }), jsx(TableCell, { sx: monoSx, children: row.commit || '—' }), jsx(TableCell, { children: jsx(Typography, { variant: "body2", noWrap: true, title: row.subject, children: row.subject || '—' }) }), jsx(TableCell, { align: "right", children: section !== 'remote' && (jsx(Button$1, { size: "small", color: "error", startIcon: jsx(DeleteOutlineRoundedIcon, {}), disabled: writeLocked, onClick: function () { return openDelete(section === 'tags' ? 'tag' : 'branch', row); }, children: "Delete" })) })] }, row.name)); }) })] })) })] }), jsxs(Dialog, { open: Boolean(createDialog), onClose: function () { return !busy && setCreateDialog(null); }, maxWidth: "sm", fullWidth: true, children: [jsx(DialogTitle, { children: (createDialog === null || createDialog === void 0 ? void 0 : createDialog.kind) === 'tag' ? 'Create tag' : 'Create branch' }), jsx(DialogContent, { children: (createDialog === null || createDialog === void 0 ? void 0 : createDialog.kind) === 'branch' ? (jsxs(Stack$1, { spacing: 2, sx: { mt: 1 }, children: [jsx(TextField$1, { label: "Branch name", value: branchName, onChange: function (e) { return setBranchName(e.target.value); }, fullWidth: true, autoFocus: true }), jsx(TextField$1, { label: "Start point (optional)", value: branchStart, onChange: function (e) { return setBranchStart(e.target.value); }, placeholder: "commit, tag, or branch", fullWidth: true, helperText: "Leave empty to branch from HEAD." }), jsx(FormControlLabel, { control: jsx(Checkbox, { checked: branchForce, onChange: function (e) { return setBranchForce(e.target.checked); } }), label: "Force (reset branch if it already exists)" })] })) : (jsxs(Stack$1, { spacing: 2, sx: { mt: 1 }, children: [jsx(TextField$1, { label: "Tag name", value: tagName, onChange: function (e) { return setTagName(e.target.value); }, fullWidth: true, autoFocus: true }), jsx(TextField$1, { label: "Commit (optional)", value: tagCommit, onChange: function (e) { return setTagCommit(e.target.value); }, placeholder: "defaults to HEAD", fullWidth: true }), jsx(FormControlLabel, { control: jsx(Checkbox, { checked: tagAnnotated, onChange: function (e) { return setTagAnnotated(e.target.checked); } }), label: "Annotated tag" }), tagAnnotated && (jsx(TextField$1, { label: "Tag message", value: tagMessage, onChange: function (e) { return setTagMessage(e.target.value); }, fullWidth: true, multiline: true, minRows: 2, required: true }))] })) }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: function () { return setCreateDialog(null); }, disabled: busy, children: "Cancel" }), jsx(Button$1, { variant: "contained", disabled: writeLocked ||
+                                    busy ||
+                                    ((createDialog === null || createDialog === void 0 ? void 0 : createDialog.kind) === 'branch' ? !branchName.trim() : !tagName.trim() || (tagAnnotated && !tagMessage.trim())), onClick: onCreate, children: "Create" })] })] }), jsxs(Dialog, { open: Boolean(deleteDialog), onClose: function () { return !busy && setDeleteDialog(null); }, maxWidth: "sm", fullWidth: true, children: [jsxs(DialogTitle, { children: ["Delete ", (deleteDialog === null || deleteDialog === void 0 ? void 0 : deleteDialog.kind) === 'tag' ? 'tag' : 'branch', " \u00B7 ", deleteDialog === null || deleteDialog === void 0 ? void 0 : deleteDialog.ref.name] }), jsx(DialogContent, { children: jsxs(Stack$1, { spacing: 2, sx: { mt: 1 }, children: [jsx(Typography, { variant: "body2", color: "text.secondary", children: "Remove the ref locally, from the remote, or both. Remote deletion is permanent for collaborators." }), jsx(FormControlLabel, { control: jsx(Checkbox, { checked: deleteLocal, onChange: function (e) { return setDeleteLocal(e.target.checked); } }), label: "Delete locally" }), jsx(FormControlLabel, { control: jsx(Checkbox, { checked: deleteRemote, onChange: function (e) { return setDeleteRemote(e.target.checked); } }), label: "Delete from remote (permanent)" }), (deleteDialog === null || deleteDialog === void 0 ? void 0 : deleteDialog.kind) === 'branch' && (jsx(FormControlLabel, { control: jsx(Checkbox, { checked: deleteForce, onChange: function (e) { return setDeleteForce(e.target.checked); } }), label: "Force local delete (-D)" })), deleteRemote && ((_l = (_k = refs === null || refs === void 0 ? void 0 : refs.remotes) === null || _k === void 0 ? void 0 : _k.length) !== null && _l !== void 0 ? _l : 0) > 0 && (jsxs(FormControl, { fullWidth: true, size: "small", children: [jsx(InputLabel, { children: "Remote" }), jsx(Select, { label: "Remote", value: deleteRemoteName || ((_m = refs === null || refs === void 0 ? void 0 : refs.remotes) === null || _m === void 0 ? void 0 : _m[0]) || '', onChange: function (e) { return setDeleteRemoteName(e.target.value); }, children: ((_o = refs === null || refs === void 0 ? void 0 : refs.remotes) !== null && _o !== void 0 ? _o : []).map(function (remote) { return (jsx(MenuItem$1, { value: remote, children: remote }, remote)); }) })] })), (deleteDialog === null || deleteDialog === void 0 ? void 0 : deleteDialog.kind) === 'branch' && deleteDialog.ref.name === sandboxBranch && deleteLocal && !deleteForce && (jsx(Alert, { severity: "warning", children: "This is the site sandbox branch. Enable force to delete it locally." })), (deleteDialog === null || deleteDialog === void 0 ? void 0 : deleteDialog.kind) === 'branch' && deleteDialog.ref.current && deleteLocal && (jsx(Alert, { severity: "warning", children: "This branch is currently checked out and cannot be deleted locally." }))] }) }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: function () { return setDeleteDialog(null); }, disabled: busy, children: "Cancel" }), jsx(Button$1, { color: "error", variant: "contained", disabled: writeLocked ||
+                                    busy ||
                                     (!deleteLocal && !deleteRemote) ||
                                     ((deleteDialog === null || deleteDialog === void 0 ? void 0 : deleteDialog.kind) === 'branch' && deleteDialog.ref.current && deleteLocal) ||
                                     ((deleteDialog === null || deleteDialog === void 0 ? void 0 : deleteDialog.kind) === 'branch' &&
@@ -50180,6 +50329,7 @@ function DatabaseTab(_a) {
     var _this = this;
     var _b, _c, _d, _e;
     var siteId = _a.siteId, siteName = _a.siteName;
+    var writeLocked = useWriteOpsLocked();
     var _f = useState(true), accessLoading = _f[0], setAccessLoading = _f[1];
     var _g = useState(false), systemAdmin = _g[0], setSystemAdmin = _g[1];
     var _h = useState(''), username = _h[0], setUsername = _h[1];
@@ -50418,9 +50568,9 @@ function DatabaseTab(_a) {
                     flexDirection: 'column',
                     gap: 2,
                     pr: 0.5
-                }, children: [jsx(Paper, { variant: "outlined", sx: __assign(__assign({}, surfacePaperSx), { flexShrink: 0 }), children: jsxs(Box$1, { sx: { p: 2.5 }, children: [jsxs(Stack$1, { direction: "row", spacing: 1.5, alignItems: "center", sx: { mb: 2 }, children: [jsx(StorageRoundedIcon, { color: "primary" }), jsxs(Box$1, { children: [jsx(Typography, { variant: "subtitle1", fontWeight: 700, children: "Audit history" }), jsx(Typography, { variant: "body2", color: "text.secondary", children: "Permanently delete Studio audit log entries. This cannot be undone." })] })] }), statsError && (jsx(Alert, { severity: "error", onClose: function () { return setStatsError(''); }, sx: { mb: 2 }, children: statsError })), jsxs(Stack$1, { direction: { xs: 'column', md: 'row' }, spacing: 2, sx: { mb: 2 }, children: [jsxs(FormControl, { size: "small", sx: { minWidth: 220 }, children: [jsx(InputLabel, { children: "Scope" }), jsxs(Select, { label: "Scope", value: scope, onChange: function (e) { return setScope(e.target.value); }, children: [jsx(MenuItem$1, { value: "site", children: "This project only" }), jsx(MenuItem$1, { value: "global", children: "Entire Studio (all projects)" })] })] }), jsxs(FormControl, { size: "small", sx: { minWidth: 220 }, children: [jsx(InputLabel, { children: "Operation" }), jsxs(Select, { label: "Operation", value: mode, onChange: function (e) { return setMode(e.target.value); }, children: [jsx(MenuItem$1, { value: "all", children: "Delete all audit history" }), jsx(MenuItem$1, { value: "beforeDate", children: "Delete before date" })] })] }), mode === 'beforeDate' && (jsx(TextField$1, { size: "small", type: "date", label: "Delete before", value: beforeDate, onChange: function (e) { return setBeforeDate(e.target.value); }, InputLabelProps: { shrink: true }, helperText: "Entries before this date (UTC midnight) will be deleted." }))] }), jsxs(Paper, { variant: "outlined", sx: { p: 2, mb: 2, bgcolor: 'background.default' }, children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, gutterBottom: true, children: option.label }), jsx(Typography, { variant: "body2", color: "text.secondary", sx: { mb: 1.5 }, children: option.summary }), jsxs(Stack$1, { direction: { xs: 'column', sm: 'row' }, spacing: 2, children: [jsxs(Box$1, { children: [jsx(Typography, { variant: "caption", color: "text.secondary", fontWeight: 600, children: "Matching entries" }), jsx(Typography, { variant: "h5", fontWeight: 700, children: statsLoading ? '…' : Number((_c = (_b = stats === null || stats === void 0 ? void 0 : stats.deleteCount) !== null && _b !== void 0 ? _b : stats === null || stats === void 0 ? void 0 : stats.matchingEntries) !== null && _c !== void 0 ? _c : 0).toLocaleString() })] }), jsxs(Box$1, { children: [jsx(Typography, { variant: "caption", color: "text.secondary", fontWeight: 600, children: "Total in scope" }), jsx(Typography, { variant: "h5", fontWeight: 700, children: statsLoading ? '…' : Number((_d = stats === null || stats === void 0 ? void 0 : stats.totalEntries) !== null && _d !== void 0 ? _d : 0).toLocaleString() })] })] })] }), jsx(DangerZone, { title: "Destructive database operation", description: option.consequence, action: jsx(Button$1, { color: "error", variant: "contained", onClick: onOpenConfirm, disabled: mode === 'beforeDate' && !beforeDate, children: "Truncate audit history" }) })] }) }), jsx(Paper, { variant: "outlined", sx: __assign(__assign({}, surfacePaperSx), { flexShrink: 0 }), children: jsxs(Box$1, { sx: { p: 2.5 }, children: [jsxs(Stack$1, { direction: "row", spacing: 1.5, alignItems: "center", sx: { mb: 2 }, children: [jsx(HistoryRoundedIcon, { color: "primary" }), jsxs(Box$1, { children: [jsx(Typography, { variant: "subtitle1", fontWeight: 700, children: "Processed commits (git sync cache)" }), jsx(Typography, { variant: "body2", color: "text.secondary", children: "Clears the Studio processed_commits table. Safe after history rewrite; does not delete git or content." })] })] }), processedStatsError && (jsx(Alert, { severity: "error", onClose: function () { return setProcessedStatsError(''); }, sx: { mb: 2 }, children: processedStatsError })), jsx(Stack$1, { direction: { xs: 'column', md: 'row' }, spacing: 2, sx: { mb: 2 }, children: jsxs(FormControl, { size: "small", sx: { minWidth: 220 }, children: [jsx(InputLabel, { children: "Scope" }), jsxs(Select, { label: "Scope", value: processedScope, onChange: function (e) { return setProcessedScope(e.target.value); }, children: [jsx(MenuItem$1, { value: "site", children: "This project only" }), jsx(MenuItem$1, { value: "global", children: "Entire Studio (all projects)" })] })] }) }), jsxs(Paper, { variant: "outlined", sx: { p: 2, mb: 2, bgcolor: 'background.default' }, children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, gutterBottom: true, children: processedOption.label }), jsx(Typography, { variant: "body2", color: "text.secondary", sx: { mb: 1.5 }, children: processedOption.summary }), jsxs(Stack$1, { direction: { xs: 'column', sm: 'row' }, spacing: 2, children: [jsxs(Box$1, { children: [jsx(Typography, { variant: "caption", color: "text.secondary", fontWeight: 600, children: "Cached rows" }), jsx(Typography, { variant: "h5", fontWeight: 700, children: processedStatsLoading ? '…' : Number((_e = processedStats === null || processedStats === void 0 ? void 0 : processedStats.rowCount) !== null && _e !== void 0 ? _e : 0).toLocaleString() })] }), processedScope === 'site' && (jsxs(Box$1, { children: [jsx(Typography, { variant: "caption", color: "text.secondary", fontWeight: 600, children: "Sync pointer (preserved)" }), jsx(Typography, { variant: "body2", fontFamily: "monospace", sx: { wordBreak: 'break-all' }, children: processedStatsLoading
+                }, children: [jsx(Paper, { variant: "outlined", sx: __assign(__assign({}, surfacePaperSx), { flexShrink: 0 }), children: jsxs(Box$1, { sx: { p: 2.5 }, children: [jsxs(Stack$1, { direction: "row", spacing: 1.5, alignItems: "center", sx: { mb: 2 }, children: [jsx(StorageRoundedIcon, { color: "primary" }), jsxs(Box$1, { children: [jsx(Typography, { variant: "subtitle1", fontWeight: 700, children: "Audit history" }), jsx(Typography, { variant: "body2", color: "text.secondary", children: "Permanently delete Studio audit log entries. This cannot be undone." })] })] }), statsError && (jsx(Alert, { severity: "error", onClose: function () { return setStatsError(''); }, sx: { mb: 2 }, children: statsError })), jsxs(Stack$1, { direction: { xs: 'column', md: 'row' }, spacing: 2, sx: { mb: 2 }, children: [jsxs(FormControl, { size: "small", sx: { minWidth: 220 }, children: [jsx(InputLabel, { children: "Scope" }), jsxs(Select, { label: "Scope", value: scope, onChange: function (e) { return setScope(e.target.value); }, children: [jsx(MenuItem$1, { value: "site", children: "This project only" }), jsx(MenuItem$1, { value: "global", children: "Entire Studio (all projects)" })] })] }), jsxs(FormControl, { size: "small", sx: { minWidth: 220 }, children: [jsx(InputLabel, { children: "Operation" }), jsxs(Select, { label: "Operation", value: mode, onChange: function (e) { return setMode(e.target.value); }, children: [jsx(MenuItem$1, { value: "all", children: "Delete all audit history" }), jsx(MenuItem$1, { value: "beforeDate", children: "Delete before date" })] })] }), mode === 'beforeDate' && (jsx(TextField$1, { size: "small", type: "date", label: "Delete before", value: beforeDate, onChange: function (e) { return setBeforeDate(e.target.value); }, InputLabelProps: { shrink: true }, helperText: "Entries before this date (UTC midnight) will be deleted." }))] }), jsxs(Paper, { variant: "outlined", sx: { p: 2, mb: 2, bgcolor: 'background.default' }, children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, gutterBottom: true, children: option.label }), jsx(Typography, { variant: "body2", color: "text.secondary", sx: { mb: 1.5 }, children: option.summary }), jsxs(Stack$1, { direction: { xs: 'column', sm: 'row' }, spacing: 2, children: [jsxs(Box$1, { children: [jsx(Typography, { variant: "caption", color: "text.secondary", fontWeight: 600, children: "Matching entries" }), jsx(Typography, { variant: "h5", fontWeight: 700, children: statsLoading ? '…' : Number((_c = (_b = stats === null || stats === void 0 ? void 0 : stats.deleteCount) !== null && _b !== void 0 ? _b : stats === null || stats === void 0 ? void 0 : stats.matchingEntries) !== null && _c !== void 0 ? _c : 0).toLocaleString() })] }), jsxs(Box$1, { children: [jsx(Typography, { variant: "caption", color: "text.secondary", fontWeight: 600, children: "Total in scope" }), jsx(Typography, { variant: "h5", fontWeight: 700, children: statsLoading ? '…' : Number((_d = stats === null || stats === void 0 ? void 0 : stats.totalEntries) !== null && _d !== void 0 ? _d : 0).toLocaleString() })] })] })] }), jsx(DangerZone, { title: "Destructive database operation", description: option.consequence, action: jsx(Button$1, { color: "error", variant: "contained", onClick: onOpenConfirm, disabled: writeLocked || (mode === 'beforeDate' && !beforeDate), children: "Truncate audit history" }) })] }) }), jsx(Paper, { variant: "outlined", sx: __assign(__assign({}, surfacePaperSx), { flexShrink: 0 }), children: jsxs(Box$1, { sx: { p: 2.5 }, children: [jsxs(Stack$1, { direction: "row", spacing: 1.5, alignItems: "center", sx: { mb: 2 }, children: [jsx(HistoryRoundedIcon, { color: "primary" }), jsxs(Box$1, { children: [jsx(Typography, { variant: "subtitle1", fontWeight: 700, children: "Processed commits (git sync cache)" }), jsx(Typography, { variant: "body2", color: "text.secondary", children: "Clears the Studio processed_commits table. Safe after history rewrite; does not delete git or content." })] })] }), processedStatsError && (jsx(Alert, { severity: "error", onClose: function () { return setProcessedStatsError(''); }, sx: { mb: 2 }, children: processedStatsError })), jsx(Stack$1, { direction: { xs: 'column', md: 'row' }, spacing: 2, sx: { mb: 2 }, children: jsxs(FormControl, { size: "small", sx: { minWidth: 220 }, children: [jsx(InputLabel, { children: "Scope" }), jsxs(Select, { label: "Scope", value: processedScope, onChange: function (e) { return setProcessedScope(e.target.value); }, children: [jsx(MenuItem$1, { value: "site", children: "This project only" }), jsx(MenuItem$1, { value: "global", children: "Entire Studio (all projects)" })] })] }) }), jsxs(Paper, { variant: "outlined", sx: { p: 2, mb: 2, bgcolor: 'background.default' }, children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, gutterBottom: true, children: processedOption.label }), jsx(Typography, { variant: "body2", color: "text.secondary", sx: { mb: 1.5 }, children: processedOption.summary }), jsxs(Stack$1, { direction: { xs: 'column', sm: 'row' }, spacing: 2, children: [jsxs(Box$1, { children: [jsx(Typography, { variant: "caption", color: "text.secondary", fontWeight: 600, children: "Cached rows" }), jsx(Typography, { variant: "h5", fontWeight: 700, children: processedStatsLoading ? '…' : Number((_e = processedStats === null || processedStats === void 0 ? void 0 : processedStats.rowCount) !== null && _e !== void 0 ? _e : 0).toLocaleString() })] }), processedScope === 'site' && (jsxs(Box$1, { children: [jsx(Typography, { variant: "caption", color: "text.secondary", fontWeight: 600, children: "Sync pointer (preserved)" }), jsx(Typography, { variant: "body2", fontFamily: "monospace", sx: { wordBreak: 'break-all' }, children: processedStatsLoading
                                                                 ? '…'
-                                                                : (processedStats === null || processedStats === void 0 ? void 0 : processedStats.lastProcessedCommitId) || '(none set)' })] }))] })] }), jsx(DangerZone, { title: "Clear sync cache", description: processedOption.consequence, action: jsx(Button$1, { color: "warning", variant: "contained", onClick: onOpenProcessedConfirm, children: "Truncate processed commits" }) })] }) })] }), jsxs(Dialog, { open: confirmOpen, onClose: function () { return !busy && setConfirmOpen(false); }, maxWidth: "sm", fullWidth: true, children: [jsx(DialogTitle, { children: "Confirm audit history truncation" }), jsx(DialogContent, { children: jsxs(Stack$1, { spacing: 2, sx: { mt: 1 }, children: [jsx(Alert, { severity: "error", icon: jsx(WarningAmberRoundedIcon, {}), children: option.consequence }), jsxs(Box$1, { children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, children: "What will be deleted" }), jsx(Typography, { variant: "body2", color: "text.secondary", children: option.whatIsDestroyed })] }), jsxs(Box$1, { children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, children: "What is preserved" }), jsx(Typography, { variant: "body2", color: "text.secondary", children: option.whatIsPreserved })] }), jsxs(Typography, { variant: "body2", children: ["This action is logged in the Studio audit log and server log as performed by ", jsx("strong", { children: username }), "."] }), jsx(FormControlLabel, { control: jsx(Checkbox, { checked: ackChecked, onChange: function (e) { return setAckChecked(e.target.checked); } }), label: "I understand this permanently deletes audit history and cannot be undone." })] }) }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: function () { return setConfirmOpen(false); }, disabled: busy, children: "Cancel" }), jsx(Button$1, { color: "error", variant: "contained", disabled: !canConfirm || busy, onClick: onTruncate, children: busy ? 'Deleting…' : 'Delete audit history' })] })] }), jsxs(Dialog, { open: processedConfirmOpen, onClose: function () { return !processedBusy && setProcessedConfirmOpen(false); }, maxWidth: "sm", fullWidth: true, children: [jsx(DialogTitle, { children: "Confirm processed commits truncation" }), jsx(DialogContent, { children: jsxs(Stack$1, { spacing: 2, sx: { mt: 1 }, children: [jsx(Alert, { severity: "warning", icon: jsx(WarningAmberRoundedIcon, {}), children: processedOption.consequence }), jsxs(Box$1, { children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, children: "What will be deleted" }), jsx(Typography, { variant: "body2", color: "text.secondary", children: processedOption.whatIsDestroyed })] }), jsxs(Box$1, { children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, children: "What is preserved" }), jsx(Typography, { variant: "body2", color: "text.secondary", children: processedOption.whatIsPreserved })] }), jsxs(Typography, { variant: "body2", children: ["This action is logged in the Studio audit log and server log as performed by ", jsx("strong", { children: username }), "."] }), jsx(FormControlLabel, { control: jsx(Checkbox, { checked: processedAckChecked, onChange: function (e) { return setProcessedAckChecked(e.target.checked); } }), label: "I understand this clears the git sync cache and may affect Git Log processed badges until the next sync." })] }) }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: function () { return setProcessedConfirmOpen(false); }, disabled: processedBusy, children: "Cancel" }), jsx(Button$1, { color: "warning", variant: "contained", disabled: !canConfirmProcessed || processedBusy, onClick: onTruncateProcessed, children: processedBusy ? 'Clearing…' : 'Truncate processed commits' })] })] })] }));
+                                                                : (processedStats === null || processedStats === void 0 ? void 0 : processedStats.lastProcessedCommitId) || '(none set)' })] }))] })] }), jsx(DangerZone, { title: "Clear sync cache", description: processedOption.consequence, action: jsx(Button$1, { color: "warning", variant: "contained", disabled: writeLocked, onClick: onOpenProcessedConfirm, children: "Truncate processed commits" }) })] }) })] }), jsxs(Dialog, { open: confirmOpen, onClose: function () { return !busy && setConfirmOpen(false); }, maxWidth: "sm", fullWidth: true, children: [jsx(DialogTitle, { children: "Confirm audit history truncation" }), jsx(DialogContent, { children: jsxs(Stack$1, { spacing: 2, sx: { mt: 1 }, children: [jsx(Alert, { severity: "error", icon: jsx(WarningAmberRoundedIcon, {}), children: option.consequence }), jsxs(Box$1, { children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, children: "What will be deleted" }), jsx(Typography, { variant: "body2", color: "text.secondary", children: option.whatIsDestroyed })] }), jsxs(Box$1, { children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, children: "What is preserved" }), jsx(Typography, { variant: "body2", color: "text.secondary", children: option.whatIsPreserved })] }), jsxs(Typography, { variant: "body2", children: ["This action is logged in the Studio audit log and server log as performed by ", jsx("strong", { children: username }), "."] }), jsx(FormControlLabel, { control: jsx(Checkbox, { checked: ackChecked, onChange: function (e) { return setAckChecked(e.target.checked); } }), label: "I understand this permanently deletes audit history and cannot be undone." })] }) }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: function () { return setConfirmOpen(false); }, disabled: busy, children: "Cancel" }), jsx(Button$1, { color: "error", variant: "contained", disabled: writeLocked || !canConfirm || busy, onClick: onTruncate, children: busy ? 'Deleting…' : 'Delete audit history' })] })] }), jsxs(Dialog, { open: processedConfirmOpen, onClose: function () { return !processedBusy && setProcessedConfirmOpen(false); }, maxWidth: "sm", fullWidth: true, children: [jsx(DialogTitle, { children: "Confirm processed commits truncation" }), jsx(DialogContent, { children: jsxs(Stack$1, { spacing: 2, sx: { mt: 1 }, children: [jsx(Alert, { severity: "warning", icon: jsx(WarningAmberRoundedIcon, {}), children: processedOption.consequence }), jsxs(Box$1, { children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, children: "What will be deleted" }), jsx(Typography, { variant: "body2", color: "text.secondary", children: processedOption.whatIsDestroyed })] }), jsxs(Box$1, { children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, children: "What is preserved" }), jsx(Typography, { variant: "body2", color: "text.secondary", children: processedOption.whatIsPreserved })] }), jsxs(Typography, { variant: "body2", children: ["This action is logged in the Studio audit log and server log as performed by ", jsx("strong", { children: username }), "."] }), jsx(FormControlLabel, { control: jsx(Checkbox, { checked: processedAckChecked, onChange: function (e) { return setProcessedAckChecked(e.target.checked); } }), label: "I understand this clears the git sync cache and may affect Git Log processed badges until the next sync." })] }) }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: function () { return setProcessedConfirmOpen(false); }, disabled: processedBusy, children: "Cancel" }), jsx(Button$1, { color: "warning", variant: "contained", disabled: writeLocked || !canConfirmProcessed || processedBusy, onClick: onTruncateProcessed, children: processedBusy ? 'Clearing…' : 'Truncate processed commits' })] })] })] }));
 }
 
 function isUntracked(file) {
@@ -50468,6 +50618,7 @@ function WorkingTreeTab(_a) {
     var _this = this;
     var _b, _c;
     var siteId = _a.siteId, siteName = _a.siteName;
+    var writeLocked = useWriteOpsLocked();
     var _d = useState(null), data = _d[0], setData = _d[1];
     var _e = useState(true), loading = _e[0], setLoading = _e[1];
     var _f = useState(false), busy = _f[0], setBusy = _f[1];
@@ -50672,7 +50823,7 @@ function WorkingTreeTab(_a) {
             }
         });
     }); };
-    return (jsxs(TabShell, { children: [jsxs(TabAlertStack, { children: [error && (jsx(Alert, { severity: "error", onClose: function () { return setError(''); }, children: error })), notice && (jsx(Alert, { severity: "success", onClose: function () { return setNotice(''); }, children: notice }))] }), jsxs(TabToolbar, { children: [jsxs(Stack$1, { direction: "row", spacing: 1.5, flexWrap: "wrap", useFlexGap: true, alignItems: "center", justifyContent: "space-between", children: [jsxs(Box$1, { sx: { minWidth: 0 }, children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, children: "Working tree" }), jsx(Typography, { variant: "caption", color: "text.secondary", display: "block", children: siteName ? "".concat(siteName, " (").concat(siteId, ")") : siteId })] }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: loading ? jsx(CircularProgress, { size: 14 }) : jsx(RefreshRoundedIcon, {}), disabled: loading || busy, onClick: function () { return load(); }, children: "Refresh" })] }), jsxs(Stack$1, { direction: "row", spacing: 1, flexWrap: "wrap", useFlexGap: true, alignItems: "center", children: [jsx(Chip, { size: "small", label: (data === null || data === void 0 ? void 0 : data.workTreeClean) ? 'Working tree clean' : 'Working tree dirty', color: (data === null || data === void 0 ? void 0 : data.workTreeClean) ? 'success' : 'warning', variant: (data === null || data === void 0 ? void 0 : data.workTreeClean) ? 'outlined' : 'filled' }), jsx(Chip, { size: "small", label: (data === null || data === void 0 ? void 0 : data.gitStatusOk) ? 'Git index OK' : 'Git index issues', color: (data === null || data === void 0 ? void 0 : data.gitStatusOk) ? 'success' : 'error', variant: "outlined" }), conflictCount > 0 && (jsx(Chip, { size: "small", color: "error", label: "".concat(conflictCount, " conflict(s)") })), (data === null || data === void 0 ? void 0 : data.headCommitId) && (jsx(Chip, { size: "small", variant: "outlined", sx: monoSx, label: "HEAD \u00B7 ".concat(data.headCommitId.slice(0, 7)) })), (data === null || data === void 0 ? void 0 : data.branch) && (jsx(Chip, { size: "small", variant: "outlined", sx: monoSx, label: "Branch \u00B7 ".concat(data.branch) })), jsxs(Typography, { variant: "caption", color: "text.secondary", sx: monoSx, children: [files.length, " changed path(s)"] })] }), jsx(Divider, {}), jsxs(Stack$1, { direction: "row", spacing: 2, flexWrap: "wrap", useFlexGap: true, alignItems: "flex-start", children: [jsxs(ToolbarGroup, { label: "Staging", children: [jsx(Tooltip, { title: hasSelection ? 'Stage selected unstaged paths' : 'Stage all unstaged paths', children: jsx("span", { children: jsx(Button$1, { size: "small", variant: "outlined", disabled: busy || loading || !canStageAction, startIcon: jsx(PlaylistAddCheckRoundedIcon, {}), onClick: function () {
+    return (jsxs(TabShell, { children: [jsxs(TabAlertStack, { children: [error && (jsx(Alert, { severity: "error", onClose: function () { return setError(''); }, children: error })), notice && (jsx(Alert, { severity: "success", onClose: function () { return setNotice(''); }, children: notice }))] }), jsxs(TabToolbar, { children: [jsxs(Stack$1, { direction: "row", spacing: 1.5, flexWrap: "wrap", useFlexGap: true, alignItems: "center", justifyContent: "space-between", children: [jsxs(Box$1, { sx: { minWidth: 0 }, children: [jsx(Typography, { variant: "subtitle2", fontWeight: 700, children: "Working tree" }), jsx(Typography, { variant: "caption", color: "text.secondary", display: "block", children: siteName ? "".concat(siteName, " (").concat(siteId, ")") : siteId })] }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: loading ? jsx(CircularProgress, { size: 14 }) : jsx(RefreshRoundedIcon, {}), disabled: loading || busy, onClick: function () { return load(); }, children: "Refresh" })] }), jsxs(Stack$1, { direction: "row", spacing: 1, flexWrap: "wrap", useFlexGap: true, alignItems: "center", children: [jsx(Chip, { size: "small", label: (data === null || data === void 0 ? void 0 : data.workTreeClean) ? 'Working tree clean' : 'Working tree dirty', color: (data === null || data === void 0 ? void 0 : data.workTreeClean) ? 'success' : 'warning', variant: (data === null || data === void 0 ? void 0 : data.workTreeClean) ? 'outlined' : 'filled' }), jsx(Chip, { size: "small", label: (data === null || data === void 0 ? void 0 : data.gitStatusOk) ? 'Git index OK' : 'Git index issues', color: (data === null || data === void 0 ? void 0 : data.gitStatusOk) ? 'success' : 'error', variant: "outlined" }), conflictCount > 0 && (jsx(Chip, { size: "small", color: "error", label: "".concat(conflictCount, " conflict(s)") })), (data === null || data === void 0 ? void 0 : data.headCommitId) && (jsx(Chip, { size: "small", variant: "outlined", sx: monoSx, label: "HEAD \u00B7 ".concat(data.headCommitId.slice(0, 7)) })), (data === null || data === void 0 ? void 0 : data.branch) && (jsx(Chip, { size: "small", variant: "outlined", sx: monoSx, label: "Branch \u00B7 ".concat(data.branch) })), jsxs(Typography, { variant: "caption", color: "text.secondary", sx: monoSx, children: [files.length, " changed path(s)"] })] }), jsx(Divider, {}), jsxs(Stack$1, { direction: "row", spacing: 2, flexWrap: "wrap", useFlexGap: true, alignItems: "flex-start", children: [jsxs(ToolbarGroup, { label: "Staging", children: [jsx(Tooltip, { title: hasSelection ? 'Stage selected unstaged paths' : 'Stage all unstaged paths', children: jsx("span", { children: jsx(Button$1, { size: "small", variant: "outlined", disabled: writeLocked || busy || loading || !canStageAction, startIcon: jsx(PlaylistAddCheckRoundedIcon, {}), onClick: function () {
                                                     return runAction(function () { return __awaiter(_this, void 0, void 0, function () {
                                                         var result;
                                                         return __generator(this, function (_a) {
@@ -50685,7 +50836,7 @@ function WorkingTreeTab(_a) {
                                                             }
                                                         });
                                                     }); });
-                                                }, children: hasSelection ? 'Stage selected' : 'Stage all' }) }) }), jsx(Tooltip, { title: "Unstage selected paths in the index", children: jsx("span", { children: jsx(Button$1, { size: "small", variant: "outlined", disabled: busy || loading || !canUnstageAction, onClick: function () {
+                                                }, children: hasSelection ? 'Stage selected' : 'Stage all' }) }) }), jsx(Tooltip, { title: "Unstage selected paths in the index", children: jsx("span", { children: jsx(Button$1, { size: "small", variant: "outlined", disabled: writeLocked || busy || loading || !canUnstageAction, onClick: function () {
                                                     return runAction(function () { return __awaiter(_this, void 0, void 0, function () {
                                                         var result;
                                                         return __generator(this, function (_a) {
@@ -50698,10 +50849,10 @@ function WorkingTreeTab(_a) {
                                                             }
                                                         });
                                                     }); });
-                                                }, children: "Unstage selected" }) }) })] }), jsx(Divider, { flexItem: true, orientation: "vertical", sx: { alignSelf: 'stretch', my: 0.5 } }), jsx(ToolbarGroup, { label: "Commit", children: jsx(Tooltip, { title: "Commit staged changes to the sandbox repository", children: jsx("span", { children: jsx(Button$1, { size: "small", variant: "contained", disabled: busy || loading || !canCommitAction, startIcon: jsx(CommitRoundedIcon, {}), onClick: function () {
+                                                }, children: "Unstage selected" }) }) })] }), jsx(Divider, { flexItem: true, orientation: "vertical", sx: { alignSelf: 'stretch', my: 0.5 } }), jsx(ToolbarGroup, { label: "Commit", children: jsx(Tooltip, { title: "Commit staged changes to the sandbox repository", children: jsx("span", { children: jsx(Button$1, { size: "small", variant: "contained", disabled: writeLocked || busy || loading || !canCommitAction, startIcon: jsx(CommitRoundedIcon, {}), onClick: function () {
                                                 setCommitMessage('');
                                                 setCommitOpen(true);
-                                            }, children: "Commit staged" }) }) }) }), jsx(Divider, { flexItem: true, orientation: "vertical", sx: { alignSelf: 'stretch', my: 0.5 } }), jsxs(ToolbarGroup, { label: "Restore", children: [jsx(Tooltip, { title: hasSelection ? 'Discard working tree changes for selected paths' : 'Discard all unstaged changes', children: jsx("span", { children: jsx(Button$1, { size: "small", variant: "outlined", color: "warning", disabled: busy || loading || !canDiscardAction, startIcon: jsx(RestoreRoundedIcon, {}), onClick: function () {
+                                            }, children: "Commit staged" }) }) }) }), jsx(Divider, { flexItem: true, orientation: "vertical", sx: { alignSelf: 'stretch', my: 0.5 } }), jsxs(ToolbarGroup, { label: "Restore", children: [jsx(Tooltip, { title: hasSelection ? 'Discard working tree changes for selected paths' : 'Discard all unstaged changes', children: jsx("span", { children: jsx(Button$1, { size: "small", variant: "outlined", color: "warning", disabled: writeLocked || busy || loading || !canDiscardAction, startIcon: jsx(RestoreRoundedIcon, {}), onClick: function () {
                                                     return runAction(function () { return __awaiter(_this, void 0, void 0, function () {
                                                         var result;
                                                         return __generator(this, function (_a) {
@@ -50714,7 +50865,7 @@ function WorkingTreeTab(_a) {
                                                             }
                                                         });
                                                     }); });
-                                                }, children: hasSelection ? 'Discard selected' : 'Discard all' }) }) }), jsx(Tooltip, { title: hasSelection ? 'Remove selected untracked paths' : 'Remove all untracked files', children: jsx("span", { children: jsx(Button$1, { size: "small", variant: "outlined", disabled: busy || loading || !canCleanAction, startIcon: jsx(CleaningServicesRoundedIcon, {}), onClick: function () {
+                                                }, children: hasSelection ? 'Discard selected' : 'Discard all' }) }) }), jsx(Tooltip, { title: hasSelection ? 'Remove selected untracked paths' : 'Remove all untracked files', children: jsx("span", { children: jsx(Button$1, { size: "small", variant: "outlined", disabled: writeLocked || busy || loading || !canCleanAction, startIcon: jsx(CleaningServicesRoundedIcon, {}), onClick: function () {
                                                     return runAction(function () { return __awaiter(_this, void 0, void 0, function () {
                                                         var result;
                                                         return __generator(this, function (_a) {
@@ -50727,7 +50878,7 @@ function WorkingTreeTab(_a) {
                                                             }
                                                         });
                                                     }); });
-                                                }, children: hasSelection ? 'Remove untracked selected' : 'Clean untracked' }) }) }), jsx(Tooltip, { title: "Reset tracked files to HEAD and remove uncommitted changes", children: jsx("span", { children: jsx(Button$1, { size: "small", variant: "outlined", color: "error", disabled: busy || loading || !canResetAction, onClick: function () {
+                                                }, children: hasSelection ? 'Remove untracked selected' : 'Clean untracked' }) }) }), jsx(Tooltip, { title: "Reset tracked files to HEAD and remove uncommitted changes", children: jsx("span", { children: jsx(Button$1, { size: "small", variant: "outlined", color: "error", disabled: writeLocked || busy || loading || !canResetAction, onClick: function () {
                                                     setResetAck(false);
                                                     setResetOpen(true);
                                                 }, children: "Reset hard" }) }) })] })] })] }), jsxs(TabContentPanel, { children: [jsx(Box$1, { sx: {
@@ -50736,7 +50887,7 @@ function WorkingTreeTab(_a) {
                             borderBottom: 1,
                             borderColor: 'divider',
                             flexShrink: 0
-                        }, children: jsx(Typography, { variant: "subtitle2", fontWeight: 700, children: "Changed paths" }) }), loading && !data ? (jsx(Box$1, { sx: { p: 4, display: 'flex', justifyContent: 'center' }, children: jsx(CircularProgress, { size: 32 }) })) : files.length === 0 ? (jsx(Box$1, { sx: { p: 4, textAlign: 'center' }, children: jsx(Typography, { color: "text.secondary", children: "No uncommitted changes in the sandbox working tree." }) })) : (jsx(Box$1, { sx: { overflow: 'auto', flex: 1 }, children: jsxs(Table, { size: "small", stickyHeader: true, children: [jsx(TableHead, { children: jsxs(TableRow, { children: [jsx(TableCell, { padding: "checkbox", children: jsx(Checkbox, { size: "small", checked: files.length > 0 && selected.size === files.length, indeterminate: selected.size > 0 && selected.size < files.length, onChange: toggleAll }) }), jsx(TableCell, { children: "Path" }), jsx(TableCell, { children: "Status" }), jsx(TableCell, { align: "right", children: "Actions" })] }) }), jsx(TableBody, { children: files.map(function (file) { return (jsxs(TableRow, { hover: true, selected: selected.has(file.path), children: [jsx(TableCell, { padding: "checkbox", children: jsx(Checkbox, { size: "small", checked: selected.has(file.path), onChange: function () { return togglePath(file.path); } }) }), jsx(TableCell, { sx: __assign(__assign({}, monoSx), { maxWidth: 420 }), children: file.path }), jsx(TableCell, { children: jsx(Chip, { size: "small", label: file.status, color: statusChipColor(file.status), variant: file.conflict ? 'filled' : 'outlined' }) }), jsx(TableCell, { align: "right", children: jsxs(Stack$1, { direction: "row", spacing: 0.5, justifyContent: "flex-end", flexWrap: "wrap", useFlexGap: true, children: [(file.workTreeStatus || file.conflict) && (jsx(Tooltip, { title: "Diff working tree changes", children: jsx("span", { children: jsx(Button$1, { size: "small", variant: "text", disabled: busy || loading, startIcon: jsx(CompareArrowsRoundedIcon, {}), onClick: function () { return onDiff(file, 'unstaged'); }, children: "Diff" }) }) })), file.staged && (jsx(Button$1, { size: "small", variant: "text", disabled: busy || loading, onClick: function () { return onDiff(file, 'staged'); }, children: "Staged diff" })), canStage(file) && (jsx(Button$1, { size: "small", variant: "text", disabled: busy || loading, onClick: function () {
+                        }, children: jsx(Typography, { variant: "subtitle2", fontWeight: 700, children: "Changed paths" }) }), loading && !data ? (jsx(Box$1, { sx: { p: 4, display: 'flex', justifyContent: 'center' }, children: jsx(CircularProgress, { size: 32 }) })) : files.length === 0 ? (jsx(Box$1, { sx: { p: 4, textAlign: 'center' }, children: jsx(Typography, { color: "text.secondary", children: "No uncommitted changes in the sandbox working tree." }) })) : (jsx(Box$1, { sx: { overflow: 'auto', flex: 1 }, children: jsxs(Table, { size: "small", stickyHeader: true, children: [jsx(TableHead, { children: jsxs(TableRow, { children: [jsx(TableCell, { padding: "checkbox", children: jsx(Checkbox, { size: "small", checked: files.length > 0 && selected.size === files.length, indeterminate: selected.size > 0 && selected.size < files.length, onChange: toggleAll }) }), jsx(TableCell, { children: "Path" }), jsx(TableCell, { children: "Status" }), jsx(TableCell, { align: "right", children: "Actions" })] }) }), jsx(TableBody, { children: files.map(function (file) { return (jsxs(TableRow, { hover: true, selected: selected.has(file.path), children: [jsx(TableCell, { padding: "checkbox", children: jsx(Checkbox, { size: "small", checked: selected.has(file.path), onChange: function () { return togglePath(file.path); } }) }), jsx(TableCell, { sx: __assign(__assign({}, monoSx), { maxWidth: 420 }), children: file.path }), jsx(TableCell, { children: jsx(Chip, { size: "small", label: file.status, color: statusChipColor(file.status), variant: file.conflict ? 'filled' : 'outlined' }) }), jsx(TableCell, { align: "right", children: jsxs(Stack$1, { direction: "row", spacing: 0.5, justifyContent: "flex-end", flexWrap: "wrap", useFlexGap: true, children: [(file.workTreeStatus || file.conflict) && (jsx(Tooltip, { title: "Diff working tree changes", children: jsx("span", { children: jsx(Button$1, { size: "small", variant: "text", disabled: busy || loading, startIcon: jsx(CompareArrowsRoundedIcon, {}), onClick: function () { return onDiff(file, 'unstaged'); }, children: "Diff" }) }) })), file.staged && (jsx(Button$1, { size: "small", variant: "text", disabled: busy || loading, onClick: function () { return onDiff(file, 'staged'); }, children: "Staged diff" })), canStage(file) && (jsx(Button$1, { size: "small", variant: "text", disabled: writeLocked || busy || loading, onClick: function () {
                                                                 return runAction(function () { return __awaiter(_this, void 0, void 0, function () {
                                                                     var result;
                                                                     return __generator(this, function (_a) {
@@ -50749,7 +50900,7 @@ function WorkingTreeTab(_a) {
                                                                         }
                                                                     });
                                                                 }); });
-                                                            }, children: "Stage" })), canUnstage(file) && (jsx(Button$1, { size: "small", variant: "text", disabled: busy || loading, onClick: function () {
+                                                            }, children: "Stage" })), canUnstage(file) && (jsx(Button$1, { size: "small", variant: "text", disabled: writeLocked || busy || loading, onClick: function () {
                                                                 return runAction(function () { return __awaiter(_this, void 0, void 0, function () {
                                                                     var result;
                                                                     return __generator(this, function (_a) {
@@ -50762,7 +50913,7 @@ function WorkingTreeTab(_a) {
                                                                         }
                                                                     });
                                                                 }); });
-                                                            }, children: "Unstage" })), canDiscard(file) && (jsx(Button$1, { size: "small", variant: "text", color: "warning", disabled: busy || loading, startIcon: jsx(DeleteOutlineRoundedIcon, {}), onClick: function () {
+                                                            }, children: "Unstage" })), canDiscard(file) && (jsx(Button$1, { size: "small", variant: "text", color: "warning", disabled: writeLocked || busy || loading, startIcon: jsx(DeleteOutlineRoundedIcon, {}), onClick: function () {
                                                                 return runAction(function () { return __awaiter(_this, void 0, void 0, function () {
                                                                     var result;
                                                                     return __generator(this, function (_a) {
@@ -50775,7 +50926,7 @@ function WorkingTreeTab(_a) {
                                                                         }
                                                                     });
                                                                 }); });
-                                                            }, children: "Discard" })), file.conflict && (jsxs(Fragment, { children: [jsx(Button$1, { size: "small", variant: "text", disabled: busy || loading, onClick: function () {
+                                                            }, children: "Discard" })), file.conflict && (jsxs(Fragment, { children: [jsx(Button$1, { size: "small", variant: "text", disabled: writeLocked || busy || loading, onClick: function () {
                                                                         return runAction(function () { return __awaiter(_this, void 0, void 0, function () {
                                                                             var result;
                                                                             return __generator(this, function (_a) {
@@ -50788,7 +50939,7 @@ function WorkingTreeTab(_a) {
                                                                                 }
                                                                             });
                                                                         }); });
-                                                                    }, children: "Use ours" }), jsx(Button$1, { size: "small", variant: "text", disabled: busy || loading, onClick: function () {
+                                                                    }, children: "Use ours" }), jsx(Button$1, { size: "small", variant: "text", disabled: writeLocked || busy || loading, onClick: function () {
                                                                         return runAction(function () { return __awaiter(_this, void 0, void 0, function () {
                                                                             var result;
                                                                             return __generator(this, function (_a) {
@@ -50801,7 +50952,7 @@ function WorkingTreeTab(_a) {
                                                                                 }
                                                                             });
                                                                         }); });
-                                                                    }, children: "Use theirs" })] }))] }) })] }, file.path)); }) })] }) }))] }), jsxs(Dialog, { open: commitOpen, onClose: function () { return !busy && setCommitOpen(false); }, maxWidth: "sm", fullWidth: true, children: [jsx(DialogTitle, { children: "Commit staged changes" }), jsx(DialogContent, { children: jsxs(Stack$1, { spacing: 2, sx: { mt: 1 }, children: [jsx(Typography, { variant: "body2", color: "text.secondary", children: "Creates a new commit in the sandbox git repository. Studio may need to sync to ingest the commit." }), jsx(TextField$1, { fullWidth: true, size: "small", label: "Commit message", value: commitMessage, onChange: function (e) { return setCommitMessage(e.target.value); }, multiline: true, minRows: 3 })] }) }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: function () { return setCommitOpen(false); }, disabled: busy, children: "Cancel" }), jsx(Button$1, { variant: "contained", disabled: busy || !commitMessage.trim(), onClick: onCommit, children: busy ? 'Committing…' : 'Commit' })] })] }), jsxs(Dialog, { open: resetOpen, onClose: function () { return !busy && setResetOpen(false); }, maxWidth: "sm", fullWidth: true, children: [jsx(DialogTitle, { children: "Reset working tree to HEAD?" }), jsx(DialogContent, { children: jsxs(Stack$1, { spacing: 2, sx: { mt: 1 }, children: [jsx(Alert, { severity: "error", icon: jsx(WarningAmberRoundedIcon, {}), children: "This discards all uncommitted changes and resets tracked files to HEAD. Untracked files may also be removed." }), jsx(FormControlLabel, { control: jsx(Checkbox, { checked: resetAck, onChange: function (e) { return setResetAck(e.target.checked); } }), label: "I understand this cannot be undone." })] }) }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: function () { return setResetOpen(false); }, disabled: busy, children: "Cancel" }), jsx(Button$1, { color: "error", variant: "contained", disabled: !resetAck || busy, onClick: onResetHard, children: "Reset hard" })] })] }), jsxs(Dialog, { open: diffOpen, onClose: function () { return setDiffOpen(false); }, maxWidth: "lg", fullWidth: true, children: [jsx(DialogTitle, { children: diffTitle }), jsx(DialogContent, { sx: { minHeight: 320, display: 'flex', flexDirection: 'column' }, children: diffLoading ? (jsx(Box$1, { sx: { py: 4, display: 'flex', justifyContent: 'center' }, children: jsx(CircularProgress, { size: 28 }) })) : (jsx(DiffViewer, { title: diffTitle, fileDiffs: fileDiffs })) }), jsx(DialogActions, { children: jsx(Button$1, { onClick: function () { return setDiffOpen(false); }, children: "Close" }) })] })] }));
+                                                                    }, children: "Use theirs" })] }))] }) })] }, file.path)); }) })] }) }))] }), jsxs(Dialog, { open: commitOpen, onClose: function () { return !busy && setCommitOpen(false); }, maxWidth: "sm", fullWidth: true, children: [jsx(DialogTitle, { children: "Commit staged changes" }), jsx(DialogContent, { children: jsxs(Stack$1, { spacing: 2, sx: { mt: 1 }, children: [jsx(Typography, { variant: "body2", color: "text.secondary", children: "Creates a new commit in the sandbox git repository. Studio may need to sync to ingest the commit." }), jsx(TextField$1, { fullWidth: true, size: "small", label: "Commit message", value: commitMessage, onChange: function (e) { return setCommitMessage(e.target.value); }, multiline: true, minRows: 3 })] }) }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: function () { return setCommitOpen(false); }, disabled: busy, children: "Cancel" }), jsx(Button$1, { variant: "contained", disabled: writeLocked || busy || !commitMessage.trim(), onClick: onCommit, children: busy ? 'Committing…' : 'Commit' })] })] }), jsxs(Dialog, { open: resetOpen, onClose: function () { return !busy && setResetOpen(false); }, maxWidth: "sm", fullWidth: true, children: [jsx(DialogTitle, { children: "Reset working tree to HEAD?" }), jsx(DialogContent, { children: jsxs(Stack$1, { spacing: 2, sx: { mt: 1 }, children: [jsx(Alert, { severity: "error", icon: jsx(WarningAmberRoundedIcon, {}), children: "This discards all uncommitted changes and resets tracked files to HEAD. Untracked files may also be removed." }), jsx(FormControlLabel, { control: jsx(Checkbox, { checked: resetAck, onChange: function (e) { return setResetAck(e.target.checked); } }), label: "I understand this cannot be undone." })] }) }), jsxs(DialogActions, { children: [jsx(Button$1, { onClick: function () { return setResetOpen(false); }, disabled: busy, children: "Cancel" }), jsx(Button$1, { color: "error", variant: "contained", disabled: writeLocked || !resetAck || busy, onClick: onResetHard, children: "Reset hard" })] })] }), jsxs(Dialog, { open: diffOpen, onClose: function () { return setDiffOpen(false); }, maxWidth: "lg", fullWidth: true, children: [jsx(DialogTitle, { children: diffTitle }), jsx(DialogContent, { sx: { minHeight: 320, display: 'flex', flexDirection: 'column' }, children: diffLoading ? (jsx(Box$1, { sx: { py: 4, display: 'flex', justifyContent: 'center' }, children: jsx(CircularProgress, { size: 28 }) })) : (jsx(DiffViewer, { title: diffTitle, fileDiffs: fileDiffs })) }), jsx(DialogActions, { children: jsx(Button$1, { onClick: function () { return setDiffOpen(false); }, children: "Close" }) })] })] }));
 }
 
 function PresenceChip(_a) {
@@ -50968,6 +51119,7 @@ function BlobVersionPreviewPanel(_a) {
 function BlobVersionHistoryDialog(_a) {
     var _this = this;
     var siteId = _a.siteId, store = _a.store, assetPath = _a.assetPath, overview = _a.overview, open = _a.open, onClose = _a.onClose, onRestored = _a.onRestored;
+    var writeLocked = useWriteOpsLocked();
     var targetOptions = useMemo(function () {
         var options = ['preview'];
         if (store.mappings.some(function (m) { return m.publishingTarget.toLowerCase() === 'staging'; }) && overview.stagingEnabled) {
@@ -51085,11 +51237,12 @@ function BlobVersionHistoryDialog(_a) {
     }); };
     return (jsxs(Dialog, { open: open, onClose: onClose, maxWidth: "lg", fullWidth: true, children: [jsx(DialogTitle, { children: "Version history" }), jsxs(DialogContent, { dividers: true, sx: { maxHeight: '80vh', overflow: 'auto' }, children: [jsx(Typography, { variant: "body2", color: "text.secondary", sx: __assign(__assign({}, monoSx), { mb: 1.5 }), noWrap: true, title: assetPath, children: assetPath }), objectKey && (jsxs(Typography, { variant: "caption", color: "text.secondary", sx: __assign(__assign({ display: 'block' }, monoSx), { mb: 1.5 }), children: ["S3 key: ", objectKey] })), jsxs(Stack$1, { direction: { xs: 'column', sm: 'row' }, spacing: 1, alignItems: { sm: 'center' }, sx: { mb: 1.5 }, children: [jsxs(FormControl, { size: "small", sx: { minWidth: 160 }, children: [jsx(InputLabel, { id: "blob-version-target-label", children: "Environment" }), jsx(Select, { labelId: "blob-version-target-label", label: "Environment", value: target, onChange: function (e) { return setTarget(e.target.value); }, children: targetOptions.map(function (option) { return (jsx(MenuItem$1, { value: option, children: option }, option)); }) })] }), jsx(Button$1, { size: "small", startIcon: jsx(RefreshRoundedIcon, {}), onClick: loadVersions, disabled: loading, children: "Refresh" })] }), notice && (jsx(Alert, { severity: "success", sx: { mb: 1.5 }, onClose: function () { return setNotice(null); }, children: notice })), error && (jsx(Alert, { severity: "error", sx: { mb: 1.5 }, onClose: function () { return setError(null); }, children: error })), loading ? (jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', gap: 1, py: 3, justifyContent: 'center' }, children: [jsx(CircularProgress, { size: 20 }), jsx(Typography, { variant: "body2", color: "text.secondary", children: "Loading versions\u2026" })] })) : versions.length === 0 ? (jsx(Typography, { variant: "body2", color: "text.secondary", children: "No versions found. Ensure bucket versioning is enabled on the S3/MinIO bucket." })) : (jsxs(Table, { size: "small", children: [jsx(TableHead, { children: jsxs(TableRow, { children: [jsx(TableCell, { children: "Version" }), jsx(TableCell, { children: "Modified" }), jsx(TableCell, { align: "right", children: "Size" }), jsx(TableCell, { align: "right", children: "Actions" })] }) }), jsx(TableBody, { children: versions.map(function (version) { return (jsxs(TableRow, { hover: true, selected: previewVersionId === version.versionId, sx: { cursor: version.deleteMarker ? 'default' : 'pointer' }, onClick: function () { return !version.deleteMarker && loadPreview(version); }, children: [jsx(TableCell, { sx: __assign(__assign({}, monoSx), { maxWidth: 220 }), children: jsxs(Stack$1, { direction: "row", spacing: 0.5, alignItems: "center", useFlexGap: true, flexWrap: "wrap", children: [jsx(Typography, { variant: "body2", sx: version.legacyNullVersion ? undefined : monoSx, noWrap: true, title: version.legacyNullVersion
                                                             ? 'Object uploaded before bucket versioning was enabled'
-                                                            : version.versionId, children: formatBlobVersionLabel(version) }), version.latest && !version.deleteMarker && (jsx(Chip, { size: "small", label: "Current", color: "primary", variant: "outlined" })), version.deleteMarker && (jsx(Chip, { size: "small", label: "Deleted", color: "warning", variant: "outlined" }))] }) }), jsx(TableCell, { children: formatVersionDate(version.lastModified) }), jsx(TableCell, { align: "right", children: version.deleteMarker ? '—' : formatBytes(version.size) }), jsx(TableCell, { align: "right", children: jsxs(Stack$1, { direction: "row", spacing: 0.5, justifyContent: "flex-end", onClick: function (e) { return e.stopPropagation(); }, children: [jsx(Button$1, { size: "small", variant: "text", startIcon: previewLoading && previewVersionId === version.versionId ? (jsx(CircularProgress, { size: 14 })) : (jsx(VisibilityRoundedIcon, {})), disabled: Boolean(version.deleteMarker) || previewLoading, onClick: function () { return loadPreview(version); }, children: "Preview" }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: restoringId === version.versionId ? (jsx(CircularProgress, { size: 14 })) : (jsx(RestoreRoundedIcon, {})), disabled: Boolean(store.readOnly) || restoringId !== null, onClick: function () { return restore(version); }, children: version.deleteMarker ? 'Undelete' : 'Restore' })] }) })] }, blobVersionRowKey(version))); }) })] })), jsx(BlobVersionPreviewPanel, { preview: preview, loading: previewLoading, error: previewError })] }), jsx(DialogActions, { children: jsx(Button$1, { onClick: onClose, children: "Close" }) })] }));
+                                                            : version.versionId, children: formatBlobVersionLabel(version) }), version.latest && !version.deleteMarker && (jsx(Chip, { size: "small", label: "Current", color: "primary", variant: "outlined" })), version.deleteMarker && (jsx(Chip, { size: "small", label: "Deleted", color: "warning", variant: "outlined" }))] }) }), jsx(TableCell, { children: formatVersionDate(version.lastModified) }), jsx(TableCell, { align: "right", children: version.deleteMarker ? '—' : formatBytes(version.size) }), jsx(TableCell, { align: "right", children: jsxs(Stack$1, { direction: "row", spacing: 0.5, justifyContent: "flex-end", onClick: function (e) { return e.stopPropagation(); }, children: [jsx(Button$1, { size: "small", variant: "text", startIcon: previewLoading && previewVersionId === version.versionId ? (jsx(CircularProgress, { size: 14 })) : (jsx(VisibilityRoundedIcon, {})), disabled: Boolean(version.deleteMarker) || previewLoading, onClick: function () { return loadPreview(version); }, children: "Preview" }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: restoringId === version.versionId ? (jsx(CircularProgress, { size: 14 })) : (jsx(RestoreRoundedIcon, {})), disabled: writeLocked || Boolean(store.readOnly) || restoringId !== null, onClick: function () { return restore(version); }, children: version.deleteMarker ? 'Undelete' : 'Restore' })] }) })] }, blobVersionRowKey(version))); }) })] })), jsx(BlobVersionPreviewPanel, { preview: preview, loading: previewLoading, error: previewError })] }), jsx(DialogActions, { children: jsx(Button$1, { onClick: onClose, children: "Close" }) })] }));
 }
 function DeletedBlobsPanel(_a) {
     var _this = this;
     var siteId = _a.siteId, store = _a.store, overview = _a.overview, onOpenHistory = _a.onOpenHistory, onRestored = _a.onRestored;
+    var writeLocked = useWriteOpsLocked();
     var targetOptions = useMemo(function () {
         var options = ['preview'];
         if (store.mappings.some(function (m) { return m.publishingTarget.toLowerCase() === 'staging'; }) && overview.stagingEnabled) {
@@ -51222,11 +51375,12 @@ function DeletedBlobsPanel(_a) {
                     bgcolor: function (t) { return alpha(t.palette.text.primary, 0.02); }
                 }, children: loading ? (jsxs(Box$1, { sx: { p: 2, display: 'flex', alignItems: 'center', gap: 1 }, children: [jsx(CircularProgress, { size: 18 }), jsx(Typography, { variant: "body2", color: "text.secondary", children: "Loading deleted objects\u2026" })] })) : entries.length === 0 ? (jsx(Typography, { variant: "body2", color: "text.secondary", sx: { p: 2 }, children: appliedKeyword
                         ? "No currently deleted blobs match \"".concat(appliedKeyword, "\" in ").concat(target, ".")
-                        : "No currently deleted blobs found under this store path in ".concat(target, ".") })) : (jsxs(Table, { size: "small", stickyHeader: true, children: [jsx(TableHead, { children: jsxs(TableRow, { children: [jsx(TableCell, { children: "Path" }), jsx(TableCell, { children: "Deleted" }), jsx(TableCell, { align: "right", children: "Actions" })] }) }), jsx(TableBody, { children: entries.map(function (entry) { return (jsxs(TableRow, { hover: true, children: [jsx(TableCell, { sx: __assign(__assign({}, monoSx), { maxWidth: 360 }), title: entry.path, children: entry.path }), jsx(TableCell, { children: formatVersionDate(entry.lastModified) }), jsx(TableCell, { align: "right", children: jsxs(Stack$1, { direction: "row", spacing: 0.5, justifyContent: "flex-end", children: [jsx(Button$1, { size: "small", onClick: function () { return onOpenHistory(entry.path); }, children: "History" }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: restoringId === entry.versionId ? jsx(CircularProgress, { size: 14 }) : jsx(RestoreRoundedIcon, {}), disabled: Boolean(store.readOnly) || restoringId !== null, onClick: function () { return undelete(entry); }, children: "Restore" })] }) })] }, "".concat(entry.path, "-").concat(entry.versionId))); }) })] })) })] }));
+                        : "No currently deleted blobs found under this store path in ".concat(target, ".") })) : (jsxs(Table, { size: "small", stickyHeader: true, children: [jsx(TableHead, { children: jsxs(TableRow, { children: [jsx(TableCell, { children: "Path" }), jsx(TableCell, { children: "Deleted" }), jsx(TableCell, { align: "right", children: "Actions" })] }) }), jsx(TableBody, { children: entries.map(function (entry) { return (jsxs(TableRow, { hover: true, children: [jsx(TableCell, { sx: __assign(__assign({}, monoSx), { maxWidth: 360 }), title: entry.path, children: entry.path }), jsx(TableCell, { children: formatVersionDate(entry.lastModified) }), jsx(TableCell, { align: "right", children: jsxs(Stack$1, { direction: "row", spacing: 0.5, justifyContent: "flex-end", children: [jsx(Button$1, { size: "small", onClick: function () { return onOpenHistory(entry.path); }, children: "History" }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: restoringId === entry.versionId ? jsx(CircularProgress, { size: 14 }) : jsx(RestoreRoundedIcon, {}), disabled: writeLocked || Boolean(store.readOnly) || restoringId !== null, onClick: function () { return undelete(entry); }, children: "Restore" })] }) })] }, "".concat(entry.path, "-").concat(entry.versionId))); }) })] })) })] }));
 }
 function BlobStoreSection(_a) {
     var _this = this;
     var siteId = _a.siteId, store = _a.store, overview = _a.overview;
+    var writeLocked = useWriteOpsLocked();
     var _b = useState({ entries: [], loading: true }), rootState = _b[0], setRootState = _b[1];
     var _c = useState({}), selectedPaths = _c[0], setSelectedPaths = _c[1];
     var _d = useState(null), syncing = _d[0], setSyncing = _d[1];
@@ -51298,10 +51452,11 @@ function BlobStoreSection(_a) {
             }
         });
     }); };
-    return (jsxs(Paper, { elevation: 0, sx: __assign(__assign({}, surfacePaperSx), { p: 2 }), children: [jsx(PanelHeader, { title: store.id, action: jsx(Button$1, { size: "small", startIcon: jsx(RefreshRoundedIcon, {}), onClick: function () { return loadRoot(); }, children: "Refresh tree" }) }), jsxs(Stack$1, { direction: "row", spacing: 0.5, useFlexGap: true, flexWrap: "wrap", sx: { mt: 0.5 }, children: [jsx(Chip, { size: "small", label: store.type, variant: "outlined" }), jsx(Chip, { size: "small", label: store.active ? 'Active' : 'Inactive', color: store.active ? 'success' : 'default', variant: "outlined" }), store.readOnly && jsx(Chip, { size: "small", label: "Read-only", color: "warning", variant: "outlined" })] }), jsx(Typography, { variant: "caption", color: "text.secondary", sx: { display: 'block', mt: 1 }, children: "Browse files in preview storage, then sync to staging or live when needed." }), jsx(SectionLabel, { sx: { mt: 1.5 }, children: "Storage targets" }), jsx(Stack$1, { direction: "row", spacing: 0.5, useFlexGap: true, flexWrap: "wrap", children: store.mappings.map(function (mapping) { return (jsx(Chip, { size: "small", variant: "outlined", label: "".concat(mapping.publishingTarget, ": ").concat(mapping.storeTarget).concat(mapping.prefix ? " (".concat(mapping.prefix, ")") : ''), sx: { maxWidth: '100%', '& .MuiChip-label': __assign(__assign({}, monoSx), { fontSize: '0.72rem' }) } }, mapping.publishingTarget)); }) }), jsxs(TabAlertStack, { sx: { mt: 1.5 }, children: [store.versioningSupported && store.versioningNote && (jsx(Alert, { severity: "warning", children: store.versioningNote })), notice && (jsx(Alert, { severity: "success", onClose: function () { return setNotice(null); }, children: notice })), error && (jsx(Alert, { severity: "error", onClose: function () { return setError(null); }, children: error }))] }), jsx(TabToolbar, { sx: { mt: 1.5, px: 0 }, children: jsxs(ToolbarRow, { children: [jsx(ToolbarGroup, { children: jsxs(Typography, { variant: "body2", color: "text.secondary", children: [selectedList.length, " selected"] }) }), jsx(ToolbarDivider, {}), jsxs(ToolbarGroup, { children: [store.versioningSupported ? (jsx(Button$1, { size: "small", variant: "outlined", startIcon: jsx(HistoryRoundedIcon, {}), disabled: selectedList.length !== 1, onClick: function () { return openVersionHistory(selectedList[0]); }, children: "Version history" })) : store.type === 's3BlobStore' ? (jsx(Typography, { variant: "body2", color: "text.secondary", sx: { px: 0.5 }, children: "Version history requires S3 bucket versioning" })) : null, jsx(Button$1, { size: "small", variant: "outlined", startIcon: syncing === 'staging' ? jsx(CircularProgress, { size: 14 }) : jsx(CloudUploadRoundedIcon, {}), disabled: !selectedList.length ||
+    return (jsxs(Paper, { elevation: 0, sx: __assign(__assign({}, surfacePaperSx), { p: 2 }), children: [jsx(PanelHeader, { title: store.id, action: jsx(Button$1, { size: "small", startIcon: jsx(RefreshRoundedIcon, {}), onClick: function () { return loadRoot(); }, children: "Refresh tree" }) }), jsxs(Stack$1, { direction: "row", spacing: 0.5, useFlexGap: true, flexWrap: "wrap", sx: { mt: 0.5 }, children: [jsx(Chip, { size: "small", label: store.type, variant: "outlined" }), jsx(Chip, { size: "small", label: store.active ? 'Active' : 'Inactive', color: store.active ? 'success' : 'default', variant: "outlined" }), store.readOnly && jsx(Chip, { size: "small", label: "Read-only", color: "warning", variant: "outlined" })] }), jsx(Typography, { variant: "caption", color: "text.secondary", sx: { display: 'block', mt: 1 }, children: "Browse files in preview storage, then sync to staging or live when needed." }), jsx(SectionLabel, { sx: { mt: 1.5 }, children: "Storage targets" }), jsx(Stack$1, { direction: "row", spacing: 0.5, useFlexGap: true, flexWrap: "wrap", children: store.mappings.map(function (mapping) { return (jsx(Chip, { size: "small", variant: "outlined", label: "".concat(mapping.publishingTarget, ": ").concat(mapping.storeTarget).concat(mapping.prefix ? " (".concat(mapping.prefix, ")") : ''), sx: { maxWidth: '100%', '& .MuiChip-label': __assign(__assign({}, monoSx), { fontSize: '0.72rem' }) } }, mapping.publishingTarget)); }) }), jsxs(TabAlertStack, { sx: { mt: 1.5 }, children: [store.versioningSupported && store.versioningNote && (jsx(Alert, { severity: "warning", children: store.versioningNote })), notice && (jsx(Alert, { severity: "success", onClose: function () { return setNotice(null); }, children: notice })), error && (jsx(Alert, { severity: "error", onClose: function () { return setError(null); }, children: error }))] }), jsx(TabToolbar, { sx: { mt: 1.5, px: 0 }, children: jsxs(ToolbarRow, { children: [jsx(ToolbarGroup, { children: jsxs(Typography, { variant: "body2", color: "text.secondary", children: [selectedList.length, " selected"] }) }), jsx(ToolbarDivider, {}), jsxs(ToolbarGroup, { children: [store.versioningSupported ? (jsx(Button$1, { size: "small", variant: "outlined", startIcon: jsx(HistoryRoundedIcon, {}), disabled: selectedList.length !== 1, onClick: function () { return openVersionHistory(selectedList[0]); }, children: "Version history" })) : store.type === 's3BlobStore' ? (jsx(Typography, { variant: "body2", color: "text.secondary", sx: { px: 0.5 }, children: "Version history requires S3 bucket versioning" })) : null, jsx(Button$1, { size: "small", variant: "outlined", startIcon: syncing === 'staging' ? jsx(CircularProgress, { size: 14 }) : jsx(CloudUploadRoundedIcon, {}), disabled: writeLocked ||
+                                        !selectedList.length ||
                                         syncing !== null ||
                                         !overview.stagingEnabled ||
-                                        !hasStagingMapping, onClick: function () { return sync('staging'); }, children: "Preview \u2192 staging" }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: syncing === 'live' ? jsx(CircularProgress, { size: 14 }) : jsx(CloudUploadRoundedIcon, {}), disabled: !selectedList.length || syncing !== null || !hasLiveMapping, onClick: function () { return sync('live'); }, children: "Preview \u2192 live" })] })] }) }), !overview.stagingEnabled && (jsx(Typography, { variant: "caption", color: "text.secondary", sx: { display: 'block', mb: 1 }, children: "Staging environment is not enabled for this project." })), jsx(Box$1, { sx: {
+                                        !hasStagingMapping, onClick: function () { return sync('staging'); }, children: "Preview \u2192 staging" }), jsx(Button$1, { size: "small", variant: "outlined", startIcon: syncing === 'live' ? jsx(CircularProgress, { size: 14 }) : jsx(CloudUploadRoundedIcon, {}), disabled: writeLocked || !selectedList.length || syncing !== null || !hasLiveMapping, onClick: function () { return sync('live'); }, children: "Preview \u2192 live" })] })] }) }), !overview.stagingEnabled && (jsx(Typography, { variant: "caption", color: "text.secondary", sx: { display: 'block', mb: 1 }, children: "Staging environment is not enabled for this project." })), jsx(Box$1, { sx: {
                     mt: 1,
                     border: 1,
                     borderColor: 'divider',
@@ -51575,7 +51730,11 @@ function DevContentOpsTools() {
     var _d = useState([]), sites = _d[0], setSites = _d[1];
     var _e = useState(true), sitesLoading = _e[0], setSitesLoading = _e[1];
     var _f = useState(null), selectedSite = _f[0], setSelectedSite = _f[1];
+    var _g = useState(false), writeOperationsEnabled = _g[0], setWriteOperationsEnabled = _g[1];
     var userPickedSiteRef = useRef(false);
+    var onWriteOperationsEnabledChange = useCallback(function (enabled) {
+        setWriteOperationsEnabled(enabled);
+    }, []);
     useEffect(function () {
         setDevContentOpsStudioSiteId(activeSiteId !== null && activeSiteId !== void 0 ? activeSiteId : null);
     }, [activeSiteId]);
@@ -51610,48 +51769,67 @@ function DevContentOpsTools() {
     var operatingSite = (_b = (_a = selectedSite !== null && selectedSite !== void 0 ? selectedSite : sites.find(function (site) { return site.id === activeSiteId; })) !== null && _a !== void 0 ? _a : sites[0]) !== null && _b !== void 0 ? _b : null;
     var siteId = operatingSite === null || operatingSite === void 0 ? void 0 : operatingSite.id;
     var projectPickerValue = operatingSite;
-    return (jsxs(Box$1, { sx: {
-            height: '100%',
-            minHeight: 0,
-            display: 'flex',
-            flexDirection: 'column',
-            bgcolor: function (t) { return alpha(t.palette.text.primary, 0.02); }
-        }, children: [jsxs(Paper, { elevation: 0, square: true, sx: {
-                    px: 2.5,
-                    pt: 2.5,
-                    pb: 2,
-                    borderBottom: 1,
-                    borderColor: 'divider',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: 2,
-                    bgcolor: 'background.paper',
-                    flexWrap: 'wrap',
-                    flexShrink: 0,
-                    overflow: 'visible'
-                }, children: [jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', gap: 1.5, minWidth: 0 }, children: [jsx(Box$1, { sx: {
-                                    width: 40,
-                                    height: 40,
-                                    borderRadius: 2,
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    bgcolor: alpha(theme.palette.primary.main, 0.12),
-                                    color: 'primary.main',
-                                    flexShrink: 0
-                                }, children: jsx(AccountTreeRoundedIcon, { fontSize: "small" }) }), jsx(Typography, { variant: "h6", fontWeight: 700, lineHeight: 1.25, letterSpacing: "-0.01em", sx: { minWidth: 0 }, children: "DevContentOps Tools" })] }), jsx(Box$1, { sx: { minWidth: { xs: '100%', sm: 280 }, maxWidth: 360, flex: { sm: '0 1 360px' }, pt: 0.5 }, children: sitesLoading ? (jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', gap: 1, justifyContent: { xs: 'flex-start', sm: 'flex-end' } }, children: [jsx(CircularProgress, { size: 18 }), jsx(Typography, { variant: "body2", color: "text.secondary", children: "Loading projects\u2026" })] })) : sites.length === 0 ? (jsx(Chip, { size: "small", label: "No accessible projects", color: "warning", variant: "outlined" })) : projectPickerValue ? (jsx(Autocomplete, { size: "small", disableClearable: true, options: sites, value: projectPickerValue, onChange: function (_, value) {
-                                userPickedSiteRef.current = true;
-                                setSelectedSite(value);
-                            }, getOptionLabel: function (option) { return "".concat(option.name, " (").concat(option.id, ")"); }, isOptionEqualToValue: function (option, value) { return option.id === value.id; }, renderInput: function (params) { return (jsx(TextField$1, __assign({}, params, { label: "Project", helperText: "Tools run against this project; does not change your Studio session", InputLabelProps: __assign(__assign({}, params.InputLabelProps), { shrink: true }) }))); } })) : null })] }), jsxs(Tabs, { value: tab, onChange: function (_, v) { return setTab(v); }, variant: "scrollable", scrollButtons: "auto", allowScrollButtonsMobile: true, sx: {
-                    px: 2.5,
-                    borderBottom: 1,
-                    borderColor: 'divider',
-                    bgcolor: 'background.paper',
-                    minHeight: 44,
-                    flexShrink: 0,
-                    '& .MuiTab-root': { minHeight: 44, textTransform: 'none', fontWeight: 600, fontSize: '0.875rem' }
-                }, children: [jsx(Tab, { value: "git-log", label: "Git log" }), jsx(Tab, { value: "working-tree", label: "Working tree" }), jsx(Tab, { value: "branches", label: "Branches" }), jsx(Tab, { value: "database", label: "Database" }), jsx(Tab, { value: "repo-health", label: "Repository health" }), jsx(Tab, { value: "site-items", label: "Site items" }), jsx(Tab, { value: "blob-stores", label: "Blob stores" }), jsx(Tab, { value: "publish-compare", label: "Publish compare" })] }), jsx(Box$1, { sx: { flex: 1, minHeight: 0, p: 2.5, display: 'flex', flexDirection: 'column', overflow: 'hidden' }, children: !siteId ? (jsx(Box$1, { sx: { flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 240 }, children: jsx(Typography, { color: "text.secondary", variant: "body1", children: sitesLoading ? 'Loading projects…' : 'Select a project to continue.' }) })) : (jsxs(Fragment, { children: [tab === 'git-log' && (jsx(GitLogTab, { siteId: siteId, siteName: operatingSite.name, sites: sites }, siteId)), tab === 'working-tree' && (jsx(WorkingTreeTab, { siteId: siteId, siteName: operatingSite.name }, siteId)), tab === 'branches' && (jsx(BranchesTab, { siteId: siteId, siteName: operatingSite.name }, siteId)), tab === 'database' && (jsx(DatabaseTab, { siteId: siteId, siteName: operatingSite.name }, siteId)), tab === 'repo-health' && (jsx(RepoHealthTab, { siteId: siteId, siteName: operatingSite.name }, siteId)), tab === 'site-items' && (jsx(SiteItemsTab, { siteId: siteId, siteName: operatingSite.name }, siteId)), tab === 'blob-stores' && (jsx(BlobStoreTab, { siteId: siteId, siteName: operatingSite.name }, siteId)), tab === 'publish-compare' && (jsx(PublishCompareTab, { siteId: siteId, siteName: operatingSite.name }, siteId))] })) })] }));
+    return (jsx(DevContentOpsWriteGateProvider, { writeOperationsEnabled: writeOperationsEnabled, onWriteOperationsEnabledChange: onWriteOperationsEnabledChange, children: jsxs(Box$1, { sx: {
+                height: '100%',
+                minHeight: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                bgcolor: function (t) { return alpha(t.palette.text.primary, 0.02); }
+            }, children: [jsxs(Paper, { elevation: 0, square: true, sx: {
+                        px: 2.5,
+                        pt: 2.5,
+                        pb: 2,
+                        borderBottom: 1,
+                        borderColor: 'divider',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: 2,
+                        bgcolor: 'background.paper',
+                        flexWrap: 'wrap',
+                        flexShrink: 0,
+                        overflow: 'visible'
+                    }, children: [jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', gap: 1.5, minWidth: 0 }, children: [jsx(Box$1, { sx: {
+                                        width: 40,
+                                        height: 40,
+                                        borderRadius: 2,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        bgcolor: alpha(theme.palette.primary.main, 0.12),
+                                        color: 'primary.main',
+                                        flexShrink: 0
+                                    }, children: jsx(AccountTreeRoundedIcon, { fontSize: "small" }) }), jsx(Typography, { variant: "h6", fontWeight: 700, lineHeight: 1.25, letterSpacing: "-0.01em", sx: { minWidth: 0 }, children: "DevContentOps Tools" })] }), jsxs(Box$1, { sx: {
+                                display: 'flex',
+                                alignItems: 'flex-start',
+                                gap: 2,
+                                flexWrap: 'wrap',
+                                minWidth: { xs: '100%', sm: 'auto' },
+                                justifyContent: { xs: 'flex-start', sm: 'flex-end' }
+                            }, children: [jsx(Box$1, { sx: { minWidth: { xs: '100%', sm: 280 }, maxWidth: 360, flex: { sm: '0 1 360px' }, pt: 0.5 }, children: sitesLoading ? (jsxs(Box$1, { sx: { display: 'flex', alignItems: 'center', gap: 1 }, children: [jsx(CircularProgress, { size: 18 }), jsx(Typography, { variant: "body2", color: "text.secondary", children: "Loading projects\u2026" })] })) : sites.length === 0 ? (jsx(Chip, { size: "small", label: "No accessible projects", color: "warning", variant: "outlined" })) : projectPickerValue ? (jsx(Autocomplete, { size: "small", disableClearable: true, options: sites, value: projectPickerValue, onChange: function (_, value) {
+                                            userPickedSiteRef.current = true;
+                                            setSelectedSite(value);
+                                        }, getOptionLabel: function (option) { return "".concat(option.name, " (").concat(option.id, ")"); }, isOptionEqualToValue: function (option, value) { return option.id === value.id; }, renderInput: function (params) { return (jsx(TextField$1, __assign({}, params, { label: "Project", helperText: "Tools run against this project; does not change your Studio session", InputLabelProps: __assign(__assign({}, params.InputLabelProps), { shrink: true }) }))); } })) : null }), jsx(Tooltip, { title: writeOperationsEnabled
+                                        ? 'Mutating actions are enabled for this session'
+                                        : 'Mutating actions (apply patch, commit, reset, truncate, restore, etc.) are locked until enabled', children: jsx(FormControlLabel, { sx: {
+                                            m: 0,
+                                            mt: { xs: 0, sm: 0.75 },
+                                            alignItems: 'center',
+                                            flexShrink: 0,
+                                            '& .MuiFormControlLabel-label': {
+                                                typography: 'body2',
+                                                fontWeight: 600,
+                                                whiteSpace: 'nowrap'
+                                            }
+                                        }, control: jsx(Switch, { size: "small", color: "warning", checked: writeOperationsEnabled, onChange: function (_, checked) { return setWriteOperationsEnabled(checked); }, inputProps: { 'aria-label': 'Enable write Operations' } }), label: "Enable write Operations" }) })] })] }), jsxs(Tabs, { value: tab, onChange: function (_, v) { return setTab(v); }, variant: "scrollable", scrollButtons: "auto", allowScrollButtonsMobile: true, sx: {
+                        px: 2.5,
+                        borderBottom: 1,
+                        borderColor: 'divider',
+                        bgcolor: 'background.paper',
+                        minHeight: 44,
+                        flexShrink: 0,
+                        '& .MuiTab-root': { minHeight: 44, textTransform: 'none', fontWeight: 600, fontSize: '0.875rem' }
+                    }, children: [jsx(Tab, { value: "git-log", label: "Git log" }), jsx(Tab, { value: "working-tree", label: "Working tree" }), jsx(Tab, { value: "branches", label: "Branches" }), jsx(Tab, { value: "database", label: "Database" }), jsx(Tab, { value: "repo-health", label: "Repository health" }), jsx(Tab, { value: "site-items", label: "Site items" }), jsx(Tab, { value: "blob-stores", label: "Blob stores" }), jsx(Tab, { value: "publish-compare", label: "Publish compare" })] }), jsx(Box$1, { sx: { flex: 1, minHeight: 0, p: 2.5, display: 'flex', flexDirection: 'column', overflow: 'hidden' }, children: !siteId ? (jsx(Box$1, { sx: { flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 240 }, children: jsx(Typography, { color: "text.secondary", variant: "body1", children: sitesLoading ? 'Loading projects…' : 'Select a project to continue.' }) })) : (jsxs(Fragment, { children: [tab === 'git-log' && (jsx(GitLogTab, { siteId: siteId, siteName: operatingSite.name, sites: sites }, siteId)), tab === 'working-tree' && (jsx(WorkingTreeTab, { siteId: siteId, siteName: operatingSite.name }, siteId)), tab === 'branches' && (jsx(BranchesTab, { siteId: siteId, siteName: operatingSite.name }, siteId)), tab === 'database' && (jsx(DatabaseTab, { siteId: siteId, siteName: operatingSite.name }, siteId)), tab === 'repo-health' && (jsx(RepoHealthTab, { siteId: siteId, siteName: operatingSite.name }, siteId)), tab === 'site-items' && (jsx(SiteItemsTab, { siteId: siteId, siteName: operatingSite.name }, siteId)), tab === 'blob-stores' && (jsx(BlobStoreTab, { siteId: siteId, siteName: operatingSite.name }, siteId)), tab === 'publish-compare' && (jsx(PublishCompareTab, { siteId: siteId, siteName: operatingSite.name }, siteId))] })) })] }) }));
 }
 
 /*
@@ -54896,7 +55074,7 @@ function TranslationConfigTools() {
         var targets = typeRows.filter(function (row) { return selectedTypeIds.has(row.id); });
         setApplyLoading(true);
         from(targets)
-            .pipe(concatMap(function (row) {
+            .pipe(concatMap$1(function (row) {
             return fetchConfigurationXML(siteId, row.formPath, TRANSLATION_CONFIG_MODULE).pipe(mergeMap(function (xml) {
                 var patched = patchFormDefinitionWithTranslationFields(xml, formSectionOptions);
                 if (!patched.changed) {
