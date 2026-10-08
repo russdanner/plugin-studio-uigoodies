@@ -21,7 +21,7 @@ if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
   echo "  SKIP_YARN_DIST=1              Skip UI build (bundle must already exist)." >&2
   echo "  SKIP_SCRIPT_RELOAD=1          Skip Groovy script reload after copy." >&2
   echo "  SKIP_WHITELIST=1              Do not merge sandbox whitelist fragment (default: skip)." >&2
-  echo "  SKIP_UI_XML=1                 Do not merge DevContentOps / Translation into config/studio/ui.xml." >&2
+  echo "  SKIP_UI_XML=1                 Do not update config/studio/ui.xml (Translation tools, legacy cleanup)." >&2
   echo "  INSTALL_LINK_CHECK_TOOLBAR=1  Opt in: wire Link check + WCAG preview toolbar widgets." >&2
   echo "" >&2
   echo "IMPORTANT: marketplace/copy reads 'path' from the Studio server's filesystem." >&2
@@ -38,12 +38,10 @@ PLUGIN_UI_DEPLOY="${PLUGIN_PATH}/authoring/static-assets/plugins/org/rd/plugin/u
 SITE_PLUGIN="${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox/config/studio/static-assets/plugins/org/rd/plugin/uigoodies/apps/uigoodies/index.js"
 WHITELIST="${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox/config/studio/extension/groovy/whitelist"
 WHITELIST_APPEND="${PLUGIN_PATH}/authoring/config/studio/extension/groovy/uigoodies-plugin-whitelist.append"
-UI_SITE_TOOLS_FRAGMENT="${PLUGIN_PATH}/authoring/config/studio/ui-dev-content-ops-tools.append.xml"
 UI_TRANSLATION_CONFIG_TOOLS_FRAGMENT="${PLUGIN_PATH}/authoring/config/studio/ui-translation-config-tools.append.xml"
 UI_TRANSLATION_TOOLBAR_FRAGMENT="${PLUGIN_PATH}/authoring/config/studio/ui-translation-toolbar.append.xml"
 UI_LINK_CHECK_TOOLBAR_FRAGMENT="${PLUGIN_PATH}/authoring/config/studio/ui-link-check-toolbar.append.xml"
 UI_SITE_TOOLS_REFERENCE_FRAGMENT="${PLUGIN_PATH}/authoring/config/studio/ui-site-tools-reference.append.xml"
-DEV_CONTENT_OPS_TOOL_ID="org.rd.plugin.uigoodies.DevContentOpsTools"
 TRANSLATION_CONFIG_TOOL_ID="org.rd.plugin.uigoodies.TranslationConfigTools"
 TRANSLATION_TOOLBAR_WIDGET_ID="org.rd.plugin.uigoodies.openTranslationToolbarButton"
 LINK_CHECK_TOOLBAR_WIDGET_ID="org.craftercms.studio.linkcheck.toolbar"
@@ -138,43 +136,62 @@ EOF
 echo ""
 echo "marketplace/copy finished."
 
-sync_git_cli_runner() {
-  # Remove misplaced copies under Studio's package path only; keep the plugin class.
-  local stale_studio="${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox/config/studio/scripts/classes/org/craftercms/studio/impl/v2/utils/git/UigoodiesGitCliRunner.groovy"
-  if [[ -f "${stale_studio}" ]]; then
-    if git -C "${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-      local rel="${stale_studio#${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox/}"
-      git -C "${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox" rm -f "${rel}" 2>/dev/null || rm -f "${stale_studio}"
+remove_moved_to_devopsgoodies() {
+  # DevContentOps, Log Tail, OpenSearch Playground and Content Type Copy moved to org.rd.plugin.devopsgoodies.
+  # marketplace/copy never deletes files, so drop the old copies from this project.
+  local sandbox="${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox"
+  local classes="config/studio/scripts/classes/plugins/org/rd/plugin/uigoodies"
+  local rest="config/studio/scripts/rest/plugins/org/rd/plugin/uigoodies"
+  local rel_paths=(
+    "${classes}/DevContentOpsBlobStoreSupport.groovy"
+    "${classes}/DevContentOpsCliGitSupport.groovy"
+    "${classes}/DevContentOpsDatabaseSupport.groovy"
+    "${classes}/DevContentOpsItemStateSupport.groovy"
+    "${classes}/DevContentOpsPublishCompareSupport.groovy"
+    "${classes}/DevContentOpsRefsSupport.groovy"
+    "${classes}/DevContentOpsRepoConfigSupport.groovy"
+    "${classes}/DevContentOpsRepoHealthSupport.groovy"
+    "${classes}/DevContentOpsRepoHealthThresholds.groovy"
+    "${classes}/DevContentOpsSandboxIoSupport.groovy"
+    "${classes}/DevContentOpsStudioGitSupport.groovy"
+    "${classes}/DevContentOpsSupport.groovy"
+    "${classes}/DevContentOpsWorkTreeSupport.groovy"
+    "${classes}/DevContentOpsBlobPublishItem.groovy"
+    "${classes}/DevContentOpsBlobStoreNoopStage.groovy"
+    "${classes}/LogTailSupport.groovy"
+    "${classes}/PluginInstallerSupport.groovy"
+    "${classes}/UigoodiesGitCliRunner.groovy"
+    "config/studio/scripts/classes/org/craftercms/studio/impl/v2/utils/git/UigoodiesGitCliRunner.groovy"
+    "${rest}/database-tools.get.groovy"
+    "${rest}/database-tools.post.groovy"
+    "${rest}/dev-content-ops-git.get.groovy"
+    "${rest}/dev-content-ops-git.post.groovy"
+    "${rest}/log-tail-drop-all.get.groovy"
+    "${rest}/log-tail-read.get.groovy"
+    "${rest}/log-tail.get.groovy"
+    "${rest}/plugin-installer.post.groovy"
+  )
+  local removed=0
+  for rel in "${rel_paths[@]}"; do
+    local f="${sandbox}/${rel}"
+    [[ -f "${f}" ]] || continue
+    if git -C "${sandbox}" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+      git -C "${sandbox}" rm -q -f "${rel}" 2>/dev/null || rm -f "${f}"
     else
-      rm -f "${stale_studio}"
+      rm -f "${f}"
     fi
-    echo "Removed misplaced UigoodiesGitCliRunner: ${stale_studio}"
+    removed=$((removed + 1))
+  done
+  if [[ "${removed}" -gt 0 ]]; then
+    echo "Removed ${removed} file(s) that moved to Studio DevOps Goodies."
+    if git -C "${sandbox}" rev-parse --is-inside-work-tree >/dev/null 2>&1 \
+      && ! git -C "${sandbox}" diff --cached --quiet 2>/dev/null; then
+      git -C "${sandbox}" commit -q -m "Remove tools moved from org.rd.plugin.uigoodies to org.rd.plugin.devopsgoodies" || true
+    fi
   fi
 }
 
-sync_git_cli_runner
-
-sync_stale_blob_store_classes() {
-  local sandbox="${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox"
-  local rel_paths=(
-    "config/studio/scripts/classes/plugins/org/rd/plugin/uigoodies/DevContentOpsBlobPublishItem.groovy"
-    "config/studio/scripts/classes/plugins/org/rd/plugin/uigoodies/DevContentOpsBlobStoreNoopStage.groovy"
-  )
-  for rel in "${rel_paths[@]}"; do
-    local stale="${sandbox}/${rel}"
-    if [[ ! -f "${stale}" ]]; then
-      continue
-    fi
-    if git -C "${sandbox}" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-      git -C "${sandbox}" rm -f "${rel}" 2>/dev/null || rm -f "${stale}"
-    else
-      rm -f "${stale}"
-    fi
-    echo "Removed stale blob-store class: ${stale}"
-  done
-}
-
-sync_stale_blob_store_classes
+remove_moved_to_devopsgoodies
 
 if [[ "${SKIP_SCRIPT_RELOAD:-}" != "1" ]]; then
   echo "Reloading Groovy plugin scripts for site '${SITE_ID}'..."
@@ -267,48 +284,29 @@ PY
   fi
 fi
 
-if [[ "${SKIP_UI_XML:-}" != "1" && -f "${SITE_UI_XML}" && -f "${UI_SITE_TOOLS_FRAGMENT}" ]]; then
-  if grep -qF "${DEV_CONTENT_OPS_TOOL_ID}" "${SITE_UI_XML}" 2>/dev/null; then
-    echo "DevContentOps Tools already present in ui.xml."
-  else
-    echo "Merging DevContentOps Tools into config/studio/ui.xml..."
-    python3 - "${SITE_UI_XML}" "${UI_SITE_TOOLS_FRAGMENT}" "${DEV_CONTENT_OPS_TOOL_ID}" <<'PY'
+if [[ "${SKIP_UI_XML:-}" != "1" && -f "${SITE_UI_XML}" ]]; then
+  python3 - "${SITE_UI_XML}" <<'PY'
+import re
 import sys
 from pathlib import Path
 
 ui_path = Path(sys.argv[1])
-fragment_path = Path(sys.argv[2])
-widget_id = sys.argv[3]
 text = ui_path.read_text(encoding="utf-8")
-fragment = fragment_path.read_text(encoding="utf-8")
-if widget_id in text:
-    sys.exit(0)
-needle = '<reference id="craftercms.siteTools">'
-start = text.find(needle)
-if start == -1:
-    needle = "id='craftercms.siteTools'"
-    start = text.find(needle)
-if start == -1:
-    print("Warning: craftercms.siteTools reference not found in ui.xml — add DevContentOps Tools manually.", file=sys.stderr)
-    sys.exit(0)
-tools_open = text.find("<tools>", start)
-if tools_open == -1:
-    print("Warning: siteTools <tools> not found — add DevContentOps Tools manually.", file=sys.stderr)
-    sys.exit(0)
-tools_close = text.find("</tools>", tools_open)
-if tools_close == -1:
-    print("Warning: siteTools </tools> not found — add DevContentOps Tools manually.", file=sys.stderr)
-    sys.exit(0)
-updated = text[:tools_close] + fragment + text[tools_close:]
-ui_path.write_text(updated, encoding="utf-8")
-print("DevContentOps Tools merged into Project Tools.")
+original = text
+for legacy in ("DevContentOpsTools", "LogTail", "OpenSearchPlayground", "CrossSiteContentTypeCopy"):
+    pattern = re.compile(
+        r"[ \t]*<tool>(?:(?!</tool>).)*?<widget id=\"org\.rd\.plugin\.uigoodies\." + legacy + r"\">.*?</tool>[ \t]*\n?",
+        re.DOTALL,
+    )
+    text, n = pattern.subn("", text)
+    if n:
+        print(f"Removed {legacy} from Project Tools (moved to Studio DevOps Goodies).")
+if text != original:
+    ui_path.write_text(text, encoding="utf-8")
 PY
-    if git -C "${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-      git -C "${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox" add "config/studio/ui.xml" 2>/dev/null || true
-    fi
+  if git -C "${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    git -C "${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox" add "config/studio/ui.xml" 2>/dev/null || true
   fi
-elif [[ "${SKIP_UI_XML:-}" != "1" && ! -f "${SITE_UI_XML}" ]]; then
-  echo "Note: site ui.xml not found — merge DevContentOps Tools manually (see docs/widgets/dev-content-ops-tools.md)."
 fi
 
 if [[ "${SKIP_UI_XML:-}" != "1" && -f "${SITE_UI_XML}" && -f "${UI_TRANSLATION_CONFIG_TOOLS_FRAGMENT}" ]]; then

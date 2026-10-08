@@ -19,16 +19,11 @@ With default settings, this plugin works **without any site-specific Studio conf
 
 2. **Content APIs** — Cross-site copy uses `cstudioContentService` and `dependencyServiceInternal` beans. Shared logic lives in `scripts/classes/plugins/org/rd/plugin/uigoodies/CrossSiteContentCopySupport.groovy`.
 
-3. **Filesystem (Log Tail, Repository health)** — Do **not** use `java.io.File` construction, `RandomAccessFile`, or `File.createTempFile` (blacklisted). Use `java.nio.file.Path.of`, `Files.*`, and `SeekableByteChannel` instead. Repository health scratch files live under `.git/uigoodies-scratch/` via `DevContentOpsSandboxIoSupport`.
+3. **Filesystem** — Do **not** use `java.io.File` construction, `RandomAccessFile`, or `File.createTempFile` (blacklisted). Use `java.nio.file.Path.of`, `Files.*`, and `SeekableByteChannel` instead.
 
 4. **IO reads** — Use `InputStream.readAllBytes()` (not Groovy `bytes` on streams) when reading content from `cstudioContentService.getContent()`.
 
 5. **Logging** — Use `org.slf4j.LoggerFactory.getLogger` (allowed by default).
-
-6. **Git operations (DevContentOps)** — Use a tiered strategy from sandboxed Groovy:
-   - **Tier 1 — Studio beans:** `studio.gitCli` (`clean`, `resetHard`, `isRepoClean`) and `GitRepositoryHelper` (`removeIndexAndClean`, `gitStatusOk`, `getRepository`, …) under `cstudioGeneralLockService` sandbox lock.
-   - **Tier 2 — JGit:** reads, branch/tag CRUD, GC/repack-style maintenance when GitCli has no API (`DevContentOpsRefsSupport`, `DevContentOpsRepoHealthSupport` analysis/optimize).
-   - **Tier 3 — GitCli subclass for host git:** `UigoodiesGitCliRunner` extends Studio `GitCli` and calls protected `doExecuteGitCommand` so `ProcessBuilder` runs in Java (not Groovy). Used for `git filter-repo` / `filter-branch` when removing a path from history. Do **not** construct `ProcessBuilder` or call `Runtime.exec` from Groovy — those are blacklisted.
 
 ## Beans used
 
@@ -36,22 +31,11 @@ With default settings, this plugin works **without any site-specific Studio conf
 |------|---------|
 | `cstudioContentService` | cross-site-content-copy, cross-site-content-copy-plan |
 | `dependencyServiceInternal` | cross-site-content-copy, cross-site-content-copy-plan (when `copyDependencies` is true) |
-| `studio.gitRepositoryHelper` | dev-content-ops-git |
-| `studio.gitCli` | dev-content-ops-git (work tree clean/reset, repo clean check) |
-| `cstudioGeneralLockService` | dev-content-ops-git (sandbox repo lock during git ops) |
-| `contentRepository` | dev-content-ops-git |
-| `sitesService` | dev-content-ops-git (branch, last commit, sync trigger) |
-| `syncFromRepoTask` | dev-content-ops-git (`SyncFromRepositoryTask.syncRepoListener` after set processed) |
-| `applicationEventPublisher` | dev-content-ops-git (fallback `SyncFromRepoEvent` publish if `syncFromRepoTask` unavailable) |
-| `processedCommitsDao` | dev-content-ops-git (processed flag on commits) |
-| `blobStoreResolver` | dev-content-ops-git (blob store overview, tree, preview → staging/live sync) |
-| `crafter.s3ClientFactory` | dev-content-ops-git (S3 blob version list/restore) |
-| `studio.securityService` / `cstudioSecurityService` | dev-content-ops-git blob sync (current user for publish audit) |
 
 If **bean restriction** is enabled (`studio.scripting.restrictBeans: true`), add at least:
 
 ```yaml
-studio.scripting.allowedBeans: cstudioContentService,dependencyServiceInternal,studio.gitRepositoryHelper,studio.gitCli,cstudioGeneralLockService,contentRepository,sitesService,processedCommitsDao,syncFromRepoTask,applicationEventPublisher,blobStoreResolver,crafter.s3ClientFactory,studio.securityService
+studio.scripting.allowedBeans: cstudioContentService,dependencyServiceInternal
 ```
 
 ## Whitelist-enabled environments
@@ -71,16 +55,6 @@ Marker line in the append file: `# Studio UI Goodies plugin (org.rd.plugin.uigoo
 
 To opt in during install (site sandbox only): `SKIP_WHITELIST=0 ./scripts/install-plugin.sh <siteId>`
 
-DevContentOps git via Studio beans requires (among others):
-
-```
-method org.craftercms.studio.impl.v2.utils.git.GitCli isRepoClean java.io.File
-method org.craftercms.studio.impl.v2.utils.git.GitCli clean java.io.File boolean boolean
-method org.craftercms.studio.impl.v2.utils.git.GitCli resetHard java.io.File
-method org.craftercms.studio.api.v2.utils.GitRepositoryHelper removeIndexAndClean java.io.File
-method org.craftercms.studio.api.v2.utils.GitRepositoryHelper gitStatusOk org.eclipse.jgit.lib.Repository
-```
-
 ## Remote install failures
 
 Symptoms on another server (500, HTML error page, or `Bad control character in string literal in JSON` in the browser) usually mean one of:
@@ -98,20 +72,9 @@ REST responses sanitize path and error strings (`jsonSafeText`) so control chara
 |--------|---------|
 | `cross-site-content-copy-plan.post.groovy` | Preview copy plan |
 | `cross-site-content-copy.post.groovy` | Execute copy |
-| `dev-content-ops-git.get.groovy` | Git log, diff, patch, file content, repo health |
-| `dev-content-ops-git.post.groovy` | Patch apply, ingestion sync, history ops, repo optimize |
-| `log-tail.get.groovy` | Stream server log file (NDJSON) |
-| `log-tail-drop-all.get.groovy` | Disconnect all active log tails |
 
 | Class | Purpose |
 |-------|---------|
 | `CrossSiteContentCopySupport.groovy` | Shared cross-site copy helpers |
-| `DevContentOpsSupport.groovy` | Git log, diff, patch, ingestion sync helpers |
-| `DevContentOpsStudioGitSupport.groovy` | Sandbox-safe git: Studio GitCli + GitRepositoryHelper, JGit GC fallback |
-| `DevContentOpsCliGitSupport.groovy` | Server-side filter-repo / filter-branch; reset processed commit for full re-ingest |
-| `UigoodiesGitCliRunner.groovy` | GitCli subclass: filter-repo, filter-branch, reflog expire, gc via `doExecuteGitCommand` |
-| `DevContentOpsRefsSupport.groovy` | Branch/tag list and CRUD via JGit + sandbox lock |
-| `DevContentOpsRepoHealthSupport.groovy` | GitSizer-style metrics (JGit) and optimize (GitCli + JGit + external hints) |
-| `DevContentOpsRepoConfigSupport.groovy` | Repo config metrics via JGit Config + NIO |
-| `DevContentOpsBlobStoreSupport.groovy` | Blob store config/tree/presence; sync via `DeploymentItemTO` + `StudioBlobStore.publish`; S3 version list/restore via `crafter.s3ClientFactory` / `S3Utils`; version preview streams through the plugin REST endpoint (no S3 presigner) |
-| `DevContentOpsPublishCompareSupport.groovy` | Cross-repo tree compare: sandbox branch vs published staging/live; per-file text diff |
+
+DevContentOps, Log Tail and plugin-installer scripts moved to [Studio DevOps Goodies](https://github.com/russdanner/plugin-studio-devopsgoodies); see its `docs/GROOVY_SANDBOX.md`.

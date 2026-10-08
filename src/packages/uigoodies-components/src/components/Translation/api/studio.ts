@@ -67,6 +67,7 @@ const API_TRANSLATION_REMOVE_CANDIDATES =
   '/api/2/plugin/script/plugins/org/rd/plugin/uigoodies/translation-remove-candidates.post';
 const API_TRANSLATION_REMOVE = '/api/2/plugin/script/plugins/org/rd/plugin/uigoodies/translation-remove.post';
 const API_TRANSLATION_CONFIG = '/api/2/plugin/script/plugins/org/rd/plugin/uigoodies/translation-config.get';
+const API_TRANSLATION_LOCALES = '/api/2/plugin/script/plugins/org/rd/plugin/uigoodies/translation-locales';
 /** Same as Studio `fetchConfigurationXML` — path under `module=studio` (file: `config/studio/translation-config.xml`). */
 const API_GET_CONFIGURATION = '/api/2/configuration/get_configuration';
 const CONFIG_STUDIO_TRANSLATION_XML_PATH = '/translation-config.xml';
@@ -254,6 +255,38 @@ export type TranslationRemoveExecuteResult = {
   ok: boolean;
   deleted?: string[];
   failed?: Array<{ path?: string; message?: string }>;
+};
+
+/** One row per configured locale from `translation-locales` (config order). */
+export type TranslationLocaleVariant = {
+  /** Locale folder on disk (may differ in case/region from the configured code). */
+  locale: string;
+  code: string;
+  label: string;
+  flag: string;
+  path: string;
+  parentPath: string;
+  exists: boolean;
+  lastModified: number | null;
+  isSource: boolean;
+  isOutdated: boolean;
+  isCurrent: boolean;
+  isPage: boolean;
+  matchedBy: 'lineage' | 'folder' | null;
+};
+
+export type TranslationLocalesResult = {
+  config: SiteTranslationConfig | null;
+  path?: string;
+  rootDir?: string;
+  relativeUnderLocale?: string;
+  currentLocale?: string;
+  sourceLocale?: string;
+  contentType?: string;
+  objectId?: string;
+  localeSourceId?: string;
+  locales: TranslationLocaleVariant[];
+  message?: string;
 };
 
 function extractContentXmlString(body: any): string | null {
@@ -553,6 +586,75 @@ const StudioAPI = {
       const baseLanguage = String(p.baseLanguage).toLowerCase();
       return { baseLanguage, languages };
     } catch (e) {
+      return null;
+    }
+  },
+
+  /**
+   * Translation config plus every locale variant of `path` (lineage + mirrored folder, exists, modified,
+   * source/outdated flags) in one request. Without `path` only `config` is filled.
+   */
+  async getTranslationLocales(
+    authoringBase: string,
+    siteId: string,
+    path?: string | null
+  ): Promise<TranslationLocalesResult | null> {
+    const base = String(authoringBase || '').replace(/\/$/, '');
+    if (!base || !siteId) {
+      return null;
+    }
+    const qs = [`siteId=${encodeURIComponent(siteId)}`];
+    if (path) {
+      qs.push(`path=${encodeURIComponent(path)}`);
+    }
+    try {
+      const res = await studioPluginScriptGet(`${base}${API_TRANSLATION_LOCALES}?${qs.join('&')}`);
+      const status = (res as any)?.status ?? (res as any)?.statusCode;
+      if (status != null && status !== 200) {
+        return null;
+      }
+      const p: any = parsePluginScriptPayload(res);
+      if (!p || !p.ok) {
+        return null;
+      }
+      const languages = (Array.isArray(p.languages) ? p.languages : [])
+        .map((row: any) => ({
+          locale: String(row?.locale || '').toLowerCase(),
+          label: String(row?.label || row?.locale || ''),
+          ...(row?.flag != null && String(row.flag).trim() !== '' ? { flag: String(row.flag) } : {})
+        }))
+        .filter((row: { locale: string }) => row.locale);
+      const config: SiteTranslationConfig | null =
+        languages.length && p.baseLanguage ? { baseLanguage: String(p.baseLanguage).toLowerCase(), languages } : null;
+      const locales: TranslationLocaleVariant[] = (Array.isArray(p.locales) ? p.locales : []).map((r: any) => ({
+        locale: String(r?.locale || ''),
+        code: String(r?.code || r?.locale || ''),
+        label: String(r?.label || r?.locale || ''),
+        flag: (r?.flag && String(r.flag).trim()) || getFlagForLocale(String(r?.locale || '')),
+        path: String(r?.path || ''),
+        parentPath: String(r?.parentPath || ''),
+        exists: Boolean(r?.exists),
+        lastModified: parseTimestampMs(r?.lastModified),
+        isSource: Boolean(r?.isSource),
+        isOutdated: Boolean(r?.isOutdated),
+        isCurrent: Boolean(r?.isCurrent),
+        isPage: Boolean(r?.isPage),
+        matchedBy: r?.matchedBy === 'lineage' || r?.matchedBy === 'folder' ? r.matchedBy : null
+      }));
+      return {
+        config,
+        path: p.path || undefined,
+        rootDir: p.rootDir || undefined,
+        relativeUnderLocale: p.relativeUnderLocale || undefined,
+        currentLocale: p.currentLocale || undefined,
+        sourceLocale: p.sourceLocale || undefined,
+        contentType: p.contentType || undefined,
+        objectId: p.objectId || undefined,
+        localeSourceId: p.localeSourceId || undefined,
+        locales,
+        message: typeof p.message === 'string' ? p.message : undefined
+      };
+    } catch {
       return null;
     }
   }

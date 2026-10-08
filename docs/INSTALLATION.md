@@ -32,12 +32,12 @@ Hard-refresh Studio (**Ctrl+Shift+R**) after install. Commit sandbox changes in 
    - `src/packages/translation-versions` → `control/translation-versions/main.js`
 2. **`POST /studio/api/2/marketplace/copy`** — copies plugin into site sandbox (committed).
 3. **Groovy script reload** — `GET /studio/api/2/plugin/script/reload?siteId=...` (unless `SKIP_SCRIPT_RELOAD=1`).
-4. **Optional `ui.xml` merges** (unless `SKIP_UI_XML=1`):
-   - DevContentOps Project Tool
+4. **Removes tools that moved to Studio DevOps Goodies** — deletes the old DevContentOps, Log Tail and plugin-installer Groovy files from the project sandbox (committed), and removes their Project Tools entries (including Content Type Copy) from `ui.xml`.
+5. **Optional `ui.xml` merges** (unless `SKIP_UI_XML=1`):
    - Translation Project Tool
    - Translation preview toolbar button
    - Site tools reference fragment (if needed)
-5. **Optional whitelist** — only when `SKIP_WHITELIST=0` (default: skipped).
+6. **Optional whitelist** — only when `SKIP_WHITELIST=0` (default: skipped).
 
 ### Install script environment variables
 
@@ -79,7 +79,7 @@ Bump **`patch`** in `craftercms-plugin.yaml` after changes so marketplace copy p
 | Step | Action |
 |------|--------|
 | 1 | Hard-refresh Studio |
-| 2 | **Project Tools** — confirm tools appear (OpenSearch, Log Tail, DevContentOps, Translation, etc.) |
+| 2 | **Project Tools** — confirm tools appear (Cross Site Copy, Translation) |
 | 3 | **Tools panel** — optional widgets (merge fragments manually if desired) |
 | 4 | **Preview toolbar** — Translation button (only when ≥2 locales in `translation-config.xml`) |
 | 5 | **Commit** pending sandbox files (`ui.xml`, static assets, scripts) |
@@ -94,13 +94,12 @@ Plugin install merges these when Crafter applies the descriptor:
 
 | Type | What |
 |------|------|
-| `preview-app` | Project Tools entries (Cross Site Copy, OpenSearch, Log Tail, DevContentOps, Translation) |
+| `preview-app` | Project Tools entries (Cross Site Copy, Translation) |
 | `preview-app` | Translation preview toolbar button |
 | `form-control` | `custom-locale` and `translation-versions` in Studio form-control registry |
 
 If you manage `config/studio/ui.xml` manually, merge fragments from `authoring/config/studio/`:
 
-- `ui-dev-content-ops-tools.append.xml`
 - `ui-translation-config-tools.append.xml`
 - `ui-translation-toolbar.append.xml`
 - `ui-site-tools-reference.append.xml` (site tools reference, if missing)
@@ -114,17 +113,16 @@ Base URL: `/studio/api/2/plugin/script/plugins/org/rd/plugin/uigoodies/`
 |--------|--------|---------|
 | `translation-copy` | POST | Copy content to locale path; new `objectId`, locale metadata |
 | `translation-config` | GET | Read `translation-config.xml` |
+| `translation-locales` | GET | Config plus all locale variants of an item (path, exists, modified, source/outdated) in one call |
 | `translation-siblings` | POST | Find sibling translations by `localeSourceId_s` / `objectId` |
 | `translation-remove-candidates` | POST | Candidates for translation removal |
 | `translation-remove` | POST | Remove translation items |
 | `cross-site-content-copy` | POST | Cross-site content copy |
 | `cross-site-content-copy-plan` | POST | Plan preview for cross-site copy |
-| `dev-content-ops-git` | GET/POST | Git log, working tree, branches, health, blob sync |
-| `database-tools` | GET/POST | DevContentOps database helpers |
-| `log-tail` | GET | SSE log tail (Engine; used by Log Tail widget) |
-| `log-tail-drop-all` | GET | Drop active log-tail streams |
 
 Translation copy is also used internally by scaffold and the Translation dialog.
+
+DevContentOps, database tools, plugin installer and Log Tail scripts moved to [Studio DevOps Goodies](https://github.com/russdanner/plugin-studio-devopsgoodies) (base URL `/studio/api/2/plugin/script/plugins/org/rd/plugin/devopsgoodies/`).
 
 ## Building from source
 

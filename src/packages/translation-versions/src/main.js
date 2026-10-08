@@ -982,18 +982,6 @@ function bootTranslationVersionsControl() {
   }
 
   /** Studio /api/1/content/content-exists — unwrap common response shapes. */
-  function parseContentExistsPayload(body) {
-    if (!body) return false;
-    var c = body.content;
-    if (c == null && body.response) c = body.response.content;
-    if (c == null && body.result) c = body.result.content;
-    if (c == null) c = body.exists;
-    if (typeof c === "boolean") return c;
-    if (typeof c === "string") return String(c).toLowerCase() === "true";
-    if (typeof c === "number") return c !== 0;
-    return false;
-  }
-
   /** Authoring base for /api/1/services/api/1/content/... (pref prop may be empty on first paint). */
   function resolveAuthoringContentApiBase(pref) {
     var a = pref && String(pref).replace(/\/$/, "");
@@ -1180,108 +1168,6 @@ function bootTranslationVersionsControl() {
     return p.indexOf("/website/") >= 0 && p.endsWith(".xml");
   }
 
-  function extractPathsFromSearchItems(items) {
-    var out = [];
-    if (!items || !items.length) return out;
-    items.forEach(function (item) {
-      var p = item.path || item.localId || (item.item && (item.item.path || item.item.localId));
-      if (p && out.indexOf(p) === -1) out.push(p);
-    });
-    return out;
-  }
-
-  /**
-   * Studio OpenSearch: find all indexed items sharing the same translation lineage id.
-   */
-  function extractPathsFromPluginResult(body) {
-    var payload = body && body.result;
-    if (payload && typeof payload === "object" && payload.result != null && payload.ok === undefined) {
-      payload = payload.result;
-    }
-    if (!payload || typeof payload !== "object") {
-      payload = body && body.response && body.response.result;
-    }
-    if (!payload || !payload.ok) {
-      return [];
-    }
-    var items = payload.items || [];
-    var out = [];
-    items.forEach(function (it) {
-      var p = it && (it.localId || it.path);
-      if (p && out.indexOf(p) === -1) {
-        out.push(p);
-      }
-    });
-    return out;
-  }
-
-  /**
-   * Preview OpenSearch (plugin Groovy): same content-type and localeSourceId_s matching lineage or objectId.
-   */
-  function fetchTranslationSiblingsFromPlugin(studioBase, siteId, contentType, localeSourceId, objectId) {
-    if (!studioBase || !siteId || !contentType) {
-      return Promise.resolve([]);
-    }
-    var lid = localeSourceId && String(localeSourceId).trim();
-    var oid = objectId && String(objectId).trim();
-    if (!lid && !oid) {
-      return Promise.resolve([]);
-    }
-    var url =
-      studioBase +
-      "/api/2/plugin/script/plugins/org/rd/plugin/uigoodies/translation-siblings.post?siteId=" +
-      encodeURIComponent(siteId) +
-      "&contentType=" +
-      encodeURIComponent(String(contentType).trim()) +
-      "&localeSourceId=" +
-      encodeURIComponent(lid || "") +
-      "&objectId=" +
-      encodeURIComponent(oid || "");
-    return studioAjaxPost(url, "", { Accept: "application/json" })
-      .then(unwrapAjaxResponse)
-      .then(extractPathsFromPluginResult)
-      .catch(function () {
-        return [];
-      });
-  }
-
-  function searchPathsByLocaleSourceId(studioBase, siteId, localeSourceId) {
-    if (!studioBase || !siteId || !localeSourceId) {
-      return Promise.resolve([]);
-    }
-    var url =
-      studioBase + "/api/2/search/search.json?siteId=" + encodeURIComponent(siteId);
-    function postSearch(body) {
-      return studioAjaxPost(url, body, { "Content-Type": "application/json", Accept: "application/json" }).then(
-        unwrapAjaxResponse
-      );
-    }
-    return postSearch({
-      keywords: "",
-      offset: 0,
-      limit: 200,
-      filters: {
-        localeSourceId_s: [String(localeSourceId).trim()]
-      }
-    })
-      .then(function (body) {
-        var items = (body.response && body.response.result && body.response.result.items) || [];
-        var paths = extractPathsFromSearchItems(items);
-        if (paths.length > 0) return paths;
-        return postSearch({
-          keywords: String(localeSourceId).trim(),
-          offset: 0,
-          limit: 200
-        }).then(function (body2) {
-          var items2 = (body2.response && body2.response.result && body2.response.result.items) || [];
-          return extractPathsFromSearchItems(items2);
-        });
-      })
-      .catch(function () {
-        return [];
-      });
-  }
-
   function flagForLocaleCode(localeCode) {
     var k = String(localeCode || "").toLowerCase();
     if (!k) return "\uD83C\uDF10";
@@ -1316,20 +1202,29 @@ function bootTranslationVersionsControl() {
     return map[k] || map[k.slice(0, 2)] || "\uD83C\uDF10";
   }
 
-  function fetchTranslationConfig(studioBase, siteId) {
+  /**
+   * GET translation-locales: config ({ baseLocale, codes, meta }) plus one row per configured locale for `path`
+   * ({ locale, path, exists, isOutdated, isSource, isCurrent, ... }). `overrides` carry unsaved form values.
+   */
+  function fetchTranslationLocales(studioBase, siteId, path, overrides) {
     if (!studioBase || !siteId) return Promise.resolve(null);
+    var o = overrides || {};
+    var qs = ["siteId=" + encodeURIComponent(siteId)];
+    if (path) qs.push("path=" + encodeURIComponent(path));
+    ["contentType", "localeSourceId", "objectId", "sourceLocale"].forEach(function (k) {
+      var v = o[k] != null ? String(o[k]).trim() : "";
+      if (v) qs.push(k + "=" + encodeURIComponent(v));
+    });
     var url =
-      studioBase +
-      "/api/2/plugin/script/plugins/org/rd/plugin/uigoodies/translation-config.get?siteId=" +
-      encodeURIComponent(siteId);
+      studioBase + "/api/2/plugin/script/plugins/org/rd/plugin/uigoodies/translation-locales?" + qs.join("&");
     return studioAjaxGet(url)
       .then(unwrapAjaxResponse)
       .then(function (body) {
-        var p = body && body.result !== undefined ? body.result : body;
-        if (!p || !p.ok || !Array.isArray(p.languages) || p.languages.length === 0) return null;
+        var p = unwrapPluginScriptResultBody(body);
+        if (!p || !p.ok) return null;
         var codes = [];
         var meta = {};
-        p.languages.forEach(function (row) {
+        (Array.isArray(p.languages) ? p.languages : []).forEach(function (row) {
           var lc = row && row.locale ? String(row.locale).toLowerCase() : "";
           if (!lc) return;
           if (codes.indexOf(lc) < 0) codes.push(lc);
@@ -1338,20 +1233,13 @@ function bootTranslationVersionsControl() {
             flag: row && row.flag && String(row.flag).trim() ? String(row.flag).trim() : flagForLocaleCode(lc)
           };
         });
-        if (codes.length === 0) return null;
-        var baseRaw = p.baseLanguage != null && String(p.baseLanguage).trim() ? String(p.baseLanguage).trim() : "";
-        var baseLocale = baseRaw ? baseRaw.toLowerCase() : codes[0];
-        if (codes.indexOf(baseLocale) < 0) {
-          baseLocale = codes[0];
+        var cfg = null;
+        if (codes.length) {
+          var baseLocale = p.baseLanguage ? String(p.baseLanguage).trim().toLowerCase() : codes[0];
+          if (codes.indexOf(baseLocale) < 0) baseLocale = codes[0];
+          cfg = { baseLocale: baseLocale, codes: codes, meta: meta };
         }
-        return {
-          baseLocale: baseLocale,
-          codes: codes,
-          meta: meta
-        };
-      })
-      .catch(function () {
-        return null;
+        return { cfg: cfg, locales: Array.isArray(p.locales) ? p.locales : [] };
       });
   }
 
@@ -1441,67 +1329,6 @@ function bootTranslationVersionsControl() {
       }
     } catch (e) {}
     return null;
-  }
-
-  function contentExists(authoringBase, siteId, path) {
-    var base = resolveAuthoringContentApiBase(authoringBase);
-    if (!base || !siteId || !path) {
-      return Promise.resolve(false);
-    }
-    var url =
-      base +
-      "/api/1/services/api/1/content/content-exists.json?site_id=" +
-      encodeURIComponent(siteId) +
-      "&path=" +
-      encodeURIComponent(path);
-    return studioAjaxGet(url)
-      .then(function (res) {
-        var body = unwrapAjaxResponse(res);
-        return parseContentExistsPayload(body);
-      })
-      .catch(function () {
-        return false;
-      });
-  }
-
-  function parseTimestampMs(input) {
-    if (input == null) return null;
-    if (typeof input === "number" && isFinite(input)) return input;
-    var asNum = Number(input);
-    if (isFinite(asNum) && asNum > 0) return asNum;
-    var parsed = Date.parse(String(input));
-    return isFinite(parsed) ? parsed : null;
-  }
-
-  function getItemModifiedTimestamp(authoringBase, siteId, path) {
-    var base = resolveAuthoringContentApiBase(authoringBase);
-    if (!base || !siteId || !path) {
-      return Promise.resolve(null);
-    }
-    var url =
-      base +
-      "/api/1/services/api/1/content/get-items-tree.json?site=" +
-      encodeURIComponent(siteId) +
-      "&path=" +
-      encodeURIComponent(path) +
-      "&depth=0";
-    return studioAjaxGet(url)
-      .then(unwrapAjaxResponse)
-      .then(function (body) {
-        var item = body && body.item;
-        if (!item) return null;
-        return (
-          parseTimestampMs(item.lastModifiedDate_dt) ||
-          parseTimestampMs(item.lastModifiedDate) ||
-          parseTimestampMs(item.lastEditDate) ||
-          parseTimestampMs(item.modifiedDate) ||
-          parseTimestampMs(item.dateModified) ||
-          null
-        );
-      })
-      .catch(function () {
-        return null;
-      });
   }
 
   /**
@@ -1766,8 +1593,6 @@ function bootTranslationVersionsControl() {
           setOptions([]);
           return Promise.resolve();
         }
-        setLoading(true);
-        var studioBase = getStudioApiBase();
         function applyCodes(activeMeta, rawCodes) {
           var seen = {};
           var activeCodes = [];
@@ -1803,35 +1628,11 @@ function bootTranslationVersionsControl() {
           setOptions(out);
           return Promise.resolve();
         }
-        return fetchTranslationConfig(studioBase, siteId)
-          .then(function (fetched) {
-            var rawCodes =
-              fetched && fetched.codes && fetched.codes.length
-                ? fetched.codes
-                : translationCfgProp && translationCfgProp.codes && translationCfgProp.codes.length
-                  ? translationCfgProp.codes
-                  : localeCodes && localeCodes.length
-                    ? localeCodes
-                    : MULTI_LOCALE_CODES;
-            var activeMeta =
-              (fetched && fetched.meta) ||
-              (translationCfgProp && translationCfgProp.meta) ||
-              localeMeta;
-            return applyCodes(activeMeta, rawCodes);
-          })
-          .catch(function () {
-            var rawCodes =
-              translationCfgProp && translationCfgProp.codes && translationCfgProp.codes.length
-                ? translationCfgProp.codes
-                : localeCodes && localeCodes.length
-                  ? localeCodes
-                  : MULTI_LOCALE_CODES;
-            var activeMeta = (translationCfgProp && translationCfgProp.meta) || localeMeta;
-            return applyCodes(activeMeta, rawCodes);
-          })
-          .finally(function () {
-            setLoading(false);
-          });
+        if (!translationCfgProp || !translationCfgProp.codes || !translationCfgProp.codes.length) {
+          setOptions([]);
+          return Promise.resolve();
+        }
+        return applyCodes(translationCfgProp.meta || localeMeta, translationCfgProp.codes);
       },
       [formPath, siteId, rootDir, suffix, existingPaths, localeCodes, localeMeta, translationCfgProp]
     );
@@ -2496,187 +2297,60 @@ function bootTranslationVersionsControl() {
       [formPath]
     );
 
-    React.useEffect(
-      function () {
-        var active = true;
-        fetchTranslationConfig(resolveAuthoringContentApiBase(authoringBase), siteId).then(function (cfg) {
-          if (active) setTranslationCfg(cfg);
-        });
-        return function () {
-          active = false;
-        };
-      },
-      [authoringBase, siteId]
-    );
-
+    /** One server call: translation config + every locale variant of this item (lineage, exists, outdated). */
     React.useEffect(
       function () {
         var cancelled = false;
-        var ab = getAuthoringBase();
-        setAuthoringBase(ab);
-
-        function finish(list) {
-          if (!cancelled) {
-            setTranslationPaths(list);
-            setLoading(false);
-          }
-        }
+        setAuthoringBase(getAuthoringBase());
 
         if (!siteId || !formPath) {
-          finish([]);
+          setTranslationPaths([]);
+          setExistsByPath({});
+          setStaleByPath({});
+          setLoading(false);
           return function () {
             cancelled = true;
           };
         }
 
         setLoading(true);
-        var studioBase = getStudioApiBase();
-        var lsid = model.localeSourceId_s && String(model.localeSourceId_s).trim();
-        var oid = model.objectId && String(model.objectId).trim();
-        var ctype = resolvedContentTypeId;
-        var cur = (currentLocale || "").toLowerCase();
-        var pathOkForLocaleProbe = Boolean(rootDir && suffix != null);
-
-        function runFallback() {
-          var base = ab || getAuthoringBase();
-          if (!base) {
-            mergePathsAndFinish([formPath]);
-            return;
-          }
-          if (!pathOkForLocaleProbe) {
-            mergePathsAndFinish([formPath]);
-            return;
-          }
-          Promise.all(
-            ((translationCfg && translationCfg.codes) || MULTI_LOCALE_CODES).map(function (loc) {
-              var p = pathForTargetLocale(rootDir, loc, suffix);
-              return contentExists(base, siteId, p).then(function (ok) {
-                if (ok) return p;
-                if (cur && localeSegmentsCompatible(cur, loc)) return p;
-                return null;
-              });
-            })
-          )
-            .then(function (results) {
-              if (cancelled) return;
-              var m = {};
-              results.forEach(function (p) {
-                if (p) m[p] = true;
-              });
-              if (formPath) {
-                m[formPath] = true;
-              }
-              finish(sortTranslationPathsForDisplay(Object.keys(m), resolvedSourceKey, translationCfg && translationCfg.codes));
-            })
-            .catch(function () {
-              mergePathsAndFinish([formPath]);
-            });
-        }
-
-        /**
-         * Rows = translated copies only: sibling/index paths plus on-disk paths for configured locales.
-         * Do not add config locale paths unless content exists (missing locales belong in Translate dropdown only).
-         */
-        function mergePathsAndFinish(paths) {
-          if (cancelled) return;
-          var m = {};
-          (paths || []).forEach(function (p) {
-            if (p) m[p] = true;
-          });
-          if (formPath) {
-            m[formPath] = true;
-          }
-
-          function applyMap() {
+        fetchTranslationLocales(getStudioApiBase(), siteId, formPath, {
+          contentType: resolvedContentTypeId,
+          localeSourceId: model.localeSourceId_s,
+          objectId: model.objectId,
+          sourceLocale: resolvedSourceKey
+        })
+          .then(function (res) {
             if (cancelled) return;
-            finish(sortTranslationPathsForDisplay(Object.keys(m), resolvedSourceKey, translationCfg && translationCfg.codes));
-          }
-
-          var base = ab || getAuthoringBase();
-          var cfgCodes =
-            translationCfg && translationCfg.codes && translationCfg.codes.length
-              ? translationCfg.codes
-              : MULTI_LOCALE_CODES;
-          if (base && siteId && rootDir != null && suffix != null && cfgCodes.length) {
-            Promise.all(
-              cfgCodes.map(function (code) {
-                var p = pathForTargetLocale(rootDir, code, suffix);
-                return contentExists(base, siteId, p).then(function (ok) {
-                  return ok ? p : null;
-                });
-              })
-            )
-              .then(function (found) {
-                if (cancelled) return;
-                (found || []).forEach(function (p) {
-                  if (p) m[p] = true;
-                });
-                applyMap();
-              })
-              .catch(function () {
-                applyMap();
-              });
-          } else {
-            applyMap();
-          }
-        }
-
-        /** Preview OpenSearch plugin: same content-type + lineage (localeSourceId_s or objectId on hits). */
-        if (ctype && (lsid || oid) && studioBase) {
-          fetchTranslationSiblingsFromPlugin(studioBase, siteId, ctype, lsid, oid)
-            .then(function (paths) {
-              if (cancelled) return;
-              if (paths && paths.length > 0) {
-                mergePathsAndFinish(paths);
-                return;
-              }
-              if (lsid) {
-                return searchPathsByLocaleSourceId(studioBase, siteId, lsid).then(function (legacyPaths) {
-                  if (cancelled) return;
-                  if (legacyPaths && legacyPaths.length > 0) {
-                    mergePathsAndFinish(legacyPaths);
-                  } else {
-                    runFallback();
-                  }
-                });
-              }
-              runFallback();
-            })
-            .catch(function () {
-              if (cancelled) return;
-              if (lsid && studioBase) {
-                searchPathsByLocaleSourceId(studioBase, siteId, lsid)
-                  .then(function (legacyPaths) {
-                    if (cancelled) return;
-                    if (legacyPaths && legacyPaths.length > 0) {
-                      mergePathsAndFinish(legacyPaths);
-                    } else {
-                      runFallback();
-                    }
-                  })
-                  .catch(function () {
-                    runFallback();
-                  });
-              } else {
-                runFallback();
-              }
+            if (res && res.cfg) {
+              setTranslationCfg(res.cfg);
+            }
+            var paths = {};
+            var exists = {};
+            var stale = {};
+            ((res && res.locales) || []).forEach(function (row) {
+              if (!row || !row.path) return;
+              exists[row.path] = !!row.exists;
+              stale[row.path] = !!row.isOutdated;
+              if (row.exists) paths[row.path] = true;
             });
-        } else if (lsid && studioBase) {
-          searchPathsByLocaleSourceId(studioBase, siteId, lsid)
-            .then(function (paths) {
-              if (cancelled) return;
-              if (!paths || paths.length === 0) {
-                runFallback();
-                return;
-              }
-              mergePathsAndFinish(paths);
-            })
-            .catch(function () {
-              runFallback();
-            });
-        } else {
-          runFallback();
-        }
+            paths[formPath] = true;
+            exists[formPath] = true;
+            setExistsByPath(exists);
+            setStaleByPath(stale);
+            setTranslationPaths(
+              sortTranslationPathsForDisplay(Object.keys(paths), resolvedSourceKey, res && res.cfg && res.cfg.codes)
+            );
+          })
+          .catch(function () {
+            if (cancelled) return;
+            setTranslationPaths([formPath]);
+            setExistsByPath({});
+            setStaleByPath({});
+          })
+          .finally(function () {
+            if (!cancelled) setLoading(false);
+          });
 
         return function () {
           cancelled = true;
@@ -2685,96 +2359,12 @@ function bootTranslationVersionsControl() {
       [
         formPath,
         siteId,
-        rootDir,
-        suffix,
         model.localeSourceId_s,
         model.objectId,
         resolvedContentTypeId,
-        currentLocale,
-        translationListRefreshKey,
-        translationCfg
+        resolvedSourceKey,
+        translationListRefreshKey
       ]
-    );
-
-    React.useEffect(
-      function () {
-        var cancelled = false;
-        var base = authoringBase || getAuthoringBase();
-        if (!siteId || !base || !translationPaths || translationPaths.length === 0) {
-          setStaleByPath({});
-          return function () {
-            cancelled = true;
-          };
-        }
-        var sourcePath =
-          translationPaths.find(function (p) {
-            var loc = (getLocaleFromPath(p) || "").toLowerCase();
-            return resolvedSourceKey && localeSegmentsCompatible(loc, resolvedSourceKey);
-          }) || formPath;
-        Promise.all(
-          [getItemModifiedTimestamp(base, siteId, sourcePath)].concat(
-            translationPaths.map(function (p) {
-              return getItemModifiedTimestamp(base, siteId, p);
-            })
-          )
-        ).then(function (arr) {
-          if (cancelled) return;
-          var sourceMs = arr[0];
-          var map = {};
-          translationPaths.forEach(function (p, i) {
-            var targetMs = arr[i + 1];
-            var loc = (getLocaleFromPath(p) || "").toLowerCase();
-            var isSource = resolvedSourceKey && localeSegmentsCompatible(loc, resolvedSourceKey);
-            map[p] =
-              !isSource &&
-              sourceMs != null &&
-              targetMs != null &&
-              Number(targetMs) < Number(sourceMs);
-          });
-          setStaleByPath(map);
-        }).catch(function () {
-          if (!cancelled) setStaleByPath({});
-        });
-        return function () {
-          cancelled = true;
-        };
-      },
-      [authoringBase, siteId, translationPaths, resolvedSourceKey, formPath]
-    );
-
-    React.useEffect(
-      function () {
-        var cancelled = false;
-        var base = authoringBase || getAuthoringBase();
-        if (!siteId || !base || !translationPaths || translationPaths.length === 0) {
-          setExistsByPath({});
-          return function () {
-            cancelled = true;
-          };
-        }
-        Promise.all(
-          translationPaths.map(function (p) {
-            return contentExists(base, siteId, p).then(function (ok) {
-              return [p, !!ok];
-            });
-          })
-        )
-          .then(function (pairs) {
-            if (cancelled) return;
-            var map = {};
-            pairs.forEach(function (row) {
-              map[row[0]] = row[1];
-            });
-            setExistsByPath(map);
-          })
-          .catch(function () {
-            if (!cancelled) setExistsByPath({});
-          });
-        return function () {
-          cancelled = true;
-        };
-      },
-      [authoringBase, siteId, translationPaths]
     );
 
     React.useEffect(function () {

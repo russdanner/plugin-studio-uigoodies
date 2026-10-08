@@ -99,4 +99,4 @@ Optional browser overrides (see bulk edit plugin README): `bulkedit.batchSize`, 
 | Widget | Doc |
 |--------|-----|
 | Bulk **publish** (subtree go-live) | [open-bulk-publish-panel-button.md](open-bulk-publish-panel-button.md) |
-| DevContentOps bulk **state** updates | [dev-content-ops-tools.md](dev-content-ops-tools.md) |
+| DevContentOps bulk **state** updates | [Studio DevOps Goodies → dev-content-ops-tools.md](https://github.com/russdanner/plugin-studio-devopsgoodies/blob/master/docs/widgets/dev-content-ops-tools.md) |

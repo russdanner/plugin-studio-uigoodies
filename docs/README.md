@@ -4,6 +4,8 @@ Plugin id: **`org.rd.plugin.uigoodies`**
 
 This folder documents installation, configuration, and every widget / REST surface shipped with the plugin.
 
+DevContentOps Tools, OpenSearch Playground, Log Tail and Content Type Copy moved to [Studio DevOps Goodies](https://github.com/russdanner/plugin-studio-devopsgoodies) (`org.rd.plugin.devopsgoodies`).
+
 ## Start here
 
 | Document | Contents |
@@ -21,11 +23,7 @@ Each registered React widget is documented under **[widgets/](widgets/README.md)
 
 | Tool | Widget ID | Doc |
 |------|-----------|-----|
-| Content Type Copy | `org.rd.plugin.uigoodies.CrossSiteContentTypeCopy` | [cross-site-content-type-copy.md](widgets/cross-site-content-type-copy.md) |
 | Cross Site Copy | `org.rd.plugin.uigoodies.CrossSiteContentCopy` | [cross-site-content-copy.md](widgets/cross-site-content-copy.md) |
-| OpenSearch | `org.rd.plugin.uigoodies.OpenSearchPlayground` | [open-search-playground.md](widgets/open-search-playground.md) |
-| Log Tail | `org.rd.plugin.uigoodies.LogTail` | [log-tail.md](widgets/log-tail.md) |
-| DevContentOps Tools | `org.rd.plugin.uigoodies.DevContentOpsTools` | [dev-content-ops-tools.md](widgets/dev-content-ops-tools.md) |
 | Translation | `org.rd.plugin.uigoodies.TranslationConfigTools` | [translation-config-tools.md](widgets/translation-config-tools.md) |
 
 ### Tools panel & preview toolbar

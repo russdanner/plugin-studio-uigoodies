@@ -179,6 +179,7 @@ Base: `/studio/api/2/plugin/script/plugins/org/rd/plugin/uigoodies/`
 | Script | Method | Purpose |
 |--------|--------|---------|
 | `translation-config` | GET | Locale list |
+| `translation-locales` | GET | Config plus every locale variant of `path` in one call (used by the form control and toolbar) |
 | `translation-copy` | POST | Copy + normalize `objectId`, `localeCode_s`, `sourceLocaleCode_s`, `localeSourceId_s` |
 | `translation-siblings` | POST | Search siblings |
 | `translation-remove-candidates` | POST | Removal candidates |

@@ -9,6 +9,11 @@ possible.
 If you see a widget that helps you here, install it and be happy. If not, make the world a better
 place by doing a bit of programming and send us pull request :)
 
+> **DevOps tools moved:** DevContentOps Tools, OpenSearch Playground, Log Tail and Content Type Copy now live in
+> [Studio DevOps Goodies](https://github.com/russdanner/plugin-studio-devopsgoodies) (`org.rd.plugin.devopsgoodies`).
+> They are admin tools, so install that plugin into one admin project instead of every content project.
+> Installing UI Goodies 1.0.108+ removes the old copies of those tools from the project.
+
 **Full documentation:** [docs/README.md](docs/README.md) — installation, requirements, Translation setup, and per-widget configuration.
 
 # Installation
@@ -33,7 +38,7 @@ The script:
 1. Runs `yarn dist` in `src/packages/uigoodies-components`, `custom-locale`, and `translation-versions`
 2. Calls `POST /studio/api/2/marketplace/copy` (commits into the site sandbox)
 3. Reloads Groovy plugin scripts
-4. Merges optional `ui.xml` fragments (Image Studio, DevContentOps, Translation tool + toolbar) unless `SKIP_UI_XML=1`
+4. Merges optional `ui.xml` fragments (Translation tool + toolbar) unless `SKIP_UI_XML=1`, and removes Project Tools entries for tools that moved to Studio DevOps Goodies
 5. Optionally merges `uigoodies-plugin-whitelist.append` into the **site sandbox** whitelist only when `SKIP_WHITELIST=0` (skipped by default)
 
 See [docs/INSTALLATION.md](docs/INSTALLATION.md) for environment variables, post-install checklist, and REST API index.
@@ -74,7 +79,7 @@ curl --location --request POST 'http://SERVER_AND_PORT/studio/api/2/marketplace/
 | Bump `craftercms-plugin.yaml` version after changes | Marketplace may skip unchanged plugin artifacts |
 | Groovy script reload after install | Updated `.groovy` / class files are not live until reload |
 | `studio.scripting.sandbox.whitelist.enable: true` | Manually append `authoring/config/studio/extension/groovy/uigoodies-plugin-whitelist.append` to your Studio whitelist path; install script does not modify it |
-| `studio.scripting.restrictBeans: true` | Add `cstudioContentService,dependencyServiceInternal,studio.gitRepositoryHelper,contentRepository,sitesService,processedCommitsDao` to `studio.scripting.allowedBeans` |
+| `studio.scripting.restrictBeans: true` | Add `cstudioContentService,dependencyServiceInternal` to `studio.scripting.allowedBeans` |
 
 Do **not** rsync into `static-assets/` at the site root — marketplace maps plugin assets to `config/studio/static-assets/...`. Manual copies leave dirty git and wrong paths.
 
@@ -84,11 +89,7 @@ See [docs/GROOVY_SANDBOX.md](docs/GROOVY_SANDBOX.md) for sandbox and bean-restri
 
 This plugin auto-wires Project Tools entries in `craftercms-plugin.yaml`:
 
-- **Content Type Copy** (`uigoodies-cross-site-content-types`)
 - **Cross Site Copy** (`uigoodies-cross-site-content-copy`)
-- **OpenSearch** (`uigoodies-opensearch-playground`)
-- **Log Tail** (`uigoodies-log-tail`)
-- **DevContentOps Tools** (`uigoodies-dev-content-ops`)
 - **Translation** (`uigoodies-translation-config`) — locales, content-type fields, locale site scaffold
 
 Also auto-wired when install merges `ui.xml`:
@@ -131,48 +132,6 @@ Registered widgets use plugin id **`org.rd.plugin.uigoodies`**, app **`uigoodies
 Screenshots below are from Studio **Project Tools**, the **Tools Panel**, and the **preview toolbar**. Full widget index at the end of this section.
 
 ## Project Tools
-
-### OpenSearch Playground
-
-Explorer, OpenSearch DSL editor, and live JSON from Engine `search.json`.
-
-![OpenSearch Playground — Explorer, DSL editor, and response](docs/images/opensearch-playground.png)
-
-Doc: [open-search-playground.md](docs/widgets/open-search-playground.md)
-
-### Log Tail
-
-Live SSE tail of Tomcat `catalina.out` (and related logs) while the panel is open.
-
-![Log Tail — streaming log console](docs/images/log-tail.png)
-
-Doc: [log-tail.md](docs/widgets/log-tail.md)
-
-### DevContentOps Tools
-
-Git log, working tree, branches, database maintenance, repository health, and site item state management for any Studio project you can access.
-
-**Git log** — commit graph, patches, ingestion sync, cross-project patch apply:
-
-![DevContentOps Tools — Git log tab](docs/images/dev-content-ops-git-log.png)
-
-**Working tree** — stage, commit, discard, clean, resolve conflicts:
-
-![DevContentOps Tools — Working tree tab](docs/images/dev-content-ops-working-tree.png)
-
-**Repository health** — git-sizer-style metrics and safe optimize operations:
-
-![DevContentOps Tools — Repository health tab](docs/images/dev-content-ops-repository-health.png)
-
-**Site items** — filter by path/type/state; bulk state updates:
-
-![DevContentOps Tools — Site items tab](docs/images/dev-content-ops-site-items.png)
-
-**Database** — audit history and processed-commits cache (ingestion helper):
-
-![DevContentOps Tools — Database tab](docs/images/dev-content-ops-database.png)
-
-Doc: [dev-content-ops-tools.md](docs/widgets/dev-content-ops-tools.md)
 
 ### Cross Site Copy
 
@@ -241,12 +200,8 @@ Translation form controls (`custom-locale`, `translation-versions`) render insid
 | `org.rd.plugin.uigoodies.DeviceSimulatorFlyoutToolbarButton` | Device presets in a preview-toolbar popover (ICE-compatible `devices`). | [device-simulator-flyout-toolbar-button.md](docs/widgets/device-simulator-flyout-toolbar-button.md) |
 | `org.rd.plugin.uigoodies.openCannedSearchPanelButton` | Sidebar shortcut to Search (replaces standalone canned-search plugin). | [open-canned-search-panel-button.md](docs/widgets/open-canned-search-panel-button.md) |
 | `org.rd.plugin.uigoodies.openCannedSearchToolbarButton` | Toolbar shortcut to Search with the same options as the sidebar widget. | [open-canned-search-toolbar-button.md](docs/widgets/open-canned-search-toolbar-button.md) |
-| `org.rd.plugin.uigoodies.CrossSiteContentTypeCopy` | Project tool: copy `config.xml` + `form-definition.xml` for content types between sites. | [cross-site-content-type-copy.md](docs/widgets/cross-site-content-type-copy.md) |
 | `org.rd.plugin.uigoodies.CrossSiteContentCopy` | Project tool: multi-select cross-site content copy with plan preview, per-item actions, and switch-to-destination after copy. | [cross-site-content-copy.md](docs/widgets/cross-site-content-copy.md) |
 | `org.rd.plugin.uigoodies.ComponentPreviewPathNavigator` | Path navigator that opens headless/component preview URLs with path mapping. | [component-preview-path-navigator.md](docs/widgets/component-preview-path-navigator.md) |
-| `org.rd.plugin.uigoodies.OpenSearchPlayground` | Project tool: Explorer + Dictionary tabs, OpenSearch DSL, Engine `search.json`. | [open-search-playground.md](docs/widgets/open-search-playground.md) |
-| `org.rd.plugin.uigoodies.LogTail` | Project tool: SSE live tail of Tomcat/deployer/search logs. | [log-tail.md](docs/widgets/log-tail.md) |
-| `org.rd.plugin.uigoodies.DevContentOpsTools` | Project tool: git log, working tree, branches, repo health, item states. | [dev-content-ops-tools.md](docs/widgets/dev-content-ops-tools.md) |
 | `org.rd.plugin.uigoodies.TranslationConfigTools` | Project tool: `translation-config.xml`, content-type Translation fields, locale scaffold. | [translation-config-tools.md](docs/widgets/translation-config-tools.md) |
 | `org.rd.plugin.uigoodies.TranslationDialog` | Translation dialog (locale tree + copy). | [translation-tools.md](docs/widgets/translation-tools.md) |
 | `org.rd.plugin.uigoodies.openTranslationToolbarButton` | Preview toolbar → locale picker / copy. | [translation-tools.md](docs/widgets/translation-tools.md) |

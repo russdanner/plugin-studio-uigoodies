@@ -13,7 +13,7 @@ plugin:
   version:
     major: 1
     minor: 0
-    patch: 106
+    patch: 108
   description: A plugin to adds some UI goodies to your studio
   documentation: "https://raw.githubusercontent.com/russdanner/plugin-studio-uigoodies/master/README.md"
   website:
@@ -58,41 +58,6 @@ plugin:
 installation:
   - type: preview-app
     parentXpath: //reference[@id='craftercms.siteTools']
-    elementXpath: //reference[@id='craftercms.siteTools']//widget[@id='org.rd.plugin.uigoodies.CrossSiteContentTypeCopy']
-    element:
-      name: tools
-      children:
-        - name: tool
-          children:
-            - name: title
-              attributes:
-                - name: id
-                  value: uigoodies.crossSiteContentTypeCopy.title
-                - name: defaultMessage
-                  value: Content Type Copy
-            - name: icon
-              attributes:
-                - name: id
-                  value: "@mui/icons-material/FileCopyOutlined"
-            - name: url
-              value: uigoodies-cross-site-content-types
-            - name: widget
-              attributes:
-                - name: id
-                  value: org.rd.plugin.uigoodies.CrossSiteContentTypeCopy
-              children:
-                - name: plugin
-                  attributes:
-                    - name: id
-                      value: org.rd.plugin.uigoodies
-                    - name: type
-                      value: apps
-                    - name: name
-                      value: uigoodies
-                    - name: file
-                      value: index.js
-  - type: preview-app
-    parentXpath: //reference[@id='craftercms.siteTools']
     elementXpath: //reference[@id='craftercms.siteTools']//widget[@id='org.rd.plugin.uigoodies.CrossSiteContentCopy']
     element:
       name: tools
@@ -115,133 +80,6 @@ installation:
               attributes:
                 - name: id
                   value: org.rd.plugin.uigoodies.CrossSiteContentCopy
-              children:
-                - name: plugin
-                  attributes:
-                    - name: id
-                      value: org.rd.plugin.uigoodies
-                    - name: type
-                      value: apps
-                    - name: name
-                      value: uigoodies
-                    - name: file
-                      value: index.js
-  - type: preview-app
-    parentXpath: //reference[@id='craftercms.siteTools']
-    elementXpath: //reference[@id='craftercms.siteTools']//widget[@id='org.rd.plugin.uigoodies.OpenSearchPlayground']
-    element:
-      name: tools
-      children:
-        - name: tool
-          children:
-            - name: title
-              attributes:
-                - name: id
-                  value: uigoodies.openSearchPlayground.title
-                - name: defaultMessage
-                  value: OpenSearch
-            - name: icon
-              attributes:
-                - name: id
-                  value: "@mui/icons-material/SearchRounded"
-            - name: url
-              value: uigoodies-opensearch-playground
-            - name: widget
-              attributes:
-                - name: id
-                  value: org.rd.plugin.uigoodies.OpenSearchPlayground
-              children:
-                - name: plugin
-                  attributes:
-                    - name: id
-                      value: org.rd.plugin.uigoodies
-                    - name: type
-                      value: apps
-                    - name: name
-                      value: uigoodies
-                    - name: file
-                      value: index.js
-  - type: preview-app
-    parentXpath: //reference[@id='craftercms.siteTools']
-    elementXpath: //reference[@id='craftercms.siteTools']//widget[@id='org.rd.plugin.uigoodies.LogTail']
-    element:
-      name: tools
-      children:
-        - name: tool
-          children:
-            - name: title
-              attributes:
-                - name: id
-                  value: uigoodies.logTail.title
-                - name: defaultMessage
-                  value: Log Tail
-            - name: icon
-              attributes:
-                - name: id
-                  value: "@mui/icons-material/TerminalRounded"
-            - name: url
-              value: uigoodies-log-tail
-            - name: widget
-              attributes:
-                - name: id
-                  value: org.rd.plugin.uigoodies.LogTail
-              children:
-                - name: plugin
-                  attributes:
-                    - name: id
-                      value: org.rd.plugin.uigoodies
-                    - name: type
-                      value: apps
-                    - name: name
-                      value: uigoodies
-                    - name: file
-                      value: index.js
-                - name: configuration
-                  children:
-                    - name: files
-                      children:
-                        - name: file
-                          children:
-                            - name: label
-                              value: Tomcat
-                            - name: path
-                              value: ../logs/tomcat/catalina.out
-                        - name: file
-                          children:
-                            - name: label
-                              value: Deployer
-                            - name: path
-                              value: ../logs/deployer/crafter-deployer.out
-                        - name: file
-                          children:
-                            - name: label
-                              value: Search
-                            - name: path
-                              value: ../logs/search/opensearch.log
-  - type: preview-app
-    parentXpath: //reference[@id='craftercms.siteTools']
-    elementXpath: //reference[@id='craftercms.siteTools']//widget[@id='org.rd.plugin.uigoodies.DevContentOpsTools']
-    element:
-      name: tools
-      children:
-        - name: tool
-          children:
-            - name: title
-              attributes:
-                - name: id
-                  value: uigoodies.devContentOpsTools.title
-                - name: defaultMessage
-                  value: DevContentOps Tools
-            - name: icon
-              attributes:
-                - name: id
-                  value: "@mui/icons-material/BuildRounded"
-            - name: url
-              value: uigoodies-dev-content-ops
-            - name: widget
-              attributes:
-                - name: id
-                  value: org.rd.plugin.uigoodies.DevContentOpsTools
               children:
                 - name: plugin
                   attributes:

@@ -28,21 +28,14 @@ import useCurrentPreviewItem from '@craftercms/studio-ui/hooks/useCurrentPreview
 import useEnv from '@craftercms/studio-ui/hooks/useEnv';
 
 import StudioAPI, { TranslationRemoveCandidate } from '../api/studio';
-import {
-  getWebsiteComponentsRootDir,
-  localeSegmentsCompatible,
-  parentFolderPath,
-  parseLocaleRelative,
-  pathForLocale
-} from '../utils/localePathUtils';
+import { localeSegmentsCompatible } from '../utils/localePathUtils';
 import {
   TranslationCurrentBadge,
   TranslationOutdatedBadge,
   TranslationSourceBadge
 } from './TranslationLocaleIndicatorBadges';
 import { openEditFormStudioDispatch } from '../utils/studioEditDialog';
-import { SiteTranslationConfig, getFlagForLocale, hasConfiguredTranslationLocales, translationConfigsEqual } from '../config/multiLocaleConfig';
-import { resolveLocaleFoldersOnSite } from '../utils/translateLocaleUtils';
+import { SiteTranslationConfig, hasConfiguredTranslationLocales, translationConfigsEqual } from '../config/multiLocaleConfig';
 
 type IconConfig = { id: string };
 type LocaleMenuRow = {
@@ -194,144 +187,58 @@ export function OpenTranslationToolbarButton(props: {
   const [translationConfig, setTranslationConfig] = useState<SiteTranslationConfig | null>(null);
   const translationConfigRef = useRef<SiteTranslationConfig | null>(null);
   translationConfigRef.current = translationConfig;
-  /** Last resolved locale folder list + path context for copy-from-base and remove flows. */
-  const foldersRef = useRef<string[]>([]);
-  const copyCtxRef = useRef<{ rootDir: string; relativeUnderLocale: string } | null>(null);
+  /** Existing base-language variant of the previewed item; translations are copied from it when present. */
+  const baseCopySourceRef = useRef<string | null>(null);
   const [removeDialog, setRemoveDialog] = useState<RemoveDialogState>(null);
+  const loadSeqRef = useRef(0);
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      if (!siteId || !authoringBase) {
-        setTranslationConfig(null);
-        return;
-      }
-      const cfg = await StudioAPI.getTranslationConfig(authoringBase, siteId, true);
-      if (!cancelled) setTranslationConfig(cfg);
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [siteId, authoringBase]);
-
+  /** One server call: config (toolbar visibility) + every locale variant of the previewed item. */
   const loadTargets = useCallback(async () => {
+    const seq = ++loadSeqRef.current;
+    const base = authoringBase || '';
+    if (!siteId || !base) {
+      setTranslationConfig(null);
+      setRows([]);
+      baseCopySourceRef.current = null;
+      return;
+    }
     setLoading(true);
-    const clearCopyRefs = () => {
-      foldersRef.current = [];
-      copyCtxRef.current = null;
-    };
     try {
-      const base = authoringBase || '';
-      if (!siteId || !base || !sourceItem?.path) {
-        setRows([]);
-        clearCopyRefs();
+      const res = await StudioAPI.getTranslationLocales(base, siteId, sourceItem?.path || null);
+      if (seq !== loadSeqRef.current) {
         return;
       }
-      const rootDir = getWebsiteComponentsRootDir(sourceItem.path);
-      if (!rootDir) {
+      const cfg = res ? res.config : translationConfigRef.current;
+      if (res) {
+        setTranslationConfig((prev) => (translationConfigsEqual(prev, cfg) ? prev : cfg));
+      }
+      const locales = res?.relativeUnderLocale ? res.locales : [];
+      if (locales.length < 2) {
         setRows([]);
-        clearCopyRefs();
+        baseCopySourceRef.current = null;
         return;
       }
-      const liveConfig = await StudioAPI.getTranslationConfig(base, siteId, true);
-      if (liveConfig) {
-        setTranslationConfig((prev) =>
-          translationConfigsEqual(prev, liveConfig) ? prev : liveConfig
-        );
-      }
-      const effectiveConfig = liveConfig ?? translationConfigRef.current;
-      const localeCodes = (effectiveConfig?.languages ?? [])
-        .map((l) => l.locale)
-        .filter((c): c is string => Boolean(c));
-      if (localeCodes.length < 2) {
-        setRows([]);
-        clearCopyRefs();
-        return;
-      }
-      const folders = await resolveLocaleFoldersOnSite(
-        base,
-        siteId,
-        rootDir,
-        localeCodes,
-        effectiveConfig?.baseLanguage
+      const baseRow = cfg?.baseLanguage
+        ? locales.find((l) => l.exists && localeSegmentsCompatible(l.locale, cfg.baseLanguage))
+        : undefined;
+      baseCopySourceRef.current = baseRow?.path ?? null;
+      setRows(
+        locales.map((l) => ({
+          locale: l.locale,
+          label: l.label,
+          flag: l.flag,
+          targetFilePath: l.path,
+          destinationParentPath: l.parentPath,
+          exists: l.exists,
+          isOutdated: l.isOutdated,
+          isSource: l.isSource,
+          isCurrentPreview: l.isCurrent
+        }))
       );
-      if (!folders) {
-        setRows([]);
-        clearCopyRefs();
-        return;
-      }
-      const parsed = parseLocaleRelative(sourceItem.path, rootDir, folders);
-      const relativeUnderLocale = parsed
-        ? parsed.relativeUnderLocale
-        : (() => {
-            const prefix = `${rootDir.replace(/\/$/, '')}/`;
-            if (!sourceItem.path.startsWith(prefix)) {
-              return null;
-            }
-            const rest = sourceItem.path.slice(prefix.length);
-            if (!rest || rest.startsWith('/')) {
-              return null;
-            }
-            return `/${rest}`;
-          })();
-      if (!relativeUnderLocale) {
-        setRows([]);
-        clearCopyRefs();
-        return;
-      }
-
-      foldersRef.current = folders;
-      copyCtxRef.current = { rootDir, relativeUnderLocale };
-
-      const metaForFolderLoc = (loc: string) => {
-        const row = effectiveConfig?.languages?.find((l) => localeSegmentsCompatible(l.locale, loc));
-        return {
-          label: row?.label || loc,
-          flag: (row?.flag && String(row.flag).trim()) || getFlagForLocale(loc)
-        };
-      };
-
-      const hints = await StudioAPI.getTranslationLocaleHints(base, siteId, sourceItem.path);
-      const sourceKey = hints.sourceLocaleCode;
-      const sourceFolder =
-        sourceKey !== '' ? folders.find((f) => localeSegmentsCompatible(f, sourceKey)) : undefined;
-      const sourcePathForStale =
-        sourceFolder != null ? pathForLocale(rootDir, relativeUnderLocale, sourceFolder) : sourceItem.path;
-      const sourceModifiedMs = await StudioAPI.getItemModifiedTimestamp(base, siteId, sourcePathForStale);
-      const previewNorm = normalizeRepoPath(sourceItem.path);
-
-      const allRows = await Promise.all(
-        folders.map(async (loc) => {
-          const targetFilePath = pathForLocale(rootDir, relativeUnderLocale, loc);
-          const exists = await StudioAPI.contentExists(base, siteId, targetFilePath);
-          const meta = metaForFolderLoc(loc);
-          const targetModifiedMs = exists
-            ? await StudioAPI.getItemModifiedTimestamp(base, siteId, targetFilePath)
-            : null;
-          const isSource = Boolean(sourceKey && localeSegmentsCompatible(loc, sourceKey));
-          const isOutdated =
-            Boolean(exists) &&
-            !isSource &&
-            sourceModifiedMs != null &&
-            targetModifiedMs != null &&
-            targetModifiedMs < sourceModifiedMs;
-          const isCurrentPreview = normalizeRepoPath(targetFilePath) === previewNorm;
-          return {
-            locale: loc,
-            label: meta.label,
-            flag: meta.flag,
-            targetFilePath,
-            destinationParentPath: parentFolderPath(targetFilePath),
-            exists,
-            isOutdated,
-            isSource,
-            isCurrentPreview
-          } as LocaleMenuRow;
-        })
-      );
-      setRows(allRows);
     } finally {
-      setLoading(false);
+      if (seq === loadSeqRef.current) {
+        setLoading(false);
+      }
     }
   }, [siteId, authoringBase, sourceItem?.path]);
 
@@ -459,20 +366,7 @@ export function OpenTranslationToolbarButton(props: {
     }
     setCopyBusy(true);
     try {
-      const ctx = copyCtxRef.current;
-      const cfg = translationConfigRef.current;
-      const folders = foldersRef.current;
-      let copySource = sourceItem.path;
-      if (ctx && folders.length && cfg?.baseLanguage) {
-        const baseFolder = folders.find((f) => localeSegmentsCompatible(f, cfg.baseLanguage));
-        if (baseFolder) {
-          const candidate = pathForLocale(ctx.rootDir, ctx.relativeUnderLocale, baseFolder);
-          const existsBase = await StudioAPI.contentExists(authoringBase, siteId, candidate);
-          if (existsBase) {
-            copySource = candidate;
-          }
-        }
-      }
+      const copySource = baseCopySourceRef.current || sourceItem.path;
       const res = await StudioAPI.copyItem(
         authoringBase,
         siteId,

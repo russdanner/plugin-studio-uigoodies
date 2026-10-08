@@ -11,17 +11,13 @@ import OpenBulkPublishPanelButton from './components/OpenBulkPublishPanelButton'
 import OpenBulkPublishToolbarButton from './components/OpenBulkPublishToolbarButton';
 import CopyCurrentPageUrl from './components/CopyCurrentPageUrl';
 import ComponentPreviewPathNavigator from './components/ComponentPreview/ComponentPreviewPathNavigator';
-import CrossSiteContentTypeCopy from './components/CrossSiteContentTypeCopy';
 import CrossSiteContentCopy from './components/CrossSiteContentCopy';
 import AudienceTargetingFlyoutToolbarButton from './components/AudienceTargetingFlyoutToolbarButton';
 import DeviceSimulatorFlyoutToolbarButton from './components/DeviceSimulatorFlyoutToolbarButton';
 import OpenCannedSearchPanelButton from './components/OpenCannedSearchPanelButton';
 import OpenCannedSearchToolbarButton from './components/OpenCannedSearchToolbarButton';
-import OpenSearchPlayground from './components/OpenSearchPlayground';
-import LogTail from './components/LogTail';
 import ImageStudio from './components/ImageStudio/ImageStudio';
 import OpenImageStudioPanelButton from './components/OpenImageStudioPanelButton';
-import DevContentOpsTools from './components/DevContentOps/DevContentOpsTools';
 import TranslationDialog from './components/Translation/TranslationDialog';
 import TranslationConfigTools from './components/Translation/TranslationConfigTools';
 import OpenTranslationPanelButton from './components/Translation/components/OpenTranslationPanelButton';
@@ -47,17 +43,13 @@ const plugin: PluginDescriptor = {
     'org.rd.plugin.uigoodies.openBulkPublishPanelButton': OpenBulkPublishPanelButton,
     'org.rd.plugin.uigoodies.openBulkPublishToolbarButton': OpenBulkPublishToolbarButton,
     'org.rd.plugin.uigoodies.CopyCurrentPageUrl': CopyCurrentPageUrl,
-    'org.rd.plugin.uigoodies.CrossSiteContentTypeCopy': CrossSiteContentTypeCopy,
     'org.rd.plugin.uigoodies.CrossSiteContentCopy': CrossSiteContentCopy,
     'org.rd.plugin.uigoodies.AudienceTargetingFlyoutToolbarButton': AudienceTargetingFlyoutToolbarButton,
     'org.rd.plugin.uigoodies.DeviceSimulatorFlyoutToolbarButton': DeviceSimulatorFlyoutToolbarButton,
     'org.rd.plugin.uigoodies.openCannedSearchPanelButton': OpenCannedSearchPanelButton,
     'org.rd.plugin.uigoodies.openCannedSearchToolbarButton': OpenCannedSearchToolbarButton,
-    'org.rd.plugin.uigoodies.OpenSearchPlayground': OpenSearchPlayground,
-    'org.rd.plugin.uigoodies.LogTail': LogTail,
     'org.rd.plugin.uigoodies.ImageStudio': ImageStudio,
     'org.rd.plugin.uigoodies.openImageStudioPanelButton': OpenImageStudioPanelButton,
-    'org.rd.plugin.uigoodies.DevContentOpsTools': DevContentOpsTools,
     'org.rd.plugin.uigoodies.TranslationConfigTools': TranslationConfigTools,
     'org.rd.plugin.uigoodies.TranslationDialog': TranslationDialog,
     'org.rd.plugin.uigoodies.openTranslationPanelButton': OpenTranslationPanelButton,
@@ -80,17 +72,13 @@ export {
   OpenBulkPublishPanelButton,
   OpenBulkPublishToolbarButton,
   CopyCurrentPageUrl,
-  CrossSiteContentTypeCopy,
   CrossSiteContentCopy,
   AudienceTargetingFlyoutToolbarButton,
   DeviceSimulatorFlyoutToolbarButton,
   OpenCannedSearchPanelButton,
   OpenCannedSearchToolbarButton,
-  OpenSearchPlayground,
-  LogTail,
   ImageStudio,
   OpenImageStudioPanelButton,
-  DevContentOpsTools,
   TranslationConfigTools,
   TranslationDialog,
   OpenTranslationPanelButton,

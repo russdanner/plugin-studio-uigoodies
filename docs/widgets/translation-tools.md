@@ -98,8 +98,30 @@ Base: `/studio/api/2/plugin/script/plugins/org/rd/plugin/uigoodies/`
 |--------|--------|---------|
 | `translation-copy` | POST | Copy item; new `objectId`; locale metadata |
 | `translation-config` | GET | Read site locale list |
+| `translation-locales` | GET | Config plus every locale variant of an item in one call (see below) |
 | `translation-siblings` | POST | Find sibling translations |
 | `translation-remove-candidates` | POST | List deletable locale components |
 | `translation-remove` | POST | Delete translation and optional components |
+
+### `translation-locales`
+
+The **Translations** form control and the preview toolbar button each make a single request to this endpoint instead of probing every locale from the browser.
+
+`GET translation-locales?siteId={site}&path={repo path}`
+
+| Param | Required | Notes |
+|-------|----------|-------|
+| `siteId` | yes | |
+| `path` | no | Item repo path, e.g. `/site/website/en/about/index.xml`. Without it only the config is returned. |
+| `contentType`, `localeSourceId`, `objectId`, `sourceLocale` | no | Override the values read from the saved item (the form control sends unsaved form values). |
+
+For each configured locale, the server:
+
+1. Maps the configured code to the locale folder on disk (`ar-sa` vs `ar-SA`, `zh` vs `zh-cn`).
+2. Finds lineage matches in the preview index (same `content-type`, and `localeSourceId_s` equal to the item's `localeSourceId_s` or `objectId`). In the item's own locale, the item itself always wins.
+3. Falls back to the mirrored path `{root}/{locale}{relative path}`.
+4. Reads the modified date of each existing variant and flags variants that are older than the source-locale variant.
+
+The response contains `baseLanguage` and `languages` (same shape as `translation-config`), `currentLocale`, `sourceLocale`, `relativeUnderLocale`, and `locales[]` in config order. Each `locales[]` row has: `locale`, `code`, `label`, `flag`, `path`, `parentPath`, `exists`, `lastModified` (epoch ms), `isSource`, `isOutdated`, `isCurrent`, `isPage` and `matchedBy` (`lineage` or `folder`).
 
 See [../TRANSLATION_SPEC.md](../TRANSLATION_SPEC.md) for the product spec.

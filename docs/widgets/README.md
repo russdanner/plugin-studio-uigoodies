@@ -23,14 +23,10 @@ Each file in this folder documents one **registered widget** (or embedded view u
 | `org.rd.plugin.uigoodies.DeviceSimulatorFlyoutToolbarButton` | Device size presets in a preview-toolbar popover. | [device-simulator-flyout-toolbar-button.md](device-simulator-flyout-toolbar-button.md) |
 | `org.rd.plugin.uigoodies.openCannedSearchPanelButton` | Sidebar shortcut to Search with preset query or dialog. | [open-canned-search-panel-button.md](open-canned-search-panel-button.md) |
 | `org.rd.plugin.uigoodies.openCannedSearchToolbarButton` | Toolbar shortcut to Search with preset query or dialog. | [open-canned-search-toolbar-button.md](open-canned-search-toolbar-button.md) |
-| `org.rd.plugin.uigoodies.CrossSiteContentTypeCopy` | Project tool: copy content types between sites. | [cross-site-content-type-copy.md](cross-site-content-type-copy.md) |
 | `org.rd.plugin.uigoodies.CrossSiteContentCopy` | Project tool: multi-select cross-site content copy with plan preview, item actions, and switch-to-destination. | [cross-site-content-copy.md](cross-site-content-copy.md) |
 | `org.rd.plugin.uigoodies.ComponentPreviewPathNavigator` | Sidebar path navigator that opens component preview URLs. | [component-preview-path-navigator.md](component-preview-path-navigator.md) |
-| `org.rd.plugin.uigoodies.OpenSearchPlayground` | Project tool: Explorer + Dictionary tabs, expanded Search API options, OpenSearch DSL editor, and Engine `search.json`. | [open-search-playground.md](open-search-playground.md) |
-| `org.rd.plugin.uigoodies.LogTail` | Project tool: live SSE tail of Tomcat `catalina.out`, colorized levels, collapsible stack traces, fullscreen. Server streams only while the panel is open. | [log-tail.md](log-tail.md) |
 | `org.rd.plugin.uigoodies.openImageStudioPanelButton` | Sidebar button → Image Studio dialog (crop, focal point, adjust, save). | [open-image-studio-panel-button.md](open-image-studio-panel-button.md) |
 | `org.rd.plugin.uigoodies.ImageStudio` | Image editing UI embedded in Image Studio dialog. | [image-studio.md](image-studio.md) |
-| `org.rd.plugin.uigoodies.DevContentOpsTools` | Project tool: git log graph, remotes, patches, ingestion sync. | [dev-content-ops-tools.md](dev-content-ops-tools.md) |
 | `org.rd.plugin.uigoodies.TranslationConfigTools` | Project tool: edit translation-config.xml and add Translation fields to content types. | [translation-config-tools.md](translation-config-tools.md) |
 | `org.rd.plugin.uigoodies.TranslationDialog` | Translation dialog (locale path tree + copy). | [translation-tools.md](translation-tools.md) |
 | `org.rd.plugin.uigoodies.openTranslationToolbarButton` | Preview toolbar → translation locale picker. | [translation-tools.md](translation-tools.md) |
@@ -41,6 +37,7 @@ Each file in this folder documents one **registered widget** (or embedded view u
 | Plugin / widget | Description | Doc |
 |-----------------|-------------|-----|
 | `org.craftercms.plugin.bulkedit` / `…bulkedit.components.reactComponent` | Spreadsheet bulk edit by content type (sidebar). | [bulk-edit.md](bulk-edit.md) |
+| `org.rd.plugin.devopsgoodies` | DevContentOps Tools, OpenSearch Playground, Log Tail, Content Type Copy (moved out of UI Goodies; install in one admin project). | [Studio DevOps Goodies](https://github.com/russdanner/plugin-studio-devopsgoodies) |
 
 ### Form controls (separate bundles)
 
