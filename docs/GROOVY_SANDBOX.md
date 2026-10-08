@@ -31,11 +31,12 @@ With default settings, this plugin works **without any site-specific Studio conf
 |------|---------|
 | `cstudioContentService` | cross-site-content-copy, cross-site-content-copy-plan |
 | `dependencyServiceInternal` | cross-site-content-copy, cross-site-content-copy-plan (when `copyDependencies` is true) |
+| `contentService` | translation-remove (Studio v2 delete, so the Sidebar and item metadata stay in sync) |
 
 If **bean restriction** is enabled (`studio.scripting.restrictBeans: true`), add at least:
 
 ```yaml
-studio.scripting.allowedBeans: cstudioContentService,dependencyServiceInternal
+studio.scripting.allowedBeans: cstudioContentService,contentService,dependencyServiceInternal
 ```
 
 ## Whitelist-enabled environments

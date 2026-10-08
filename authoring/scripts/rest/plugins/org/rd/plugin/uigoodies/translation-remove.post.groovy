@@ -2,9 +2,11 @@ import groovy.json.JsonSlurper
 import java.util.regex.Pattern
 import org.craftercms.studio.api.v1.service.content.ContentService as V1ContentService
 import org.craftercms.studio.api.v1.service.dependency.DependencyService as V1DependencyService
+import org.craftercms.studio.api.v2.service.content.ContentService as V2ContentService
 
 /**
- * Deletes selected locale-specific components then the translated page.
+ * Deletes selected locale-specific components and the translated page in one Studio delete
+ * (same workflow as the Delete dialog, including removal from live for published items).
  *
  * POST .../translation-remove.post?siteId=...
  * Body JSON:
@@ -142,16 +144,6 @@ V1DependencyService resolveDependencyService(def ctx) {
     return null
 }
 
-String actorUser() {
-    try {
-        def auth = org.springframework.security.core.context.SecurityContextHolder.context?.authentication
-        def n = auth?.name
-        return n ? String.valueOf(n) : 'uigoodies-plugin'
-    } catch (Throwable t) {
-        return 'uigoodies-plugin'
-    }
-}
-
 def effectiveParams = mergePluginParams(params, request)
 def siteId = trimParam(effectiveParams, 'siteId') ?: trimParam(effectiveParams, 'site')
 def pagePath = normPath(trimParam(effectiveParams, 'pagePath'))
@@ -208,25 +200,24 @@ toDelete.sort { a, b -> Integer.compare(b.count('/'), a.count('/')) }
 
 List<String> deleted = []
 List<Map> failed = []
-String user = actorUser()
 
-for (String path : toDelete) {
-    try {
-        boolean ok = contentSvc.deleteContent(siteId, path, true, user)
-        if (ok) deleted << path
-        else failed << [path: path, message: 'deleteContent returned false']
-    } catch (Throwable t) {
-        failed << [path: path, message: String.valueOf(t.message)]
-    }
+List<String> batch = new ArrayList<>(toDelete)
+if (deletePageFlag) {
+    batch << pagePath
 }
 
-if (deletePageFlag) {
+// v1 deleteContent removes the page folder from git but leaves its row in the item table; the Sidebar
+// then lists a folder that does not exist. Use the same v2 delete as Studio's Delete dialog.
+if (!batch.isEmpty()) {
+    def deleteSvc = applicationContext.get('contentService', V2ContentService)
     try {
-        boolean pok = contentSvc.deleteContent(siteId, pagePath, true, user)
-        if (pok) deleted << pagePath
-        else failed << [path: pagePath, message: 'deleteContent returned false for page']
+        if (deleteSvc.deleteContent(siteId, batch, "Removed translation ${pagePath}".toString())) {
+            deleted.addAll(batch)
+        } else {
+            batch.each { failed << [path: it, message: 'deleteContent returned false'] }
+        }
     } catch (Throwable t) {
-        failed << [path: pagePath, message: String.valueOf(t.message)]
+        batch.each { failed << [path: it, message: String.valueOf(t.message)] }
     }
 }
 

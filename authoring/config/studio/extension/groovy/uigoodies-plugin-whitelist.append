@@ -14,6 +14,9 @@ method org.craftercms.studio.api.v1.service.content.ContentService writeContent 
 method org.craftercms.studio.api.v1.service.content.ContentService writeContentAsset java.lang.String java.lang.String java.lang.String java.io.InputStream java.lang.String java.lang.String java.lang.String java.lang.String java.lang.String java.lang.String java.lang.String
 method org.craftercms.studio.api.v1.service.content.ContentService createFolder java.lang.String java.lang.String java.lang.String
 
+# Content delete (bean: contentService) — translation-remove
+method org.craftercms.studio.api.v2.service.content.ContentService deleteContent java.lang.String java.util.List java.lang.String
+
 # Dependencies (bean: dependencyServiceInternal)
 method org.craftercms.studio.api.v2.service.dependency.internal.DependencyServiceInternal getItemSpecificDependencies java.lang.String java.lang.String
 method org.craftercms.studio.api.v2.service.dependency.internal.DependencyServiceInternal getItemSpecificDependencies java.lang.String java.util.List

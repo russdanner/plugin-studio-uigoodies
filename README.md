@@ -79,7 +79,7 @@ curl --location --request POST 'http://SERVER_AND_PORT/studio/api/2/marketplace/
 | Bump `craftercms-plugin.yaml` version after changes | Marketplace may skip unchanged plugin artifacts |
 | Groovy script reload after install | Updated `.groovy` / class files are not live until reload |
 | `studio.scripting.sandbox.whitelist.enable: true` | Manually append `authoring/config/studio/extension/groovy/uigoodies-plugin-whitelist.append` to your Studio whitelist path; install script does not modify it |
-| `studio.scripting.restrictBeans: true` | Add `cstudioContentService,dependencyServiceInternal` to `studio.scripting.allowedBeans` |
+| `studio.scripting.restrictBeans: true` | Add `cstudioContentService,contentService,dependencyServiceInternal` to `studio.scripting.allowedBeans` |
 
 Do **not** rsync into `static-assets/` at the site root — marketplace maps plugin assets to `config/studio/static-assets/...`. Manual copies leave dirty git and wrong paths.
 
