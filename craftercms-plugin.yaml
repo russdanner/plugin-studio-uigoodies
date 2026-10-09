@@ -45,10 +45,118 @@ plugin:
       patch: 3
     - major: 4
       minor: 0
+      patch: 4
+    - major: 4
+      minor: 0
+      patch: 5
+    - major: 4
+      minor: 0
+      patch: 6
+    - major: 4
+      minor: 0
+      patch: 7
+    - major: 4
+      minor: 0
       patch: 8
     - major: 4
       minor: 1
+      patch: 0
+    - major: 4
+      minor: 1
+      patch: 1
+    - major: 4
+      minor: 1
+      patch: 2
+    - major: 4
+      minor: 1
       patch: 3
+    - major: 4
+      minor: 1
+      patch: 4
+    - major: 4
+      minor: 1
+      patch: 5
+    - major: 4
+      minor: 1
+      patch: 6
+    - major: 4
+      minor: 1
+      patch: 7
+    - major: 4
+      minor: 1
+      patch: 8
+    - major: 4
+      minor: 2
+      patch: 0
+    - major: 4
+      minor: 2
+      patch: 1
+    - major: 4
+      minor: 2
+      patch: 2
+    - major: 4
+      minor: 2
+      patch: 3
+    - major: 4
+      minor: 2
+      patch: 4
+    - major: 4
+      minor: 2
+      patch: 5
+    - major: 4
+      minor: 2
+      patch: 6
+    - major: 4
+      minor: 3
+      patch: 0
+    - major: 4
+      minor: 3
+      patch: 1
+    - major: 4
+      minor: 3
+      patch: 2
+    - major: 4
+      minor: 3
+      patch: 3
+    - major: 4
+      minor: 3
+      patch: 4
+    - major: 4
+      minor: 4
+      patch: 0
+    - major: 4
+      minor: 4
+      patch: 1
+    - major: 4
+      minor: 4
+      patch: 2
+    - major: 4
+      minor: 4
+      patch: 3
+    - major: 4
+      minor: 4
+      patch: 4
+    - major: 4
+      minor: 5
+      patch: 0
+    - major: 4
+      minor: 5
+      patch: 1
+    - major: 4
+      minor: 5
+      patch: 2
+    - major: 4
+      minor: 5
+      patch: 3
+    - major: 4
+      minor: 5
+      patch: 4
+    - major: 4
+      minor: 6
+      patch: 0
+    - major: 4
+      minor: 6
+      patch: 1
   crafterCmsEditions:
     - community
     - enterprise
