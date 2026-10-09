@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useStore } from 'react-redux';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
@@ -35,7 +35,8 @@ import {
   TranslationSourceBadge
 } from './TranslationLocaleIndicatorBadges';
 import { openEditFormStudioDispatch } from '../utils/studioEditDialog';
-import { SiteTranslationConfig, hasConfiguredTranslationLocales, translationConfigsEqual } from '../config/multiLocaleConfig';
+import { pruneSidebarTrees, refreshSidebarTrees } from '../utils/sidebarTreePrune';
+import { hasConfiguredTranslationLocales } from '../config/multiLocaleConfig';
 
 type IconConfig = { id: string };
 type LocaleMenuRow = {
@@ -172,6 +173,7 @@ export function OpenTranslationToolbarButton(props: {
   } = props;
 
   const dispatch = useDispatch();
+  const store = useStore<any>();
   const siteId = useActiveSiteId();
   const { authoringBase } = useEnv();
   const currentPreviewItem = useCurrentPreviewItem();
@@ -182,39 +184,49 @@ export function OpenTranslationToolbarButton(props: {
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [rows, setRows] = useState<LocaleMenuRow[]>([]);
+  /** Preview path `rows` belong to; rows for any other path are stale. */
+  const [rowsPath, setRowsPath] = useState<string | null>(null);
+  const rowsPathRef = useRef<string | null>(null);
+  rowsPathRef.current = rowsPath;
   const [loading, setLoading] = useState(false);
   const [copyBusy, setCopyBusy] = useState(false);
-  const [translationConfig, setTranslationConfig] = useState<SiteTranslationConfig | null>(null);
-  const translationConfigRef = useRef<SiteTranslationConfig | null>(null);
-  translationConfigRef.current = translationConfig;
   /** Existing base-language variant of the previewed item; translations are copied from it when present. */
   const baseCopySourceRef = useRef<string | null>(null);
   const [removeDialog, setRemoveDialog] = useState<RemoveDialogState>(null);
   const loadSeqRef = useRef(0);
 
-  /** One server call: config (toolbar visibility) + every locale variant of the previewed item. */
+  /** One server call: every locale variant of the previewed item (empty when it is not under a locale). */
   const loadTargets = useCallback(async () => {
     const seq = ++loadSeqRef.current;
     const base = authoringBase || '';
-    if (!siteId || !base) {
-      setTranslationConfig(null);
+    const path = sourceItem?.path || null;
+    if (!siteId || !base || !path) {
       setRows([]);
+      setRowsPath(null);
+      setLoading(false);
       baseCopySourceRef.current = null;
       return;
     }
     setLoading(true);
     try {
-      const res = await StudioAPI.getTranslationLocales(base, siteId, sourceItem?.path || null);
+      const res = await StudioAPI.getTranslationLocales(base, siteId, path);
       if (seq !== loadSeqRef.current) {
         return;
       }
-      const cfg = res ? res.config : translationConfigRef.current;
-      if (res) {
-        setTranslationConfig((prev) => (translationConfigsEqual(prev, cfg) ? prev : cfg));
+      if (!res) {
+        // Failed request: keep what we already know about this page rather than hiding the button.
+        if (rowsPathRef.current !== path) {
+          setRows([]);
+          setRowsPath(path);
+          baseCopySourceRef.current = null;
+        }
+        return;
       }
-      const locales = res?.relativeUnderLocale ? res.locales : [];
+      const cfg = res.config;
+      const locales = res.relativeUnderLocale && hasConfiguredTranslationLocales(cfg) ? res.locales : [];
       if (locales.length < 2) {
         setRows([]);
+        setRowsPath(path);
         baseCopySourceRef.current = null;
         return;
       }
@@ -235,6 +247,7 @@ export function OpenTranslationToolbarButton(props: {
           isCurrentPreview: l.isCurrent
         }))
       );
+      setRowsPath(path);
     } finally {
       if (seq === loadSeqRef.current) {
         setLoading(false);
@@ -295,9 +308,14 @@ export function OpenTranslationToolbarButton(props: {
     const paths = Object.keys(removeDialog.selected).filter((p) => removeDialog.selected[p]);
     const currentPreviewNorm = normalizeRepoPath(sourceItem?.path ?? '');
     setRemoveDialog((prev) => (prev ? { ...prev, submitting: true, error: undefined } : prev));
+    // Studio's delete event can arrive before this request returns, so prune the Sidebar first.
+    const prunedTreeIds = pruneSidebarTrees(dispatch, store.getState()?.pathNavigatorTree, [pagePath, ...paths]);
     try {
       const res = await StudioAPI.postTranslationRemove(authoringBase, siteId, pagePath, paths, true);
       const failed = res.failed ?? [];
+      if (failed.length) {
+        refreshSidebarTrees(dispatch, prunedTreeIds);
+      }
       const deletedList = res.deleted ?? [];
       const pageRemoved = deletedList.some((p) => normalizeRepoPath(p) === normalizeRepoPath(pagePath));
       const removedWhatWeWerePreviewing =
@@ -338,6 +356,7 @@ export function OpenTranslationToolbarButton(props: {
       }
       await loadTargets();
     } catch {
+      refreshSidebarTrees(dispatch, prunedTreeIds);
       dispatch(
         showSystemNotification({
           message: 'Remove translation failed (network).'
@@ -432,19 +451,21 @@ export function OpenTranslationToolbarButton(props: {
     scheduleEnforceAllowedItemsInMegaMenu(hideEdit);
   };
 
-  const tooltipText = disabledCore
-    ? 'Select an item in preview'
-    : loading && menuOpen
-      ? 'Loading locales…'
-      : tooltip;
+  // Only show the button once this page's locales are known; pages outside a locale folder
+  // (e.g. the global home) have nothing to translate to.
+  const showButton = Boolean(sourceItem?.path) && rowsPath === sourceItem?.path && rows.length > 0;
 
-  if (!hasConfiguredTranslationLocales(translationConfig)) {
-    return null;
-  }
+  useEffect(() => {
+    if (!showButton) {
+      setAnchorEl(null);
+    }
+  }, [showButton]);
 
   return (
     <>
-      <Tooltip title={tooltipText}>
+      {showButton ? (
+        <>
+      <Tooltip title={tooltip}>
         <span>
           <IconButton
             size={buttonSize}
@@ -470,33 +491,7 @@ export function OpenTranslationToolbarButton(props: {
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         PaperProps={{ sx: { minWidth: 220 } }}
       >
-        {loading ? (
-          <MenuItem disabled dense>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 0.5 }}>
-              <CircularProgress size={16} />
-              Loading locales…
-            </Box>
-          </MenuItem>
-        ) : rows.length === 0 ? (
-          <MenuItem disabled dense sx={{ bgcolor: 'background.paper', alignItems: 'flex-start' }}>
-            <Box
-              component="div"
-              sx={{
-                whiteSpace: 'normal',
-                py: 0.75,
-                fontSize: '0.8125rem',
-                lineHeight: 1.45,
-                maxWidth: 320,
-                color: 'text.primary'
-              }}
-            >
-              No locales loaded. The menu only uses <Box component="code">translation-config.xml</Box> (via the plugin
-              REST script). Fix the script response or XML, confirm the plugin is installed for this site, and use a
-              preview item under <Box component="code">/site/…/website</Box> or <Box component="code">/site/…/components</Box>.
-            </Box>
-          </MenuItem>
-        ) : (
-          rows.map((o) => {
+        {rows.map((o) => {
             const showRemove = o.exists && !o.isSource && isPageRepoPath(o.targetFilePath);
             return (
             <MenuItem
@@ -608,9 +603,10 @@ export function OpenTranslationToolbarButton(props: {
               </Box>
             </MenuItem>
             );
-          })
-        )}
+          })}
       </Menu>
+        </>
+      ) : null}
       <Dialog open={Boolean(removeDialog)} onClose={removeDialog?.submitting ? undefined : closeRemoveDialog} maxWidth="sm" fullWidth>
         {removeDialog ? (
           <>

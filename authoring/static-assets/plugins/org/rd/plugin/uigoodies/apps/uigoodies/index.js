@@ -17111,27 +17111,30 @@ function OpenTranslationToolbarButton(props) {
     var sourceItem = useMemo(function () { return (currentPreviewItem ? StudioAPI.getPreviewItem(currentPreviewItem) : null); }, [currentPreviewItem]);
     var _d = useState(null), anchorEl = _d[0], setAnchorEl = _d[1];
     var _e = useState([]), rows = _e[0], setRows = _e[1];
-    var _f = useState(false), loading = _f[0], setLoading = _f[1];
-    var _g = useState(false), copyBusy = _g[0], setCopyBusy = _g[1];
-    var _h = useState(null), translationConfig = _h[0], setTranslationConfig = _h[1];
-    var translationConfigRef = useRef(null);
-    translationConfigRef.current = translationConfig;
+    /** Preview path `rows` belong to; rows for any other path are stale. */
+    var _f = useState(null), rowsPath = _f[0], setRowsPath = _f[1];
+    var rowsPathRef = useRef(null);
+    rowsPathRef.current = rowsPath;
+    var _g = useState(false), loading = _g[0], setLoading = _g[1];
+    var _h = useState(false), copyBusy = _h[0], setCopyBusy = _h[1];
     /** Existing base-language variant of the previewed item; translations are copied from it when present. */
     var baseCopySourceRef = useRef(null);
     var _j = useState(null), removeDialog = _j[0], setRemoveDialog = _j[1];
     var loadSeqRef = useRef(0);
-    /** One server call: config (toolbar visibility) + every locale variant of the previewed item. */
+    /** One server call: every locale variant of the previewed item (empty when it is not under a locale). */
     var loadTargets = useCallback(function () { return __awaiter(_this, void 0, void 0, function () {
-        var seq, base, res, cfg_1, locales, baseRow;
+        var seq, base, path, res, cfg_1, locales, baseRow;
         var _a;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
                     seq = ++loadSeqRef.current;
                     base = authoringBase || '';
-                    if (!siteId || !base) {
-                        setTranslationConfig(null);
+                    path = (sourceItem === null || sourceItem === void 0 ? void 0 : sourceItem.path) || null;
+                    if (!siteId || !base || !path) {
                         setRows([]);
+                        setRowsPath(null);
+                        setLoading(false);
                         baseCopySourceRef.current = null;
                         return [2 /*return*/];
                     }
@@ -17139,19 +17142,26 @@ function OpenTranslationToolbarButton(props) {
                     _b.label = 1;
                 case 1:
                     _b.trys.push([1, , 3, 4]);
-                    return [4 /*yield*/, StudioAPI.getTranslationLocales(base, siteId, (sourceItem === null || sourceItem === void 0 ? void 0 : sourceItem.path) || null)];
+                    return [4 /*yield*/, StudioAPI.getTranslationLocales(base, siteId, path)];
                 case 2:
                     res = _b.sent();
                     if (seq !== loadSeqRef.current) {
                         return [2 /*return*/];
                     }
-                    cfg_1 = res ? res.config : translationConfigRef.current;
-                    if (res) {
-                        setTranslationConfig(function (prev) { return (translationConfigsEqual(prev, cfg_1) ? prev : cfg_1); });
+                    if (!res) {
+                        // Failed request: keep what we already know about this page rather than hiding the button.
+                        if (rowsPathRef.current !== path) {
+                            setRows([]);
+                            setRowsPath(path);
+                            baseCopySourceRef.current = null;
+                        }
+                        return [2 /*return*/];
                     }
-                    locales = (res === null || res === void 0 ? void 0 : res.relativeUnderLocale) ? res.locales : [];
+                    cfg_1 = res.config;
+                    locales = res.relativeUnderLocale && hasConfiguredTranslationLocales(cfg_1) ? res.locales : [];
                     if (locales.length < 2) {
                         setRows([]);
+                        setRowsPath(path);
                         baseCopySourceRef.current = null;
                         return [2 /*return*/];
                     }
@@ -17170,6 +17180,7 @@ function OpenTranslationToolbarButton(props) {
                         isSource: l.isSource,
                         isCurrentPreview: l.isCurrent
                     }); }));
+                    setRowsPath(path);
                     return [3 /*break*/, 4];
                 case 3:
                     if (seq === loadSeqRef.current) {
@@ -17399,60 +17410,53 @@ function OpenTranslationToolbarButton(props) {
         var hideEdit = normalizeRepoPath(path) === normalizeRepoPath((_a = sourceItem === null || sourceItem === void 0 ? void 0 : sourceItem.path) !== null && _a !== void 0 ? _a : '');
         scheduleEnforceAllowedItemsInMegaMenu(hideEdit);
     };
-    var tooltipText = disabledCore
-        ? 'Select an item in preview'
-        : loading && menuOpen
-            ? 'Loading locales…'
-            : tooltip;
-    if (!hasConfiguredTranslationLocales(translationConfig)) {
-        return null;
-    }
-    return (jsxs(Fragment, { children: [jsx(Tooltip$1, { title: tooltipText, children: jsx("span", { children: jsx(IconButton, { size: buttonSize, onClick: openMenu, disabled: disabledCore || copyBusy, "aria-label": tooltip, "aria-haspopup": "true", "aria-expanded": menuOpen ? 'true' : undefined, children: copyBusy || (loading && menuOpen) ? (jsx(CircularProgress$1, { size: buttonSize === 'small' ? 18 : 22 })) : (jsx(SystemIcon, { icon: icon })) }) }) }), jsx(Menu, { anchorEl: anchorEl, open: menuOpen, onClose: closeMenu, anchorOrigin: { vertical: 'bottom', horizontal: 'right' }, transformOrigin: { vertical: 'top', horizontal: 'right' }, PaperProps: { sx: { minWidth: 220 } }, children: loading ? (jsx(MenuItem, { disabled: true, dense: true, children: jsxs(Box, { sx: { display: 'flex', alignItems: 'center', gap: 1, py: 0.5 }, children: [jsx(CircularProgress$1, { size: 16 }), "Loading locales\u2026"] }) })) : rows.length === 0 ? (jsx(MenuItem, { disabled: true, dense: true, sx: { bgcolor: 'background.paper', alignItems: 'flex-start' }, children: jsxs(Box, { component: "div", sx: {
-                            whiteSpace: 'normal',
-                            py: 0.75,
-                            fontSize: '0.8125rem',
-                            lineHeight: 1.45,
-                            maxWidth: 320,
-                            color: 'text.primary'
-                        }, children: ["No locales loaded. The menu only uses ", jsx(Box, { component: "code", children: "translation-config.xml" }), " (via the plugin REST script). Fix the script response or XML, confirm the plugin is installed for this site, and use a preview item under ", jsx(Box, { component: "code", children: "/site/\u2026/website" }), " or ", jsx(Box, { component: "code", children: "/site/\u2026/components" }), "."] }) })) : (rows.map(function (o) {
-                    var showRemove = o.exists && !o.isSource && isPageRepoPath(o.targetFilePath);
-                    return (jsxs(MenuItem, { dense: true, disabled: copyBusy, onClick: o.exists ? function () { return openPreview(o.targetFilePath); } : undefined, sx: { py: 1 }, children: [jsxs(Box, { component: "span", sx: {
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: 1,
-                                    flexWrap: 'wrap',
-                                    typography: 'body2',
-                                    flex: 1,
-                                    minWidth: 0
-                                }, children: [jsx(Box, { component: "span", sx: { fontSize: '1.25rem', lineHeight: 1 }, "aria-hidden": true, children: o.flag }), jsx(Box, { component: "span", sx: { minWidth: 100 }, children: o.label }), jsxs(Box, { component: "span", sx: { display: 'inline-flex', flexWrap: 'wrap', gap: 0.5, alignItems: 'center' }, children: [o.isSource ? jsx(TranslationSourceBadge, {}) : null, o.isOutdated ? jsx(TranslationOutdatedBadge, {}) : null, o.isCurrentPreview ? jsx(TranslationCurrentBadge, {}) : null] })] }), jsx(Box, { sx: { ml: 'auto', display: 'inline-flex', alignItems: 'center', gap: 0.5 }, children: o.exists ? (jsxs(Fragment, { children: [showRemove ? (jsx(Tooltip$1, { title: o.isCurrentPreview
-                                                ? 'Remove this translation (preview moves to the parent page, or back if there is no parent)'
-                                                : 'Remove this translated page (and optional locale-only components)', children: jsx(IconButton, { size: "small", color: "error", onClick: function (e) {
-                                                    e.preventDefault();
-                                                    e.stopPropagation();
-                                                    void openRemoveDialog(o);
-                                                }, "aria-label": "Remove translation ".concat(o.label), children: jsx(DeleteOutlineIcon, { fontSize: "small" }) }) })) : null, jsx(IconButton, { size: "small", onClick: function (e) {
+    // Only show the button once this page's locales are known; pages outside a locale folder
+    // (e.g. the global home) have nothing to translate to.
+    var showButton = Boolean(sourceItem === null || sourceItem === void 0 ? void 0 : sourceItem.path) && rowsPath === (sourceItem === null || sourceItem === void 0 ? void 0 : sourceItem.path) && rows.length > 0;
+    useEffect(function () {
+        if (!showButton) {
+            setAnchorEl(null);
+        }
+    }, [showButton]);
+    return (jsxs(Fragment, { children: [showButton ? (jsxs(Fragment, { children: [jsx(Tooltip$1, { title: tooltip, children: jsx("span", { children: jsx(IconButton, { size: buttonSize, onClick: openMenu, disabled: disabledCore || copyBusy, "aria-label": tooltip, "aria-haspopup": "true", "aria-expanded": menuOpen ? 'true' : undefined, children: copyBusy || (loading && menuOpen) ? (jsx(CircularProgress$1, { size: buttonSize === 'small' ? 18 : 22 })) : (jsx(SystemIcon, { icon: icon })) }) }) }), jsx(Menu, { anchorEl: anchorEl, open: menuOpen, onClose: closeMenu, anchorOrigin: { vertical: 'bottom', horizontal: 'right' }, transformOrigin: { vertical: 'top', horizontal: 'right' }, PaperProps: { sx: { minWidth: 220 } }, children: rows.map(function (o) {
+                            var showRemove = o.exists && !o.isSource && isPageRepoPath(o.targetFilePath);
+                            return (jsxs(MenuItem, { dense: true, disabled: copyBusy, onClick: o.exists ? function () { return openPreview(o.targetFilePath); } : undefined, sx: { py: 1 }, children: [jsxs(Box, { component: "span", sx: {
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: 1,
+                                            flexWrap: 'wrap',
+                                            typography: 'body2',
+                                            flex: 1,
+                                            minWidth: 0
+                                        }, children: [jsx(Box, { component: "span", sx: { fontSize: '1.25rem', lineHeight: 1 }, "aria-hidden": true, children: o.flag }), jsx(Box, { component: "span", sx: { minWidth: 100 }, children: o.label }), jsxs(Box, { component: "span", sx: { display: 'inline-flex', flexWrap: 'wrap', gap: 0.5, alignItems: 'center' }, children: [o.isSource ? jsx(TranslationSourceBadge, {}) : null, o.isOutdated ? jsx(TranslationOutdatedBadge, {}) : null, o.isCurrentPreview ? jsx(TranslationCurrentBadge, {}) : null] })] }), jsx(Box, { sx: { ml: 'auto', display: 'inline-flex', alignItems: 'center', gap: 0.5 }, children: o.exists ? (jsxs(Fragment, { children: [showRemove ? (jsx(Tooltip$1, { title: o.isCurrentPreview
+                                                        ? 'Remove this translation (preview moves to the parent page, or back if there is no parent)'
+                                                        : 'Remove this translated page (and optional locale-only components)', children: jsx(IconButton, { size: "small", color: "error", onClick: function (e) {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            void openRemoveDialog(o);
+                                                        }, "aria-label": "Remove translation ".concat(o.label), children: jsx(DeleteOutlineIcon, { fontSize: "small" }) }) })) : null, jsx(IconButton, { size: "small", onClick: function (e) {
+                                                        e.stopPropagation();
+                                                        showStudioItemMegaMenu(e, o.targetFilePath);
+                                                    }, "aria-label": "Options for ".concat(o.label), children: "\u22EE" })] })) : (jsx(Box, { component: "button", type: "button", onClick: function (e) {
+                                                e.preventDefault();
                                                 e.stopPropagation();
-                                                showStudioItemMegaMenu(e, o.targetFilePath);
-                                            }, "aria-label": "Options for ".concat(o.label), children: "\u22EE" })] })) : (jsx(Box, { component: "button", type: "button", onClick: function (e) {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                        void handleTranslateTo(o);
-                                    }, disabled: copyBusy, sx: {
-                                        border: 'none',
-                                        borderRadius: 1,
-                                        px: 1,
-                                        py: 0.25,
-                                        fontSize: '0.75rem',
-                                        color: 'white',
-                                        bgcolor: copyBusy ? 'grey.400' : 'primary.main',
-                                        cursor: copyBusy ? 'not-allowed' : 'pointer',
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        gap: 0.5,
-                                        minWidth: 96,
-                                        justifyContent: 'center'
-                                    }, children: copyBusy ? (jsxs(Fragment, { children: [jsx(CircularProgress$1, { size: 12, sx: { color: 'white' } }), "Adding\u2026"] })) : ('Add to Scope') })) })] }, o.locale));
-                })) }), jsx(Dialog$1, { open: Boolean(removeDialog), onClose: (removeDialog === null || removeDialog === void 0 ? void 0 : removeDialog.submitting) ? undefined : closeRemoveDialog, maxWidth: "sm", fullWidth: true, children: removeDialog ? (jsxs(Fragment, { children: [jsx(DialogTitle$1, { children: "Remove translation" }), jsxs(DialogContent$1, { dividers: true, children: [removeDialog.loading ? (jsxs(Box, { sx: { display: 'flex', alignItems: 'center', gap: 1.5, py: 1 }, children: [jsx(CircularProgress$1, { size: 20 }), jsx(Typography$1, { variant: "body2", color: "text.secondary", children: "Loading removable components\u2026" })] })) : null, removeDialog.error ? (jsx(Typography$1, { variant: "body2", color: "error", sx: { mb: 1 }, children: removeDialog.error })) : null, !removeDialog.loading && !removeDialog.error && removeDialog.candidates.length === 0 ? (jsx(Typography$1, { variant: "body2", color: "text.secondary", sx: { mb: 1 }, children: "No locale-only components were found that are safe to delete automatically. The translated page will still be removed." })) : null, removeDialog.candidates.length > 0 ? (jsxs(Fragment, { children: [jsx(Typography$1, { variant: "subtitle2", sx: { mb: 1 }, children: "Also delete these components (checked by default)" }), jsxs(Box, { sx: { display: 'flex', gap: 1, mb: 1 }, children: [jsx(Button, { size: "small", onClick: function () {
+                                                void handleTranslateTo(o);
+                                            }, disabled: copyBusy, sx: {
+                                                border: 'none',
+                                                borderRadius: 1,
+                                                px: 1,
+                                                py: 0.25,
+                                                fontSize: '0.75rem',
+                                                color: 'white',
+                                                bgcolor: copyBusy ? 'grey.400' : 'primary.main',
+                                                cursor: copyBusy ? 'not-allowed' : 'pointer',
+                                                display: 'inline-flex',
+                                                alignItems: 'center',
+                                                gap: 0.5,
+                                                minWidth: 96,
+                                                justifyContent: 'center'
+                                            }, children: copyBusy ? (jsxs(Fragment, { children: [jsx(CircularProgress$1, { size: 12, sx: { color: 'white' } }), "Adding\u2026"] })) : ('Add to Scope') })) })] }, o.locale));
+                        }) })] })) : null, jsx(Dialog$1, { open: Boolean(removeDialog), onClose: (removeDialog === null || removeDialog === void 0 ? void 0 : removeDialog.submitting) ? undefined : closeRemoveDialog, maxWidth: "sm", fullWidth: true, children: removeDialog ? (jsxs(Fragment, { children: [jsx(DialogTitle$1, { children: "Remove translation" }), jsxs(DialogContent$1, { dividers: true, children: [removeDialog.loading ? (jsxs(Box, { sx: { display: 'flex', alignItems: 'center', gap: 1.5, py: 1 }, children: [jsx(CircularProgress$1, { size: 20 }), jsx(Typography$1, { variant: "body2", color: "text.secondary", children: "Loading removable components\u2026" })] })) : null, removeDialog.error ? (jsx(Typography$1, { variant: "body2", color: "error", sx: { mb: 1 }, children: removeDialog.error })) : null, !removeDialog.loading && !removeDialog.error && removeDialog.candidates.length === 0 ? (jsx(Typography$1, { variant: "body2", color: "text.secondary", sx: { mb: 1 }, children: "No locale-only components were found that are safe to delete automatically. The translated page will still be removed." })) : null, removeDialog.candidates.length > 0 ? (jsxs(Fragment, { children: [jsx(Typography$1, { variant: "subtitle2", sx: { mb: 1 }, children: "Also delete these components (checked by default)" }), jsxs(Box, { sx: { display: 'flex', gap: 1, mb: 1 }, children: [jsx(Button, { size: "small", onClick: function () {
                                                         return setRemoveDialog(function (prev) {
                                                             if (!prev || prev.loading) {
                                                                 return prev;
@@ -18796,6 +18800,25 @@ function A11yToolbar() {
                         })) : (jsx(ListItem, { sx: { py: 1.5, px: 2 }, children: jsx(ListItemText$1, { primary: jsx(Typography$1, { variant: "body2", color: "text.secondary", children: errorMsg || 'No rule results. Run the check again.' }) }) })) })] })] }));
 }
 
+var buildInfo = {"version":"1.0.112","commit":"d7ebe03-dirty","builtAt":"2026-10-09T19:01:15.082Z"};
+
+function formatBuiltAt(iso) {
+    var date = new Date(iso);
+    return isNaN(date.getTime()) ? iso : date.toLocaleString();
+}
+var rows = [
+    ['Plugin', 'org.rd.plugin.uigoodies'],
+    ['Version', buildInfo.version],
+    ['Built', formatBuiltAt(buildInfo.builtAt)],
+    ['Commit', buildInfo.commit]
+];
+function UIGoodiesAdmin() {
+    return (jsxs(Box, { sx: { height: '100%', minHeight: 0, display: 'flex', flexDirection: 'column', p: 2, gap: 2, overflow: 'auto' }, children: [jsx(Typography$1, { variant: "h5", children: "UI Goodies" }), jsxs(Paper$1, { sx: { p: 2 }, children: [jsx(Typography$1, { variant: "h6", gutterBottom: true, children: "Build" }), jsx(Box, { component: "dl", sx: { display: 'grid', gridTemplateColumns: 'max-content 1fr', columnGap: 3, rowGap: 1, m: 0 }, children: rows.map(function (_a) {
+                            var label = _a[0], value = _a[1];
+                            return (jsxs(React__default.Fragment, { children: [jsx(Typography$1, { component: "dt", color: "text.secondary", children: label }), jsx(Typography$1, { component: "dd", sx: { m: 0, fontFamily: 'monospace' }, children: value })] }, label));
+                        }) })] }), jsxs(Paper$1, { sx: { p: 2 }, children: [jsx(Typography$1, { variant: "h6", gutterBottom: true, children: "Preferences" }), jsx(Typography$1, { color: "text.secondary", children: "No preferences yet." })] })] }));
+}
+
 var plugin = {
     locales: undefined,
     scripts: undefined,
@@ -18826,8 +18849,9 @@ var plugin = {
         'org.rd.plugin.uigoodies.openTranslationPanelButton': OpenTranslationPanelButton,
         'org.rd.plugin.uigoodies.openTranslationToolbarButton': OpenTranslationToolbarButton,
         'org.craftercms.studio.linkcheck.toolbar': LinkCheckToolbar,
-        'org.craftercms.studio.linkcheck.a11y': A11yToolbar
+        'org.craftercms.studio.linkcheck.a11y': A11yToolbar,
+        'org.rd.plugin.uigoodies.UIGoodiesAdmin': UIGoodiesAdmin
     }
 };
 
-export { A11yToolbar, AudienceTargetingFlyoutToolbarButton, BulkPublishView, ComponentPreviewPathNavigator, ContentUpload, CopyCurrentPageUrl, CrossSiteContentCopy, DeviceSimulatorFlyoutToolbarButton, EditOrViewCurrent, ImageStudio, LinkCheckToolbar, OpenBulkPublishPanelButton, OpenBulkPublishToolbarButton, OpenCannedSearchPanelButton, OpenCannedSearchToolbarButton, OpenContentUploadPanelButton, OpenContentUploadToolbarButton, OpenImageStudioPanelButton, OpenTranslationPanelButton, OpenTranslationToolbarButton, PublishOrRequestPublish, PullPushRemoteButtons, ToolPanelAccordion, TranslationConfigTools, TranslationDialog, plugin as default };
+export { A11yToolbar, AudienceTargetingFlyoutToolbarButton, BulkPublishView, ComponentPreviewPathNavigator, ContentUpload, CopyCurrentPageUrl, CrossSiteContentCopy, DeviceSimulatorFlyoutToolbarButton, EditOrViewCurrent, ImageStudio, LinkCheckToolbar, OpenBulkPublishPanelButton, OpenBulkPublishToolbarButton, OpenCannedSearchPanelButton, OpenCannedSearchToolbarButton, OpenContentUploadPanelButton, OpenContentUploadToolbarButton, OpenImageStudioPanelButton, OpenTranslationPanelButton, OpenTranslationToolbarButton, PublishOrRequestPublish, PullPushRemoteButtons, ToolPanelAccordion, TranslationConfigTools, TranslationDialog, UIGoodiesAdmin, plugin as default };

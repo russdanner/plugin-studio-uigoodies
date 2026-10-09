@@ -1,4 +1,6 @@
-const { cpSync, rmSync } = require('fs');
+const { cpSync, rmSync, readFileSync } = require('fs');
+const { execSync } = require('child_process');
+const path = require('path');
 const typescript = require('@rollup/plugin-typescript');
 const commonjs = require('@rollup/plugin-commonjs');
 const resolve = require('@rollup/plugin-node-resolve');
@@ -8,6 +10,32 @@ const pkg = require('./package.json');
 const replace = require('@rollup/plugin-replace');
 
 const extensions = ['.js', '.jsx', '.ts', '.tsx'];
+
+function readPluginVersion() {
+  const yaml = readFileSync(path.resolve(__dirname, '../../../craftercms-plugin.yaml'), 'utf8');
+  const block = /^\s+version:\s*\n\s+major:\s*(\d+)\s*\n\s+minor:\s*(\d+)\s*\n\s+patch:\s*(\d+)/m.exec(yaml);
+  return block ? `${block[1]}.${block[2]}.${block[3]}` : 'unknown';
+}
+
+function readGitCommit() {
+  try {
+    const sha = execSync('git rev-parse --short HEAD', { cwd: __dirname, stdio: ['ignore', 'pipe', 'ignore'] })
+      .toString()
+      .trim();
+    const dirty = execSync('git status --porcelain', { cwd: __dirname, stdio: ['ignore', 'pipe', 'ignore'] })
+      .toString()
+      .trim();
+    return dirty ? `${sha}-dirty` : sha;
+  } catch (e) {
+    return 'unknown';
+  }
+}
+
+const buildInfo = {
+  version: readPluginVersion(),
+  commit: readGitCommit(),
+  builtAt: new Date().toISOString()
+};
 
 const globals = {
   react: 'craftercms.libs.React',
@@ -52,7 +80,8 @@ module.exports = {
       preventAssignment: true,
       'process.env.NODE_ENV': JSON.stringify('production'),
       'import.meta.env.NODE_ENV': JSON.stringify('production'),
-      'import.meta.env.MODE': JSON.stringify('production')
+      'import.meta.env.MODE': JSON.stringify('production'),
+      __UIGOODIES_BUILD_INFO__: JSON.stringify(buildInfo)
     }),
     typescript({ tsconfig: './tsconfig.json', compilerOptions: { noEmit: false, outDir: 'dist' } }),
     replaceImportsWithVars({

@@ -25,6 +25,7 @@ Each registered React widget is documented under **[widgets/](widgets/README.md)
 |------|-----------|-----|
 | Cross Site Copy | `org.rd.plugin.uigoodies.CrossSiteContentCopy` | [cross-site-content-copy.md](widgets/cross-site-content-copy.md) |
 | Translation | `org.rd.plugin.uigoodies.TranslationConfigTools` | [translation-config-tools.md](widgets/translation-config-tools.md) |
+| UI Goodies | `org.rd.plugin.uigoodies.UIGoodiesAdmin` | [uigoodies-admin.md](widgets/uigoodies-admin.md) |
 
 ### Tools panel & preview toolbar
 

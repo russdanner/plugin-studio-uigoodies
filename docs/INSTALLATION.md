@@ -35,6 +35,7 @@ Hard-refresh Studio (**Ctrl+Shift+R**) after install. Commit sandbox changes in 
 4. **Removes tools that moved to Studio DevOps Goodies** — deletes the old DevContentOps, Log Tail and plugin-installer Groovy files from the project sandbox (committed), and removes their Project Tools entries (including Content Type Copy) from `ui.xml`.
 5. **Optional `ui.xml` merges** (unless `SKIP_UI_XML=1`):
    - Translation Project Tool
+   - UI Goodies Project Tool (build info / preferences)
    - Translation preview toolbar button
    - Site tools reference fragment (if needed)
 6. **Optional whitelist** — only when `SKIP_WHITELIST=0` (default: skipped).
@@ -79,7 +80,7 @@ Bump **`patch`** in `craftercms-plugin.yaml` after changes so marketplace copy p
 | Step | Action |
 |------|--------|
 | 1 | Hard-refresh Studio |
-| 2 | **Project Tools** — confirm tools appear (Cross Site Copy, Translation) |
+| 2 | **Project Tools** — confirm tools appear (Cross Site Copy, Translation, UI Goodies) |
 | 3 | **Tools panel** — optional widgets (merge fragments manually if desired) |
 | 4 | **Preview toolbar** — Translation button (only when ≥2 locales in `translation-config.xml`) |
 | 5 | **Commit** pending sandbox files (`ui.xml`, static assets, scripts) |
@@ -94,13 +95,14 @@ Plugin install merges these when Crafter applies the descriptor:
 
 | Type | What |
 |------|------|
-| `preview-app` | Project Tools entries (Cross Site Copy, Translation) |
+| `preview-app` | Project Tools entries (Cross Site Copy, Translation, UI Goodies) |
 | `preview-app` | Translation preview toolbar button |
 | `form-control` | `custom-locale` and `translation-versions` in Studio form-control registry |
 
 If you manage `config/studio/ui.xml` manually, merge fragments from `authoring/config/studio/`:
 
 - `ui-translation-config-tools.append.xml`
+- `ui-uigoodies-admin-tools.append.xml`
 - `ui-translation-toolbar.append.xml`
 - `ui-site-tools-reference.append.xml` (site tools reference, if missing)
 - `ui-bulk-edit.append.xml` (optional — **Bulk Edit** plugin [`org.craftercms.plugin.bulkedit`](../docs/widgets/bulk-edit.md); install that plugin first)

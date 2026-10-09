@@ -149,6 +149,12 @@ Locales, content-type Translation field readiness, and locale site scaffold. See
 
 Doc: [translation-config-tools.md](docs/widgets/translation-config-tools.md)
 
+### UI Goodies (Project Tool)
+
+Shows the loaded UI Goodies build (version, build time, commit). Plugin preferences will live here.
+
+Doc: [uigoodies-admin.md](docs/widgets/uigoodies-admin.md)
+
 ## Tools Panel
 
 ### Image Studio
@@ -203,6 +209,7 @@ Translation form controls (`custom-locale`, `translation-versions`) render insid
 | `org.rd.plugin.uigoodies.CrossSiteContentCopy` | Project tool: multi-select cross-site content copy with plan preview, per-item actions, and switch-to-destination after copy. | [cross-site-content-copy.md](docs/widgets/cross-site-content-copy.md) |
 | `org.rd.plugin.uigoodies.ComponentPreviewPathNavigator` | Path navigator that opens headless/component preview URLs with path mapping. | [component-preview-path-navigator.md](docs/widgets/component-preview-path-navigator.md) |
 | `org.rd.plugin.uigoodies.TranslationConfigTools` | Project tool: `translation-config.xml`, content-type Translation fields, locale scaffold. | [translation-config-tools.md](docs/widgets/translation-config-tools.md) |
+| `org.rd.plugin.uigoodies.UIGoodiesAdmin` | Project tool: loaded build info; future home of plugin preferences. | [uigoodies-admin.md](docs/widgets/uigoodies-admin.md) |
 | `org.rd.plugin.uigoodies.TranslationDialog` | Translation dialog (locale tree + copy). | [translation-tools.md](docs/widgets/translation-tools.md) |
 | `org.rd.plugin.uigoodies.openTranslationToolbarButton` | Preview toolbar → locale picker / copy. | [translation-tools.md](docs/widgets/translation-tools.md) |
 | `org.rd.plugin.uigoodies.openTranslationPanelButton` | Tools panel translation entry (optional). | [translation-tools.md](docs/widgets/translation-tools.md) |

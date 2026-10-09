@@ -42,6 +42,8 @@ UI_TRANSLATION_CONFIG_TOOLS_FRAGMENT="${PLUGIN_PATH}/authoring/config/studio/ui-
 UI_TRANSLATION_TOOLBAR_FRAGMENT="${PLUGIN_PATH}/authoring/config/studio/ui-translation-toolbar.append.xml"
 UI_LINK_CHECK_TOOLBAR_FRAGMENT="${PLUGIN_PATH}/authoring/config/studio/ui-link-check-toolbar.append.xml"
 UI_SITE_TOOLS_REFERENCE_FRAGMENT="${PLUGIN_PATH}/authoring/config/studio/ui-site-tools-reference.append.xml"
+UI_ADMIN_TOOLS_FRAGMENT="${PLUGIN_PATH}/authoring/config/studio/ui-uigoodies-admin-tools.append.xml"
+ADMIN_TOOL_ID="org.rd.plugin.uigoodies.UIGoodiesAdmin"
 TRANSLATION_CONFIG_TOOL_ID="org.rd.plugin.uigoodies.TranslationConfigTools"
 TRANSLATION_TOOLBAR_WIDGET_ID="org.rd.plugin.uigoodies.openTranslationToolbarButton"
 LINK_CHECK_TOOLBAR_WIDGET_ID="org.craftercms.studio.linkcheck.toolbar"
@@ -372,6 +374,35 @@ PY
   fi
   if git -C "${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     git -C "${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox" add "config/studio/ui.xml" 2>/dev/null || true
+  fi
+fi
+
+if [[ "${SKIP_UI_XML:-}" != "1" && -f "${SITE_UI_XML}" && -f "${UI_ADMIN_TOOLS_FRAGMENT}" ]]; then
+  if grep -qF "${ADMIN_TOOL_ID}" "${SITE_UI_XML}" 2>/dev/null; then
+    echo "UI Goodies admin tool already present in ui.xml."
+  else
+    echo "Merging UI Goodies admin tool into config/studio/ui.xml..."
+    python3 - "${SITE_UI_XML}" "${UI_ADMIN_TOOLS_FRAGMENT}" <<'PY'
+import sys
+from pathlib import Path
+
+ui_path = Path(sys.argv[1])
+fragment = Path(sys.argv[2]).read_text(encoding="utf-8")
+text = ui_path.read_text(encoding="utf-8")
+start = text.find('<reference id="craftercms.siteTools">')
+if start == -1:
+    start = text.find("id='craftercms.siteTools'")
+tools_open = text.find("<tools>", start) if start != -1 else -1
+tools_close = text.find("</tools>", tools_open) if tools_open != -1 else -1
+if tools_close == -1:
+    print("Warning: craftercms.siteTools <tools> not found in ui.xml — add the UI Goodies admin tool manually.", file=sys.stderr)
+    sys.exit(0)
+ui_path.write_text(text[:tools_close] + fragment + text[tools_close:], encoding="utf-8")
+print("UI Goodies admin tool merged into Project Tools.")
+PY
+    if git -C "${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+      git -C "${CRAFTER_DATA}/repos/sites/${SITE_ID}/sandbox" add "config/studio/ui.xml" 2>/dev/null || true
+    fi
   fi
 fi
 

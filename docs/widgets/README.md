@@ -28,6 +28,7 @@ Each file in this folder documents one **registered widget** (or embedded view u
 | `org.rd.plugin.uigoodies.openImageStudioPanelButton` | Sidebar button → Image Studio dialog (crop, focal point, adjust, save). | [open-image-studio-panel-button.md](open-image-studio-panel-button.md) |
 | `org.rd.plugin.uigoodies.ImageStudio` | Image editing UI embedded in Image Studio dialog. | [image-studio.md](image-studio.md) |
 | `org.rd.plugin.uigoodies.TranslationConfigTools` | Project tool: edit translation-config.xml and add Translation fields to content types. | [translation-config-tools.md](translation-config-tools.md) |
+| `org.rd.plugin.uigoodies.UIGoodiesAdmin` | Project tool: loaded build info; future home of plugin preferences. | [uigoodies-admin.md](uigoodies-admin.md) |
 | `org.rd.plugin.uigoodies.TranslationDialog` | Translation dialog (locale path tree + copy). | [translation-tools.md](translation-tools.md) |
 | `org.rd.plugin.uigoodies.openTranslationToolbarButton` | Preview toolbar → translation locale picker. | [translation-tools.md](translation-tools.md) |
 | `org.rd.plugin.uigoodies.openTranslationPanelButton` | Tools panel locale picker + copy actions. | [translation-tools.md](translation-tools.md) |

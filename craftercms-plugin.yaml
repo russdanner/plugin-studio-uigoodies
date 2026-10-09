@@ -13,7 +13,7 @@ plugin:
   version:
     major: 1
     minor: 0
-    patch: 109
+    patch: 113
   description: A plugin to adds some UI goodies to your studio
   documentation: "https://raw.githubusercontent.com/russdanner/plugin-studio-uigoodies/master/README.md"
   website:
@@ -115,6 +115,41 @@ installation:
               attributes:
                 - name: id
                   value: org.rd.plugin.uigoodies.TranslationConfigTools
+              children:
+                - name: plugin
+                  attributes:
+                    - name: id
+                      value: org.rd.plugin.uigoodies
+                    - name: type
+                      value: apps
+                    - name: name
+                      value: uigoodies
+                    - name: file
+                      value: index.js
+  - type: preview-app
+    parentXpath: //reference[@id='craftercms.siteTools']
+    elementXpath: //reference[@id='craftercms.siteTools']//widget[@id='org.rd.plugin.uigoodies.UIGoodiesAdmin']
+    element:
+      name: tools
+      children:
+        - name: tool
+          children:
+            - name: title
+              attributes:
+                - name: id
+                  value: uigoodies.uigoodiesAdmin.title
+                - name: defaultMessage
+                  value: UI Goodies
+            - name: icon
+              attributes:
+                - name: id
+                  value: "@mui/icons-material/SettingsSuggestOutlined"
+            - name: url
+              value: uigoodies-admin
+            - name: widget
+              attributes:
+                - name: id
+                  value: org.rd.plugin.uigoodies.UIGoodiesAdmin
               children:
                 - name: plugin
                   attributes:
