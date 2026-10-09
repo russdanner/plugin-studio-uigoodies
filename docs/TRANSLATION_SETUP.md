@@ -62,6 +62,12 @@ Optional per-locale `language` (display name) and `flag` override the built-in c
 
 Legacy plain `<localeCode>en</localeCode>` entries are still read. Saving from Project Tools writes the `<locale>` form above.
 
+To hide the remove (trash can) action in the preview toolbar's Translation menu, add this to the root element (or untick **Enable Remove Scope Button** on the Locales tab). When it is missing, remove is shown.
+
+```xml
+<allowRemoveFromScope>false</allowRemoveFromScope>
+```
+
 The plugin catalog includes:
 
 - **ISO 639-1** language codes (e.g. `de`, `fr`, `ja`)

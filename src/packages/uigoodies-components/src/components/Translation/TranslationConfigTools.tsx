@@ -625,6 +625,18 @@ export function TranslationConfigTools() {
                   Add locale
                 </Button>
               </Box>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    size="small"
+                    checked={configModel.allowRemoveFromScope !== false}
+                    onChange={(event) =>
+                      setConfigModel((prev) => ({ ...prev, allowRemoveFromScope: event.target.checked }))
+                    }
+                  />
+                }
+                label="Enable Remove Scope Button"
+              />
               <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                 <Button
                   variant="contained"

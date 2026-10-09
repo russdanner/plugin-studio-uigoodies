@@ -25,6 +25,8 @@ export type LocaleRow = {
 export type TranslationConfigModel = {
   baseLanguage: string;
   languages: LocaleRow[];
+  /** Show the remove (trash can) action in the Translation toolbar menu. Missing in XML means true. */
+  allowRemoveFromScope?: boolean;
 };
 
 export type TranslationFieldStatus = {
@@ -272,7 +274,8 @@ export function parseTranslationConfigXml(xml: string): TranslationConfigModel |
   if (!baseLanguage || !seen.has(baseLanguage)) {
     baseLanguage = languages[0].locale;
   }
-  return { baseLanguage, languages };
+  const allowRemoveRaw = (root.querySelector(':scope > allowRemoveFromScope')?.textContent || '').trim().toLowerCase();
+  return { baseLanguage, languages, allowRemoveFromScope: allowRemoveRaw !== 'false' };
 }
 
 export function buildTranslationConfigXml(model: TranslationConfigModel): string {
@@ -309,7 +312,7 @@ export function buildTranslationConfigXml(model: TranslationConfigModel): string
   <localeCodes>
 ${lines.join('\n')}
   </localeCodes>
-</translation-config>
+${model.allowRemoveFromScope === false ? '  <allowRemoveFromScope>false</allowRemoveFromScope>\n' : ''}</translation-config>
 `;
 }
 

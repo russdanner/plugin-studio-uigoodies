@@ -449,7 +449,8 @@ final class TranslationConfigSupport {
         if (!result) {
             return [ok: false, message: "Could not read localeCodes from ${CONFIG_PATH}".toString(), path: CONFIG_PATH]
         }
-        return [ok: true, path: CONFIG_PATH, baseLanguage: result.baseLanguage, languages: result.languages]
+        return [ok: true, path: CONFIG_PATH, baseLanguage: result.baseLanguage, languages: result.languages,
+                allowRemoveFromScope: result.allowRemoveFromScope]
     }
 
     static Map parseTranslationConfig(def root) {
@@ -480,8 +481,9 @@ final class TranslationConfigSupport {
             normalizedDefault = list[0].locale
         }
         return [
-            baseLanguage: normalizedDefault,
-            languages   : list
+            baseLanguage        : normalizedDefault,
+            languages           : list,
+            allowRemoveFromScope: !'false'.equalsIgnoreCase(text(root.element('allowRemoveFromScope')))
         ]
     }
 

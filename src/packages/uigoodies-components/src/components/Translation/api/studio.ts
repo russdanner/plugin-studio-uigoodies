@@ -277,6 +277,7 @@ export type TranslationLocaleVariant = {
 
 export type TranslationLocalesResult = {
   config: SiteTranslationConfig | null;
+  allowRemoveFromScope: boolean;
   path?: string;
   rootDir?: string;
   relativeUnderLocale?: string;
@@ -643,6 +644,7 @@ const StudioAPI = {
       }));
       return {
         config,
+        allowRemoveFromScope: p.allowRemoveFromScope !== false,
         path: p.path || undefined,
         rootDir: p.rootDir || undefined,
         relativeUnderLocale: p.relativeUnderLocale || undefined,

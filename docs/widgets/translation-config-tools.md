@@ -11,6 +11,7 @@
 - Loads and edits `/config/studio/translation-config.xml` (**not** `site-config.xml`)
 - Set default locale; add/remove locales; **reorder** (order is used by all translation UIs)
 - Optionally set per-locale **language** (display name) and **flag** (saved only when overridden)
+- **Enable Remove Scope Button** — untick to hide the trash can in the toolbar's Translation menu (saved as `<allowRemoveFromScope>false</allowRemoveFromScope>`)
 - Creates the config file if missing (requires at least two locales)
 - **Create locale site structure** — global home + per-locale home pages and component folders (see below)
 

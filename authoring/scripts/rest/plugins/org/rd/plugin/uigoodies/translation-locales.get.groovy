@@ -23,7 +23,7 @@ import plugins.org.rd.plugin.uigoodies.TranslationConfigSupport
  *   folder  — the same relative path under each configured locale folder ({root}/{locale}/…)
  *
  * Response:
- *   ok, baseLanguage, languages[{locale,label,flag}], path, rootDir, relativeUnderLocale, currentLocale,
+ *   ok, baseLanguage, languages[{locale,label,flag}], allowRemoveFromScope, path, rootDir, relativeUnderLocale, currentLocale,
  *   sourceLocale, contentType, objectId, localeSourceId,
  *   locales[{locale, code, label, flag, path, parentPath, exists, lastModified, isSource, isOutdated,
  *            isCurrent, isPage, matchedBy}]
@@ -42,7 +42,8 @@ if (!cfg.ok) {
     return [ok: false, message: cfg.message, locales: []]
 }
 List<Map> languages = cfg.languages as List<Map>
-Map result = [ok: true, baseLanguage: cfg.baseLanguage, languages: languages, path: itemPath, locales: []]
+Map result = [ok: true, baseLanguage: cfg.baseLanguage, languages: languages,
+              allowRemoveFromScope: cfg.allowRemoveFromScope != false, path: itemPath, locales: []]
 if (!itemPath || languages.size() < 2) {
     return result
 }

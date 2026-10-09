@@ -42,7 +42,7 @@ const ErrorRounded = craftercms.utils.constants.components.get('@mui/icons-mater
 const KeyboardArrowLeftRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/KeyboardArrowLeftRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/KeyboardArrowLeftRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/KeyboardArrowLeftRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/KeyboardArrowLeftRounded');
 const ArrowRightRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/ArrowRightRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ArrowRightRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ArrowRightRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ArrowRightRounded');
 const ArrowDropDownRoundedIcon = craftercms.utils.constants.components.get('@mui/icons-material/ArrowDropDownRounded') && Object.prototype.hasOwnProperty.call(craftercms.utils.constants.components.get('@mui/icons-material/ArrowDropDownRounded'), 'default') ? craftercms.utils.constants.components.get('@mui/icons-material/ArrowDropDownRounded')['default'] : craftercms.utils.constants.components.get('@mui/icons-material/ArrowDropDownRounded');
-const { withoutIndex, getRootPath, getIndividualPaths, withoutFile, withIndex } = craftercms.utils.path;
+const { withoutIndex: withoutIndex$1, getRootPath, getIndividualPaths, withoutFile, withIndex } = craftercms.utils.path;
 const { takeUntil, map, catchError, take, filter, mergeMap, toArray, concatMap } = craftercms.libs.rxjs;
 const { Subject, of, firstValueFrom, from } = craftercms.libs.rxjs;
 const Collapse = craftercms.libs.MaterialUI.Collapse && Object.prototype.hasOwnProperty.call(craftercms.libs.MaterialUI.Collapse, 'default') ? craftercms.libs.MaterialUI.Collapse['default'] : craftercms.libs.MaterialUI.Collapse;
@@ -7381,7 +7381,7 @@ function parseChildrenResponse(response) {
 }
 function getChildrenFetchPath(itemPath) {
     if (itemPath.startsWith('/site/website') && itemPath.endsWith('/index.xml')) {
-        return withoutIndex(itemPath);
+        return withoutIndex$1(itemPath);
     }
     return itemPath;
 }
@@ -7397,7 +7397,7 @@ function toTreeItemId(contentPath) {
     return contentPath;
 }
 function pathsMatchForSelection(selectedPath, itemPath) {
-    return selectedPath === itemPath || withoutIndex(selectedPath) === withoutIndex(itemPath);
+    return selectedPath === itemPath || withoutIndex$1(selectedPath) === withoutIndex$1(itemPath);
 }
 function isBranchNode(item, children, isRoot) {
     var _a;
@@ -7432,7 +7432,7 @@ function SourcePathSelectionInput(_a) {
     var _e = useState(null), pathExists = _e[0], setPathExists = _e[1];
     var _f = useState(false), isChecking = _f[0], setIsChecking = _f[1];
     useEffect(function () {
-        var relative = withoutIndex(currentPath.startsWith(rootPath) ? currentPath.slice(rootPath.length) : currentPath);
+        var relative = withoutIndex$1(currentPath.startsWith(rootPath) ? currentPath.slice(rootPath.length) : currentPath);
         setPath(relative);
         setPathExists(null);
         setIsChecking(false);
@@ -7627,7 +7627,7 @@ function CrossSitePathSelectionDialog(_a) {
         setCurrentPath(DEFAULT_ROOT);
     }, [open, siteId]);
     var handleAccept = function () {
-        var path = (stripXmlIndex ? withoutIndex(currentPath) : currentPath).trim();
+        var path = (stripXmlIndex ? withoutIndex$1(currentPath) : currentPath).trim();
         if (!path) {
             return;
         }
@@ -14814,6 +14814,7 @@ var StudioAPI = {
                         }); });
                         return [2 /*return*/, {
                                 config: config,
+                                allowRemoveFromScope: p.allowRemoveFromScope !== false,
                                 path: p.path || undefined,
                                 rootDir: p.rootDir || undefined,
                                 relativeUnderLocale: p.relativeUnderLocale || undefined,
@@ -15465,7 +15466,7 @@ function parseLocaleEntry(elm) {
     };
 }
 function parseTranslationConfigXml(xml) {
-    var _a;
+    var _a, _b;
     var trimmed = String(xml || '').trim();
     if (!trimmed) {
         return null;
@@ -15501,7 +15502,8 @@ function parseTranslationConfigXml(xml) {
     if (!baseLanguage || !seen.has(baseLanguage)) {
         baseLanguage = languages[0].locale;
     }
-    return { baseLanguage: baseLanguage, languages: languages };
+    var allowRemoveRaw = (((_b = root.querySelector(':scope > allowRemoveFromScope')) === null || _b === void 0 ? void 0 : _b.textContent) || '').trim().toLowerCase();
+    return { baseLanguage: baseLanguage, languages: languages, allowRemoveFromScope: allowRemoveRaw !== 'false' };
 }
 function buildTranslationConfigXml(model) {
     var rows = [];
@@ -15532,7 +15534,7 @@ function buildTranslationConfigXml(model) {
         }
         return "    <locale>\n".concat(parts.join('\n'), "\n    </locale>");
     });
-    return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<translation-config>\n  <defaultLocaleCode>".concat(escapeXmlText(baseLanguage), "</defaultLocaleCode>\n  <localeCodes>\n").concat(lines.join('\n'), "\n  </localeCodes>\n</translation-config>\n");
+    return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<translation-config>\n  <defaultLocaleCode>".concat(escapeXmlText(baseLanguage), "</defaultLocaleCode>\n  <localeCodes>\n").concat(lines.join('\n'), "\n  </localeCodes>\n").concat(model.allowRemoveFromScope === false ? '  <allowRemoveFromScope>false</allowRemoveFromScope>\n' : '', "</translation-config>\n");
 }
 /** Resolved display label (custom language or catalog). */
 function resolveLocaleLanguage(row) {
@@ -16896,7 +16898,9 @@ function TranslationConfigTools() {
                                                                 });
                                                             }
                                                         }, helperText: row.customFlag ? 'Saved in config' : "Catalog: ".concat(catalog.flag || '🌐') }) }), jsx(TableCell, { children: jsx(Tooltip$1, { title: "Remove locale", children: jsx("span", { children: jsx(IconButton, { size: "small", color: "error", disabled: configModel.languages.length <= 1, onClick: function () { return removeLocale(row.locale); }, "aria-label": "Remove ".concat(row.locale), children: jsx(DeleteOutlineRoundedIcon, { fontSize: "small" }) }) }) }) })] }, row.locale));
-                                    }) })] }), jsxs(Box$1, { sx: { display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }, children: [jsx(Autocomplete, { size: "small", sx: { minWidth: 280 }, options: localeSuggestions, getOptionLabel: function (option) { return "".concat(option.flag, " ").concat(option.label, " (").concat(option.code, ")"); }, value: (_a = localeSuggestions.find(function (row) { return row.code === newLocaleCode; })) !== null && _a !== void 0 ? _a : null, onChange: function (_, value) { var _a; return setNewLocaleCode((_a = value === null || value === void 0 ? void 0 : value.code) !== null && _a !== void 0 ? _a : null); }, renderInput: function (params) { return jsx(TextField$1, __assign({}, params, { label: "Add locale", placeholder: "Search locales" })); } }), jsx(Button$1, { variant: "outlined", onClick: addLocale, disabled: !newLocaleCode, children: "Add locale" })] }), jsxs(Box$1, { sx: { display: 'flex', gap: 1, flexWrap: 'wrap' }, children: [jsx(Button$1, { variant: "contained", startIcon: configSaving ? jsx(CircularProgress, { size: 16, color: "inherit" }) : jsx(SaveRoundedIcon, {}), onClick: saveConfig, disabled: configSaving, children: "Save locale config" }), jsx(Button$1, { variant: "outlined", startIcon: jsx(HomeWorkOutlinedIcon, {}), onClick: function () { return setScaffoldOpen(true); }, disabled: configLoading || configModel.languages.length < 2 || !siteId, children: "Create locale site structure" }), jsx(Button$1, { variant: "text", startIcon: jsx(RefreshRoundedIcon, {}), onClick: loadConfig, children: "Reload" })] }), jsxs(Typography, { variant: "caption", color: "text.secondary", sx: { display: 'block', maxWidth: 720 }, children: [jsx("strong", { children: "Create locale site structure" }), " copies", ' ', jsx(Box$1, { component: "code", children: GLOBAL_HOME_PATH }), " into each configured locale folder, renames the global page to ", jsx("strong", { children: GLOBAL_HOME_INTERNAL_NAME }), ", and creates locale home pages named", ' ', jsx("strong", { children: localeHomeInternalName('en') }), ", etc. Empty", ' ', jsx(Box$1, { component: "code", children: "/site/components/<locale>/" }), " folders are added when", ' ', jsx(Box$1, { component: "code", children: "/site/components" }), " exists."] })] })) })), jsxs(Dialog, { open: scaffoldOpen, onClose: scaffoldLoading ? undefined : function () { return setScaffoldOpen(false); }, maxWidth: "sm", fullWidth: true, children: [jsx(DialogTitle, { children: "Create locale site structure" }), jsxs(DialogContent, { dividers: true, children: [jsxs(Typography, { variant: "body2", sx: { mb: 2 }, children: ["This will update ", jsx(Box$1, { component: "code", children: GLOBAL_HOME_PATH }), " to internal-name", ' ', jsx("strong", { children: GLOBAL_HOME_INTERNAL_NAME }), " (standalone \u2014 not grouped with locale homes), then copy it into each locale folder below. Locale homes share one translation lineage and each gets its own", ' ', jsx(Box$1, { component: "code", children: "objectId" }), ". Existing locale home pages are updated, not overwritten."] }), jsx(Typography, { variant: "subtitle2", sx: { mb: 1 }, children: "Planned locale home pages" }), jsx(Box$1, { component: "pre", sx: {
+                                    }) })] }), jsxs(Box$1, { sx: { display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }, children: [jsx(Autocomplete, { size: "small", sx: { minWidth: 280 }, options: localeSuggestions, getOptionLabel: function (option) { return "".concat(option.flag, " ").concat(option.label, " (").concat(option.code, ")"); }, value: (_a = localeSuggestions.find(function (row) { return row.code === newLocaleCode; })) !== null && _a !== void 0 ? _a : null, onChange: function (_, value) { var _a; return setNewLocaleCode((_a = value === null || value === void 0 ? void 0 : value.code) !== null && _a !== void 0 ? _a : null); }, renderInput: function (params) { return jsx(TextField$1, __assign({}, params, { label: "Add locale", placeholder: "Search locales" })); } }), jsx(Button$1, { variant: "outlined", onClick: addLocale, disabled: !newLocaleCode, children: "Add locale" })] }), jsx(FormControlLabel, { control: jsx(Checkbox$1, { size: "small", checked: configModel.allowRemoveFromScope !== false, onChange: function (event) {
+                                    return setConfigModel(function (prev) { return (__assign(__assign({}, prev), { allowRemoveFromScope: event.target.checked })); });
+                                } }), label: "Enable Remove Scope Button" }), jsxs(Box$1, { sx: { display: 'flex', gap: 1, flexWrap: 'wrap' }, children: [jsx(Button$1, { variant: "contained", startIcon: configSaving ? jsx(CircularProgress, { size: 16, color: "inherit" }) : jsx(SaveRoundedIcon, {}), onClick: saveConfig, disabled: configSaving, children: "Save locale config" }), jsx(Button$1, { variant: "outlined", startIcon: jsx(HomeWorkOutlinedIcon, {}), onClick: function () { return setScaffoldOpen(true); }, disabled: configLoading || configModel.languages.length < 2 || !siteId, children: "Create locale site structure" }), jsx(Button$1, { variant: "text", startIcon: jsx(RefreshRoundedIcon, {}), onClick: loadConfig, children: "Reload" })] }), jsxs(Typography, { variant: "caption", color: "text.secondary", sx: { display: 'block', maxWidth: 720 }, children: [jsx("strong", { children: "Create locale site structure" }), " copies", ' ', jsx(Box$1, { component: "code", children: GLOBAL_HOME_PATH }), " into each configured locale folder, renames the global page to ", jsx("strong", { children: GLOBAL_HOME_INTERNAL_NAME }), ", and creates locale home pages named", ' ', jsx("strong", { children: localeHomeInternalName('en') }), ", etc. Empty", ' ', jsx(Box$1, { component: "code", children: "/site/components/<locale>/" }), " folders are added when", ' ', jsx(Box$1, { component: "code", children: "/site/components" }), " exists."] })] })) })), jsxs(Dialog, { open: scaffoldOpen, onClose: scaffoldLoading ? undefined : function () { return setScaffoldOpen(false); }, maxWidth: "sm", fullWidth: true, children: [jsx(DialogTitle, { children: "Create locale site structure" }), jsxs(DialogContent, { dividers: true, children: [jsxs(Typography, { variant: "body2", sx: { mb: 2 }, children: ["This will update ", jsx(Box$1, { component: "code", children: GLOBAL_HOME_PATH }), " to internal-name", ' ', jsx("strong", { children: GLOBAL_HOME_INTERNAL_NAME }), " (standalone \u2014 not grouped with locale homes), then copy it into each locale folder below. Locale homes share one translation lineage and each gets its own", ' ', jsx(Box$1, { component: "code", children: "objectId" }), ". Existing locale home pages are updated, not overwritten."] }), jsx(Typography, { variant: "subtitle2", sx: { mb: 1 }, children: "Planned locale home pages" }), jsx(Box$1, { component: "pre", sx: {
                                     m: 0,
                                     p: 1.5,
                                     bgcolor: 'action.hover',
@@ -17007,6 +17011,84 @@ function TranslationCurrentBadge() {
     return (jsx(Box, { component: "span", sx: translationIndicatorSx.current, title: "This is the item you have open", children: "Current" }));
 }
 
+function withoutIndex(path) {
+    return path.replace(/\/index\.xml$/, '');
+}
+/**
+ * Removes the given paths (and everything under them) from every Sidebar tree.
+ *
+ * Studio 4.x drops deleted items from `content.itemsByPath` on the delete event, but its tree reducer only
+ * prunes when `getParentPath(path)` is a key in `totalByPath`. For a page under another page that is the
+ * parent's folder path while the tree keys it as `.../index.xml`, so the tree keeps the deleted path and
+ * PathNavigatorTreeItem crashes reading `item.childrenCount`. Call this before deleting.
+ *
+ * @return ids of the trees that were changed (refresh them if the delete fails).
+ */
+function pruneSidebarTrees(dispatch, trees, paths) {
+    var roots = paths.filter(Boolean).map(withoutIndex);
+    if (!trees || !roots.length)
+        return [];
+    var isRemoved = function (path) {
+        var p = withoutIndex(path);
+        return roots.some(function (root) { return p === root || p.startsWith("".concat(root, "/")); });
+    };
+    var changed = [];
+    Object.values(trees).forEach(function (tree) {
+        var _a;
+        if (!(tree === null || tree === void 0 ? void 0 : tree.childrenByParentPath))
+            return;
+        var touched = false;
+        var childrenByParentPath = {};
+        var totalByPath = __assign({}, tree.totalByPath);
+        Object.entries(tree.childrenByParentPath).forEach(function (_a) {
+            var parent = _a[0], children = _a[1];
+            if (isRemoved(parent)) {
+                touched = true;
+                return;
+            }
+            var kept = (children !== null && children !== void 0 ? children : []).filter(function (child) { return !isRemoved(child); });
+            if (kept.length !== (children !== null && children !== void 0 ? children : []).length) {
+                touched = true;
+                if (typeof totalByPath[parent] === 'number') {
+                    totalByPath[parent] = Math.max(0, totalByPath[parent] - ((children !== null && children !== void 0 ? children : []).length - kept.length));
+                }
+            }
+            childrenByParentPath[parent] = kept;
+        });
+        Object.keys(totalByPath).forEach(function (key) {
+            if (isRemoved(key)) {
+                delete totalByPath[key];
+                touched = true;
+            }
+        });
+        if (!touched)
+            return;
+        var dropKeys = function (table) {
+            if (table === void 0) { table = {}; }
+            return Object.fromEntries(Object.entries(table).filter(function (_a) {
+                var key = _a[0];
+                return !isRemoved(key);
+            }));
+        };
+        dispatch({
+            type: 'PATH_NAV_TREE_UPDATE',
+            payload: {
+                id: tree.id,
+                childrenByParentPath: childrenByParentPath,
+                totalByPath: totalByPath,
+                keywordByPath: dropKeys(tree.keywordByPath),
+                offsetByPath: dropKeys(tree.offsetByPath),
+                expanded: ((_a = tree.expanded) !== null && _a !== void 0 ? _a : []).filter(function (path) { return !isRemoved(path); })
+            }
+        });
+        changed.push(tree.id);
+    });
+    return changed;
+}
+function refreshSidebarTrees(dispatch, ids) {
+    ids.forEach(function (id) { return dispatch({ type: 'PATH_NAV_TREE_REFRESH', payload: { id: id } }); });
+}
+
 function normalizeRepoPath(p) {
     return String(p !== null && p !== void 0 ? p : '')
         .replace(/\\/g, '/')
@@ -17105,6 +17187,7 @@ function OpenTranslationToolbarButton(props) {
     var _this = this;
     var _a = props.tooltip, tooltip = _a === void 0 ? 'Add to Scope' : _a, _b = props.icon, icon = _b === void 0 ? { id: '@mui/icons-material/TranslateOutlined' } : _b, _c = props.buttonSize, buttonSize = _c === void 0 ? 'small' : _c;
     var dispatch = useDispatch();
+    var store = useStore();
     var siteId = useActiveSiteId();
     var authoringBase = useEnv().authoringBase;
     var currentPreviewItem = useCurrentPreviewItem();
@@ -17116,12 +17199,17 @@ function OpenTranslationToolbarButton(props) {
     var rowsPathRef = useRef(null);
     rowsPathRef.current = rowsPath;
     var _g = useState(false), loading = _g[0], setLoading = _g[1];
-    var _h = useState(false), copyBusy = _h[0], setCopyBusy = _h[1];
+    /** Last request for `rowsPath` failed (as opposed to the page having no translations). */
+    var _h = useState(false), loadFailed = _h[0], setLoadFailed = _h[1];
+    /** null until the first response; the button is only rendered for projects with locales configured. */
+    var _j = useState(null), translationConfigured = _j[0], setTranslationConfigured = _j[1];
+    var _k = useState(true), allowRemoveFromScope = _k[0], setAllowRemoveFromScope = _k[1];
+    var _l = useState(false), copyBusy = _l[0], setCopyBusy = _l[1];
     /** Existing base-language variant of the previewed item; translations are copied from it when present. */
     var baseCopySourceRef = useRef(null);
-    var _j = useState(null), removeDialog = _j[0], setRemoveDialog = _j[1];
+    var _m = useState(null), removeDialog = _m[0], setRemoveDialog = _m[1];
     var loadSeqRef = useRef(0);
-    /** One server call: every locale variant of the previewed item (empty when it is not under a locale). */
+    /** One server call: config + every locale variant of the previewed item (none when it is not under a locale). */
     var loadTargets = useCallback(function () { return __awaiter(_this, void 0, void 0, function () {
         var seq, base, path, res, cfg_1, locales, baseRow;
         var _a;
@@ -17131,7 +17219,7 @@ function OpenTranslationToolbarButton(props) {
                     seq = ++loadSeqRef.current;
                     base = authoringBase || '';
                     path = (sourceItem === null || sourceItem === void 0 ? void 0 : sourceItem.path) || null;
-                    if (!siteId || !base || !path) {
+                    if (!siteId || !base) {
                         setRows([]);
                         setRowsPath(null);
                         setLoading(false);
@@ -17149,15 +17237,25 @@ function OpenTranslationToolbarButton(props) {
                         return [2 /*return*/];
                     }
                     if (!res) {
-                        // Failed request: keep what we already know about this page rather than hiding the button.
-                        if (rowsPathRef.current !== path) {
+                        // Failed request: keep what we already know about this page.
+                        if (path && rowsPathRef.current !== path) {
                             setRows([]);
                             setRowsPath(path);
+                            setLoadFailed(true);
                             baseCopySourceRef.current = null;
                         }
                         return [2 /*return*/];
                     }
                     cfg_1 = res.config;
+                    setTranslationConfigured(hasConfiguredTranslationLocales(cfg_1));
+                    setAllowRemoveFromScope(res.allowRemoveFromScope);
+                    setLoadFailed(false);
+                    if (!path) {
+                        setRows([]);
+                        setRowsPath(null);
+                        baseCopySourceRef.current = null;
+                        return [2 /*return*/];
+                    }
                     locales = res.relativeUnderLocale && hasConfiguredTranslationLocales(cfg_1) ? res.locales : [];
                     if (locales.length < 2) {
                         setRows([]);
@@ -17248,10 +17346,10 @@ function OpenTranslationToolbarButton(props) {
         setRemoveDialog(null);
     };
     var confirmRemoveTranslation = function () { return __awaiter(_this, void 0, void 0, function () {
-        var pagePath, label, paths, currentPreviewNorm, res, failed, deletedList, pageRemoved, removedWhatWeWerePreviewing, parentCandidate, previewUrl;
-        var _b, _c, _d;
-        return __generator(this, function (_e) {
-            switch (_e.label) {
+        var pagePath, label, paths, currentPreviewNorm, prunedTreeIds, res, failed, deletedList, pageRemoved, removedWhatWeWerePreviewing, parentCandidate, previewUrl;
+        var _b, _c, _d, _e;
+        return __generator(this, function (_f) {
+            switch (_f.label) {
                 case 0:
                     if (!removeDialog || removeDialog.loading || removeDialog.submitting || !siteId || !authoringBase) {
                         return [2 /*return*/];
@@ -17261,14 +17359,18 @@ function OpenTranslationToolbarButton(props) {
                     paths = Object.keys(removeDialog.selected).filter(function (p) { return removeDialog.selected[p]; });
                     currentPreviewNorm = normalizeRepoPath((_b = sourceItem === null || sourceItem === void 0 ? void 0 : sourceItem.path) !== null && _b !== void 0 ? _b : '');
                     setRemoveDialog(function (prev) { return (prev ? __assign(__assign({}, prev), { submitting: true, error: undefined }) : prev); });
-                    _e.label = 1;
+                    prunedTreeIds = pruneSidebarTrees(dispatch, (_c = store.getState()) === null || _c === void 0 ? void 0 : _c.pathNavigatorTree, __spreadArray([pagePath], paths, true));
+                    _f.label = 1;
                 case 1:
-                    _e.trys.push([1, 11, , 12]);
+                    _f.trys.push([1, 11, , 12]);
                     return [4 /*yield*/, StudioAPI.postTranslationRemove(authoringBase, siteId, pagePath, paths, true)];
                 case 2:
-                    res = _e.sent();
-                    failed = (_c = res.failed) !== null && _c !== void 0 ? _c : [];
-                    deletedList = (_d = res.deleted) !== null && _d !== void 0 ? _d : [];
+                    res = _f.sent();
+                    failed = (_d = res.failed) !== null && _d !== void 0 ? _d : [];
+                    if (failed.length) {
+                        refreshSidebarTrees(dispatch, prunedTreeIds);
+                    }
+                    deletedList = (_e = res.deleted) !== null && _e !== void 0 ? _e : [];
                     pageRemoved = deletedList.some(function (p) { return normalizeRepoPath(p) === normalizeRepoPath(pagePath); });
                     removedWhatWeWerePreviewing = pageRemoved && currentPreviewNorm && currentPreviewNorm === normalizeRepoPath(pagePath);
                     if (failed.length) {
@@ -17284,12 +17386,12 @@ function OpenTranslationToolbarButton(props) {
                     closeRemoveDialog();
                     if (!removedWhatWeWerePreviewing) return [3 /*break*/, 9];
                     parentCandidate = parentWebsiteIndexStorePath(pagePath);
-                    _e.label = 3;
+                    _f.label = 3;
                 case 3:
                     if (!parentCandidate) return [3 /*break*/, 7];
                     return [4 /*yield*/, StudioAPI.contentExists(authoringBase, siteId, parentCandidate)];
                 case 4:
-                    if (!_e.sent()) return [3 /*break*/, 6];
+                    if (!_f.sent()) return [3 /*break*/, 6];
                     previewUrl = storePathToPreviewPath(parentCandidate);
                     if (previewUrl) {
                         dispatch(changeCurrentUrl(previewUrl));
@@ -17299,7 +17401,7 @@ function OpenTranslationToolbarButton(props) {
                     }
                     return [4 /*yield*/, loadTargets()];
                 case 5:
-                    _e.sent();
+                    _f.sent();
                     return [2 /*return*/];
                 case 6:
                     parentCandidate = parentWebsiteIndexStorePath(parentCandidate);
@@ -17308,14 +17410,15 @@ function OpenTranslationToolbarButton(props) {
                     dispatch(goToLastPage());
                     return [4 /*yield*/, loadTargets()];
                 case 8:
-                    _e.sent();
+                    _f.sent();
                     return [2 /*return*/];
                 case 9: return [4 /*yield*/, loadTargets()];
                 case 10:
-                    _e.sent();
+                    _f.sent();
                     return [3 /*break*/, 12];
                 case 11:
-                    _e.sent();
+                    _f.sent();
+                    refreshSidebarTrees(dispatch, prunedTreeIds);
                     dispatch(showSystemNotification({
                         message: 'Remove translation failed (network).'
                     }));
@@ -17410,16 +17513,27 @@ function OpenTranslationToolbarButton(props) {
         var hideEdit = normalizeRepoPath(path) === normalizeRepoPath((_a = sourceItem === null || sourceItem === void 0 ? void 0 : sourceItem.path) !== null && _a !== void 0 ? _a : '');
         scheduleEnforceAllowedItemsInMegaMenu(hideEdit);
     };
-    // Only show the button once this page's locales are known; pages outside a locale folder
-    // (e.g. the global home) have nothing to translate to.
-    var showButton = Boolean(sourceItem === null || sourceItem === void 0 ? void 0 : sourceItem.path) && rowsPath === (sourceItem === null || sourceItem === void 0 ? void 0 : sourceItem.path) && rows.length > 0;
+    // Rows are only trusted for the page they were loaded for; until then the button stays disabled.
+    var currentPath = (sourceItem === null || sourceItem === void 0 ? void 0 : sourceItem.path) || null;
+    var pageLoaded = Boolean(currentPath) && rowsPath === currentPath;
+    var pageLoading = Boolean(currentPath) && !pageLoaded;
+    var canOpen = pageLoaded && rows.length > 0;
+    var buttonTooltip = disabledCore
+        ? 'Select an item in preview'
+        : pageLoading
+            ? 'Loading translations…'
+            : loadFailed
+                ? "Couldn't load translations for this page"
+                : rows.length === 0
+                    ? "This page isn't part of a translated section"
+                    : tooltip;
     useEffect(function () {
-        if (!showButton) {
+        if (!canOpen) {
             setAnchorEl(null);
         }
-    }, [showButton]);
-    return (jsxs(Fragment, { children: [showButton ? (jsxs(Fragment, { children: [jsx(Tooltip$1, { title: tooltip, children: jsx("span", { children: jsx(IconButton, { size: buttonSize, onClick: openMenu, disabled: disabledCore || copyBusy, "aria-label": tooltip, "aria-haspopup": "true", "aria-expanded": menuOpen ? 'true' : undefined, children: copyBusy || (loading && menuOpen) ? (jsx(CircularProgress$1, { size: buttonSize === 'small' ? 18 : 22 })) : (jsx(SystemIcon, { icon: icon })) }) }) }), jsx(Menu, { anchorEl: anchorEl, open: menuOpen, onClose: closeMenu, anchorOrigin: { vertical: 'bottom', horizontal: 'right' }, transformOrigin: { vertical: 'top', horizontal: 'right' }, PaperProps: { sx: { minWidth: 220 } }, children: rows.map(function (o) {
-                            var showRemove = o.exists && !o.isSource && isPageRepoPath(o.targetFilePath);
+    }, [canOpen]);
+    return (jsxs(Fragment, { children: [translationConfigured ? (jsxs(Fragment, { children: [jsx(Tooltip$1, { title: buttonTooltip, children: jsx("span", { children: jsx(IconButton, { size: buttonSize, onClick: openMenu, disabled: !canOpen || copyBusy, "aria-label": tooltip, "aria-haspopup": "true", "aria-expanded": menuOpen ? 'true' : undefined, children: copyBusy || pageLoading || (loading && menuOpen) ? (jsx(CircularProgress$1, { size: buttonSize === 'small' ? 18 : 22 })) : (jsx(SystemIcon, { icon: icon })) }) }) }), jsx(Menu, { anchorEl: anchorEl, open: menuOpen, onClose: closeMenu, anchorOrigin: { vertical: 'bottom', horizontal: 'right' }, transformOrigin: { vertical: 'top', horizontal: 'right' }, PaperProps: { sx: { minWidth: 220 } }, children: rows.map(function (o) {
+                            var showRemove = allowRemoveFromScope && o.exists && !o.isSource && isPageRepoPath(o.targetFilePath);
                             return (jsxs(MenuItem, { dense: true, disabled: copyBusy, onClick: o.exists ? function () { return openPreview(o.targetFilePath); } : undefined, sx: { py: 1 }, children: [jsxs(Box, { component: "span", sx: {
                                             display: 'inline-flex',
                                             alignItems: 'center',
@@ -18800,7 +18914,7 @@ function A11yToolbar() {
                         })) : (jsx(ListItem, { sx: { py: 1.5, px: 2 }, children: jsx(ListItemText$1, { primary: jsx(Typography$1, { variant: "body2", color: "text.secondary", children: errorMsg || 'No rule results. Run the check again.' }) }) })) })] })] }));
 }
 
-var buildInfo = {"version":"1.0.112","commit":"d7ebe03-dirty","builtAt":"2026-10-09T19:01:15.082Z"};
+var buildInfo = {"version":"1.0.115","commit":"4c7c8a1-dirty","builtAt":"2026-10-09T19:40:51.428Z"};
 
 function formatBuiltAt(iso) {
     var date = new Date(iso);

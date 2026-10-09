@@ -189,18 +189,23 @@ export function OpenTranslationToolbarButton(props: {
   const rowsPathRef = useRef<string | null>(null);
   rowsPathRef.current = rowsPath;
   const [loading, setLoading] = useState(false);
+  /** Last request for `rowsPath` failed (as opposed to the page having no translations). */
+  const [loadFailed, setLoadFailed] = useState(false);
+  /** null until the first response; the button is only rendered for projects with locales configured. */
+  const [translationConfigured, setTranslationConfigured] = useState<boolean | null>(null);
+  const [allowRemoveFromScope, setAllowRemoveFromScope] = useState(true);
   const [copyBusy, setCopyBusy] = useState(false);
   /** Existing base-language variant of the previewed item; translations are copied from it when present. */
   const baseCopySourceRef = useRef<string | null>(null);
   const [removeDialog, setRemoveDialog] = useState<RemoveDialogState>(null);
   const loadSeqRef = useRef(0);
 
-  /** One server call: every locale variant of the previewed item (empty when it is not under a locale). */
+  /** One server call: config + every locale variant of the previewed item (none when it is not under a locale). */
   const loadTargets = useCallback(async () => {
     const seq = ++loadSeqRef.current;
     const base = authoringBase || '';
     const path = sourceItem?.path || null;
-    if (!siteId || !base || !path) {
+    if (!siteId || !base) {
       setRows([]);
       setRowsPath(null);
       setLoading(false);
@@ -214,15 +219,25 @@ export function OpenTranslationToolbarButton(props: {
         return;
       }
       if (!res) {
-        // Failed request: keep what we already know about this page rather than hiding the button.
-        if (rowsPathRef.current !== path) {
+        // Failed request: keep what we already know about this page.
+        if (path && rowsPathRef.current !== path) {
           setRows([]);
           setRowsPath(path);
+          setLoadFailed(true);
           baseCopySourceRef.current = null;
         }
         return;
       }
       const cfg = res.config;
+      setTranslationConfigured(hasConfiguredTranslationLocales(cfg));
+      setAllowRemoveFromScope(res.allowRemoveFromScope);
+      setLoadFailed(false);
+      if (!path) {
+        setRows([]);
+        setRowsPath(null);
+        baseCopySourceRef.current = null;
+        return;
+      }
       const locales = res.relativeUnderLocale && hasConfiguredTranslationLocales(cfg) ? res.locales : [];
       if (locales.length < 2) {
         setRows([]);
@@ -451,31 +466,42 @@ export function OpenTranslationToolbarButton(props: {
     scheduleEnforceAllowedItemsInMegaMenu(hideEdit);
   };
 
-  // Only show the button once this page's locales are known; pages outside a locale folder
-  // (e.g. the global home) have nothing to translate to.
-  const showButton = Boolean(sourceItem?.path) && rowsPath === sourceItem?.path && rows.length > 0;
+  // Rows are only trusted for the page they were loaded for; until then the button stays disabled.
+  const currentPath = sourceItem?.path || null;
+  const pageLoaded = Boolean(currentPath) && rowsPath === currentPath;
+  const pageLoading = Boolean(currentPath) && !pageLoaded;
+  const canOpen = pageLoaded && rows.length > 0;
+  const buttonTooltip = disabledCore
+    ? 'Select an item in preview'
+    : pageLoading
+      ? 'Loading translations…'
+      : loadFailed
+        ? "Couldn't load translations for this page"
+        : rows.length === 0
+          ? "This page isn't part of a translated section"
+          : tooltip;
 
   useEffect(() => {
-    if (!showButton) {
+    if (!canOpen) {
       setAnchorEl(null);
     }
-  }, [showButton]);
+  }, [canOpen]);
 
   return (
     <>
-      {showButton ? (
+      {translationConfigured ? (
         <>
-      <Tooltip title={tooltip}>
+      <Tooltip title={buttonTooltip}>
         <span>
           <IconButton
             size={buttonSize}
             onClick={openMenu}
-            disabled={disabledCore || copyBusy}
+            disabled={!canOpen || copyBusy}
             aria-label={tooltip}
             aria-haspopup="true"
             aria-expanded={menuOpen ? 'true' : undefined}
           >
-            {copyBusy || (loading && menuOpen) ? (
+            {copyBusy || pageLoading || (loading && menuOpen) ? (
               <CircularProgress size={buttonSize === 'small' ? 18 : 22} />
             ) : (
               <SystemIcon icon={icon} />
@@ -492,7 +518,7 @@ export function OpenTranslationToolbarButton(props: {
         PaperProps={{ sx: { minWidth: 220 } }}
       >
         {rows.map((o) => {
-            const showRemove = o.exists && !o.isSource && isPageRepoPath(o.targetFilePath);
+            const showRemove = allowRemoveFromScope && o.exists && !o.isSource && isPageRepoPath(o.targetFilePath);
             return (
             <MenuItem
               key={o.locale}
